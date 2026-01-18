@@ -415,6 +415,57 @@ export const siteConfig = {
 } as const;
 ```
 
+### 6.3 年次更新対応（第98回以降の使い回し設計）
+
+本プロジェクトは、第97回のWebサイトとして開発されますが、来年（第98回）以降も**ロジックとレイアウトを使い回す**前提で設計されています。
+
+#### 年次更新の基本方針
+
+- **ロジック・デザインは不変**: UIコンポーネント、ページ構成、機能ロジックは原則として変更しない
+- **コンテンツのみ差し替え**: 年度情報、画像パス、テキストのみを更新
+- **一元管理**: 年度情報は `/src/data/site.ts` で一元管理し、他のファイルで参照
+
+#### 年次更新時に更新すべきファイル
+
+1. **`/src/data/site.ts`** - サイト基本情報（年度、開催日、テーマカラー等）
+2. **`/src/data/navigation.ts`** - 必要に応じてメニュー項目を調整
+3. **`/src/data/buildings.ts`** - 建物情報（変更がある場合のみ）
+4. **`/src/data/facilities.ts`** - 施設情報（変更がある場合のみ）
+5. **`/src/data/access.ts`** - アクセス情報（変更がある場合のみ）
+6. **`/src/data/guide.ts`** - 注意事項等（変更がある場合のみ）
+7. **`/src/assets/images/`** - 画像ファイルの差し替え
+8. **`/src/assets/videos/`** - 動画ファイルの差し替え
+9. **microCMS** - News, Events, Informations APIのコンテンツを削除・再投稿
+
+#### 年度情報の一元管理
+
+`/src/data/site.ts` で年度情報を一元管理し、他のファイルやコンポーネントで参照：
+
+```typescript
+// /src/data/site.ts
+export const siteConfig = {
+  edition: 97,  // 第X回
+  name: `東京都市大学 第${97}回 世田谷祭`,
+  shortName: '世田谷祭',
+  dates: {
+    day1: '2026-10-31',
+    day2: '2026-11-01',
+  },
+  // ...
+} as const;
+```
+
+**年次更新時**: `edition` と `dates` のみを変更すれば、他のコンポーネントで自動的に反映される設計とする。
+
+#### 年次更新のチェックリスト
+
+- [ ] `/src/data/site.ts` の `edition` と `dates` を更新
+- [ ] `/src/assets/images/` の画像を差し替え
+- [ ] `/src/assets/videos/` の動画を差し替え
+- [ ] microCMS の過去データを削除（または非公開化）
+- [ ] microCMS に新年度のデータを投稿
+- [ ] ビルド・デプロイして動作確認
+
 ---
 
 ## 7. 非機能要件
