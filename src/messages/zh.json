@@ -1,0 +1,7 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "error": "发生错误",
+    "notFound": "未找到页面"
+  }
+}
