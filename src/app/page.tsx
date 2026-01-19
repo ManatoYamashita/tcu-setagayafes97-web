@@ -1,25 +1,57 @@
-import { siteConfig } from "@/data/site";
+import { HeroSection } from "@/components/home/HeroSection";
+import { CountdownTimer } from "@/components/home/CountdownTimer";
+import { EventOverview } from "@/components/home/EventOverview";
+import { NewsSection } from "@/components/home/NewsSection";
+import { FeaturedEvents } from "@/components/home/FeaturedEvents";
+import { SponsorBanner } from "@/components/home/SponsorBanner";
+import { StartupAnimation } from "@/components/home/StartupAnimation";
+import { ScrollAnimation } from "@/components/animation/ScrollAnimation";
 
+/**
+ * トップページ
+ * 第97回世田谷祭の公式Webサイト
+ */
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm">
-        <h1 className="mb-8 text-center text-5xl font-bold text-primary">{siteConfig.name}</h1>
+    <>
+      {/* 起動アニメーション（初回訪問時のみ） */}
+      <StartupAnimation />
 
-        <div className="mb-8 text-center">
-          <p className="mb-2 text-xl">第{siteConfig.edition}回</p>
-          <p className="text-gray-600">
-            {siteConfig.dates.day1} - {siteConfig.dates.day2}
-          </p>
-          <p className="mt-4 text-gray-600">{siteConfig.venue}</p>
-        </div>
+      {/* メインコンテンツ */}
+      <ScrollAnimation>
+        <main>
+          {/* ヒーローセクション */}
+          <HeroSection />
 
-        <div className="mt-16 text-center">
-          <p className="text-lg text-gray-500">
-            セットアップが完了しました。開発を開始してください。
-          </p>
-        </div>
-      </div>
-    </main>
+          {/* カウントダウンタイマー（スクロールアニメーション適用） */}
+          <div data-scroll>
+            <CountdownTimer />
+          </div>
+
+          {/* 開催概要（スクロールアニメーション適用） */}
+          <div data-scroll>
+            <EventOverview />
+          </div>
+
+          {/* お知らせ（スクロールアニメーション適用） */}
+          <div data-scroll>
+            <NewsSection />
+          </div>
+
+          {/* おすすめ企画（スクロールアニメーション適用） */}
+          <div data-scroll>
+            <FeaturedEvents />
+          </div>
+
+          {/* 協賛企業（スクロールアニメーション適用） */}
+          <div data-scroll>
+            <SponsorBanner />
+          </div>
+        </main>
+      </ScrollAnimation>
+    </>
   );
 }
+
+// ISR設定: 1時間ごとに再検証
+export const revalidate = 3600;

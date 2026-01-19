@@ -1,0 +1,51 @@
+{
+  "apiFields": [
+    {
+      "fieldId": "type",
+      "name": "お知らせ種別",
+      "kind": "select",
+      "required": true,
+      "multipleSelect": false,
+      "selectInitialValue": null,
+      "selectItems": [
+        {
+          "id": "urgent_001",
+          "value": "urgent"
+        },
+        {
+          "id": "news_002",
+          "value": "news"
+        },
+        {
+          "id": "other_003",
+          "value": "other"
+        }
+      ]
+    },
+    {
+      "fieldId": "title",
+      "name": "タイトル",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "thumbnail",
+      "name": "サムネイル画像",
+      "kind": "media",
+      "required": false
+    },
+    {
+      "fieldId": "description",
+      "name": "概要",
+      "kind": "textArea",
+      "required": true
+    },
+    {
+      "fieldId": "content",
+      "name": "本文",
+      "kind": "richEditorV2",
+      "required": true
+    }
+  ],
+  "customFields": []
+}

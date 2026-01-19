@@ -1,0 +1,75 @@
+{
+  "apiFields": [
+    {
+      "fieldId": "category",
+      "name": "カテゴリ",
+      "kind": "select",
+      "required": true,
+      "multipleSelect": false,
+      "selectInitialValue": null,
+      "selectItems": [
+        {
+          "id": "sponsor_001",
+          "value": "sponsor"
+        },
+        {
+          "id": "faq_002",
+          "value": "faq"
+        },
+        {
+          "id": "other_003",
+          "value": "other"
+        }
+      ]
+    },
+    {
+      "fieldId": "title",
+      "name": "タイトル",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "sponsorName",
+      "name": "協賛企業名",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "sponsorDescription",
+      "name": "協賛企業説明",
+      "kind": "textArea",
+      "required": false
+    },
+    {
+      "fieldId": "logo",
+      "name": "ロゴ画像",
+      "kind": "media",
+      "required": false
+    },
+    {
+      "fieldId": "url",
+      "name": "URL",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "priority",
+      "name": "表示優先度",
+      "kind": "number",
+      "required": false
+    },
+    {
+      "fieldId": "question",
+      "name": "質問（FAQ用）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "answer",
+      "name": "回答（FAQ用）",
+      "kind": "richEditorV2",
+      "required": false
+    }
+  ],
+  "customFields": []
+}

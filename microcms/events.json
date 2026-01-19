@@ -1,0 +1,143 @@
+{
+  "apiFields": [
+    {
+      "fieldId": "date",
+      "name": "開催日",
+      "kind": "select",
+      "required": true,
+      "multipleSelect": false,
+      "selectInitialValue": null,
+      "selectItems": [
+        {
+          "id": "day1_001",
+          "value": "day1"
+        },
+        {
+          "id": "day2_002",
+          "value": "day2"
+        },
+        {
+          "id": "both_003",
+          "value": "both"
+        },
+        {
+          "id": "other_004",
+          "value": "other"
+        }
+      ]
+    },
+    {
+      "fieldId": "type",
+      "name": "企画種別",
+      "kind": "select",
+      "required": true,
+      "multipleSelect": false,
+      "selectInitialValue": null,
+      "selectItems": [
+        {
+          "id": "room_001",
+          "value": "room"
+        },
+        {
+          "id": "stage_002",
+          "value": "stage"
+        },
+        {
+          "id": "special_003",
+          "value": "special"
+        },
+        {
+          "id": "other_004",
+          "value": "other"
+        }
+      ]
+    },
+    {
+      "fieldId": "place",
+      "name": "場所（教室番号等）",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "building",
+      "name": "建物名",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "title",
+      "name": "企画タイトル",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "organizer",
+      "name": "主催団体名",
+      "kind": "text",
+      "required": true
+    },
+    {
+      "fieldId": "thumbnail",
+      "name": "サムネイル画像",
+      "kind": "media",
+      "required": false
+    },
+    {
+      "fieldId": "description",
+      "name": "企画概要",
+      "kind": "textArea",
+      "required": true
+    },
+    {
+      "fieldId": "content",
+      "name": "詳細説明",
+      "kind": "richEditorV2",
+      "required": true
+    },
+    {
+      "fieldId": "startTime",
+      "name": "開始時刻（HH:mm）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "endTime",
+      "name": "終了時刻（HH:mm）",
+      "kind": "text",
+      "required": false
+    },
+    {
+      "fieldId": "sns",
+      "name": "SNS情報",
+      "kind": "custom",
+      "customFieldId": "sns_links",
+      "required": false
+    }
+  ],
+  "customFields": [
+    {
+      "fieldId": "sns_links",
+      "name": "SNSリンク",
+      "fields": [
+        {
+          "fieldId": "twitter",
+          "name": "Twitter（X）",
+          "kind": "text",
+          "required": false
+        },
+        {
+          "fieldId": "instagram",
+          "name": "Instagram",
+          "kind": "text",
+          "required": false
+        },
+        {
+          "fieldId": "website",
+          "name": "Webサイト",
+          "kind": "text",
+          "required": false
+        }
+      ]
+    }
+  ]
+}
