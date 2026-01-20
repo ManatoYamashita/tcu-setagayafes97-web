@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+dist
+build
+.cache
+public
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+*.log
+.env*
+!.env.local.example
