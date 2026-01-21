@@ -160,4 +160,163 @@ export const mockEvents: Event[] = [
       website: "https://programming-club.example.com",
     },
   },
+  // 追加のステージ企画（タイムテーブル検証用）
+  {
+    id: "event-007",
+    createdAt: "2026-09-10T10:00:00.000Z",
+    updatedAt: "2026-09-10T10:00:00.000Z",
+    publishedAt: "2026-09-10T10:00:00.000Z",
+    date: "day1",
+    type: "stage",
+    place: "7号館A（7A）",
+    building: "7号館",
+    title: "アカペラライブ 〜Harmony Voices〜",
+    organizer: "アカペラサークル Harmony",
+    thumbnail: {
+      url: "/images/placeholder/event-07.jpg",
+      height: 800,
+      width: 1200,
+    },
+    description:
+      "学内アカペラサークルによる美しいハーモニーをお届けします。J-POPからクラシックまで、幅広いジャンルをカバー。",
+    content:
+      "学内アカペラサークルHarmonyによる圧巻のステージパフォーマンス。人の声だけで奏でる音楽の素晴らしさを体感してください。J-POPの人気曲からクラシックの名曲まで、幅広いレパートリーをお楽しみいただけます。",
+    startTime: "11:00",
+    endTime: "11:45",
+    sns: {
+      twitter: "https://twitter.com/tcu_harmony",
+      instagram: "https://instagram.com/tcu_harmony",
+    },
+  },
+  {
+    id: "event-008",
+    createdAt: "2026-09-10T10:00:00.000Z",
+    updatedAt: "2026-09-10T10:00:00.000Z",
+    publishedAt: "2026-09-10T10:00:00.000Z",
+    date: "day2",
+    type: "stage",
+    place: "7号館B（7B）",
+    building: "7号館",
+    title: "バンドコンテスト 〜ROCK THE CAMPUS〜",
+    organizer: "軽音楽サークル連合",
+    thumbnail: {
+      url: "/images/placeholder/event-08.jpg",
+      height: 800,
+      width: 1200,
+    },
+    description:
+      "学内バンドサークルによる本格ライブコンテスト。ロック、ポップス、メタルなど、多彩なバンドが熱いステージを繰り広げます。",
+    content:
+      "学内の軽音楽サークルから選抜された8組のバンドが出演する大型ライブイベント。オリジナル曲からカバー曲まで、バラエティ豊かな音楽をお楽しみいただけます。来場者投票で優勝バンドを決定します。",
+    startTime: "13:00",
+    endTime: "16:00",
+    sns: {
+      twitter: "https://twitter.com/tcu_keion",
+      website: "https://keion.example.com",
+    },
+  },
+  {
+    id: "event-009",
+    createdAt: "2026-09-10T10:00:00.000Z",
+    updatedAt: "2026-09-10T10:00:00.000Z",
+    publishedAt: "2026-09-10T10:00:00.000Z",
+    date: "day1",
+    type: "stage",
+    place: "体育館",
+    building: "体育館",
+    title: "よさこいソーラン演舞",
+    organizer: "よさこいソーランサークル 彩",
+    thumbnail: {
+      url: "/images/placeholder/event-09.jpg",
+      height: 800,
+      width: 1200,
+    },
+    description:
+      "迫力満点のよさこいソーラン演舞。色とりどりの衣装と力強い踊りで、会場を盛り上げます。",
+    content:
+      "よさこいソーランサークル「彩」による迫力満点のステージパフォーマンス。半年間練習を重ねてきた渾身の演舞をご覧ください。伝統的なよさこいソーランから現代風アレンジまで、多彩な演目を披露します。",
+    startTime: "12:00",
+    endTime: "12:40",
+    sns: {
+      instagram: "https://instagram.com/tcu_yosakoi",
+    },
+  },
+  {
+    id: "event-010",
+    createdAt: "2026-09-10T10:00:00.000Z",
+    updatedAt: "2026-09-10T10:00:00.000Z",
+    publishedAt: "2026-09-10T10:00:00.000Z",
+    date: "both",
+    type: "stage",
+    place: "ホール",
+    building: "ホール",
+    title: "演劇公演『青春の一ページ』",
+    organizer: "演劇サークル Stage Craft",
+    thumbnail: {
+      url: "/images/placeholder/event-10.jpg",
+      height: 800,
+      width: 1200,
+    },
+    description:
+      "大学生活をテーマにした感動のオリジナル演劇。笑いあり涙ありの青春ストーリーをお届けします。",
+    content:
+      "演劇サークルStage Craftが贈る完全オリジナル脚本の舞台公演。大学生活の喜び、悩み、友情、恋愛を描いた心温まる青春ストーリー。プロの演出家による指導のもと、3ヶ月間稽古を重ねてきた渾身の作品です。両日とも公演いたします。",
+    startTime: "15:00",
+    endTime: "16:30",
+    sns: {
+      twitter: "https://twitter.com/tcu_stagecraft",
+      website: "https://stagecraft.example.com",
+    },
+  },
+  {
+    id: "event-011",
+    createdAt: "2026-09-10T10:00:00.000Z",
+    updatedAt: "2026-09-10T10:00:00.000Z",
+    publishedAt: "2026-09-10T10:00:00.000Z",
+    date: "day2",
+    type: "stage",
+    place: "中庭特設ステージ",
+    building: "中庭",
+    title: "ジャズコンサート 〜Autumn Jazz Night〜",
+    organizer: "ジャズ研究会",
+    thumbnail: {
+      url: "/images/placeholder/event-11.jpg",
+      height: 800,
+      width: 1200,
+    },
+    description:
+      "秋の夜長にぴったりのジャズコンサート。スタンダードナンバーから現代ジャズまで、大人の音楽をお楽しみください。",
+    content:
+      "ジャズ研究会による本格ジャズコンサート。トランペット、サックス、ピアノ、ベース、ドラムによる5人編成で、ジャズの名曲を演奏します。秋の爽やかな風を感じながら、優雅なジャズサウンドに酔いしれてください。",
+    startTime: "16:30",
+    endTime: "17:30",
+    sns: {
+      instagram: "https://instagram.com/tcu_jazz",
+    },
+  },
+  {
+    id: "event-012",
+    createdAt: "2026-09-10T10:00:00.000Z",
+    updatedAt: "2026-09-10T10:00:00.000Z",
+    publishedAt: "2026-09-10T10:00:00.000Z",
+    date: "day1",
+    type: "stage",
+    place: "7号館A（7A）",
+    building: "7号館",
+    title: "落語研究会 寄席",
+    organizer: "落語研究会",
+    thumbnail: {
+      url: "/images/placeholder/event-12.jpg",
+      height: 800,
+      width: 1200,
+    },
+    description: "学生による本格落語公演。古典落語から創作落語まで、笑いの世界をお楽しみください。",
+    content:
+      "落語研究会による学生寄席を開催します。プロの落語家から指導を受けた学生たちが、古典落語の名作から、現代風にアレンジした創作落語まで披露。日本の伝統芸能の魅力を存分にお楽しみください。",
+    startTime: "13:00",
+    endTime: "14:00",
+    sns: {
+      twitter: "https://twitter.com/tcu_rakugo",
+    },
+  },
 ];
