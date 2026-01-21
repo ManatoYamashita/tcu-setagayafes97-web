@@ -51,29 +51,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 開発フロー
 
-### セットアップ（予定）
+### セットアップ
 
 ```bash
 # 依存パッケージインストール
-npm install
+pnpm install
 
 # 開発サーバー起動
-npm run dev
+pnpm dev
 
 # ビルド
-npm run build
+pnpm build
 
 # プロダクションサーバー起動
-npm start
+pnpm start
 
 # Lintチェック
-npm run lint
+pnpm lint
 
 # フォーマットチェック
-npm run format:check
+pnpm format:check
 
 # フォーマット自動修正
-npm run format
+pnpm format
 ```
 
 ### ブランチ戦略

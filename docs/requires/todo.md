@@ -28,7 +28,7 @@
 - [ ] Next.js 16.1プロジェクトを初期化（`npx create-next-app@latest`）
 - [ ] TypeScript設定を構成（`tsconfig.json`の最適化）
 - [ ] TailwindCSSをインストール・設定（`tailwind.config.ts`、`globals.css`）
-- [ ] GSAPをインストール（`npm install gsap`）
+- [ ] GSAPをインストール（`pnpm add gsap`）
 - [ ] package.jsonのscriptsセクションを設定（dev, build, start, lint, format等）
 - [ ] ESLintを設定（`.eslintrc.json`の最適化）
 - [ ] Prettierを設定（`.prettierrc`、`.prettierignore`）
@@ -324,10 +324,10 @@
 
 #### ステップ5: 動作確認・デプロイ
 
-1. ローカル環境で `npm run dev` を実行
+1. ローカル環境で `pnpm dev` を実行
 2. トップページ、企画一覧、タイムテーブル等の主要ページを確認
 3. 年度情報が正しく反映されているか確認
-4. ビルド（`npm run build`）を実行してエラーがないか確認
+4. ビルド（`pnpm build`）を実行してエラーがないか確認
 5. Vercel にデプロイ
 6. 本番環境で最終確認
 
