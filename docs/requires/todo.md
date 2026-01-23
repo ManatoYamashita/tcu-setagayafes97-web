@@ -12,12 +12,12 @@
 ## 進捗状況
 
 - **全タスク数**: 152
-- **完了**: 0
+- **完了**: 82
 - **進行中**: 0
-- **未着手**: 152
-- **進捗率**: 0%
+- **未着手**: 70
+- **進捗率**: 53.9%
 
-最終更新日: 2026-01-18
+最終更新日: 2026-01-23
 
 ---
 
@@ -25,19 +25,19 @@
 
 ### 1. セットアップ・環境構築
 
-- [ ] Next.js 16.1プロジェクトを初期化（`npx create-next-app@latest`）
-- [ ] TypeScript設定を構成（`tsconfig.json`の最適化）
-- [ ] TailwindCSSをインストール・設定（`tailwind.config.ts`、`globals.css`）
-- [ ] GSAPをインストール（`pnpm add gsap`）
-- [ ] package.jsonのscriptsセクションを設定（dev, build, start, lint, format等）
-- [ ] ESLintを設定（`.eslintrc.json`の最適化）
-- [ ] Prettierを設定（`.prettierrc`、`.prettierignore`）
-- [ ] プロジェクトディレクトリ構造を構築（`/src/app`, `/src/components`, `/src/data`, `/src/lib`, `/src/messages`, `/src/assets`）
-- [ ] `.gitignore`を設定（node_modules, .next, .env.local等）
+- [x] Next.js 16.1プロジェクトを初期化（`npx create-next-app@latest`）
+- [x] TypeScript設定を構成（`tsconfig.json`の最適化）
+- [x] TailwindCSSをインストール・設定（`tailwind.config.ts`、`globals.css`）
+- [x] GSAPをインストール（`pnpm add gsap`）
+- [x] package.jsonのscriptsセクションを設定（dev, build, start, lint, format等）
+- [x] ESLintを設定（`.eslintrc.json`の最適化）
+- [x] Prettierを設定（`.prettierrc`、`.prettierignore`）
+- [x] プロジェクトディレクトリ構造を構築（`/src/app`, `/src/components`, `/src/data`, `/src/lib`, `/src/messages`, `/src/assets`）
+- [x] `.gitignore`を設定（node_modules, .next, .env.local等）
 - [ ] `.env.local.example`を作成（環境変数のテンプレート）
-- [ ] GitHub Actionsワークフローファイルを作成（`.github/workflows/feature-ci.yml`）
-- [ ] Git hooksを設定（husky + lint-staged）
-- [ ] VSCode設定ファイルを作成（`.vscode/settings.json`, `.vscode/extensions.json`）
+- [x] GitHub Actionsワークフローファイルを作成（`.github/workflows/feature-ci.yml`）
+- [x] Git hooksを設定（husky + lint-staged）
+- [x] VSCode設定ファイルを作成（`.vscode/settings.json`, `.vscode/extensions.json`）
 - [ ] README.mdを更新（セットアップ手順、開発コマンド等）
 
 ### 2. microCMS設定
@@ -47,45 +47,45 @@
 - [ ] News APIを設計・作成（フィールド: type, title, thumbnail, description, content）
 - [ ] Events APIを設計・作成（フィールド: date, type, place, building, title, organizer, thumbnail, description, content, startTime, endTime, sns）
 - [ ] Informations APIを設計・作成（フィールド: category, title, sponsorName, sponsorDescription, logo, url, priority）
-- [ ] microCMS APIキーを取得（`.env.local`に設定）
-- [ ] microCMS SDK（`microcms-js-sdk`）をインストール
-- [ ] microCMSクライアントを実装（`/src/lib/microcms.ts`）
-- [ ] News API型定義ファイルを作成（`/src/types/news.ts`）
-- [ ] Events API型定義ファイルを作成（`/src/types/events.ts`）
-- [ ] Informations API型定義ファイルを作成（`/src/types/informations.ts`）
-- [ ] microCMS APIテストデータを投稿（各API 3件程度のダミーデータ）
+- [x] microCMS APIキーを取得（`.env.local`に設定）
+- [x] microCMS SDK（`microcms-js-sdk`）をインストール
+- [x] microCMSクライアントを実装（`/src/lib/microcms.ts`）
+- [x] News API型定義ファイルを作成（`/src/types/news.ts`）
+- [x] Events API型定義ファイルを作成（`/src/types/events.ts`）
+- [x] Informations API型定義ファイルを作成（`/src/types/informations.ts`）
+- [x] microCMS APIテストデータを投稿（各API 3件程度のダミーデータ）
 
 ### 3. 基本レイアウト・共通コンポーネント
 
-- [ ] Headerコンポーネントを作成（`/src/components/layout/Header.tsx`）
-- [ ] Footerコンポーネントを作成（`/src/components/layout/Footer.tsx`）
+- [x] Headerコンポーネントを作成（`/src/components/layout/Header.tsx`）
+- [x] Footerコンポーネントを作成（`/src/components/layout/Footer.tsx`）
 - [ ] Navigationコンポーネントを作成（`/src/components/layout/Navigation.tsx`）
 - [ ] モバイルメニューコンポーネントを作成（ハンバーガーメニュー）
-- [ ] Loadingコンポーネントを作成（`/src/components/ui/Loading.tsx`）
-- [ ] Errorコンポーネントを作成（`/src/components/ui/Error.tsx`）
-- [ ] Buttonコンポーネントを作成（再利用可能な汎用ボタン）
-- [ ] Cardコンポーネントを作成（企画カード等で使用）
+- [x] Loadingコンポーネントを作成（`/src/components/ui/Loading.tsx`）
+- [x] Errorコンポーネントを作成（`/src/components/ui/Error.tsx`）
+- [x] Buttonコンポーネントを作成（再利用可能な汎用ボタン）
+- [x] Cardコンポーネントを作成（企画カード等で使用）
 - [ ] Modalコンポーネントを作成（汎用モーダル）
-- [ ] Badgeコンポーネントを作成（カテゴリバッジ等）
-- [ ] SEO用Metadataコンポーネントを作成（`/src/components/seo/Metadata.tsx`）
-- [ ] 構造化データ（JSON-LD）コンポーネントを作成（イベント情報マークアップ）
+- [x] Badgeコンポーネントを作成（カテゴリバッジ等）
+- [x] SEO用Metadataコンポーネントを作成（`/src/components/seo/Metadata.tsx`）
+- [x] 構造化データ（JSON-LD）コンポーネントを作成（イベント情報マークアップ）
 - [ ] 多言語切替UIコンポーネントを作成（`/src/components/ui/LanguageSwitcher.tsx`）
 - [ ] Breadcrumbコンポーネントを作成（パンくずリスト）
-- [ ] ルートレイアウト（`/src/app/layout.tsx`）を実装（Header, Footer配置）
-- [ ] error.tsxを実装（エラーバウンダリ）
-- [ ] loading.tsxを実装（ローディング表示）
-- [ ] not-found.tsxを実装（404ページ）
+- [x] ルートレイアウト（`/src/app/layout.tsx`）を実装（Header, Footer配置）
+- [x] error.tsxを実装（エラーバウンダリ）
+- [x] loading.tsxを実装（ローディング表示）
+- [x] not-found.tsxを実装（404ページ）
 
 ### 4. 静的データ管理
 
-- [ ] サイト基本情報ファイルを作成（`/src/data/site.ts` - サイト名、開催日、会場、テーマカラー、SNSリンク等）
-- [ ] ナビゲーション構成ファイルを作成（`/src/data/navigation.ts` - メニュー項目、パス）
-- [ ] 建物情報ファイルを作成（`/src/data/buildings.ts` - 3Dマップ用、建物番号、名称、座標等）
-- [ ] 施設情報ファイルを作成（`/src/data/facilities.ts` - トイレ、案内所、休憩所等の位置情報）
-- [ ] アクセス情報ファイルを作成（`/src/data/access.ts` - 最寄り駅、ルート、駐車場情報）
-- [ ] ご来場の方へファイルを作成（`/src/data/guide.ts` - 注意事項、バリアフリー情報）
-- [ ] プライバシーポリシーファイルを作成（`/src/data/privacy.ts`）
-- [ ] 各データファイルの型定義を作成（TypeScript interface）
+- [x] サイト基本情報ファイルを作成（`/src/data/site.ts` - サイト名、開催日、会場、テーマカラー、SNSリンク等）
+- [x] ナビゲーション構成ファイルを作成（`/src/data/navigation.ts` - メニュー項目、パス）
+- [x] 建物情報ファイルを作成（`/src/data/buildings.ts` - 3Dマップ用、建物番号、名称、座標等）
+- [x] 施設情報ファイルを作成（`/src/data/facilities.ts` - トイレ、案内所、休憩所等の位置情報）
+- [x] アクセス情報ファイルを作成（`/src/data/access.ts` - 最寄り駅、ルート、駐車場情報）
+- [x] ご来場の方へファイルを作成（`/src/data/guide.ts` - 注意事項、バリアフリー情報）
+- [x] プライバシーポリシーファイルを作成（`/src/data/privacy.ts`）
+- [x] 各データファイルの型定義を作成（TypeScript interface）
 
 ---
 
@@ -93,47 +93,47 @@
 
 ### 5. トップページ実装
 
-- [ ] トップページルート（`/src/app/page.tsx`）を作成
-- [ ] 起動時アニメーションコンポーネントを実装（WebM動画再生、sessionStorage管理）
-- [ ] 起動アニメーションスキップボタンを実装（3秒以上の場合）
-- [ ] カウントダウンタイマーコンポーネントを実装（開催日までの日:時:分:秒）
-- [ ] カウントダウンロジックを実装（開催前/開催中/終了後の状態管理）
-- [ ] メインビジュアルセクションを実装（ヒーローイメージ、キャッチコピー）
-- [ ] 開催概要セクションを実装（開催日時、会場、テーマ）
-- [ ] Newsセクションを実装（microCMS News APIから最新3件取得）
-- [ ] おすすめ企画セクションを実装（Featured企画の表示）
-- [ ] 協賛バナーエリアを実装（ロゴスライダー、Informations APIから取得）
-- [ ] スクロールアニメーションを実装（GSAP ScrollTrigger使用）
-- [ ] トップページのレスポンシブ対応を実装
+- [x] トップページルート（`/src/app/page.tsx`）を作成
+- [x] 起動時アニメーションコンポーネントを実装（WebM動画再生、sessionStorage管理）
+- [x] 起動アニメーションスキップボタンを実装（3秒以上の場合）
+- [x] カウントダウンタイマーコンポーネントを実装（開催日までの日:時:分:秒）
+- [x] カウントダウンロジックを実装（開催前/開催中/終了後の状態管理）
+- [x] メインビジュアルセクションを実装（ヒーローイメージ、キャッチコピー）
+- [x] 開催概要セクションを実装（開催日時、会場、テーマ）
+- [x] Newsセクションを実装（microCMS News APIから最新3件取得）
+- [x] おすすめ企画セクションを実装（Featured企画の表示）
+- [x] 協賛バナーエリアを実装（ロゴスライダー、Informations APIから取得）
+- [x] スクロールアニメーションを実装（GSAP ScrollTrigger使用）
+- [x] トップページのレスポンシブ対応を実装
 
 ### 6. 企画機能実装
 
-- [ ] 企画一覧ページルート（`/src/app/events/page.tsx`）を作成
-- [ ] 企画詳細ページルート（`/src/app/events/[id]/page.tsx`）を作成（動的ルーティング）
-- [ ] microCMS Events APIからデータ取得ロジックを実装
-- [ ] 企画一覧カード表示を実装（サムネイル、タイトル、カテゴリバッジ、場所、日程）
-- [ ] 検索・絞り込みUIを実装（日程、場所、カテゴリ、キーワード）
-- [ ] フィルター機能のロジックを実装（クライアントサイドフィルタリング）
-- [ ] ページネーションコンポーネントを実装（または無限スクロール）
-- [ ] 企画詳細ページのレイアウトを実装（画像、説明、SNSリンク等）
+- [x] 企画一覧ページルート（`/src/app/events/page.tsx`）を作成
+- [x] 企画詳細ページルート（`/src/app/events/[id]/page.tsx`）を作成（動的ルーティング）
+- [x] microCMS Events APIからデータ取得ロジックを実装
+- [x] 企画一覧カード表示を実装（サムネイル、タイトル、カテゴリバッジ、場所、日程）
+- [x] 検索・絞り込みUIを実装（日程、場所、カテゴリ、キーワード）
+- [x] フィルター機能のロジックを実装（クライアントサイドフィルタリング）
+- [x] ページネーションコンポーネントを実装（または無限スクロール）
+- [x] 企画詳細ページのレイアウトを実装（画像、説明、SNSリンク等）
 - [ ] 「マップで見る」ボタンを実装（3Dマップへの遷移）
-- [ ] 企画データのISR設定を実装（revalidate設定）
-- [ ] 企画一覧のソート機能を実装（日程順、人気順等）
-- [ ] 企画検索結果の「該当なし」表示を実装
-- [ ] 企画一覧のローディング表示を実装
-- [ ] 企画詳細のOGP画像設定を実装（動的メタタグ）
-- [ ] 企画一覧・詳細のレスポンシブ対応を実装
+- [x] 企画データのISR設定を実装（revalidate設定）
+- [x] 企画一覧のソート機能を実装（日程順、人気順等）
+- [x] 企画検索結果の「該当なし」表示を実装
+- [x] 企画一覧のローディング表示を実装
+- [x] 企画詳細のOGP画像設定を実装（動的メタタグ）
+- [x] 企画一覧・詳細のレスポンシブ対応を実装
 
 ### 7. タイムテーブル実装
 
-- [ ] タイムテーブルページルート（`/src/app/timetable/page.tsx`）を作成
-- [ ] 縦型ガントチャートUIコンポーネントを作成
-- [ ] 日程切替タブを実装（Day1 / Day2）
-- [ ] ステージ切替タブを実装（7A, 7B, 体育館, ホール等）
-- [ ] イベントデータをmicroCMS Events APIから取得（type: stage のみ）
-- [ ] タイムラインのグリッド表示を実装（時間軸、ステージ軸）
-- [ ] イベントクリック時のモーダル表示を実装（または詳細ページ遷移）
-- [ ] タイムテーブルのレスポンシブ対応を実装（モバイルでは横スクロール）
+- [x] タイムテーブルページルート（`/src/app/timetable/page.tsx`）を作成
+- [x] 縦型ガントチャートUIコンポーネントを作成
+- [x] 日程切替タブを実装（Day1 / Day2）
+- [x] ステージ切替タブを実装（7A, 7B, 体育館, ホール等）
+- [x] イベントデータをmicroCMS Events APIから取得（type: stage のみ）
+- [x] タイムラインのグリッド表示を実装（時間軸、ステージ軸）
+- [x] イベントクリック時のモーダル表示を実装（または詳細ページ遷移）
+- [x] タイムテーブルのレスポンシブ対応を実装（モバイルでは横スクロール）
 
 ---
 
@@ -204,9 +204,9 @@
 
 ### 11. 多言語対応
 
-- [ ] next-intl（またはnext-i18next）をインストール
-- [ ] i18n設定ファイルを作成（サポート言語: ja, en, zh, ko）
-- [ ] 翻訳ファイルを作成（`/src/messages/ja.json`, `en.json`, `zh.json`, `ko.json`）
+- [x] next-intl（またはnext-i18next）をインストール
+- [x] i18n設定ファイルを作成（サポート言語: ja, en, zh, ko）
+- [x] 翻訳ファイルを作成（`/src/messages/ja.json`, `en.json`, `zh.json`, `ko.json`）
 - [ ] 固定ページの翻訳キーを定義（Header, Footer, Navigation等）
 - [ ] 多言語ルーティングを設定（`/[locale]`）
 - [ ] 言語切替UIを実装（LanguageSwitcherコンポーネント）
@@ -215,9 +215,9 @@
 
 ### 12. パフォーマンス最適化
 
-- [ ] 画像最適化を実装（Next.js Imageコンポーネント使用、WebP変換）
-- [ ] コード分割を実装（Dynamic Import、React.lazy）
-- [ ] ISR/SSG設定を最適化（各ページのrevalidate設定）
+- [x] 画像最適化を実装（Next.js Imageコンポーネント使用、WebP変換）
+- [x] コード分割を実装（Dynamic Import、React.lazy）
+- [x] ISR/SSG設定を最適化（各ページのrevalidate設定）
 - [ ] フォント最適化を実装（next/font使用、FOUT防止）
 - [ ] Lighthouse監査を実施（Performance, Accessibility, Best Practices, SEO）
 - [ ] Lighthouseスコア改善（Core Web Vitals改善）
@@ -227,8 +227,8 @@
 
 - [ ] クロスブラウザテスト（Chrome, Safari, Firefox, Edge）
 - [ ] レスポンシブ調整（モバイル、タブレット、デスクトップ）
-- [ ] メタタグ設定（title, description, OGP）を全ページに実装
-- [ ] 構造化データ（JSON-LD）を実装（イベント情報、組織情報）
+- [x] メタタグ設定（title, description, OGP）を全ページに実装
+- [x] 構造化データ（JSON-LD）を実装（イベント情報、組織情報）
 - [ ] sitemap.xmlを自動生成（next-sitemap使用）
 - [ ] robots.txtを設置
 - [ ] Vercel本番環境へデプロイ
@@ -347,4 +347,4 @@
 
 ---
 
-**最終更新日**: 2026-01-18
+**最終更新日**: 2026-01-23
