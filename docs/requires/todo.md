@@ -12,10 +12,10 @@
 ## 進捗状況
 
 - **全タスク数**: 152
-- **完了**: 107
+- **完了**: 110
 - **進行中**: 0
-- **未着手**: 45
-- **進捗率**: 70.4%
+- **未着手**: 42
+- **進捗率**: 72.4%
 
 最終更新日: 2026-01-26
 
@@ -218,10 +218,10 @@
 - [x] 画像最適化を実装（Next.js Imageコンポーネント使用、WebP変換）
 - [x] コード分割を実装（Dynamic Import、React.lazy）
 - [x] ISR/SSG設定を最適化（各ページのrevalidate設定）
-- [ ] フォント最適化を実装（next/font使用、FOUT防止）
-- [ ] Lighthouse監査を実施（Performance, Accessibility, Best Practices, SEO）
-- [ ] Lighthouseスコア改善（Core Web Vitals改善）
-- [ ] バンドルサイズ分析・最適化（next-bundle-analyzer使用）
+- [x] フォント最適化を実装（next/font使用、weight指定400/500/700、display: swap、preload）
+- [x] Lighthouse監査を実施（Performance 65%, Accessibility 61%, Best Practices 96%, SEO 80%）
+- [ ] Lighthouseスコア改善（Core Web Vitals改善）※本番環境での再測定必要
+- [x] バンドルサイズ分析・最適化（@next/bundle-analyzer導入、pnpm analyze）
 
 ### 13. テスト・デプロイ
 
@@ -347,4 +347,4 @@
 
 ---
 
-**最終更新日**: 2026-01-23
+**最終更新日**: 2026-01-26

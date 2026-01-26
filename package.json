@@ -9,7 +9,8 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "analyze": "ANALYZE=true next build --webpack"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -27,6 +28,7 @@
     "zod": "^4.3.5"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.1.4",
     "@types/node": "^20",
     "@types/nodemailer": "^7.0.5",
     "@types/react": "^19",
