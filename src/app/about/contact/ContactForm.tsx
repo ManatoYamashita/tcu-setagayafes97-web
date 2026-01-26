@@ -42,11 +42,19 @@ export function ContactForm() {
     setSubmitStatus(null);
 
     try {
-      // TODO: 実際のフォーム送信処理（Vercel Serverless Functionsまたは外部サービス）
-      // 現在はダミー実装（成功を返す）
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-      console.log("Form data:", data);
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "送信に失敗しました");
+      }
 
       setSubmitStatus("success");
       reset();

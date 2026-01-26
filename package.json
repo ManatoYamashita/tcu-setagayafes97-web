@@ -19,6 +19,7 @@
     "microcms-js-sdk": "^3.2.0",
     "next": "16.1.0",
     "next-intl": "^4.7.0",
+    "nodemailer": "^7.0.12",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.71.1",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

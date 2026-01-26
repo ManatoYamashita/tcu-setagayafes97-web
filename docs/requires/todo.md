@@ -12,12 +12,12 @@
 ## 進捗状況
 
 - **全タスク数**: 152
-- **完了**: 82
+- **完了**: 107
 - **進行中**: 0
-- **未着手**: 70
-- **進捗率**: 53.9%
+- **未着手**: 45
+- **進捗率**: 70.4%
 
-最終更新日: 2026-01-23
+最終更新日: 2026-01-26
 
 ---
 
@@ -158,31 +158,31 @@
 
 #### 2Dマップフォールバック
 
-- [ ] 2Dマップ画像を準備（キャンパスマップ）
-- [ ] 2Dマップ表示コンポーネントを作成（画像 + クリッカブルエリア）
-- [ ] 2Dマップの建物クリックインタラクションを実装（image mapまたはSVG）
+- [x] 2Dマップ画像を準備（キャンパスマップ）
+- [x] 2Dマップ表示コンポーネントを作成（画像 + クリッカブルエリア）
+- [x] 2Dマップの建物クリックインタラクションを実装（image mapまたはSVG）
 
 #### 交通アクセスページ
 
-- [ ] 交通アクセスページルート（`/src/app/map/access/page.tsx`）を作成
-- [ ] Google Maps埋め込みを実装（または静的マップ画像）
-- [ ] 最寄り駅からのルート案内を実装（`/src/data/access.ts`のデータ使用）
-- [ ] 駐車場・駐輪場情報を表示
+- [x] 交通アクセスページルート（`/src/app/map/access/page.tsx`）を作成
+- [x] Google Maps埋め込みを実装（または静的マップ画像）
+- [x] 最寄り駅からのルート案内を実装（`/src/data/access.ts`のデータ使用）
+- [x] 駐車場・駐輪場情報を表示
 
 ### 9. インフォメーション実装
 
-- [ ] お知らせ一覧ページルート（`/src/app/info/page.tsx`）を作成
-- [ ] お知らせ詳細ページルート（`/src/app/info/[id]/page.tsx`）を作成
-- [ ] microCMS News APIからデータ取得ロジックを実装
-- [ ] お知らせ一覧カード表示を実装（type: urgentのハイライト表示）
-- [ ] お知らせ詳細ページのレイアウトを実装（タイトル、サムネイル、本文）
-- [ ] ご来場の方へページルート（`/src/app/info/guide/page.tsx`）を作成
-- [ ] ご来場の方へコンテンツを実装（`/src/data/guide.ts`のデータ使用）
-- [ ] FAQページルート（`/src/app/info/faq/page.tsx`）を作成
-- [ ] FAQアコーディオンコンポーネントを実装
-- [ ] FAQデータをmicroCMS Informations APIから取得（category: faq）
-- [ ] パンフレットページルート（`/src/app/info/pamphlet/page.tsx`）を作成
-- [ ] パンフレットPDFダウンロードリンクを実装（ページ内プレビューは任意）
+- [x] お知らせ一覧ページルート（`/src/app/info/page.tsx`）を作成
+- [x] お知らせ詳細ページルート（`/src/app/info/[id]/page.tsx`）を作成
+- [x] microCMS News APIからデータ取得ロジックを実装
+- [x] お知らせ一覧カード表示を実装（type: urgentのハイライト表示）
+- [x] お知らせ詳細ページのレイアウトを実装（タイトル、サムネイル、本文）
+- [x] ご来場の方へページルート（`/src/app/info/guide/page.tsx`）を作成
+- [x] ご来場の方へコンテンツを実装（`/src/data/guide.ts`のデータ使用）
+- [x] FAQページルート（`/src/app/info/faq/page.tsx`）を作成
+- [x] FAQアコーディオンコンポーネントを実装
+- [x] FAQデータをmicroCMS Informations APIから取得（category: faq）
+- [x] パンフレットページルート（`/src/app/info/pamphlet/page.tsx`）を作成
+- [x] パンフレットPDFダウンロードリンクを実装（ページ内プレビューは任意）
 
 ---
 
@@ -190,17 +190,17 @@
 
 ### 10. About実装
 
-- [ ] 委員長挨拶・理念ページルート（`/src/app/about/page.tsx`）を作成
-- [ ] 委員長挨拶コンテンツを実装（静的データまたはmicroCMS）
-- [ ] 協賛企業一覧ページルート（`/src/app/about/sponsors/page.tsx`）を作成
-- [ ] 協賛企業データをmicroCMS Informations APIから取得（category: sponsor）
-- [ ] 協賛企業ロゴ表示を実装（グリッドレイアウト、リンク付き）
-- [ ] お問い合わせページルート（`/src/app/about/contact/page.tsx`）を作成
-- [ ] お問い合わせフォームを実装（3種別: 一般、取材、落とし物）
-- [ ] フォーム送信ロジックを実装（Nodemailer + Vercel Serverless Functions）
-- [ ] フォームバリデーションを実装（zod等）
-- [ ] プライバシーポリシーページルート（`/src/app/about/privacy/page.tsx`）を作成
-- [ ] プライバシーポリシーコンテンツを実装（`/src/data/privacy.ts`のデータ使用）
+- [x] 委員長挨拶・理念ページルート（`/src/app/about/page.tsx`）を作成
+- [x] 委員長挨拶コンテンツを実装（静的データまたはmicroCMS）
+- [x] 協賛企業一覧ページルート（`/src/app/about/sponsors/page.tsx`）を作成
+- [x] 協賛企業データをmicroCMS Informations APIから取得（category: sponsor）
+- [x] 協賛企業ロゴ表示を実装（グリッドレイアウト、リンク付き）
+- [x] お問い合わせページルート（`/src/app/about/contact/page.tsx`）を作成
+- [x] お問い合わせフォームを実装（3種別: 一般、取材、落とし物）
+- [x] フォーム送信ロジックを実装（Nodemailer + Vercel Serverless Functions）
+- [x] フォームバリデーションを実装（zod等）
+- [x] プライバシーポリシーページルート（`/src/app/about/privacy/page.tsx`）を作成
+- [x] プライバシーポリシーコンテンツを実装（`/src/data/privacy.ts`のデータ使用）
 
 ### 11. 多言語対応
 
