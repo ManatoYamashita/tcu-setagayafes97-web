@@ -2,6 +2,223 @@
   "common": {
     "loading": "로딩 중...",
     "error": "오류가 발생했습니다",
-    "notFound": "페이지를 찾을 수 없습니다"
+    "notFound": "페이지를 찾을 수 없습니다",
+    "backToTop": "맨 위로",
+    "moreInfo": "자세히 보기",
+    "seeAll": "모두 보기",
+    "share": "공유",
+    "language": "언어"
+  },
+  "navigation": {
+    "events": "행사 검색",
+    "timetable": "시간표",
+    "map": "지도 & 교통",
+    "campusMap": "캠퍼스 지도",
+    "access": "교통 안내",
+    "info": "안내",
+    "news": "공지사항",
+    "guide": "방문 안내",
+    "faq": "자주 묻는 질문",
+    "pamphlet": "팸플릿",
+    "about": "소개",
+    "aboutUs": "위원장 인사",
+    "sponsors": "후원사",
+    "contact": "문의",
+    "privacy": "개인정보 처리방침"
+  },
+  "header": {
+    "menu": "메뉴",
+    "close": "닫기"
+  },
+  "footer": {
+    "eventInfo": "행사 정보",
+    "venueInfo": "장소 안내",
+    "information": "안내",
+    "aboutCommittee": "위원회 소개",
+    "copyright": "© 2026 제97회 세타가야 축제 실행위원회"
+  },
+  "languageSwitcher": {
+    "label": "언어 선택",
+    "ja": "일본어",
+    "en": "영어",
+    "zh": "중국어",
+    "ko": "한국어"
+  },
+  "about": {
+    "title": "소개",
+    "subtitle": "세타가야 축제 실행위원회의 이념과 비전",
+    "meta": {
+      "title": "소개",
+      "description": "도쿄도시대학 제97회 세타가야 축제 실행위원회를 소개합니다. 위원장 인사, 이념 및 위원회 소개."
+    },
+    "chairperson": {
+      "title": "위원장 인사"
+    },
+    "vision": {
+      "title": "이념과 비전",
+      "themeLabel": "제97회 세타가야 축제 테마"
+    },
+    "committee": {
+      "title": "위원회 소개",
+      "established": "설립",
+      "memberCount": "위원 수",
+      "members": "명",
+      "about": "약",
+      "organization": "조직 구성"
+    },
+    "social": {
+      "title": "공식 SNS 팔로우"
+    },
+    "relatedPages": {
+      "title": "관련 페이지",
+      "sponsors": "후원사",
+      "contact": "문의"
+    }
+  },
+  "contact": {
+    "title": "문의",
+    "subtitle": "제97회 세타가야 축제 관련 문의",
+    "meta": {
+      "title": "문의",
+      "description": "도쿄도시대학 제97회 세타가야 축제 문의 양식. 일반 방문객, 미디어, 분실물 문의 가능."
+    },
+    "types": {
+      "general": {
+        "title": "일반 방문객",
+        "description": "행사 내용, 일정, 장소 안내 관련 문의"
+      },
+      "media": {
+        "title": "미디어 및 언론",
+        "description": "취재 신청, 보도자료, 미디어 보도 관련 문의"
+      },
+      "lostFound": {
+        "title": "분실물",
+        "description": "세타가야 축제 회장에서 분실한 물품 관련 문의"
+      }
+    },
+    "form": {
+      "title": "문의 양식",
+      "type": "문의 유형",
+      "name": "이름",
+      "email": "이메일",
+      "subject": "제목",
+      "message": "문의 내용",
+      "submit": "제출",
+      "sending": "전송 중...",
+      "required": "필수",
+      "selectType": "문의 유형을 선택해 주세요",
+      "success": "문의가 성공적으로 접수되었습니다.",
+      "error": "전송에 실패했습니다. 나중에 다시 시도해 주세요."
+    },
+    "beforeContact": {
+      "title": "문의 전 확인사항",
+      "prefix": "자주 묻는 질문은",
+      "faqLink": "FAQ 페이지",
+      "suffix": "에서 먼저 확인해 주세요."
+    }
+  },
+  "privacy": {
+    "title": "개인정보 처리방침",
+    "subtitle": "개인정보 보호정책",
+    "meta": {
+      "title": "개인정보 처리방침",
+      "description": "도쿄도시대학 제97회 세타가야 축제의 개인정보 처리방침. 데이터 보호, 사용 목적 및 보안 조치 안내."
+    },
+    "sections": {
+      "basicInfo": "기본 정보",
+      "purposes": "사용 목적",
+      "collectedInfo": "수집 정보",
+      "security": "보안",
+      "thirdParty": "제3자 제공",
+      "cookies": "쿠키 및 분석",
+      "contactWindow": "연락처",
+      "disclaimer": "면책 조항",
+      "copyright": "저작권"
+    },
+    "lastUpdated": "최종 업데이트",
+    "toContactForm": "문의 양식으로 이동",
+    "analyticsOptOut": "Google Analytics 수신 거부",
+    "usedTools": "사용 도구",
+    "except": "다음의 경우는 예외입니다:"
+  },
+  "guide": {
+    "title": "방문 안내",
+    "subtitle": "안전하고 편안한 방문을 위한 안내",
+    "meta": {
+      "title": "방문 안내",
+      "description": "도쿄도시대학 제97회 세타가야 축제 방문 안내. 배리어프리 시설, 주의사항 및 시설 정보."
+    },
+    "sections": {
+      "admission": "입장 안내",
+      "precautions": "방문 시 주의사항",
+      "accessibility": "배리어프리 시설",
+      "weather": "날씨 정보",
+      "lostFound": "분실물",
+      "families": "가족 방문객",
+      "emergency": "응급 상황"
+    },
+    "labels": {
+      "admissionFee": "입장료",
+      "openingHours": "운영 시간",
+      "wheelchair": "휠체어 이용",
+      "available": "이용 가능",
+      "notAvailable": "이용 불가",
+      "multipurposeRestroom": "다목적 화장실",
+      "nursingRoom": "수유실",
+      "diaperChanging": "기저귀 교환대",
+      "exists": "있음",
+      "notExists": "없음",
+      "elevatorsIn": "엘리베이터 설치 건물",
+      "lostFoundLocation": "위치",
+      "lostFoundHours": "운영 시간",
+      "medicalRoom": "응급실",
+      "emergencyContact": "긴급 연락처"
+    }
+  },
+  "faq": {
+    "title": "자주 묻는 질문",
+    "subtitle": "제97회 세타가야 축제 관련 자주 묻는 질문",
+    "meta": {
+      "title": "자주 묻는 질문",
+      "description": "도쿄도시대학 제97회 세타가야 축제 자주 묻는 질문과 답변."
+    },
+    "count": "{count}개의 질문",
+    "empty": {
+      "title": "FAQ는 현재 준비 중입니다.",
+      "prefix": "문의 사항이 있으시면",
+      "contactLink": "문의 양식",
+      "suffix": "를 통해 연락해 주세요."
+    }
+  },
+  "access": {
+    "title": "교통 안내",
+    "subtitle": "도쿄도시대학 세타가야 캠퍼스 찾아오시는 길",
+    "meta": {
+      "title": "교통 안내",
+      "description": "도쿄도시대학 세타가야 캠퍼스 교통 안내. 전철 노선, 버스 정보 및 주차장 안내."
+    },
+    "sections": {
+      "address": "주소",
+      "byTrain": "전철 이용",
+      "byBus": "버스 이용",
+      "parking": "주차장",
+      "bicycle": "자전거 주차장",
+      "notes": "안내사항"
+    },
+    "labels": {
+      "walkTime": "도보 {minutes}분",
+      "available": "이용 가능",
+      "notAvailable": "이용 불가",
+      "capacity": "수용 대수",
+      "location": "위치",
+      "about": "약",
+      "units": "대"
+    },
+    "notes": {
+      "crowded": "축제 기간에는 많은 방문객이 예상됩니다. 여유 있게 방문해 주세요.",
+      "signs": "가장 가까운 역에서 안내 표지판을 따라 오시면 됩니다.",
+      "inquiry": "문의 사항은 정문 안내소에서 확인해 주세요.",
+      "trainNote": "혼잡 상황에 따라 소요 시간이 달라질 수 있습니다."
+    }
   }
 }

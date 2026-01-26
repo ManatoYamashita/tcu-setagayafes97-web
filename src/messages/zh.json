@@ -2,6 +2,223 @@
   "common": {
     "loading": "加载中...",
     "error": "发生错误",
-    "notFound": "未找到页面"
+    "notFound": "页面未找到",
+    "backToTop": "返回顶部",
+    "moreInfo": "了解更多",
+    "seeAll": "查看全部",
+    "share": "分享",
+    "language": "语言"
+  },
+  "navigation": {
+    "events": "活动查询",
+    "timetable": "时间表",
+    "map": "地图与交通",
+    "campusMap": "校园地图",
+    "access": "交通指南",
+    "info": "信息中心",
+    "news": "新闻公告",
+    "guide": "参观指南",
+    "faq": "常见问题",
+    "pamphlet": "宣传册",
+    "about": "关于我们",
+    "aboutUs": "委员长致辞",
+    "sponsors": "赞助企业",
+    "contact": "联系我们",
+    "privacy": "隐私政策"
+  },
+  "header": {
+    "menu": "菜单",
+    "close": "关闭"
+  },
+  "footer": {
+    "eventInfo": "活动信息",
+    "venueInfo": "场馆信息",
+    "information": "信息中心",
+    "aboutCommittee": "关于委员会",
+    "copyright": "© 2026 第97届世田谷祭执行委员会"
+  },
+  "languageSwitcher": {
+    "label": "选择语言",
+    "ja": "日语",
+    "en": "英语",
+    "zh": "简体中文",
+    "ko": "韩语"
+  },
+  "about": {
+    "title": "关于我们",
+    "subtitle": "世田谷祭执行委员会的理念与愿景",
+    "meta": {
+      "title": "关于我们",
+      "description": "了解东京都市大学第97届世田谷祭执行委员会。委员长致辞、理念与委员会介绍。"
+    },
+    "chairperson": {
+      "title": "委员长致辞"
+    },
+    "vision": {
+      "title": "理念与愿景",
+      "themeLabel": "第97届世田谷祭主题"
+    },
+    "committee": {
+      "title": "关于委员会",
+      "established": "成立于",
+      "memberCount": "委员人数",
+      "members": "人",
+      "about": "约",
+      "organization": "组织架构"
+    },
+    "social": {
+      "title": "关注官方社交媒体"
+    },
+    "relatedPages": {
+      "title": "相关页面",
+      "sponsors": "赞助企业",
+      "contact": "联系我们"
+    }
+  },
+  "contact": {
+    "title": "联系我们",
+    "subtitle": "关于第97届世田谷祭的咨询",
+    "meta": {
+      "title": "联系我们",
+      "description": "东京都市大学第97届世田谷祭咨询表格。面向一般参观者、媒体及失物招领。"
+    },
+    "types": {
+      "general": {
+        "title": "一般参观者",
+        "description": "关于活动内容、时间安排、场馆信息的咨询"
+      },
+      "media": {
+        "title": "媒体与新闻",
+        "description": "采访申请、新闻稿、媒体报道相关咨询"
+      },
+      "lostFound": {
+        "title": "失物招领",
+        "description": "关于在世田谷祭会场遗失物品的咨询"
+      }
+    },
+    "form": {
+      "title": "咨询表格",
+      "type": "咨询类型",
+      "name": "姓名",
+      "email": "电子邮箱",
+      "subject": "主题",
+      "message": "咨询内容",
+      "submit": "提交",
+      "sending": "发送中...",
+      "required": "必填",
+      "selectType": "请选择咨询类型",
+      "success": "您的咨询已成功提交。",
+      "error": "发送失败。请稍后重试。"
+    },
+    "beforeContact": {
+      "title": "咨询前请注意",
+      "prefix": "请先查阅",
+      "faqLink": "常见问题页面",
+      "suffix": "了解常见问题。"
+    }
+  },
+  "privacy": {
+    "title": "隐私政策",
+    "subtitle": "个人信息保护方针",
+    "meta": {
+      "title": "隐私政策",
+      "description": "东京都市大学第97届世田谷祭的隐私政策。关于数据保护、使用目的及安全措施的信息。"
+    },
+    "sections": {
+      "basicInfo": "基本信息",
+      "purposes": "使用目的",
+      "collectedInfo": "收集的信息",
+      "security": "安全措施",
+      "thirdParty": "第三方披露",
+      "cookies": "Cookie与分析",
+      "contactWindow": "联系方式",
+      "disclaimer": "免责声明",
+      "copyright": "版权"
+    },
+    "lastUpdated": "最后更新",
+    "toContactForm": "前往咨询表格",
+    "analyticsOptOut": "Google Analytics 退出选项",
+    "usedTools": "使用的工具",
+    "except": "以下情况除外："
+  },
+  "guide": {
+    "title": "参观指南",
+    "subtitle": "为您提供安全舒适的参观体验",
+    "meta": {
+      "title": "参观指南",
+      "description": "东京都市大学第97届世田谷祭参观须知。无障碍设施、注意事项及设施信息。"
+    },
+    "sections": {
+      "admission": "入场信息",
+      "precautions": "参观须知",
+      "accessibility": "无障碍设施",
+      "weather": "天气信息",
+      "lostFound": "失物招领",
+      "families": "亲子参观",
+      "emergency": "紧急情况"
+    },
+    "labels": {
+      "admissionFee": "入场费",
+      "openingHours": "开放时间",
+      "wheelchair": "轮椅通道",
+      "available": "可用",
+      "notAvailable": "不可用",
+      "multipurposeRestroom": "无障碍卫生间",
+      "nursingRoom": "哺乳室",
+      "diaperChanging": "婴儿换尿布台",
+      "exists": "有",
+      "notExists": "无",
+      "elevatorsIn": "设有电梯的建筑",
+      "lostFoundLocation": "地点",
+      "lostFoundHours": "服务时间",
+      "medicalRoom": "医务室",
+      "emergencyContact": "紧急联系方式"
+    }
+  },
+  "faq": {
+    "title": "常见问题",
+    "subtitle": "关于第97届世田谷祭的常见问题",
+    "meta": {
+      "title": "常见问题",
+      "description": "东京都市大学第97届世田谷祭常见问题解答。"
+    },
+    "count": "{count} 个问题",
+    "empty": {
+      "title": "常见问题正在准备中。",
+      "prefix": "如有疑问，请通过",
+      "contactLink": "咨询表格",
+      "suffix": "联系我们。"
+    }
+  },
+  "access": {
+    "title": "交通指南",
+    "subtitle": "前往东京都市大学世田谷校区的路线",
+    "meta": {
+      "title": "交通指南",
+      "description": "东京都市大学世田谷校区的交通信息。电车路线、巴士信息及停车场详情。"
+    },
+    "sections": {
+      "address": "地址",
+      "byTrain": "乘坐电车",
+      "byBus": "乘坐巴士",
+      "parking": "停车场",
+      "bicycle": "自行车停放处",
+      "notes": "重要提示"
+    },
+    "labels": {
+      "walkTime": "步行 {minutes} 分钟",
+      "available": "可用",
+      "notAvailable": "不可用",
+      "capacity": "容量",
+      "location": "位置",
+      "about": "约",
+      "units": "个车位"
+    },
+    "notes": {
+      "crowded": "节日期间预计人流量较大。请预留充足时间。",
+      "signs": "从最近车站沿途设有指示牌。",
+      "inquiry": "如有疑问，请前往正门信息台咨询。",
+      "trainNote": "行程时间可能因拥堵情况而有所不同。"
+    }
   }
 }

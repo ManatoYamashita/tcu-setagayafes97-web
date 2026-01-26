@@ -2,6 +2,223 @@
   "common": {
     "loading": "Loading...",
     "error": "An error occurred",
-    "notFound": "Page not found"
+    "notFound": "Page not found",
+    "backToTop": "Back to top",
+    "moreInfo": "Learn more",
+    "seeAll": "See all",
+    "share": "Share",
+    "language": "Language"
+  },
+  "navigation": {
+    "events": "Events",
+    "timetable": "Timetable",
+    "map": "Map & Access",
+    "campusMap": "Campus Map",
+    "access": "Access",
+    "info": "Information",
+    "news": "News",
+    "guide": "Visitor Guide",
+    "faq": "FAQ",
+    "pamphlet": "Pamphlet",
+    "about": "About Us",
+    "aboutUs": "Chairperson Message",
+    "sponsors": "Sponsors",
+    "contact": "Contact",
+    "privacy": "Privacy Policy"
+  },
+  "header": {
+    "menu": "Menu",
+    "close": "Close"
+  },
+  "footer": {
+    "eventInfo": "Event Info",
+    "venueInfo": "Venue Info",
+    "information": "Information",
+    "aboutCommittee": "About Committee",
+    "copyright": "© 2026 97th Setagaya Festival Executive Committee"
+  },
+  "languageSwitcher": {
+    "label": "Select Language",
+    "ja": "Japanese",
+    "en": "English",
+    "zh": "Chinese",
+    "ko": "Korean"
+  },
+  "about": {
+    "title": "About Us",
+    "subtitle": "Philosophy and Vision of Setagaya Festival Executive Committee",
+    "meta": {
+      "title": "About Us",
+      "description": "Learn about the 97th Setagaya Festival Executive Committee at Tokyo City University. Chairperson message, philosophy, and committee introduction."
+    },
+    "chairperson": {
+      "title": "Chairperson's Message"
+    },
+    "vision": {
+      "title": "Philosophy & Vision",
+      "themeLabel": "97th Setagaya Festival Theme"
+    },
+    "committee": {
+      "title": "About the Committee",
+      "established": "Established",
+      "memberCount": "Members",
+      "members": "members",
+      "about": "About",
+      "organization": "Organization"
+    },
+    "social": {
+      "title": "Follow Our Official SNS"
+    },
+    "relatedPages": {
+      "title": "Related Pages",
+      "sponsors": "Sponsors",
+      "contact": "Contact"
+    }
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Questions & Inquiries about 97th Setagaya Festival",
+    "meta": {
+      "title": "Contact",
+      "description": "Contact form for the 97th Setagaya Festival at Tokyo City University. For general visitors, media, and lost & found inquiries."
+    },
+    "types": {
+      "general": {
+        "title": "General Visitors",
+        "description": "Inquiries about event details, schedules, and venue information"
+      },
+      "media": {
+        "title": "Media & Press",
+        "description": "Media coverage requests, press releases, and publication inquiries"
+      },
+      "lostFound": {
+        "title": "Lost & Found",
+        "description": "Inquiries about items lost at the Setagaya Festival venue"
+      }
+    },
+    "form": {
+      "title": "Contact Form",
+      "type": "Inquiry Type",
+      "name": "Name",
+      "email": "Email",
+      "subject": "Subject",
+      "message": "Message",
+      "submit": "Submit",
+      "sending": "Sending...",
+      "required": "Required",
+      "selectType": "Please select an inquiry type",
+      "success": "Your inquiry has been submitted successfully.",
+      "error": "Failed to send. Please try again later."
+    },
+    "beforeContact": {
+      "title": "Before Contacting",
+      "prefix": "Please check our",
+      "faqLink": "FAQ page",
+      "suffix": "for frequently asked questions first."
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "subtitle": "Personal Information Protection Policy",
+    "meta": {
+      "title": "Privacy Policy",
+      "description": "Privacy policy for the 97th Setagaya Festival at Tokyo City University. Information about data protection, usage purposes, and security measures."
+    },
+    "sections": {
+      "basicInfo": "Basic Information",
+      "purposes": "Purpose of Use",
+      "collectedInfo": "Information Collected",
+      "security": "Security",
+      "thirdParty": "Third Party Disclosure",
+      "cookies": "Cookies & Analytics",
+      "contactWindow": "Contact",
+      "disclaimer": "Disclaimer",
+      "copyright": "Copyright"
+    },
+    "lastUpdated": "Last Updated",
+    "toContactForm": "Go to Contact Form",
+    "analyticsOptOut": "Google Analytics Opt-out",
+    "usedTools": "Tools Used",
+    "except": "Except in the following cases:"
+  },
+  "guide": {
+    "title": "Visitor Guide",
+    "subtitle": "Information for a safe and comfortable visit",
+    "meta": {
+      "title": "Visitor Guide",
+      "description": "Important information for visitors to the 97th Setagaya Festival at Tokyo City University. Accessibility, guidelines, and facility information."
+    },
+    "sections": {
+      "admission": "Admission Information",
+      "precautions": "Visitor Guidelines",
+      "accessibility": "Accessibility",
+      "weather": "Weather Information",
+      "lostFound": "Lost & Found",
+      "families": "For Families",
+      "emergency": "Emergency Information"
+    },
+    "labels": {
+      "admissionFee": "Admission Fee",
+      "openingHours": "Opening Hours",
+      "wheelchair": "Wheelchair Access",
+      "available": "Available",
+      "notAvailable": "Not Available",
+      "multipurposeRestroom": "Accessible Restroom",
+      "nursingRoom": "Nursing Room",
+      "diaperChanging": "Diaper Changing Station",
+      "exists": "Available",
+      "notExists": "Not Available",
+      "elevatorsIn": "Buildings with Elevators",
+      "lostFoundLocation": "Location",
+      "lostFoundHours": "Hours",
+      "medicalRoom": "First Aid Room",
+      "emergencyContact": "Emergency Contact"
+    }
+  },
+  "faq": {
+    "title": "FAQ",
+    "subtitle": "Frequently asked questions about 97th Setagaya Festival",
+    "meta": {
+      "title": "FAQ",
+      "description": "Frequently asked questions and answers about the 97th Setagaya Festival at Tokyo City University."
+    },
+    "count": "{count} questions",
+    "empty": {
+      "title": "FAQ is currently being prepared.",
+      "prefix": "If you have any questions, please contact us via",
+      "contactLink": "contact form",
+      "suffix": "."
+    }
+  },
+  "access": {
+    "title": "Access",
+    "subtitle": "Directions to Tokyo City University Setagaya Campus",
+    "meta": {
+      "title": "Access",
+      "description": "Access information for Tokyo City University Setagaya Campus. Train routes, bus information, and parking details."
+    },
+    "sections": {
+      "address": "Address",
+      "byTrain": "By Train",
+      "byBus": "By Bus",
+      "parking": "Parking",
+      "bicycle": "Bicycle Parking",
+      "notes": "Important Notes"
+    },
+    "labels": {
+      "walkTime": "{minutes} min walk",
+      "available": "Available",
+      "notAvailable": "Not Available",
+      "capacity": "Capacity",
+      "location": "Location",
+      "about": "About",
+      "units": "spaces"
+    },
+    "notes": {
+      "crowded": "Heavy traffic is expected on festival days. Please allow extra time for your visit.",
+      "signs": "Directional signs are placed along the route from the nearest station.",
+      "inquiry": "For any questions, please visit the Information Desk at the main gate.",
+      "trainNote": "Travel times may vary depending on congestion."
+    }
   }
 }
