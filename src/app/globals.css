@@ -1,6 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #cd79ee;
+  --font-sans: var(--font-noto-sans-jp), sans-serif;
+}
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -22,8 +25,6 @@ body {
     rgb(var(--background-start-rgb));
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+@utility text-balance {
+  text-wrap: balance;
 }
