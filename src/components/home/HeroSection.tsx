@@ -13,7 +13,7 @@ export function HeroSection() {
       {/* 背景画像 */}
       <div className="absolute inset-0">
         <Image
-          src="/images/hero/main-visual.jpg"
+          src="/images/placeholder/p.jpeg"
           alt={`${siteConfig.name} メインビジュアル`}
           fill
           priority

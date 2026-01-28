@@ -7,6 +7,8 @@ import { useState, useEffect } from "react";
  * 初回訪問時のみWebM動画を再生
  */
 export function StartupAnimation() {
+  // 起動アニメーションは動画ファイルが用意されるまで無効化
+  const isEnabled = false;
   const [show, setShow] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
 
@@ -15,7 +17,7 @@ export function StartupAnimation() {
     try {
       const hasVisited = sessionStorage.getItem("setagayafes97_visited");
 
-      if (!hasVisited) {
+      if (!hasVisited && isEnabled) {
         setShow(true);
         sessionStorage.setItem("setagayafes97_visited", "true");
       }

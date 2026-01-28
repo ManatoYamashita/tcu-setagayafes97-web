@@ -17,7 +17,7 @@ export const mockEvents: Event[] = [
     title: "TCUダンスパフォーマンスショー",
     organizer: "ダンスサークル GROOVE",
     thumbnail: {
-      url: "/images/placeholder/event-01.jpg",
+      url: "/images/placeholder/p.jpeg",
       height: 800,
       width: 1200,
     },
@@ -44,7 +44,7 @@ export const mockEvents: Event[] = [
     title: "VR体験コーナー 〜未来の教室へようこそ〜",
     organizer: "情報科学部 VR研究会",
     thumbnail: {
-      url: "/images/placeholder/event-02.jpg",
+      url: "/images/placeholder/p.jpeg",
       height: 800,
       width: 1200,
     },
@@ -71,7 +71,7 @@ export const mockEvents: Event[] = [
     title: "世田谷カフェ 〜コーヒーと軽食の店〜",
     organizer: "軽音楽サークル Acoustic Waves",
     thumbnail: {
-      url: "/images/placeholder/event-03.jpg",
+      url: "/images/placeholder/p.jpeg",
       height: 800,
       width: 1200,
     },
@@ -97,7 +97,7 @@ export const mockEvents: Event[] = [
     title: "お笑いライブ 〜芸人ネタバトル〜",
     organizer: "世田谷祭実行委員会",
     thumbnail: {
-      url: "/images/placeholder/event-04.jpg",
+      url: "/images/placeholder/p.jpeg",
       height: 800,
       width: 1200,
     },
@@ -120,7 +120,7 @@ export const mockEvents: Event[] = [
     title: "お化け屋敷 〜廃校の怪〜",
     organizer: "演劇サークル Stage Craft",
     thumbnail: {
-      url: "/images/placeholder/event-05.jpg",
+      url: "/images/placeholder/p.jpeg",
       height: 800,
       width: 1200,
     },
@@ -146,7 +146,7 @@ export const mockEvents: Event[] = [
     title: "プログラミング体験教室 〜初めてのゲーム制作〜",
     organizer: "プログラミング研究会",
     thumbnail: {
-      url: "/images/placeholder/event-06.jpg",
+      url: "/images/placeholder/p.jpeg",
       height: 800,
       width: 1200,
     },
@@ -173,7 +173,7 @@ export const mockEvents: Event[] = [
     title: "アカペラライブ 〜Harmony Voices〜",
     organizer: "アカペラサークル Harmony",
     thumbnail: {
-      url: "/images/placeholder/event-07.jpg",
+      url: "/images/placeholder/p.jpeg",
       height: 800,
       width: 1200,
     },
@@ -200,7 +200,7 @@ export const mockEvents: Event[] = [
     title: "バンドコンテスト 〜ROCK THE CAMPUS〜",
     organizer: "軽音楽サークル連合",
     thumbnail: {
-      url: "/images/placeholder/event-08.jpg",
+      url: "/images/placeholder/p.jpeg",
       height: 800,
       width: 1200,
     },
@@ -227,7 +227,7 @@ export const mockEvents: Event[] = [
     title: "よさこいソーラン演舞",
     organizer: "よさこいソーランサークル 彩",
     thumbnail: {
-      url: "/images/placeholder/event-09.jpg",
+      url: "/images/placeholder/p.jpeg",
       height: 800,
       width: 1200,
     },
@@ -253,7 +253,7 @@ export const mockEvents: Event[] = [
     title: "演劇公演『青春の一ページ』",
     organizer: "演劇サークル Stage Craft",
     thumbnail: {
-      url: "/images/placeholder/event-10.jpg",
+      url: "/images/placeholder/p.jpeg",
       height: 800,
       width: 1200,
     },
@@ -280,7 +280,7 @@ export const mockEvents: Event[] = [
     title: "ジャズコンサート 〜Autumn Jazz Night〜",
     organizer: "ジャズ研究会",
     thumbnail: {
-      url: "/images/placeholder/event-11.jpg",
+      url: "/images/placeholder/p.jpeg",
       height: 800,
       width: 1200,
     },
@@ -306,7 +306,7 @@ export const mockEvents: Event[] = [
     title: "落語研究会 寄席",
     organizer: "落語研究会",
     thumbnail: {
-      url: "/images/placeholder/event-12.jpg",
+      url: "/images/placeholder/p.jpeg",
       height: 800,
       width: 1200,
     },
