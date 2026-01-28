@@ -2,10 +2,12 @@ import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 
 /**
- * next-intl Middleware
+ * next-intl Proxy (旧: Middleware)
  *
  * 多言語対応ページのみをマッチングし、
  * 非対応ページ（microCMS依存）はスキップする
+ *
+ * @see https://next-intl.dev/docs/routing/middleware
  */
 export default createMiddleware(routing);
 
