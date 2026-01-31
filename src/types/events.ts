@@ -20,7 +20,34 @@ export interface SNSLinks {
 }
 
 /**
+ * microCMSから返される生のEvent型
+ * dateとtypeフィールドが配列形式で返される可能性がある
+ */
+export interface RawEvent {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt?: string;
+  revisedAt?: string;
+
+  // カスタムフィールド（microCMSの生データ）
+  date: string[] | string;
+  type: string[] | string;
+  place: string;
+  building: string;
+  title: string;
+  organizer: string;
+  thumbnail?: MicroCMSImage;
+  description: string;
+  content: string;
+  startTime?: string;
+  endTime?: string;
+  sns?: string; // microCMSでは単一の文字列で返される可能性がある
+}
+
+/**
  * 企画（Events API）
+ * アプリケーション内で使用する正規化された型
  */
 export interface Event {
   id: string;
@@ -45,6 +72,11 @@ export interface Event {
 }
 
 /**
- * 企画一覧のレスポンス型
+ * 企画一覧のレスポンス型（microCMS生データ）
+ */
+export type RawEventListResponse = MicroCMSListResponse<RawEvent>;
+
+/**
+ * 企画一覧のレスポンス型（正規化済み）
  */
 export type EventListResponse = MicroCMSListResponse<Event>;

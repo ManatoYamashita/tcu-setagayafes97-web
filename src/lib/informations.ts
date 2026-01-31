@@ -1,5 +1,51 @@
 import { client } from "./microcms";
-import type { Information, InformationListResponse } from "@/types/informations";
+import type {
+  Information,
+  InformationListResponse,
+  InformationCategory,
+  RawInformation,
+  RawInformationListResponse,
+} from "@/types/informations";
+
+/**
+ * microCMSから返されるcategoryフィールドを正規化
+ * 配列形式 ["sponsor : 協賛企業"] や文字列形式 "sponsor" に対応
+ * @param category microCMSのcategoryフィールド
+ * @returns 正規化されたInformationCategory
+ */
+function normalizeInformationCategory(
+  category: string[] | string | undefined
+): InformationCategory {
+  if (!category) {
+    return "other";
+  }
+
+  const rawCategory = Array.isArray(category) ? category[0] : category;
+
+  if (typeof rawCategory !== "string") {
+    return "other";
+  }
+
+  const cleanCategory = rawCategory.split(":")[0].trim().toLowerCase();
+
+  if (cleanCategory === "sponsor" || cleanCategory === "faq" || cleanCategory === "other") {
+    return cleanCategory;
+  }
+
+  return "other";
+}
+
+/**
+ * RawInformationをInformationに正規化
+ * @param rawInfo microCMSから取得した生データ
+ * @returns 正規化されたInformation
+ */
+function normalizeInformation(rawInfo: RawInformation): Information {
+  return {
+    ...rawInfo,
+    category: normalizeInformationCategory(rawInfo.category),
+  };
+}
 
 /**
  * 協賛企業一覧を取得
@@ -15,7 +61,7 @@ export async function getSponsorsList(): Promise<Information[]> {
   }
 
   try {
-    const response: InformationListResponse = await client.get({
+    const response: RawInformationListResponse = await client.get({
       endpoint: "informations",
       queries: {
         limit: 100,
@@ -23,7 +69,8 @@ export async function getSponsorsList(): Promise<Information[]> {
         orders: "-priority",
       },
     });
-    return response.contents;
+    // データを正規化して返す
+    return response.contents.map(normalizeInformation);
   } catch (error) {
     console.error("[getSponsorsList] Error:", error);
     return [];
@@ -43,7 +90,7 @@ export async function getFAQList(): Promise<Information[]> {
   }
 
   try {
-    const response: InformationListResponse = await client.get({
+    const response: RawInformationListResponse = await client.get({
       endpoint: "informations",
       queries: {
         limit: 50,
@@ -51,7 +98,8 @@ export async function getFAQList(): Promise<Information[]> {
         orders: "-publishedAt",
       },
     });
-    return response.contents;
+    // データを正規化して返す
+    return response.contents.map(normalizeInformation);
   } catch (error) {
     console.error("[getFAQList] Error:", error);
     return [];
@@ -72,11 +120,12 @@ export async function getInformationById(id: string): Promise<Information | null
   }
 
   try {
-    const response = await client.get({
+    const response: RawInformation = await client.get({
       endpoint: "informations",
       contentId: id,
     });
-    return response;
+    // データを正規化して返す
+    return normalizeInformation(response);
   } catch (error) {
     console.error("[getInformationById] Error:", error);
     return null;

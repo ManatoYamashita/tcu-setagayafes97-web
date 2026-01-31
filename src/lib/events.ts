@@ -1,5 +1,13 @@
 import { client } from "./microcms";
-import type { Event, EventListResponse, EventDate, EventType } from "@/types/events";
+import type {
+  Event,
+  EventListResponse,
+  EventDate,
+  EventType,
+  RawEvent,
+  RawEventListResponse,
+  SNSLinks,
+} from "@/types/events";
 
 /**
  * 企画一覧取得のフィルタオプション
@@ -8,6 +16,106 @@ export interface EventsFilterOptions {
   date?: EventDate;
   type?: EventType;
   building?: string;
+}
+
+/**
+ * microCMSから返されるdateフィールドを正規化
+ * 配列形式 ["day1 : 10月31日（土）"] や文字列形式 "day1" に対応
+ * @param date microCMSのdateフィールド
+ * @returns 正規化されたEventDate
+ */
+function normalizeEventDate(date: string[] | string | undefined): EventDate {
+  if (!date) {
+    return "other";
+  }
+
+  const rawDate = Array.isArray(date) ? date[0] : date;
+
+  if (typeof rawDate !== "string") {
+    return "other";
+  }
+
+  const cleanDate = rawDate.split(":")[0].trim().toLowerCase();
+
+  if (
+    cleanDate === "day1" ||
+    cleanDate === "day2" ||
+    cleanDate === "both" ||
+    cleanDate === "other"
+  ) {
+    return cleanDate;
+  }
+
+  return "other";
+}
+
+/**
+ * microCMSから返されるtypeフィールドを正規化
+ * 配列形式 ["room : 教室企画"] や文字列形式 "room" に対応
+ * @param type microCMSのtypeフィールド
+ * @returns 正規化されたEventType
+ */
+function normalizeEventType(type: string[] | string | undefined): EventType {
+  if (!type) {
+    return "other";
+  }
+
+  const rawType = Array.isArray(type) ? type[0] : type;
+
+  if (typeof rawType !== "string") {
+    return "other";
+  }
+
+  const cleanType = rawType.split(":")[0].trim().toLowerCase();
+
+  if (
+    cleanType === "room" ||
+    cleanType === "stage" ||
+    cleanType === "special" ||
+    cleanType === "other"
+  ) {
+    return cleanType;
+  }
+
+  return "other";
+}
+
+/**
+ * SNS情報を正規化
+ * @param sns microCMSのsnsフィールド
+ * @returns 正規化されたSNSLinks
+ */
+function normalizeSNSLinks(sns: string | undefined): SNSLinks | undefined {
+  if (!sns) {
+    return undefined;
+  }
+
+  // SNSが単一のURLの場合は、URLの形式から判定
+  const links: SNSLinks = {};
+
+  if (sns.includes("twitter.com") || sns.includes("x.com")) {
+    links.twitter = sns;
+  } else if (sns.includes("instagram.com")) {
+    links.instagram = sns;
+  } else {
+    links.website = sns;
+  }
+
+  return links;
+}
+
+/**
+ * RawEventをEventに正規化
+ * @param rawEvent microCMSから取得した生データ
+ * @returns 正規化されたEvent
+ */
+function normalizeEvent(rawEvent: RawEvent): Event {
+  return {
+    ...rawEvent,
+    date: normalizeEventDate(rawEvent.date),
+    type: normalizeEventType(rawEvent.type),
+    sns: typeof rawEvent.sns === "string" ? normalizeSNSLinks(rawEvent.sns) : undefined,
+  };
 }
 
 /**
@@ -53,7 +161,7 @@ export async function getEventsList(
       filterQueries.push(`building[equals]${filters.building}`);
     }
 
-    const response: EventListResponse = await client.get({
+    const response: RawEventListResponse = await client.get({
       endpoint: "events",
       queries: {
         limit,
@@ -63,7 +171,8 @@ export async function getEventsList(
         }),
       },
     });
-    return response.contents;
+    // データを正規化して返す
+    return response.contents.map(normalizeEvent);
   } catch (error) {
     console.error("[getEventsList] Error:", error);
     return [];
@@ -86,7 +195,7 @@ export async function getFeaturedEvents(): Promise<Event[]> {
   try {
     // microCMSにfeaturedフラグがある場合の実装例
     // 実際のフィールド名に合わせて調整してください
-    const response: EventListResponse = await client.get({
+    const response: RawEventListResponse = await client.get({
       endpoint: "events",
       queries: {
         limit: 6,
@@ -94,7 +203,8 @@ export async function getFeaturedEvents(): Promise<Event[]> {
         orders: "-publishedAt",
       },
     });
-    return response.contents;
+    // データを正規化して返す
+    return response.contents.map(normalizeEvent);
   } catch (error) {
     console.error("[getFeaturedEvents] Error:", error);
     // featuredフラグがない場合は、最新6件を返す
@@ -116,11 +226,12 @@ export async function getEventById(id: string): Promise<Event | null> {
   }
 
   try {
-    const response = await client.get({
+    const response: RawEvent = await client.get({
       endpoint: "events",
       contentId: id,
     });
-    return response;
+    // データを正規化して返す
+    return normalizeEvent(response);
   } catch (error) {
     console.error("[getEventById] Error:", error);
     return null;
