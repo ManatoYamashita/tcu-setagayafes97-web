@@ -1,76 +1,85 @@
 import Image from "next/image";
-import Link from "next/link";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { siteConfig } from "@/data/site";
-import { Button } from "@/components/ui/Button";
+import { SocialIcons } from "@/components/ui/SocialIcons";
 
 /**
- * ヒーローセクション
- * トップページのメインビジュアルとキャッチコピーを表示
+ * ヒーローセクション（2026年基準のモダン実装）
+ * - Tailwind CSS v4: OKLCHカラー空間
+ * - Container Queries: cqw単位でレスポンシブ設計
+ * - next/image最適化: priority + fetchPriority="high"
  */
 export function HeroSection() {
   return (
-    <section className="relative h-screen w-full">
-      {/* 背景画像 */}
-      <div className="absolute inset-0">
+    <section className="w-full min-h-screen relative flex flex-col items-center justify-center bg-accent-green">
+      {/* メインビジュアルカード */}
+      <div
+        className="w-[94vw] max-w-7xl aspect-[4/5] md:aspect-[16/9] relative rounded-[3.5rem] overflow-hidden shadow-2xl"
+        style={{ containerType: "inline-size" }}
+      >
+        {/* 背景画像 */}
         <Image
           src="/images/placeholder/p.jpeg"
           alt={`${siteConfig.name} メインビジュアル`}
           fill
           priority
+          fetchPriority="high"
           className="object-cover"
-          sizes="100vw"
+          sizes="(max-width: 768px) 94vw, 1280px"
         />
-        {/* オーバーレイ */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60" />
-      </div>
 
-      {/* コンテンツ */}
-      <div className="relative z-10 flex h-full items-center justify-center">
-        <div className="container mx-auto px-4 text-center text-white">
-          {/* ロゴ・タイトル */}
-          <div className="mb-8 animate-fade-in">
-            <h1 className="mb-4 text-5xl font-bold leading-tight drop-shadow-lg md:text-6xl lg:text-7xl">
-              {siteConfig.shortName}
-            </h1>
-            <p className="mb-2 text-xl drop-shadow-md md:text-2xl">第{siteConfig.edition}回</p>
-            <p className="text-lg drop-shadow-md md:text-xl">東京都市大学 世田谷キャンパス</p>
+        {/* 左上通知ラベル */}
+        <div className="absolute top-[5cqw] left-[5cqw] bg-accent-yellow p-[1.5cqw] rounded-sm shadow-lg z-20">
+          <p className="text-[2cqw] md:text-[1.5cqw] font-bold text-dark-green">NEW EVENT</p>
+        </div>
+
+        {/* 右上バッジ (Circle Badge) */}
+        <div className="absolute -top-[8cqw] -right-[8cqw] w-[20cqw] aspect-square rounded-full bg-primary/90 backdrop-blur-sm flex items-center justify-center z-10 shadow-2xl">
+          <div className="text-center text-white">
+            <p className="text-[2.5cqw] md:text-[2cqw] font-semibold">第{siteConfig.edition}回</p>
+            <p className="text-[1.5cqw] md:text-[1.2cqw] mt-[0.5cqw]">世田谷祭</p>
           </div>
+        </div>
 
-          {/* 開催日時 */}
-          <div className="mb-10 animate-fade-in-delay">
-            <p className="mb-1 text-2xl font-semibold drop-shadow-lg md:text-3xl">
-              {siteConfig.dates.day1.replace(/-/g, ".")} -{" "}
-              {siteConfig.dates.day2.replace(/-/g, ".")}
-            </p>
-            <p className="text-lg drop-shadow-md md:text-xl">
-              {siteConfig.openTime} - {siteConfig.closeTime}
-            </p>
-          </div>
-
-          {/* CTAボタン */}
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link href="/events">
-              <Button variant="primary" size="lg">
-                企画を探す
-              </Button>
-            </Link>
-            <Link href="/info">
-              <Button variant="outline" size="lg">
-                お知らせ
-              </Button>
-            </Link>
+        {/* 左下コピーエリア */}
+        <div className="absolute bottom-[6cqw] left-[6cqw] z-20">
+          <h2
+            className="text-[8cqw] md:text-[6cqw] font-black leading-[1.1] text-white"
+            style={{ textShadow: "2px 2px 8px rgba(0,0,0,0.3)" }}
+          >
+            さあ
+            <br />
+            世田谷祭から
+            <br />
+            始めよう
+          </h2>
+          <div className="flex items-center gap-[2cqw] mt-[2cqw]">
+            <a
+              href="/events"
+              className="w-[10cqw] md:w-[8cqw] aspect-square rounded-full bg-white flex items-center justify-center hover:scale-110 transition-transform shadow-xl"
+            >
+              <ArrowRight className="w-[4cqw] md:w-[3cqw] h-[4cqw] md:h-[3cqw] text-primary" />
+            </a>
+            <span className="text-[1.5cqw] md:text-[1.2cqw] text-white font-semibold uppercase tracking-wider">
+              View More
+            </span>
           </div>
         </div>
       </div>
 
-      {/* スクロールインジケーター */}
-      <div className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 animate-bounce">
-        <div className="flex flex-col items-center text-white">
-          <span className="mb-2 text-sm">SCROLL</span>
-          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+      {/* 下部中央: SCROLL TO EXPLORE インジケーター */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30">
+        <div className="flex flex-col items-center text-dark-green">
+          <span className="mb-2 text-sm font-semibold uppercase tracking-widest">
+            Scroll to Explore
+          </span>
+          <ChevronDown className="h-6 w-6 animate-bounce" />
         </div>
+      </div>
+
+      {/* 下部右: SNSアイコン */}
+      <div className="absolute bottom-8 right-8 z-30 md:right-16">
+        <SocialIcons layout="horizontal" size="md" showLabel className="text-dark-green" />
       </div>
     </section>
   );

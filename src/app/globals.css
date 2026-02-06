@@ -1,7 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #cd79ee;
+  /* OKLCHカラー空間での色定義 */
+  --color-primary: oklch(75% 0.18 305);
+  --color-accent-yellow: oklch(85% 0.15 145);
+  --color-accent-green: oklch(95% 0.05 140);
+  --color-dark-green: oklch(20% 0.02 140);
   --font-sans: var(--font-noto-sans-jp), sans-serif;
 }
 
@@ -27,4 +31,24 @@ body {
 
 @utility text-balance {
   text-wrap: balance;
+}
+
+@layer utilities {
+  .diagonal-bg {
+    clip-path: polygon(0 5%, 100% 0, 100% 95%, 0 100%);
+  }
+
+  .diagonal-bg-reverse {
+    clip-path: polygon(0 0, 100% 5%, 100% 100%, 0 95%);
+  }
+
+  .text-vertical {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+  }
+
+  /* Container Queries用のユーティリティ */
+  .container-inline {
+    container-type: inline-size;
+  }
 }
