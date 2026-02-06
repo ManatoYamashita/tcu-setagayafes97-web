@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { X } from "lucide-react";
 import { navigationConfig } from "@/data/navigation";
-import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { LanguageSwitcherWrapper } from "@/components/layout/LanguageSwitcherWrapper";
 import { MobileNavAccordion } from "@/components/layout/MobileNavAccordion";
 
 interface MobileMenuProps {
@@ -83,7 +83,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
         {/* 言語切り替え */}
         <div className="border-t border-gray-200 p-4">
-          <LanguageSwitcher />
+          <LanguageSwitcherWrapper />
         </div>
       </div>
     </>

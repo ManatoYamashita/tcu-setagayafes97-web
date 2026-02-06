@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import { siteConfig } from "@/data/site";
-import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { LanguageSwitcherWrapper } from "@/components/layout/LanguageSwitcherWrapper";
 import { DesktopNav } from "@/components/layout/DesktopNav";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 
@@ -33,7 +33,7 @@ export function Header() {
 
           {/* 右: 言語切り替え + モバイルメニューボタン */}
           <div className="flex items-center gap-4">
-            <LanguageSwitcher />
+            <LanguageSwitcherWrapper />
             <button
               className="rounded-lg p-2 transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 md:hidden"
               onClick={() => setIsMobileMenuOpen(true)}
