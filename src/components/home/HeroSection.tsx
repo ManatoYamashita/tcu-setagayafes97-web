@@ -14,7 +14,7 @@ export function HeroSection() {
     <section className="w-full min-h-screen relative flex flex-col items-center justify-center bg-accent-green">
       {/* メインビジュアルカード */}
       <div
-        className="w-[94vw] max-w-7xl aspect-[4/5] md:aspect-[16/9] relative rounded-[3.5rem] overflow-hidden shadow-2xl"
+        className="w-[75vw] max-w-7xl max-h-[60vh] aspect-[4/5] md:aspect-[16/9] relative rounded-[3.5rem] overflow-visible shadow-2xl"
         style={{ containerType: "inline-size" }}
       >
         {/* 背景画像 */}
@@ -24,8 +24,8 @@ export function HeroSection() {
           fill
           priority
           fetchPriority="high"
-          className="object-cover"
-          sizes="(max-width: 768px) 94vw, 1280px"
+          className="object-cover rounded-[3.5rem]"
+          sizes="(max-width: 768px) 75vw, 1280px"
         />
 
         {/* 左上通知ラベル */}
@@ -33,12 +33,15 @@ export function HeroSection() {
           <p className="text-[2cqw] md:text-[1.5cqw] font-bold text-dark-green">NEW EVENT</p>
         </div>
 
-        {/* 右上バッジ (Circle Badge) */}
-        <div className="absolute -top-[8cqw] -right-[8cqw] w-[20cqw] aspect-square rounded-full bg-primary/90 backdrop-blur-sm flex items-center justify-center z-10 shadow-2xl">
-          <div className="text-center text-white">
-            <p className="text-[2.5cqw] md:text-[2cqw] font-semibold">第{siteConfig.edition}回</p>
-            <p className="text-[1.5cqw] md:text-[1.2cqw] mt-[0.5cqw]">世田谷祭</p>
-          </div>
+        {/* 右上バッジ (Circle Badge) - 画像版 */}
+        <div className="absolute -top-[8cqw] -right-[8cqw] w-[20cqw] aspect-square rounded-full overflow-hidden shadow-2xl z-10">
+          <Image
+            src="/images/placeholder/p.jpeg"
+            alt={`第${siteConfig.edition}回 世田谷祭`}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 20vw, 15vw"
+          />
         </div>
 
         {/* 左下コピーエリア */}
