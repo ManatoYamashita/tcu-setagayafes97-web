@@ -7,7 +7,7 @@ import { SocialIcons } from "@/components/ui/SocialIcons";
  * ヒーローセクション（参考サイト構造の完全再現）
  * - absolute/relative複合レイアウト
  * - viewport単位（70vw × 80vh デスクトップ、95vw × 65vh モバイル）
- * - 大幅にはみ出す円形バッジ（224-448px、外側配置）
+ * - 円形バッジ（128-256px、外側配置、参考サイト水準）
  * - テキスト左下寄り配置
  * - 5層z-index構造（z-50/[45]/40/30/20/10）
  */
@@ -41,7 +41,7 @@ export function HeroSection() {
       </div>
 
       {/* 画像エリア（absolute、右寄り、z-20） */}
-      <div className="absolute right-0 sm:right-6 md:right-8 lg:right-12 xl:right-16 top-1/2 -translate-y-1/2 z-20">
+      <div className="absolute right-0 sm:right-4 md:right-6 lg:right-8 xl:right-10 2xl:right-12 top-1/2 -translate-y-1/2 z-20">
         {/* 新規ラッパー追加 */}
         <div className="relative">
           <div className="relative w-[95vw] sm:w-[85vw] md:w-[78vw] lg:w-[72vw] xl:w-[70vw] h-[65vh] sm:h-[72vh] md:h-[75vh] lg:h-[78vh] xl:h-[80vh] rounded-[3rem] overflow-hidden shadow-2xl">
@@ -66,13 +66,13 @@ export function HeroSection() {
           </div>
 
           {/* 円形バッジを外側に移動 */}
-          <div className="absolute -top-16 -right-16 sm:-top-24 sm:-right-24 md:-top-32 md:-right-32 lg:-top-40 lg:-right-40 xl:-top-48 xl:-right-48 w-56 sm:w-64 md:w-80 lg:w-96 xl:w-[26rem] 2xl:w-[28rem] aspect-square rounded-full overflow-hidden shadow-2xl z-[45]">
+          <div className="absolute -top-6 -right-6 sm:-top-8 sm:-right-8 md:-top-10 md:-right-10 lg:-top-12 lg:-right-12 xl:-top-14 xl:-right-14 2xl:-top-16 2xl:-right-16 w-32 sm:w-40 md:w-48 lg:w-56 xl:w-60 2xl:w-64 aspect-square rounded-full overflow-hidden shadow-2xl z-[45]">
             <Image
               src="/images/placeholder/p.jpeg"
               alt={`第${siteConfig.edition}回 世田谷祭`}
               fill
               className="object-cover"
-              sizes="(max-width: 640px) 224px, (max-width: 768px) 256px, (max-width: 1024px) 320px, (max-width: 1280px) 384px, (max-width: 1536px) 416px, 448px"
+              sizes="(max-width: 640px) 128px, (max-width: 768px) 160px, (max-width: 1024px) 192px, (max-width: 1280px) 224px, (max-width: 1536px) 240px, 256px"
             />
           </div>
         </div>
