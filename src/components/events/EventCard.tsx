@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Event } from "@/types/events";
 import { Badge } from "@/components/ui/Badge";
+import { CircleImage } from "@/components/ui/CircleImage";
 
 interface EventCardProps {
   event: Event;
@@ -15,21 +16,15 @@ interface EventCardProps {
 export function EventCard({ event, variant = "default" }: EventCardProps) {
   return (
     <Link href={`/events/${event.id}`} className="group block h-full">
-      <article className="h-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:border-primary hover:shadow-lg">
-        {/* サムネイル */}
+      <article className="h-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow transition-all hover:border-primary hover:shadow-lg">
+        {/* 円形サムネイル */}
         {event.thumbnail && (
-          <div className="relative aspect-video w-full overflow-hidden">
-            <Image
-              src={event.thumbnail.url}
-              alt={event.title}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
-            />
+          <div className="flex justify-center p-6">
+            <CircleImage src={event.thumbnail.url} alt={event.title} size="xl" />
           </div>
         )}
 
-        <div className="p-6">
+        <div className="flex flex-1 flex-col p-6 pt-0">
           {/* バッジ */}
           <div className="mb-3 flex flex-wrap gap-2">
             <Badge variant={event.date} label={event.date} />

@@ -16,9 +16,12 @@ export function EventOverview() {
   const year = new Date(siteConfig.dates.day1).getFullYear();
 
   return (
-    <section className="bg-gradient-to-b from-white to-gray-50 py-20">
-      <div className="container mx-auto px-4">
-        <h2 className="mb-12 text-center text-4xl font-bold">開催概要</h2>
+    <section className="relative overflow-hidden bg-gradient-to-b from-white to-gray-50 py-32">
+      {/* 斜め背景要素 */}
+      <div className="absolute inset-0 bg-primary/5 diagonal-bg" />
+
+      <div className="container relative z-10 mx-auto px-4">
+        <h2 className="mb-12 text-center text-5xl font-bold md:text-6xl">開催概要</h2>
 
         <div className="mx-auto max-w-4xl">
           <div className="grid gap-8 md:grid-cols-3">

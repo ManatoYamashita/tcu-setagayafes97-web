@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { siteConfig } from "@/data/site";
 import { navigationConfig } from "@/data/navigation";
+import { SocialIcons } from "@/components/ui/SocialIcons";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -23,6 +24,12 @@ export function Footer() {
               </ul>
             </div>
           ))}
+
+          {/* SNSセクション */}
+          <div>
+            <h3 className="mb-4 font-bold text-gray-900">Follow Us</h3>
+            <SocialIcons layout="vertical" size="md" showLabel className="text-gray-600" />
+          </div>
         </div>
 
         <div className="mt-8 border-t pt-8 text-center text-gray-600">

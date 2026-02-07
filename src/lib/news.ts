@@ -1,6 +1,9 @@
 import { client } from "./microcms";
 import type { News, NewsListResponse, NewsType, RawNews, RawNewsListResponse } from "@/types/news";
 
+// 型を再エクスポート
+export type { News, NewsType } from "@/types/news";
+
 /**
  * microCMSから返されるtypeフィールドを正規化
  * 配列形式 ["news : お知らせ"] や文字列形式 "news" に対応

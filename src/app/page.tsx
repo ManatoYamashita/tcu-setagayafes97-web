@@ -1,6 +1,7 @@
 import { HeroSection } from "@/components/home/HeroSection";
 import { CountdownTimer } from "@/components/home/CountdownTimer";
 import { EventOverview } from "@/components/home/EventOverview";
+import { AboutSection } from "@/components/home/AboutSection";
 import { NewsSection } from "@/components/home/NewsSection";
 import { FeaturedEvents } from "@/components/home/FeaturedEvents";
 import { SponsorBanner } from "@/components/home/SponsorBanner";
@@ -31,6 +32,11 @@ export default function Home() {
           {/* 開催概要（スクロールアニメーション適用） */}
           <div data-scroll>
             <EventOverview />
+          </div>
+
+          {/* ABOUT（スクロールアニメーション適用） */}
+          <div data-scroll>
+            <AboutSection />
           </div>
 
           {/* お知らせ（スクロールアニメーション適用） */}

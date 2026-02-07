@@ -12,10 +12,10 @@ export async function FeaturedEvents() {
   // データが取得できない場合の表示
   if (events.length === 0) {
     return (
-      <section className="bg-gradient-to-b from-gray-50 to-white py-20">
+      <section className="bg-gradient-to-b from-gray-50 to-white py-32">
         <div className="container mx-auto px-4">
           <div className="mb-12 text-center">
-            <h2 className="mb-4 text-4xl font-bold">おすすめ企画</h2>
+            <h2 className="mb-4 text-5xl font-bold md:text-6xl">おすすめ企画</h2>
             <p className="text-lg text-gray-600">実行委員会が選ぶ注目の企画</p>
           </div>
           <div className="text-center text-gray-500">現在、おすすめ企画はありません。</div>
@@ -25,10 +25,10 @@ export async function FeaturedEvents() {
   }
 
   return (
-    <section className="bg-gradient-to-b from-gray-50 to-white py-20">
+    <section className="bg-gradient-to-b from-gray-50 to-white py-32">
       <div className="container mx-auto px-4">
         <div className="mb-12 text-center">
-          <h2 className="mb-4 text-4xl font-bold">おすすめ企画</h2>
+          <h2 className="mb-4 text-5xl font-bold md:text-6xl">おすすめ企画</h2>
           <p className="text-lg text-gray-600">実行委員会が選ぶ注目の企画</p>
         </div>
 

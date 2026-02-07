@@ -15,13 +15,16 @@ import { MobileMenu } from "@/components/layout/MobileMenu";
  * - デスクトップ: ロゴ + ナビゲーション + 言語切り替え
  * - モバイル: ロゴ + 言語切り替え + ハンバーガーメニュー
  * - sticky top-0 で固定表示
+ *
+ * IMPORTANT: padding変更時は globals.css の --header-height も更新すること
+ * 現在: py-4 (1rem × 2) + 内容物約32px = 64px (4rem)
  */
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b bg-white shadow-md">
+      <header className="sticky top-0 z-40 border-b bg-white shadow-md">
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
           {/* 左: ロゴ */}
           <Link href="/" className="text-2xl font-bold text-primary">

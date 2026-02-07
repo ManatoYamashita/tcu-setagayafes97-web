@@ -35,6 +35,7 @@ export const siteConfig = {
   sns: {
     twitter: "https://twitter.com/tcu_setagayafes",
     instagram: "https://instagram.com/tcu_setagayafes",
+    facebook: "https://facebook.com/tcu.setagayafes",
   },
 
   // メタデータ
