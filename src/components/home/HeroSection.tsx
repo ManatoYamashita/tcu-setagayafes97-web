@@ -4,17 +4,20 @@ import { siteConfig } from "@/data/site";
 import { SocialIcons } from "@/components/ui/SocialIcons";
 
 /**
- * ヒーローセクション（シンプルなオーバーラップデザイン）
- * - 固定サイズ中心、absolute配置を最小限に
- * - 保守性とシンプルさを最優先
+ * ヒーローセクション（参考サイト構造の完全再現）
+ * - absolute/relative複合レイアウト
+ * - viewport単位（60-62vw × 65-68vh）
+ * - 拡大された円形バッジ（192-320px）
+ * - テキスト左下寄り配置
+ * - 5層z-index構造（z-50/40/30/20/10）
  */
 export function HeroSection() {
   return (
-    <section className="w-full min-h-screen relative bg-accent-green overflow-hidden flex items-center justify-center px-6 py-20">
-      <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        {/* テキストエリア */}
-        <div className="lg:col-span-5 z-10">
-          <h2 className="text-white font-black tracking-tight leading-tight text-5xl lg:text-7xl drop-shadow-lg">
+    <section className="w-full min-h-screen relative bg-accent-green overflow-hidden flex items-center justify-center">
+      {/* テキストエリア（absolute、左下寄り、z-30） */}
+      <div className="absolute left-0 top-0 w-full h-full flex items-end pb-16 lg:pb-20 z-30 pointer-events-none">
+        <div className="max-w-7xl mx-auto w-full px-6 lg:px-8 pointer-events-auto">
+          <h2 className="text-white font-black tracking-tight leading-tight text-5xl lg:text-7xl xl:text-8xl drop-shadow-lg">
             さあ、
             <br />
             森からはじまる
@@ -35,43 +38,45 @@ export function HeroSection() {
             </span>
           </div>
         </div>
+      </div>
 
-        {/* 画像エリア */}
-        <div className="lg:col-span-7 relative">
-          <div className="relative w-full max-w-4xl mx-auto aspect-[4/3] rounded-[3rem] overflow-hidden shadow-2xl">
+      {/* 画像エリア（absolute、右寄り、z-20） */}
+      <div className="absolute right-0 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-20">
+        <div className="relative w-[90vw] sm:w-[60vw] lg:w-[62vw] h-[60vh] sm:h-[65vh] lg:h-[68vh] rounded-[3rem] overflow-hidden shadow-2xl">
+          <Image
+            src="/images/placeholder/p.jpeg"
+            alt={`${siteConfig.name} メインビジュアル`}
+            fill
+            priority
+            fetchPriority="high"
+            className="object-cover"
+            sizes="(max-width: 640px) 90vw, (max-width: 1024px) 60vw, 62vw"
+          />
+
+          {/* 左上通知ラベル（z-40） */}
+          <div className="absolute top-6 left-6 sm:top-8 sm:left-8 bg-accent-yellow px-6 py-3 sm:px-8 sm:py-4 rounded shadow-lg max-w-[85%] sm:max-w-[60%] z-40">
+            <p className="text-xs sm:text-sm font-bold text-dark-green leading-snug">
+              第97回 世田谷祭は、たくさんの想いに支えられフィナーレを迎えました。
+              <br className="hidden sm:block" />
+              たくさんのご来場と応援、ありがとうございました！
+            </p>
+          </div>
+
+          {/* 右上バッジ（z-40） */}
+          <div className="absolute -top-12 -right-12 sm:-top-16 sm:-right-16 md:-top-20 md:-right-20 lg:-top-24 lg:-right-24 w-48 sm:w-56 md:w-64 lg:w-72 xl:w-80 aspect-square rounded-full overflow-hidden shadow-2xl z-40">
             <Image
               src="/images/placeholder/p.jpeg"
-              alt={`${siteConfig.name} メインビジュアル`}
+              alt={`第${siteConfig.edition}回 世田谷祭`}
               fill
-              priority
-              fetchPriority="high"
               className="object-cover"
-              sizes="(max-width: 1024px) 90vw, 800px"
+              sizes="(max-width: 640px) 192px, (max-width: 768px) 224px, (max-width: 1024px) 256px, (max-width: 1280px) 288px, 320px"
             />
-
-            {/* 左上通知ラベル */}
-            <div className="absolute top-6 left-6 bg-accent-yellow px-6 py-3 rounded shadow-lg max-w-[85%]">
-              <p className="text-sm font-bold text-dark-green leading-snug">
-                第97回 世田谷祭 開催決定！
-              </p>
-            </div>
-
-            {/* 右上バッジ */}
-            <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full overflow-hidden shadow-2xl">
-              <Image
-                src="/images/placeholder/p.jpeg"
-                alt={`第${siteConfig.edition}回 世田谷祭`}
-                fill
-                className="object-cover"
-                sizes="160px"
-              />
-            </div>
           </div>
         </div>
       </div>
 
-      {/* 下部中央: SCROLL TO EXPLORE */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+      {/* 下部中央: SCROLL TO EXPLORE（z-50） */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50">
         <div className="flex flex-col items-center text-dark-green">
           <span className="mb-2 text-sm font-semibold uppercase tracking-widest">
             Scroll to Explore
@@ -80,8 +85,8 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* 下部右: SNSアイコン */}
-      <div className="absolute bottom-8 right-8">
+      {/* 下部右: SNSアイコン（z-50） */}
+      <div className="absolute bottom-8 right-8 z-50">
         <SocialIcons layout="horizontal" size="md" showLabel className="text-dark-green" />
       </div>
     </section>
