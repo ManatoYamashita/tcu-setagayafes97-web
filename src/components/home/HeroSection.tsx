@@ -6,16 +6,16 @@ import { SocialIcons } from "@/components/ui/SocialIcons";
 /**
  * ヒーローセクション（参考サイト構造の完全再現）
  * - absolute/relative複合レイアウト
- * - viewport単位（60-62vw × 65-68vh）
- * - 拡大された円形バッジ（192-320px）
+ * - viewport単位（70vw × 80vh デスクトップ、95vw × 65vh モバイル）
+ * - 大幅にはみ出す円形バッジ（224-448px、外側配置）
  * - テキスト左下寄り配置
- * - 5層z-index構造（z-50/40/30/20/10）
+ * - 5層z-index構造（z-50/[45]/40/30/20/10）
  */
 export function HeroSection() {
   return (
     <section className="w-full min-h-screen relative bg-accent-green overflow-hidden flex items-center justify-center">
       {/* テキストエリア（absolute、左下寄り、z-30） */}
-      <div className="absolute left-0 top-0 w-full h-full flex items-end pb-16 lg:pb-20 z-30 pointer-events-none">
+      <div className="absolute left-0 top-0 w-full h-full flex items-end pb-20 lg:pb-24 xl:pb-28 z-30 pointer-events-none">
         <div className="max-w-7xl mx-auto w-full px-6 lg:px-8 pointer-events-auto">
           <h2 className="text-white font-black tracking-tight leading-tight text-5xl lg:text-7xl xl:text-8xl drop-shadow-lg">
             さあ、
@@ -41,35 +41,38 @@ export function HeroSection() {
       </div>
 
       {/* 画像エリア（absolute、右寄り、z-20） */}
-      <div className="absolute right-0 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-20">
-        <div className="relative w-[90vw] sm:w-[60vw] lg:w-[62vw] h-[60vh] sm:h-[65vh] lg:h-[68vh] rounded-[3rem] overflow-hidden shadow-2xl">
-          <Image
-            src="/images/placeholder/p.jpeg"
-            alt={`${siteConfig.name} メインビジュアル`}
-            fill
-            priority
-            fetchPriority="high"
-            className="object-cover"
-            sizes="(max-width: 640px) 90vw, (max-width: 1024px) 60vw, 62vw"
-          />
+      <div className="absolute right-0 sm:right-6 md:right-8 lg:right-12 xl:right-16 top-1/2 -translate-y-1/2 z-20">
+        {/* 新規ラッパー追加 */}
+        <div className="relative">
+          <div className="relative w-[95vw] sm:w-[85vw] md:w-[78vw] lg:w-[72vw] xl:w-[70vw] h-[65vh] sm:h-[72vh] md:h-[75vh] lg:h-[78vh] xl:h-[80vh] rounded-[3rem] overflow-hidden shadow-2xl">
+            <Image
+              src="/images/placeholder/p.jpeg"
+              alt={`${siteConfig.name} メインビジュアル`}
+              fill
+              priority
+              fetchPriority="high"
+              className="object-cover"
+              sizes="(max-width: 640px) 95vw, (max-width: 768px) 85vw, (max-width: 1024px) 78vw, (max-width: 1280px) 72vw, 70vw"
+            />
 
-          {/* 左上通知ラベル（z-40） */}
-          <div className="absolute top-6 left-6 sm:top-8 sm:left-8 bg-accent-yellow px-6 py-3 sm:px-8 sm:py-4 rounded shadow-lg max-w-[85%] sm:max-w-[60%] z-40">
-            <p className="text-xs sm:text-sm font-bold text-dark-green leading-snug">
-              第97回 世田谷祭は、たくさんの想いに支えられフィナーレを迎えました。
-              <br className="hidden sm:block" />
-              たくさんのご来場と応援、ありがとうございました！
-            </p>
+            {/* 左上通知ラベル（z-40、内側維持） */}
+            <div className="absolute top-6 left-6 sm:top-8 sm:left-8 bg-accent-yellow px-6 py-3 sm:px-8 sm:py-4 rounded shadow-lg max-w-[85%] sm:max-w-[60%] z-40">
+              <p className="text-xs sm:text-sm font-bold text-dark-green leading-snug">
+                第97回 世田谷祭は、たくさんの想いに支えられフィナーレを迎えました。
+                <br className="hidden sm:block" />
+                たくさんのご来場と応援、ありがとうございました！
+              </p>
+            </div>
           </div>
 
-          {/* 右上バッジ（z-40） */}
-          <div className="absolute -top-12 -right-12 sm:-top-16 sm:-right-16 md:-top-20 md:-right-20 lg:-top-24 lg:-right-24 w-48 sm:w-56 md:w-64 lg:w-72 xl:w-80 aspect-square rounded-full overflow-hidden shadow-2xl z-40">
+          {/* 円形バッジを外側に移動 */}
+          <div className="absolute -top-16 -right-16 sm:-top-24 sm:-right-24 md:-top-32 md:-right-32 lg:-top-40 lg:-right-40 xl:-top-48 xl:-right-48 w-56 sm:w-64 md:w-80 lg:w-96 xl:w-[26rem] 2xl:w-[28rem] aspect-square rounded-full overflow-hidden shadow-2xl z-[45]">
             <Image
               src="/images/placeholder/p.jpeg"
               alt={`第${siteConfig.edition}回 世田谷祭`}
               fill
               className="object-cover"
-              sizes="(max-width: 640px) 192px, (max-width: 768px) 224px, (max-width: 1024px) 256px, (max-width: 1280px) 288px, 320px"
+              sizes="(max-width: 640px) 224px, (max-width: 768px) 256px, (max-width: 1024px) 320px, (max-width: 1280px) 384px, (max-width: 1536px) 416px, 448px"
             />
           </div>
         </div>
