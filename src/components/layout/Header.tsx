@@ -39,9 +39,7 @@ export function Header() {
     <>
       <header
         className={`sticky top-0 z-40 bg-white transition-all duration-300 ${
-          isScrolled
-            ? "shadow-md border-b border-gray-300"
-            : "shadow-sm border-b border-gray-200/50"
+          isScrolled ? "border-b border-gray-300" : "border-b border-gray-200/50"
         }`}
       >
         <div className="container mx-auto flex items-center justify-between px-6 py-5">
