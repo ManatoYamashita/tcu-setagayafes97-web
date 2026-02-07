@@ -12,7 +12,7 @@ import { NavDropdown } from "@/components/layout/NavDropdown";
 export function DesktopNav() {
   return (
     <nav className="hidden md:block">
-      <ul className="flex gap-6">
+      <ul className="flex gap-8">
         {navigationConfig.header.map((item) => (
           <li key={item.href}>
             {"children" in item && item.children ? (

@@ -14,7 +14,7 @@ import { SocialIcons } from "@/components/ui/SocialIcons";
  */
 export function HeroSection() {
   return (
-    <section className="w-full min-h-[calc(100vh-4rem)] pt-16 relative bg-accent-green overflow-hidden flex items-center justify-center">
+    <section className="w-full min-h-[calc(100vh-5rem)] pt-20 relative bg-accent-green overflow-hidden flex items-center justify-center">
       {/* テキストエリア（absolute、左下寄り、z-20） */}
       <div className="absolute left-0 top-0 w-full h-full flex items-end pb-12 lg:pb-16 xl:pb-20 z-20 pointer-events-none">
         <div className="max-w-7xl mx-auto w-full px-6 lg:px-8 pointer-events-auto">

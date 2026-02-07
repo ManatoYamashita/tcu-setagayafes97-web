@@ -1,44 +1,55 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-
-// LanguageSwitcher を dynamic import で遅延ロード（SSR無効化）
-const LanguageSwitcher = dynamic(
-  () => import("@/components/layout/LanguageSwitcher").then((mod) => mod.LanguageSwitcher),
-  {
-    ssr: false,
-    loading: () => null,
-  }
-);
+import Link from "next/link";
 
 /**
- * LanguageSwitcher のラッパーコンポーネント
+ * シンプルな言語切り替えコンポーネント
  *
- * next-intl のコンテキストがある場合のみ LanguageSwitcher を表示
- * コンテキストがない場合（ルートページ等）は何も表示しない
- *
+ * 表示形式: JP / EN / ZH / KO （シンプルテキストリンク）
  * [locale] ルート配下（/en, /zh, /ko, /ja で始まるパス）の場合のみ表示
  */
 export function LanguageSwitcherWrapper() {
-  const [shouldShow, setShouldShow] = useState(false);
+  const [currentLocale, setCurrentLocale] = useState<string | null>(null);
 
   useEffect(() => {
-    // クライアントサイドで pathname をチェック
     const pathname = window.location.pathname;
-    const hasLocaleInPath =
-      pathname.startsWith("/en") ||
-      pathname.startsWith("/zh") ||
-      pathname.startsWith("/ko") ||
-      pathname.startsWith("/ja");
+    const localeMatch = pathname.match(/^\/(ja|en|zh|ko)/);
 
-    setShouldShow(hasLocaleInPath);
+    if (localeMatch) {
+      setCurrentLocale(localeMatch[1]);
+    }
   }, []);
 
   // next-intl コンテキストがない場合は何も表示しない
-  if (!shouldShow) {
+  if (!currentLocale) {
     return null;
   }
 
-  return <LanguageSwitcher />;
+  const locales = [
+    { code: "ja", label: "JP" },
+    { code: "en", label: "EN" },
+    { code: "zh", label: "ZH" },
+    { code: "ko", label: "KO" },
+  ];
+
+  return (
+    <div className="flex items-center gap-2 text-sm font-medium">
+      {locales.map((locale, index) => (
+        <div key={locale.code} className="flex items-center gap-2">
+          <Link
+            href={`/${locale.code}`}
+            className={
+              currentLocale === locale.code
+                ? "text-primary font-bold"
+                : "text-gray-700 hover:text-primary transition-colors"
+            }
+          >
+            {locale.label}
+          </Link>
+          {index < locales.length - 1 && <span className="text-gray-400">/</span>}
+        </div>
+      ))}
+    </div>
+  );
 }

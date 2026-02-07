@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import { siteConfig } from "@/data/site";
@@ -9,25 +9,47 @@ import { DesktopNav } from "@/components/layout/DesktopNav";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 
 /**
- * 共通ヘッダーコンポーネント
+ * 共通ヘッダーコンポーネント（Glassmorphism デザイン）
  *
  * - 全ページで表示される共通ヘッダー
  * - デスクトップ: ロゴ + ナビゲーション + 言語切り替え
  * - モバイル: ロゴ + 言語切り替え + ハンバーガーメニュー
  * - sticky top-0 で固定表示
+ * - スクロール前: 透明背景
+ * - スクロール時: 半透明glass背景（backdrop-blur-md）
  *
  * IMPORTANT: padding変更時は globals.css の --header-height も更新すること
- * 現在: py-4 (1rem × 2) + 内容物約32px = 64px (4rem)
+ * 現在: py-5 (1.25rem × 2) + 内容物約32px = 80px (5rem)
  */
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // スクロール検知
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b bg-white shadow-md">
-        <div className="container mx-auto flex items-center justify-between px-4 py-4">
+      <header
+        className={`sticky top-0 z-40 transition-all duration-300 ${
+          isScrolled
+            ? "bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200/50"
+            : "bg-transparent"
+        }`}
+      >
+        <div className="container mx-auto flex items-center justify-between px-6 py-5">
           {/* 左: ロゴ */}
-          <Link href="/" className="text-2xl font-bold text-primary">
+          <Link
+            href="/"
+            className="text-3xl font-bold text-primary transition-colors hover:text-primary/80"
+          >
             {siteConfig.shortName}
           </Link>
 
