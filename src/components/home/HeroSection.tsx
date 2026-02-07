@@ -56,8 +56,8 @@ export function HeroSection() {
               sizes="(max-width: 640px) 95vw, (max-width: 768px) 85vw, (max-width: 1024px) 78vw, (max-width: 1280px) 72vw, 70vw"
             />
 
-            {/* 左上通知ラベル（z-40、内側維持） */}
-            <div className="absolute top-6 left-6 sm:top-8 sm:left-8 bg-accent-yellow px-6 py-3 sm:px-8 sm:py-4 rounded shadow-lg max-w-[85%] sm:max-w-[60%] z-40">
+            {/* 左上通知ラベル（z-30、内側維持） */}
+            <div className="absolute top-6 left-6 sm:top-8 sm:left-8 bg-accent-yellow px-6 py-3 sm:px-8 sm:py-4 rounded shadow-lg max-w-[85%] sm:max-w-[60%] z-30">
               <p className="text-xs sm:text-sm font-bold text-dark-green leading-snug">
                 第97回 世田谷祭は、たくさんの想いに支えられフィナーレを迎えました。
                 <br className="hidden sm:block" />
