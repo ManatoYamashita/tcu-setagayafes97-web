@@ -15,6 +15,9 @@ docs/
 ├── INDEX.md          # 本索引ファイル
 ├── dev/              # 開発関連ドキュメント
 │   └── git.md        # ブランチ戦略とCI/CDワークフロー
+├── frontend/         # フロントエンド関連ドキュメント
+│   ├── agent-browser-workflow.md  # agent-browserを使用したデザイン再現とデバッグフロー
+│   └── layout-patterns.md         # レイアウトパターンと設計原則
 └── requires/         # 要件定義・仕様関連
     ├── require.md    # プロジェクト要件定義書
     └── todo.md       # プロジェクト開発タスクリスト
@@ -70,6 +73,20 @@ docs/
   - コミットメッセージ規約
   - 運用フロー例とトラブルシューティング
 
+### フロントエンド関連（frontend/）
+
+- **[agent-browser-workflow.md](./frontend/agent-browser-workflow.md)** - agent-browserを使用したデザイン再現とデバッグの標準フロー
+  - デザイン再現3ステップ（分析→実装→検証）
+  - 数値測定手法とコマンド集（Header高さ、z-index階層、viewport占有率）
+  - レスポンシブテスト標準手順（375px/768px/1920px）
+  - デバッグワークフロー（Layout Shift検出、z-index競合確認）
+
+- **[layout-patterns.md](./frontend/layout-patterns.md)** - レイアウトパターンと設計原則
+  - Header/Hero統合パターン（calc()による実効100vh、CSS変数化）
+  - z-index管理とレイヤー構造（標準スケール: 10/20/30/40/60）
+  - absolute/fixed/sticky使い分けガイド
+  - レスポンシブ高さ計算（100vh vs 100svh、モバイルSafari対策）
+
 ## 更新手順（PDCA）
 
 1. PLAN: 既存の配置と命名を本索引で確認し、追加箇所を決める。
@@ -79,4 +96,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-01-18
+**最終更新日**: 2026-02-07
