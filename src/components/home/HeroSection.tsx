@@ -16,7 +16,7 @@ export function HeroSection() {
   return (
     <section className="w-full min-h-[calc(100vh-4rem)] pt-16 relative bg-accent-green overflow-hidden flex items-center justify-center">
       {/* テキストエリア（absolute、左下寄り、z-20） */}
-      <div className="absolute left-0 top-0 w-full h-full flex items-end pb-20 lg:pb-24 xl:pb-28 z-20 pointer-events-none">
+      <div className="absolute left-0 top-0 w-full h-full flex items-end pb-12 lg:pb-16 xl:pb-20 z-20 pointer-events-none">
         <div className="max-w-7xl mx-auto w-full px-6 lg:px-8 pointer-events-auto">
           <h2 className="text-white font-bold tracking-tight leading-tight text-4xl lg:text-5xl xl:text-6xl drop-shadow-lg">
             さあ、
@@ -26,7 +26,7 @@ export function HeroSection() {
             未来へ
           </h2>
 
-          <div className="flex items-center gap-4 mt-8">
+          <div className="flex items-center gap-4 mt-6">
             <a
               href="/events"
               aria-label="企画一覧を見る"
@@ -66,8 +66,15 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* 円形バッジを外側に移動（z-30） */}
-          <div className="absolute -top-6 -right-6 sm:-top-8 sm:-right-8 md:-top-10 md:-right-10 lg:-top-12 lg:-right-12 xl:-top-14 xl:-right-14 2xl:-top-16 2xl:-right-16 w-32 sm:w-40 md:w-48 lg:w-56 xl:w-60 2xl:w-64 aspect-square rounded-full overflow-hidden shadow-2xl z-30">
+          {/* 円形バッジを外側に移動（z-30）
+              サイズとオフセット（25%はみ出し統一）:
+              128px → -32px (-top-8/-right-8)
+              160px → -40px (-top-10/-right-10)
+              192px → -48px (-top-12/-right-12)
+              224px → -56px (-top-14/-right-14)
+              240px → -60px (Tailwind -top-14 で近似、理想は-top-15)
+              256px → -64px (-top-16/-right-16) */}
+          <div className="absolute -top-8 -right-8 sm:-top-10 sm:-right-10 md:-top-12 md:-right-12 lg:-top-14 lg:-right-14 xl:-top-14 xl:-right-14 2xl:-top-16 2xl:-right-16 w-32 sm:w-40 md:w-48 lg:w-56 xl:w-60 2xl:w-64 aspect-square rounded-full overflow-hidden shadow-2xl z-30">
             <Image
               src="/images/placeholder/p.jpeg"
               alt={`第${siteConfig.edition}回 世田谷祭`}
