@@ -50,3 +50,8 @@ next-env.d.ts
 *.swp
 *.swo
 *~
+
+# Claude/Serena temporary files
+.claude/skills/
+.serena/
+stagewise.json
