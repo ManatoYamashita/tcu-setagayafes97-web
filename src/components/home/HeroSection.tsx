@@ -96,9 +96,9 @@ export function HeroSection() {
         className="absolute bottom-0 right-0 w-[350px] h-[350px] md:w-[450px] md:h-[450px] lg:w-[550px] lg:h-[550px] z-[15] pointer-events-none"
         style={{
           maskImage:
-            "radial-gradient(ellipse at 100% 100%, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0) 70%)",
+            "linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0) 80%)",
           WebkitMaskImage:
-            "radial-gradient(ellipse at 100% 100%, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0) 70%)",
+            "linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0) 80%)",
         }}
       >
         <PixelBlast
