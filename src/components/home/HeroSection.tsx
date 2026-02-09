@@ -3,7 +3,6 @@ import { ArrowRight, ChevronDown } from "lucide-react";
 import { siteConfig } from "@/data/site";
 import { SocialIcons } from "@/components/ui/SocialIcons";
 import { BackgroundLineAnimation } from "@/components/animation/BackgroundLineAnimation";
-import PixelBlast from "@/components/animation/PixelBlast";
 
 /**
  * ヒーローセクション（参考サイト構造の完全再現）
@@ -89,34 +88,6 @@ export function HeroSection() {
             />
           </div>
         </div>
-      </div>
-
-      {/* Pixel Blast エフェクト（右下から自然に湧き出る、z-15、画像の上） */}
-      <div
-        className="absolute bottom-0 right-0 w-[350px] h-[350px] md:w-[450px] md:h-[450px] lg:w-[550px] lg:h-[550px] z-[15] pointer-events-none"
-        style={{
-          maskImage:
-            "linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0) 80%)",
-          WebkitMaskImage:
-            "linear-gradient(to top left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0) 80%)",
-        }}
-      >
-        <PixelBlast
-          variant="square"
-          pixelSize={20}
-          color="#B19EEF"
-          patternScale={1.5}
-          patternDensity={0.8}
-          pixelSizeJitter={1.3}
-          enableRipples={false}
-          rippleSpeed={0.4}
-          rippleThickness={0.12}
-          rippleIntensityScale={1.5}
-          liquid={true}
-          speed={1.2}
-          edgeFade={0.6}
-          transparent
-        />
       </div>
 
       {/* 下部中央: SCROLL TO EXPLORE（z-30） */}
