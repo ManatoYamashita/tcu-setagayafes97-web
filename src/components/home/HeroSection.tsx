@@ -3,6 +3,7 @@ import { ArrowRight, ChevronDown } from "lucide-react";
 import { siteConfig } from "@/data/site";
 import { SocialIcons } from "@/components/ui/SocialIcons";
 import { BackgroundLineAnimation } from "@/components/animation/BackgroundLineAnimation";
+import PixelBlast from "@/components/animation/PixelBlast";
 
 /**
  * ヒーローセクション（参考サイト構造の完全再現）
@@ -11,7 +12,7 @@ import { BackgroundLineAnimation } from "@/components/animation/BackgroundLineAn
  * - 円形バッジ（128-256px、外側配置、参考サイト水準）
  * - テキスト左下寄り配置
  * - Header高さ考慮（min-h-[calc(100vh-4rem)] + pt-16）
- * - z-index標準化（Header: z-40 > Hero内最上位: z-30 > Hero内ベース: z-20/10）
+ * - z-index標準化（Header: z-40 > Hero内最上位: z-30 > Hero内ベース: z-20/10 > 背景装飾: z-5 > 背景: z-0）
  */
 export function HeroSection() {
   return (
@@ -88,6 +89,22 @@ export function HeroSection() {
             />
           </div>
         </div>
+      </div>
+
+      {/* Pixel Blast エフェクト（右下、z-5） */}
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px] z-[5] pointer-events-none">
+        <PixelBlast
+          variant="square"
+          pixelSize={8}
+          color="#CD79EE"
+          patternScale={2}
+          patternDensity={2}
+          pixelSizeJitter={0}
+          enableRipples={false}
+          speed={0.5}
+          edgeFade={0.2}
+          transparent
+        />
       </div>
 
       {/* 下部中央: SCROLL TO EXPLORE（z-30） */}
