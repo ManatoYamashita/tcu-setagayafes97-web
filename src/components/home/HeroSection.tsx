@@ -12,7 +12,7 @@ import PixelBlast from "@/components/animation/PixelBlast";
  * - 円形バッジ（128-256px、外側配置、参考サイト水準）
  * - テキスト左下寄り配置
  * - Header高さ考慮（min-h-[calc(100vh-4rem)] + pt-16）
- * - z-index標準化（Header: z-40 > Hero内最上位: z-30 > Hero内ベース: z-20/10 > 背景装飾: z-5 > 背景: z-0）
+ * - z-index標準化（Header: z-40 > Hero内最上位: z-30 > Hero内ベース: z-20 > 装飾エフェクト: z-15 > 画像: z-10 > 背景: z-0）
  */
 export function HeroSection() {
   return (
@@ -91,18 +91,27 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Pixel Blast エフェクト（右下、z-5） */}
-      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px] z-[5] pointer-events-none">
+      {/* Pixel Blast エフェクト（右下、z-15、画像の上、炎形状） */}
+      <div
+        className="absolute bottom-0 right-0 w-[400px] h-[400px] md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px] z-[15] pointer-events-none"
+        style={{
+          clipPath: "polygon(0% 100%, 100% 100%, 75% 50%, 85% 25%, 50% 0%, 15% 25%, 25% 50%)",
+        }}
+      >
         <PixelBlast
           variant="square"
-          pixelSize={8}
-          color="#CD79EE"
-          patternScale={2}
+          pixelSize={5}
+          color="#B19EEF"
+          patternScale={1}
           patternDensity={2}
-          pixelSizeJitter={0}
+          pixelSizeJitter={1.15}
           enableRipples={false}
+          rippleSpeed={0.4}
+          rippleThickness={0.12}
+          rippleIntensityScale={1.5}
+          liquid={false}
           speed={0.5}
-          edgeFade={0.2}
+          edgeFade={0.29}
           transparent
         />
       </div>
