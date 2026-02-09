@@ -2,6 +2,7 @@ import Image from "next/image";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { siteConfig } from "@/data/site";
 import { SocialIcons } from "@/components/ui/SocialIcons";
+import { HeroPixelBlast } from "@/components/home/HeroPixelBlast";
 
 /**
  * ヒーローセクション（参考サイト構造の完全再現）
@@ -63,6 +64,11 @@ export function HeroSection() {
                 <br className="hidden sm:block" />
                 たくさんのご来場と応援、ありがとうございました！
               </p>
+            </div>
+
+            {/* 右下PixelBlastエフェクト（画像の右下2/3を覆う、z-20） */}
+            <div className="absolute bottom-0 right-0 w-2/3 h-2/3 z-20 pointer-events-auto">
+              <HeroPixelBlast />
             </div>
           </div>
 
