@@ -100,18 +100,18 @@ export function HeroSection() {
       >
         <PixelBlast
           variant="square"
-          pixelSize={5}
+          pixelSize={20}
           color="#B19EEF"
-          patternScale={1}
-          patternDensity={2}
-          pixelSizeJitter={1.15}
+          patternScale={1.5}
+          patternDensity={0.8}
+          pixelSizeJitter={1.3}
           enableRipples={false}
           rippleSpeed={0.4}
           rippleThickness={0.12}
           rippleIntensityScale={1.5}
-          liquid={false}
-          speed={0.5}
-          edgeFade={0.29}
+          liquid={true}
+          speed={1.2}
+          edgeFade={0.4}
           transparent
         />
       </div>
