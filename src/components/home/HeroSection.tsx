@@ -91,11 +91,14 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Pixel Blast エフェクト（右下、z-15、画像の上、炎形状） */}
+      {/* Pixel Blast エフェクト（右下から自然に湧き出る、z-15、画像の上） */}
       <div
-        className="absolute bottom-0 right-0 w-[400px] h-[400px] md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px] z-[15] pointer-events-none"
+        className="absolute bottom-0 right-0 w-[350px] h-[350px] md:w-[450px] md:h-[450px] lg:w-[550px] lg:h-[550px] z-[15] pointer-events-none"
         style={{
-          clipPath: "polygon(0% 100%, 100% 100%, 75% 50%, 85% 25%, 50% 0%, 15% 25%, 25% 50%)",
+          maskImage:
+            "radial-gradient(ellipse at 100% 100%, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0) 70%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse at 100% 100%, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0) 70%)",
         }}
       >
         <PixelBlast
@@ -111,7 +114,7 @@ export function HeroSection() {
           rippleIntensityScale={1.5}
           liquid={true}
           speed={1.2}
-          edgeFade={0.4}
+          edgeFade={0.6}
           transparent
         />
       </div>
