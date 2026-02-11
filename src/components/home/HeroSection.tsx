@@ -2,7 +2,6 @@ import Image from "next/image";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { siteConfig } from "@/data/site";
 import { SocialIcons } from "@/components/ui/SocialIcons";
-import { BackgroundLineAnimation } from "@/components/animation/BackgroundLineAnimation";
 
 /**
  * ヒーローセクション（100svh基準レイアウト）
@@ -18,11 +17,8 @@ import { BackgroundLineAnimation } from "@/components/animation/BackgroundLineAn
 export function HeroSection() {
   return (
     <section className="relative w-full">
-      {/* 紫背景＋白ラインアニメーションの親要素（ファーストビュー＋Scroll/SNS全体を包含） */}
-      <div className="relative">
-        {/* 背景ラインアニメーション（ページ読み込みごと、親要素全体を覆う） */}
-        <BackgroundLineAnimation />
-
+      {/* コンテンツ親要素（ファーストビュー＋Scroll/SNS全体） */}
+      <div>
         {/* ファーストビュー領域（100svh - Header高さ） */}
         <div className="relative h-[calc(100svh-5rem)] overflow-hidden flex items-center justify-center">
           {/* テキストエリア（absolute、左下寄り、z-20） */}
@@ -97,7 +93,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* 追加領域（Scroll/SNS、ファーストビュー以降、同じ紫背景＋白ライン上） */}
+        {/* 追加領域（Scroll/SNS、ファーストビュー以降、単色紫背景） */}
         <div className="relative py-12 lg:py-16 bg-primary">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto px-6 lg:px-8">
             {/* 左カラム（空、デスクトップのみ） */}
