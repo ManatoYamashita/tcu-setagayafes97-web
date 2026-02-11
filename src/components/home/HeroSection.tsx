@@ -19,7 +19,7 @@ export function HeroSection() {
   return (
     <section className="relative w-full">
       {/* 紫背景＋白ラインアニメーションの親要素（ファーストビュー＋Scroll/SNS全体を包含） */}
-      <div className="relative min-h-screen">
+      <div className="relative">
         {/* 背景ラインアニメーション（ページ読み込みごと、親要素全体を覆う） */}
         <BackgroundLineAnimation />
 
@@ -98,9 +98,12 @@ export function HeroSection() {
         </div>
 
         {/* 追加領域（Scroll/SNS、ファーストビュー以降、同じ紫背景＋白ライン上） */}
-        <div className="relative py-12 lg:py-16">
-          <div className="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row items-center justify-center md:justify-between gap-8">
-            {/* SCROLL TO EXPLORE（中央） */}
+        <div className="relative py-12 lg:py-16 bg-primary">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto px-6 lg:px-8">
+            {/* 左カラム（空、デスクトップのみ） */}
+            <div className="hidden md:block"></div>
+
+            {/* 中央カラム: SCROLL TO EXPLORE */}
             <div className="flex flex-col items-center text-white">
               <span className="mb-2 text-sm font-semibold uppercase tracking-widest">
                 Scroll to Explore
@@ -108,8 +111,8 @@ export function HeroSection() {
               <ChevronDown className="h-6 w-6 animate-bounce" />
             </div>
 
-            {/* OFFICIAL SNS（右寄り、デスクトップのみ） */}
-            <div className="text-white">
+            {/* 右カラム: OFFICIAL SNS */}
+            <div className="flex justify-center md:justify-end text-white">
               <SocialIcons layout="horizontal" size="md" showLabel className="text-white" />
             </div>
           </div>
