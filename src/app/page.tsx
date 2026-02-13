@@ -1,64 +1,72 @@
-import { HeroSection } from "@/components/home/HeroSection";
-import { EventOverview } from "@/components/home/EventOverview";
-import { AboutSection } from "@/components/home/AboutSection";
-import { NewsSection } from "@/components/home/NewsSection";
-import { FeaturedEvents } from "@/components/home/FeaturedEvents";
-import { SponsorBanner } from "@/components/home/SponsorBanner";
-import { StartupAnimation } from "@/components/home/StartupAnimation";
-import { ScrollAnimation } from "@/components/animation/ScrollAnimation";
-import { HeroDiagonalLine } from "@/components/home/HeroDiagonalLine";
+import type { Metadata } from "next";
+import { siteConfig } from "@/data/site";
+import { CountdownTimer } from "@/components/countdown/CountdownTimer";
+import { CountdownNewsSection } from "@/components/countdown/CountdownNewsSection";
+import { SocialIcons } from "@/components/ui/SocialIcons";
+import { GradientBlindsBackground } from "@/components/background/GradientBlindsBackground";
+
+export const metadata: Metadata = {
+  title: `Coming Soon | ${siteConfig.name}`,
+  description: `${siteConfig.name}の公式Webサイトは近日公開予定です。`,
+};
+
+export const revalidate = 3600;
 
 /**
- * トップページ
- * 第97回世田谷祭の公式Webサイト
+ * カウントダウン専用トップページ
+ * 本番サイト公開前のティザーページ
  */
 export default function Home() {
   return (
-    <>
-      {/* 起動アニメーション（初回訪問時のみ） */}
-      <StartupAnimation />
+    <main className="relative overflow-hidden bg-[#1a0a2e]">
+      {/* 背景: Gradient Blinds */}
+      <GradientBlindsBackground />
 
-      {/* メインコンテンツ */}
-      <ScrollAnimation>
-        <main className="bg-primary relative">
-          {/* 背景レイヤー: 白い斜め帯（z-[1]） */}
-          <HeroDiagonalLine />
+      {/* Hero Section */}
+      <section className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-20">
+        {/* サイトタイトル */}
+        <div className="relative z-10 mb-12 text-center">
+          <p className="mb-2 text-sm font-semibold tracking-widest text-white/60 md:text-base">
+            第{siteConfig.edition}回
+          </p>
+          <h1 className="text-3xl font-bold text-white md:text-5xl">{siteConfig.shortName}</h1>
+          <p className="mt-2 text-sm text-[#CD79EE] md:text-base">東京都市大学 世田谷キャンパス</p>
+        </div>
 
-          {/* コンテンツレイヤー（z-[2]） */}
-          <div className="relative z-[2]">
-            {/* ヒーローセクション */}
-            <HeroSection />
+        {/* カウントダウンタイマー */}
+        <div className="relative z-10 w-full max-w-4xl">
+          <CountdownTimer />
+        </div>
 
-            {/* お知らせ（スクロールアニメーション適用） */}
-            <div data-scroll>
-              <NewsSection />
-            </div>
-
-            {/* 開催概要（スクロールアニメーション適用） */}
-            <div data-scroll>
-              <EventOverview />
-            </div>
-
-            {/* ABOUT（スクロールアニメーション適用） */}
-            <div data-scroll>
-              <AboutSection />
-            </div>
-
-            {/* おすすめ企画（スクロールアニメーション適用） */}
-            <div data-scroll>
-              <FeaturedEvents />
-            </div>
-
-            {/* 協賛企業（スクロールアニメーション適用） */}
-            <div data-scroll>
-              <SponsorBanner />
-            </div>
+        {/* 開催情報 */}
+        <div className="relative z-10 mt-12 text-center">
+          <div className="space-y-2 text-sm text-white/80 md:text-base">
+            <p>
+              <span className="font-semibold text-white">日程</span>
+              <span className="mx-2 text-white/40">|</span>
+              {siteConfig.dates.day1} 〜 {siteConfig.dates.day2}
+            </p>
+            <p>
+              <span className="font-semibold text-white">時間</span>
+              <span className="mx-2 text-white/40">|</span>
+              {siteConfig.openTime} 〜 {siteConfig.closeTime}
+            </p>
+            <p>
+              <span className="font-semibold text-white">会場</span>
+              <span className="mx-2 text-white/40">|</span>
+              {siteConfig.venue}
+            </p>
           </div>
-        </main>
-      </ScrollAnimation>
-    </>
+        </div>
+
+        {/* SNS アイコン */}
+        <div className="relative z-10 mt-10">
+          <SocialIcons layout="horizontal" size="lg" className="text-white/60" />
+        </div>
+      </section>
+
+      {/* News Section */}
+      <CountdownNewsSection />
+    </main>
   );
 }
-
-// ISR設定: 1時間ごとに再検証
-export const revalidate = 3600;
