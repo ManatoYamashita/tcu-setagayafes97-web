@@ -1,95 +1,111 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { getNewsList } from "@/lib/news";
-import { Badge } from "@/components/ui/Badge";
-import type { News } from "@/lib/news";
+import { NewsCard } from "@/components/home/NewsCard";
 
 /**
  * お知らせセクション
- * 最新のお知らせ5件をリスト形式で表示
+ * 紫背景 + 白セミモーダルの二層構造
+ * デスクトップ: 左25%見出し / 右75%カードグリッド
  */
 export async function NewsSection() {
-  const newsList = await getNewsList(5);
+  const newsList = await getNewsList(8);
 
-  // 新しいかどうかを判定（7日以内）
-  const isNew = (news: News) => {
-    const publishDate = new Date(news.publishedAt || news.createdAt);
-    const now = new Date();
-    const diffDays = (now.getTime() - publishDate.getTime()) / (1000 * 60 * 60 * 24);
-    return diffDays <= 7;
-  };
-
-  // データが取得できない場合の表示
   if (newsList.length === 0) {
     return (
-      <section className="bg-white py-32">
-        <div className="container mx-auto px-4">
-          <div className="mb-12 flex items-center justify-between">
-            <h2 className="text-5xl font-bold md:text-6xl">お知らせ</h2>
+      <section className="pt-6 px-6 pb-0 md:pt-24">
+        <div className="rounded-t-3xl bg-white px-4 py-16 sm:px-6 md:py-20 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-12">
+              <h2 className="text-5xl font-bold tracking-tight md:text-6xl">NEWS</h2>
+            </div>
+            <div className="text-center text-gray-500">現在、お知らせはありません。</div>
           </div>
-          <div className="text-center text-gray-500">現在、お知らせはありません。</div>
         </div>
       </section>
     );
   }
 
+  const largeCards = newsList.slice(0, 2);
+  const defaultCards = newsList.slice(2);
+
   return (
-    <section className="bg-white py-32">
-      <div className="container mx-auto px-4">
-        {/* セクションタイトル */}
-        <div className="mb-12 flex items-center justify-between">
-          <h2 className="text-5xl font-bold md:text-6xl">お知らせ</h2>
-          <Link
-            href="/info"
-            className="flex items-center gap-2 text-primary transition-colors hover:text-primary/80"
-          >
-            <span className="font-semibold">もっと見る</span>
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
-        </div>
+    <section className="pt-6 px-6 pb-0 md:pt-24">
+      <div className="rounded-t-3xl bg-white px-4 py-16 sm:px-6 md:py-20 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          {/* デスクトップ: 左見出し + 右カードグリッド */}
+          <div className="hidden lg:grid lg:grid-cols-[280px_1fr] lg:gap-10">
+            {/* 左カラム: 見出し + リンク */}
+            <div className="flex flex-col justify-between lg:justify-start lg:gap-6 py-2">
+              <h2 className="text-5xl font-bold tracking-tight xl:text-6xl">NEWS</h2>
+              <Link
+                href="/info"
+                className="flex items-center gap-3 transition-opacity hover:opacity-70"
+              >
+                <span className="text-sm font-semibold tracking-wider">NEWS ALL</span>
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-900">
+                  <ArrowRight className="h-4 w-4 text-white" />
+                </span>
+              </Link>
+            </div>
 
-        {/* リスト形式の表示 */}
-        <div className="space-y-4">
-          {newsList.map((news) => (
-            <Link
-              key={news.id}
-              href={`/info/${news.id}`}
-              className="group flex items-center justify-between gap-6 rounded-2xl bg-white p-6 shadow transition-all hover:shadow-lg"
-            >
-              <div className="flex flex-1 items-center gap-4">
-                {/* 日付 */}
-                <time className="min-w-[120px] text-sm font-semibold text-gray-500">
-                  {new Date(news.publishedAt || news.createdAt).toLocaleDateString("ja-JP", {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                  })}
-                </time>
-
-                {/* NEWバッジ */}
-                {isNew(news) && <Badge variant="news" label="NEW" />}
-
-                {/* タイトル */}
-                <h3 className="flex-1 font-semibold text-gray-900 line-clamp-1">{news.title}</h3>
+            {/* 右カラム: カードグリッド */}
+            <div className="space-y-6">
+              {/* 上段: largeカード 2枚 */}
+              <div className="grid grid-cols-2 gap-6">
+                {largeCards.map((news) => (
+                  <NewsCard key={news.id} news={news} variant="large" />
+                ))}
               </div>
 
-              {/* 矢印アイコン */}
-              <svg
-                className="h-5 w-5 flex-shrink-0 text-gray-400 transition-transform group-hover:translate-x-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+              {/* 下段: defaultカード 3列 */}
+              {defaultCards.length > 0 && (
+                <div className="grid grid-cols-3 gap-6">
+                  {defaultCards.map((news) => (
+                    <NewsCard key={news.id} news={news} variant="default" />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* タブレット・モバイル */}
+          <div className="lg:hidden">
+            {/* 見出し + ボタン */}
+            <div className="mb-8 flex items-end justify-between">
+              <h2 className="text-5xl font-bold tracking-tight md:text-6xl">NEWS</h2>
+              <Link
+                href="/info"
+                className="flex items-center gap-3 transition-opacity hover:opacity-70"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </Link>
-          ))}
+                <span className="text-sm font-semibold tracking-wider">NEWS ALL</span>
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-900">
+                  <ArrowRight className="h-4 w-4 text-white" />
+                </span>
+              </Link>
+            </div>
+
+            {/* Largeカード */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+              {largeCards.map((news) => (
+                <NewsCard key={news.id} news={news} variant="large" />
+              ))}
+            </div>
+
+            {/* Defaultカード（最大4件表示） */}
+            {defaultCards.length > 0 && (
+              <div className="mt-6 grid grid-cols-2 gap-4 md:gap-6">
+                {defaultCards.map((news, index) => (
+                  <NewsCard
+                    key={news.id}
+                    news={news}
+                    variant="default"
+                    className={index >= 4 ? "hidden" : undefined}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>
