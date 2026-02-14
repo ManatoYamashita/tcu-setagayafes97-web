@@ -17,6 +17,15 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-noto-sans-jp)", "sans-serif"],
       },
+      animation: {
+        "slide-up": "slideUp 20s linear infinite",
+      },
+      keyframes: {
+        slideUp: {
+          "0%": { transform: "translateY(100%)" },
+          "100%": { transform: "translateY(-100%)" },
+        },
+      },
     },
   },
   plugins: [],
