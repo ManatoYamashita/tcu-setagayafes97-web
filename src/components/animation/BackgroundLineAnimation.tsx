@@ -5,24 +5,24 @@ import { gsap } from "gsap";
 
 /**
  * 背景ラインアニメーション
- * ページ読み込みごとに、紫背景に白い45度ラインが0→画面全体に広がるアニメーションを表示
+ * ページ読み込みごとに、紫背景に白いラインが太さ0→200pxに拡大するアニメーションを表示
+ * 角度: 左上→右下（-45度）
  */
 export function BackgroundLineAnimation() {
   const lineRef = useRef<SVGLineElement>(null);
 
   useEffect(() => {
     if (lineRef.current) {
-      const timeline = gsap.timeline({ delay: 0.3 });
+      const timeline = gsap.timeline({ delay: 0.2 });
 
       timeline.fromTo(
         lineRef.current,
         {
-          strokeDasharray: 2000,
-          strokeDashoffset: 2000,
+          strokeWidth: 0,
         },
         {
-          strokeDashoffset: 0,
-          duration: 1.5,
+          strokeWidth: 600,
+          duration: 0.8,
           ease: "power2.out",
         }
       );
@@ -42,11 +42,11 @@ export function BackgroundLineAnimation() {
         <line
           ref={lineRef}
           x1="0"
-          y1="100"
+          y1="0"
           x2="100"
-          y2="0"
+          y2="100"
           stroke="white"
-          strokeWidth="48"
+          strokeWidth="0"
           strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
         />
