@@ -16,9 +16,8 @@ export const revalidate = 3600;
  */
 export default function Home() {
   return (
-    <main className="relative min-h-screen overflow-hidden">
-      {/* 背景: Pure White */}
-      <div className="fixed inset-0 z-0 bg-white" />
+    <main className="relative min-h-screen overflow-hidden bg-white">
+      {/* 固定背景divを削除し、main要素自体に bg-white を適用 */}
 
       {/* Hero Section - カウントダウンエリア */}
       <section className="relative z-10 flex min-h-screen flex-col justify-between px-6 pt-16 pb-0 md:px-12 md:pt-20 lg:px-20 lg:pt-24">
