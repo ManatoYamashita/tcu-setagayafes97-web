@@ -29,7 +29,7 @@ export function CountdownNewsCard({ news, className }: CountdownNewsCardProps) {
     return (
       <div
         className={cn(
-          "block overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm",
+          "block overflow-hidden rounded-lg border border-gray-200 bg-white",
           className
         )}
       >
@@ -61,7 +61,7 @@ export function CountdownNewsCard({ news, className }: CountdownNewsCardProps) {
     <Link
       href={`/info/${news.id}`}
       className={cn(
-        "group block overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md transition-all duration-300 hover:-translate-y-2 hover:scale-[1.01] hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10",
+        "block overflow-hidden rounded-lg border border-gray-200 bg-white transition-colors duration-200 hover:border-gray-300",
         className
       )}
     >
@@ -71,7 +71,7 @@ export function CountdownNewsCard({ news, className }: CountdownNewsCardProps) {
           src={imageUrl}
           alt={news.title}
           fill
-          className="object-cover transition-all duration-500 group-hover:scale-105 group-hover:brightness-110"
+          className="object-cover"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
         {/* urgentバッジ */}
