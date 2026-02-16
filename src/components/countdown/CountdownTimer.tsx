@@ -82,15 +82,15 @@ export function CountdownTimer() {
   if (!isClient) {
     return (
       <div className="flex flex-wrap items-baseline justify-center gap-1 px-4 md:gap-2 lg:gap-3">
-        <span className="countdown-unit inline-flex items-baseline font-bold text-white">
+        <span className="countdown-unit inline-flex items-baseline font-bold text-gray-900">
           <span className="tabular-nums text-6xl md:text-8xl lg:text-9xl">00</span>
           <span className="ml-1 text-3xl md:ml-2 md:text-5xl lg:ml-3 lg:text-6xl">日</span>
         </span>
-        <span className="countdown-unit inline-flex items-baseline font-bold text-white">
+        <span className="countdown-unit inline-flex items-baseline font-bold text-gray-900">
           <span className="tabular-nums text-6xl md:text-8xl lg:text-9xl">00</span>
           <span className="ml-1 text-3xl md:ml-2 md:text-5xl lg:ml-3 lg:text-6xl">時間</span>
         </span>
-        <span className="countdown-unit inline-flex items-baseline font-bold text-white">
+        <span className="countdown-unit inline-flex items-baseline font-bold text-gray-900">
           <span className="tabular-nums text-6xl md:text-8xl lg:text-9xl">00</span>
           <span className="ml-1 text-3xl md:ml-2 md:text-5xl lg:ml-3 lg:text-6xl">分</span>
         </span>
@@ -104,7 +104,7 @@ export function CountdownTimer() {
       className="flex flex-wrap items-baseline justify-center gap-1 px-4 md:gap-2 lg:gap-3"
     >
       {/* 日 */}
-      <span className="countdown-unit inline-flex items-baseline font-bold text-white">
+      <span className="countdown-unit inline-flex items-baseline font-bold text-gray-900">
         <span className="tabular-nums text-6xl md:text-8xl lg:text-9xl">
           {String(timeLeft.days).padStart(2, "0")}
         </span>
@@ -112,7 +112,7 @@ export function CountdownTimer() {
       </span>
 
       {/* 時間 */}
-      <span className="countdown-unit inline-flex items-baseline font-bold text-white">
+      <span className="countdown-unit inline-flex items-baseline font-bold text-gray-900">
         <span className="tabular-nums text-6xl md:text-8xl lg:text-9xl">
           {String(timeLeft.hours).padStart(2, "0")}
         </span>
@@ -120,7 +120,7 @@ export function CountdownTimer() {
       </span>
 
       {/* 分 */}
-      <span className="countdown-unit inline-flex items-baseline font-bold text-white">
+      <span className="countdown-unit inline-flex items-baseline font-bold text-gray-900">
         <span className="tabular-nums text-6xl md:text-8xl lg:text-9xl">
           {String(timeLeft.minutes).padStart(2, "0")}
         </span>
