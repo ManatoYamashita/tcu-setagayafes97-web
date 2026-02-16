@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans_JP } from "next/font/google";
+import { Noto_Sans_JP, Bricolage_Grotesque, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/data/site";
 import { Header } from "@/components/layout/Header";
@@ -9,6 +9,24 @@ const notoSansJP = Noto_Sans_JP({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
   variable: "--font-noto-sans-jp",
+  display: "swap",
+  preload: true,
+});
+
+// サイトタイトル・見出し用フォント
+const bricolageGrotesque = Bricolage_Grotesque({
+  subsets: ["latin"],
+  weight: ["300", "400", "600"],
+  variable: "--font-bricolage",
+  display: "swap",
+  preload: true,
+});
+
+// カウントダウン数字専用フォント
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["700"],
+  variable: "--font-jetbrains",
   display: "swap",
   preload: true,
 });
@@ -51,7 +69,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={`${notoSansJP.variable} font-sans antialiased`}>
+      <body
+        className={`${notoSansJP.variable} ${jetbrainsMono.variable} ${bricolageGrotesque.variable} font-sans antialiased`}
+      >
         <Header />
         {children}
         <Footer />

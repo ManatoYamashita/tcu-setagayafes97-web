@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { siteConfig } from "@/data/site";
 import { cardNavItems } from "@/data/navigation";
 import { LanguageSwitcherWrapper } from "@/components/layout/LanguageSwitcherWrapper";
@@ -12,8 +13,16 @@ import { CardNav } from "@/components/layout/CardNav";
  * - GSAP アニメーション付き浮遊型カードナビゲーション
  * - ハンバーガーメニュー押下で3枚のカラーカードが展開
  * - position: fixed でページ上部に浮遊
+ * - カウントダウンページ（"/"）では非表示
  */
 export function Header() {
+  const pathname = usePathname();
+
+  // カウントダウンページではヘッダーを非表示
+  if (pathname === "/") {
+    return null;
+  }
+
   return (
     <CardNav
       items={cardNavItems}

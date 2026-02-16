@@ -35,6 +35,9 @@ pnpm-debug.log*
 .env*.local
 !.env.local.example
 
+# GitHub tokens (security)
+.github_tokens
+
 # vercel
 .vercel
 

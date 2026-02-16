@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { siteConfig } from "@/data/site";
 import { CountdownTimer } from "@/components/countdown/CountdownTimer";
 import { CountdownNewsSection } from "@/components/countdown/CountdownNewsSection";
-import { SocialIcons } from "@/components/ui/SocialIcons";
-import { GradientBlindsBackground } from "@/components/background/GradientBlindsBackground";
 
 export const metadata: Metadata = {
   title: `Coming Soon | ${siteConfig.name}`,
@@ -13,55 +11,45 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 /**
- * カウントダウン専用トップページ
- * 本番サイト公開前のティザーページ
+ * カウントダウン専用トップページ（改訂版）
+ * Bold Minimalism - シンプルな青グラデーション背景
  */
 export default function Home() {
   return (
-    <main className="relative overflow-hidden bg-[#1a0a2e]">
-      {/* 背景: Gradient Blinds */}
-      <GradientBlindsBackground />
+    <main className="relative min-h-screen overflow-hidden">
+      {/* 背景: Bold Blue Gradient */}
+      <div
+        className="fixed inset-0 z-0"
+        style={{
+          background: `
+            radial-gradient(ellipse at top left, rgba(82, 39, 255, 0.4), transparent 50%),
+            radial-gradient(ellipse at bottom right, rgba(205, 121, 238, 0.3), transparent 50%),
+            linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%)
+          `,
+        }}
+      />
 
-      {/* Hero Section */}
-      <section className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-20">
-        {/* サイトタイトル */}
-        <div className="relative z-10 mb-12 text-center">
-          <p className="mb-2 text-sm font-semibold tracking-widest text-white/60 md:text-base">
-            第{siteConfig.edition}回
-          </p>
-          <h1 className="text-3xl font-bold text-white md:text-5xl">{siteConfig.shortName}</h1>
-          <p className="mt-2 text-sm text-[#CD79EE] md:text-base">東京都市大学 世田谷キャンパス</p>
-        </div>
-
-        {/* カウントダウンタイマー */}
-        <div className="relative z-10 w-full max-w-4xl">
-          <CountdownTimer />
-        </div>
-
-        {/* 開催情報 */}
-        <div className="relative z-10 mt-12 text-center">
-          <div className="space-y-2 text-sm text-white/80 md:text-base">
-            <p>
-              <span className="font-semibold text-white">日程</span>
-              <span className="mx-2 text-white/40">|</span>
-              {siteConfig.dates.day1} 〜 {siteConfig.dates.day2}
+      {/* Hero Section - カウントダウンエリア */}
+      <section className="relative z-10 flex min-h-screen flex-col justify-between px-6 pt-16 pb-0 md:px-12 md:pt-20 lg:px-20 lg:pt-24">
+        {/* 上部: タイトルエリア */}
+        <div className="relative z-10">
+          <div className="max-w-4xl">
+            <p className="text-sm font-medium tracking-[0.15em] text-white/80 md:text-base lg:text-lg">
+              東京都市大学
             </p>
-            <p>
-              <span className="font-semibold text-white">時間</span>
-              <span className="mx-2 text-white/40">|</span>
-              {siteConfig.openTime} 〜 {siteConfig.closeTime}
-            </p>
-            <p>
-              <span className="font-semibold text-white">会場</span>
-              <span className="mx-2 text-white/40">|</span>
-              {siteConfig.venue}
+            <h1 className="mt-2 font-bold text-white text-4xl md:text-5xl lg:text-6xl">
+              第{siteConfig.edition}回世田谷祭
+            </h1>
+            <p className="mt-4 text-base font-medium tracking-[0.1em] text-white/90 md:text-lg lg:text-xl">
+              {siteConfig.dates.day1.substring(5).replace("-", "月")}日 -{" "}
+              {siteConfig.dates.day2.substring(5).replace("-", "月")}日
             </p>
           </div>
         </div>
 
-        {/* SNS アイコン */}
-        <div className="relative z-10 mt-10">
-          <SocialIcons layout="horizontal" size="lg" className="text-white/60" />
+        {/* 中央: カウントダウンタイマー */}
+        <div className="relative z-10 flex items-center justify-center py-12 md:py-16 lg:py-20">
+          <CountdownTimer />
         </div>
       </section>
 

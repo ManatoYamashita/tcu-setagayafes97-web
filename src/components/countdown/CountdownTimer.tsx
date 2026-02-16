@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import gsap from "gsap";
 import { siteConfig } from "@/data/site";
 
 interface TimeLeft {
@@ -11,9 +12,9 @@ interface TimeLeft {
 }
 
 /**
- * カウントダウンタイマーコンポーネント
- * siteConfigから開催日時を取得し、残り時間を表示
- * ダークテーマ、ガラスモーフィズムデザイン
+ * カウントダウンタイマーコンポーネント（改訂版）
+ * 数字とラベルを一体化したBold Minimalismデザイン
+ * 例: "00日00時間00分"
  */
 export function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({
@@ -23,6 +24,7 @@ export function CountdownTimer() {
     seconds: 0,
   });
   const [isClient, setIsClient] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // 目標日時: siteConfigから取得（2026-10-31T10:00:00+09:00形式）
   const targetDate = `${siteConfig.dates.day1}T${siteConfig.openTime}:00+09:00`;
@@ -61,115 +63,69 @@ export function CountdownTimer() {
     return () => clearInterval(timer);
   }, [targetDate]);
 
+  // GSAPアニメーション: fade-in with scale
+  useEffect(() => {
+    if (isClient && containerRef.current) {
+      gsap.from(containerRef.current.querySelectorAll(".countdown-unit"), {
+        opacity: 0,
+        scale: 0.9,
+        y: 30,
+        duration: 1,
+        stagger: 0.15,
+        ease: "power3.out",
+        delay: 0.3,
+      });
+    }
+  }, [isClient]);
+
   // クライアントサイドでのみレンダリング（Hydration対策）
   if (!isClient) {
     return (
-      <div className="flex items-center justify-center gap-4 md:gap-6 lg:gap-8">
-        <div className="text-center">
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-4 md:px-8 md:py-6 shadow-xl">
-            <div className="text-5xl md:text-7xl lg:text-9xl font-bold text-white tabular-nums">
-              --
-            </div>
-            <div className="text-xs md:text-sm lg:text-base text-white/70 mt-2 font-semibold uppercase tracking-wider">
-              Days
-            </div>
-          </div>
-        </div>
-        <div className="text-4xl md:text-6xl lg:text-8xl font-bold text-white/40">:</div>
-        <div className="text-center">
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-4 md:px-8 md:py-6 shadow-xl">
-            <div className="text-5xl md:text-7xl lg:text-9xl font-bold text-white tabular-nums">
-              --
-            </div>
-            <div className="text-xs md:text-sm lg:text-base text-white/70 mt-2 font-semibold uppercase tracking-wider">
-              Hours
-            </div>
-          </div>
-        </div>
-        <div className="text-4xl md:text-6xl lg:text-8xl font-bold text-white/40">:</div>
-        <div className="text-center">
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-4 md:px-8 md:py-6 shadow-xl">
-            <div className="text-5xl md:text-7xl lg:text-9xl font-bold text-white tabular-nums">
-              --
-            </div>
-            <div className="text-xs md:text-sm lg:text-base text-white/70 mt-2 font-semibold uppercase tracking-wider">
-              Minutes
-            </div>
-          </div>
-        </div>
-        <div className="text-4xl md:text-6xl lg:text-8xl font-bold text-white/40">:</div>
-        <div className="text-center">
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-4 md:px-8 md:py-6 shadow-xl">
-            <div className="text-5xl md:text-7xl lg:text-9xl font-bold text-white tabular-nums">
-              --
-            </div>
-            <div className="text-xs md:text-sm lg:text-base text-white/70 mt-2 font-semibold uppercase tracking-wider">
-              Seconds
-            </div>
-          </div>
-        </div>
+      <div className="flex flex-wrap items-baseline justify-center gap-1 px-4 md:gap-2 lg:gap-3">
+        <span className="countdown-unit inline-flex items-baseline font-bold text-white">
+          <span className="tabular-nums text-6xl md:text-8xl lg:text-9xl">00</span>
+          <span className="ml-1 text-3xl md:ml-2 md:text-5xl lg:ml-3 lg:text-6xl">日</span>
+        </span>
+        <span className="countdown-unit inline-flex items-baseline font-bold text-white">
+          <span className="tabular-nums text-6xl md:text-8xl lg:text-9xl">00</span>
+          <span className="ml-1 text-3xl md:ml-2 md:text-5xl lg:ml-3 lg:text-6xl">時間</span>
+        </span>
+        <span className="countdown-unit inline-flex items-baseline font-bold text-white">
+          <span className="tabular-nums text-6xl md:text-8xl lg:text-9xl">00</span>
+          <span className="ml-1 text-3xl md:ml-2 md:text-5xl lg:ml-3 lg:text-6xl">分</span>
+        </span>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center justify-center gap-4 md:gap-6 lg:gap-8">
-      {/* Days */}
-      <div className="text-center">
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-4 md:px-8 md:py-6 shadow-xl">
-          <div className="text-5xl md:text-7xl lg:text-9xl font-bold text-white tabular-nums">
-            {String(timeLeft.days).padStart(2, "0")}
-          </div>
-          <div className="text-xs md:text-sm lg:text-base text-white/70 mt-2 font-semibold uppercase tracking-wider">
-            Days
-          </div>
-        </div>
-      </div>
+    <div
+      ref={containerRef}
+      className="flex flex-wrap items-baseline justify-center gap-1 px-4 md:gap-2 lg:gap-3"
+    >
+      {/* 日 */}
+      <span className="countdown-unit inline-flex items-baseline font-bold text-white">
+        <span className="tabular-nums text-6xl md:text-8xl lg:text-9xl">
+          {String(timeLeft.days).padStart(2, "0")}
+        </span>
+        <span className="ml-1 text-3xl md:ml-2 md:text-5xl lg:ml-3 lg:text-6xl">日</span>
+      </span>
 
-      {/* コロン区切り */}
-      <div className="text-4xl md:text-6xl lg:text-8xl font-bold text-white/40">:</div>
+      {/* 時間 */}
+      <span className="countdown-unit inline-flex items-baseline font-bold text-white">
+        <span className="tabular-nums text-6xl md:text-8xl lg:text-9xl">
+          {String(timeLeft.hours).padStart(2, "0")}
+        </span>
+        <span className="ml-1 text-3xl md:ml-2 md:text-5xl lg:ml-3 lg:text-6xl">時間</span>
+      </span>
 
-      {/* Hours */}
-      <div className="text-center">
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-4 md:px-8 md:py-6 shadow-xl">
-          <div className="text-5xl md:text-7xl lg:text-9xl font-bold text-white tabular-nums">
-            {String(timeLeft.hours).padStart(2, "0")}
-          </div>
-          <div className="text-xs md:text-sm lg:text-base text-white/70 mt-2 font-semibold uppercase tracking-wider">
-            Hours
-          </div>
-        </div>
-      </div>
-
-      {/* コロン区切り */}
-      <div className="text-4xl md:text-6xl lg:text-8xl font-bold text-white/40">:</div>
-
-      {/* Minutes */}
-      <div className="text-center">
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-4 md:px-8 md:py-6 shadow-xl">
-          <div className="text-5xl md:text-7xl lg:text-9xl font-bold text-white tabular-nums">
-            {String(timeLeft.minutes).padStart(2, "0")}
-          </div>
-          <div className="text-xs md:text-sm lg:text-base text-white/70 mt-2 font-semibold uppercase tracking-wider">
-            Minutes
-          </div>
-        </div>
-      </div>
-
-      {/* コロン区切り */}
-      <div className="text-4xl md:text-6xl lg:text-8xl font-bold text-white/40">:</div>
-
-      {/* Seconds */}
-      <div className="text-center">
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-4 md:px-8 md:py-6 shadow-xl">
-          <div className="text-5xl md:text-7xl lg:text-9xl font-bold text-white tabular-nums">
-            {String(timeLeft.seconds).padStart(2, "0")}
-          </div>
-          <div className="text-xs md:text-sm lg:text-base text-white/70 mt-2 font-semibold uppercase tracking-wider">
-            Seconds
-          </div>
-        </div>
-      </div>
+      {/* 分 */}
+      <span className="countdown-unit inline-flex items-baseline font-bold text-white">
+        <span className="tabular-nums text-6xl md:text-8xl lg:text-9xl">
+          {String(timeLeft.minutes).padStart(2, "0")}
+        </span>
+        <span className="ml-1 text-3xl md:ml-2 md:text-5xl lg:ml-3 lg:text-6xl">分</span>
+      </span>
     </div>
   );
 }
