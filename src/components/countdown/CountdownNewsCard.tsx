@@ -21,31 +21,24 @@ function getTypeLabel(type: NewsType): string {
 
 /**
  * カウントダウンページ用ダークテーマNewsカード
- * グラスモーフィズムスタイル
  */
 export function CountdownNewsCard({ news, className }: CountdownNewsCardProps) {
   const imageUrl = news.thumbnail?.url || "/images/placeholder/p.jpeg";
 
   return (
-    <Link
-      href={`/info/${news.id}`}
-      className={cn(
-        "group block overflow-hidden rounded-2xl border border-white/10 bg-white/10 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/15",
-        className
-      )}
-    >
+    <Link href={`/info/${news.id}`} className={cn("block overflow-hidden", className)}>
       {/* 画像エリア */}
       <div className="relative aspect-[16/10] overflow-hidden">
         <Image
           src={imageUrl}
           alt={news.title}
           fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          className="object-cover"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
         {/* urgentバッジ */}
         {news.type === "urgent" && (
-          <span className="absolute top-3 left-3 rounded-full bg-red-500 px-3 py-1 text-xs font-bold text-white">
+          <span className="absolute top-3 left-3 bg-red-500 px-3 py-1 text-xs font-bold text-white">
             重要
           </span>
         )}

@@ -6,24 +6,24 @@ import { SocialIcons } from "@/components/ui/SocialIcons";
 import { GradientBlindsBackground } from "@/components/background/GradientBlindsBackground";
 
 export const metadata: Metadata = {
-  title: `Coming Soon | ${siteConfig.name}`,
-  description: `${siteConfig.name}の公式Webサイトは近日公開予定です。`,
+  title: siteConfig.name,
+  description: siteConfig.description,
 };
 
 export const revalidate = 3600;
 
 /**
- * カウントダウン専用トップページ
- * 本番サイト公開前のティザーページ
+ * トップページ（HOME）
+ * カウントダウン・開催概要・News を表示
  */
 export default function Home() {
   return (
-    <main className="relative overflow-hidden bg-[#1a0a2e]">
+    <div className="relative overflow-hidden bg-[#1a0a2e]">
       {/* 背景: Gradient Blinds */}
       <GradientBlindsBackground />
 
       {/* Hero Section */}
-      <section className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-20">
+      <section className="relative z-10 flex min-h-[calc(100vh-var(--header-height))] flex-col items-center justify-center px-4 py-20">
         {/* サイトタイトル */}
         <div className="relative z-10 mb-12 text-center">
           <p className="mb-2 text-sm font-semibold tracking-widest text-white/60 md:text-base">
@@ -67,6 +67,6 @@ export default function Home() {
 
       {/* News Section */}
       <CountdownNewsSection />
-    </main>
+    </div>
   );
 }

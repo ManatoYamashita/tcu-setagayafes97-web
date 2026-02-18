@@ -1,46 +1,17 @@
-import createMiddleware from "next-intl/middleware";
-import { routing } from "./i18n/routing";
+import { NextRequest, NextResponse } from "next/server";
 
 /**
- * next-intl Proxy (旧: Middleware)
+ * Proxy（本番版）
+ * 全パスを許可する
  *
- * 多言語対応ページのみをマッチングし、
- * 非対応ページ（microCMS依存）はスキップする
- *
- * @see https://next-intl.dev/docs/routing/middleware
+ * Next.js 16 では middleware.ts と proxy.ts は共存不可のため、
+ * proxy.ts で制御を行う
  */
-export default createMiddleware(routing);
+export default function proxy(request: NextRequest) {
+  return NextResponse.next();
+}
 
-/**
- * マッチャー設定
- *
- * 多言語対応ページ:
- * - /about, /about/contact, /about/privacy
- * - /info/guide, /info/faq
- * - /map/access
- *
- * 多言語非対応ページ（除外）:
- * - /events, /events/[id]
- * - /timetable
- * - /map (3Dマップ)
- * - /info, /info/[id], /info/pamphlet
- * - /about/sponsors
- * - /api, /_next, /favicon.ico など
- */
 export const config = {
-  matcher: [
-    // デフォルトロケール（ja）用のルート
-    "/about",
-    "/about/contact",
-    "/about/privacy",
-    "/info/guide",
-    "/info/faq",
-    "/map/access",
-
-    // 他言語用のルート（プレフィックス付き）
-    "/(en|zh|ko)/about/:path*",
-    "/(en|zh|ko)/info/guide",
-    "/(en|zh|ko)/info/faq",
-    "/(en|zh|ko)/map/access",
-  ],
+  // 静的アセット、API、Next.js内部パスを除外
+  matcher: ["/((?!_next/static|_next/image|api|favicon\\.ico|images|videos|.*\\..*).*)"],
 };

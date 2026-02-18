@@ -12,6 +12,7 @@ interface NavItem {
 
 interface NavDropdownProps {
   item: NavItem;
+  isScrolled?: boolean;
 }
 
 /**
@@ -22,11 +23,16 @@ interface NavDropdownProps {
  * - クリック: 即座にトグル
  * - クリック外/Escape: 閉じる
  * - アクセシビリティ対応（ARIA属性、キーボード操作）
+ * - isScrolled でトリガーボタンの文字色を切替
  */
-export function NavDropdown({ item }: NavDropdownProps) {
+export function NavDropdown({ item, isScrolled = true }: NavDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  const textClass = isScrolled
+    ? "text-gray-700 hover:text-primary"
+    : "text-white/90 hover:text-white";
 
   // ホバー時: 300ms後に開く
   const handleMouseEnter = () => {
@@ -96,7 +102,7 @@ export function NavDropdown({ item }: NavDropdownProps) {
         onKeyDown={handleKeyDown}
         aria-expanded={isOpen}
         aria-haspopup="true"
-        className="flex items-center gap-1 text-gray-700 transition-colors hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        className={`flex items-center gap-1 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${textClass}`}
       >
         {item.label}
         <ChevronDown

@@ -14,7 +14,8 @@
 docs/
 ├── INDEX.md          # 本索引ファイル
 ├── dev/              # 開発関連ドキュメント
-│   └── git.md        # ブランチ戦略とCI/CDワークフロー
+│   ├── git.md        # ブランチ戦略とCI/CDワークフロー
+│   └── vercel-deployment.md  # Vercelデプロイ設定と環境構成
 ├── frontend/         # フロントエンド関連ドキュメント
 │   ├── agent-browser-workflow.md  # agent-browserを使用したデザイン再現とデバッグフロー
 │   └── layout-patterns.md         # レイアウトパターンと設計原則
@@ -73,6 +74,13 @@ docs/
   - コミットメッセージ規約
   - 運用フロー例とトラブルシューティング
 
+- **[vercel-deployment.md](./dev/vercel-deployment.md)** - Vercelデプロイ設定と環境構成
+  - Production環境（countdownブランチ）
+  - Preview環境（dev, countdownブランチ）
+  - 本番環境の切り替え手順（countdown → dev）
+  - Deploy Hookの設定
+  - デプロイフローと運用上の注意点
+
 ### フロントエンド関連（frontend/）
 
 - **[agent-browser-workflow.md](./frontend/agent-browser-workflow.md)** - agent-browserを使用したデザイン再現とデバッグの標準フロー
@@ -96,4 +104,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-02-07
+**最終更新日**: 2026-02-14

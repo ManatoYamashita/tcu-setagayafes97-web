@@ -5,11 +5,18 @@ import { SocialIcons } from "@/components/ui/SocialIcons";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const colCount = navigationConfig.footer.length + 1;
 
   return (
     <footer className="border-t bg-gray-50">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+        <div
+          className="grid grid-cols-1 gap-8"
+          style={{
+            gridTemplateColumns: undefined,
+          }}
+          data-footer-grid
+        >
           {navigationConfig.footer.map((section) => (
             <div key={section.title}>
               <h3 className="mb-4 font-bold text-gray-900">{section.title}</h3>
@@ -39,6 +46,15 @@ export function Footer() {
           </p>
         </div>
       </div>
+
+      {/* フッターセクション数に応じた動的グリッド */}
+      <style>{`
+        @media (min-width: 768px) {
+          [data-footer-grid] {
+            grid-template-columns: repeat(${colCount}, minmax(0, 1fr));
+          }
+        }
+      `}</style>
     </footer>
   );
 }
