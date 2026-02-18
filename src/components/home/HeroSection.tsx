@@ -14,11 +14,11 @@ export function HeroSection() {
       <div className="absolute left-0 top-0 w-full h-full flex items-end pb-12 lg:pb-16 xl:pb-20 z-20 pointer-events-none">
         <div className="max-w-7xl mx-auto w-full px-6 lg:px-8 pointer-events-auto">
           <h2 className="text-dark-green font-bold tracking-tight leading-tight text-4xl lg:text-5xl xl:text-6xl">
-            さあ、
+            世田谷祭
             <br />
-            森からはじまる
+            世界を動かす
             <br />
-            未来へ
+            からくり
           </h2>
 
           <div className="flex items-center gap-4 mt-6">

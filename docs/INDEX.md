@@ -16,6 +16,7 @@ docs/
 ├── dev/              # 開発関連ドキュメント
 │   └── git.md        # ブランチ戦略とCI/CDワークフロー
 ├── frontend/         # フロントエンド関連ドキュメント
+│   ├── design.md                  # デザインシステム（カラー・タイポグラフィトークン）
 │   ├── agent-browser-workflow.md  # agent-browserを使用したデザイン再現とデバッグフロー
 │   └── layout-patterns.md         # レイアウトパターンと設計原則
 └── requires/         # 要件定義・仕様関連
@@ -75,6 +76,14 @@ docs/
 
 ### フロントエンド関連（frontend/）
 
+- **[design.md](./frontend/design.md)** - デザインシステム（カラー・タイポグラフィトークン）
+  - ブランドカラー `#CD79EE` の HLC 定義（H319 / L64 / C70）と oklch CSS 実装
+  - Primary スケール・Neutral スケール・Semantic カラートークン
+  - アクセシビリティ（コントラスト比）ガイドライン
+  - Kaisei Opti ブランドフォント仕様と使用制限
+  - フォントスケール（モジュラースケール 1.25）
+  - CSS 変数まとめ
+
 - **[agent-browser-workflow.md](./frontend/agent-browser-workflow.md)** - agent-browserを使用したデザイン再現とデバッグの標準フロー
   - デザイン再現3ステップ（分析→実装→検証）
   - 数値測定手法とコマンド集（Header高さ、z-index階層、viewport占有率）
@@ -96,4 +105,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-02-07
+**最終更新日**: 2026-02-19
