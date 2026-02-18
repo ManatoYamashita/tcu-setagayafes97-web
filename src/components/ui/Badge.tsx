@@ -30,7 +30,7 @@ export function Badge({ variant, label, className }: BadgeProps) {
     other: "bg-gray-500 text-white",
     day1: "bg-primary text-white",
     day2: "bg-purple-600 text-white",
-    both: "bg-gradient-to-r from-primary to-purple-600 text-white",
+    both: "bg-primary text-white",
     room: "bg-green-500 text-white",
     stage: "bg-orange-500 text-white",
     special: "bg-pink-500 text-white",

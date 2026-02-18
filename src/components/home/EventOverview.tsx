@@ -16,17 +16,14 @@ export function EventOverview() {
   const year = new Date(siteConfig.dates.day1).getFullYear();
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-white to-gray-50 py-32">
-      {/* 斜め背景要素 */}
-      <div className="absolute inset-0 bg-primary/5 diagonal-bg" />
-
-      <div className="container relative z-10 mx-auto px-4">
+    <section className="relative overflow-hidden bg-white py-32">
+      <div className="container mx-auto px-4">
         <h2 className="mb-12 text-center text-5xl font-bold md:text-6xl">開催概要</h2>
 
         <div className="mx-auto max-w-4xl">
           <div className="grid gap-8 md:grid-cols-3">
             {/* 開催日時 */}
-            <div className="rounded-xl bg-white p-6 text-center shadow-md transition-shadow hover:shadow-lg">
+            <div className="rounded-xl border border-gray-200 bg-white p-6 text-center">
               <div className="mb-4 flex justify-center">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
                   <svg
@@ -60,7 +57,7 @@ export function EventOverview() {
             </div>
 
             {/* 会場 */}
-            <div className="rounded-xl bg-white p-6 text-center shadow-md transition-shadow hover:shadow-lg">
+            <div className="rounded-xl border border-gray-200 bg-white p-6 text-center">
               <div className="mb-4 flex justify-center">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
                   <svg
@@ -90,7 +87,7 @@ export function EventOverview() {
             </div>
 
             {/* 来場予定者数 */}
-            <div className="rounded-xl bg-white p-6 text-center shadow-md transition-shadow hover:shadow-lg">
+            <div className="rounded-xl border border-gray-200 bg-white p-6 text-center">
               <div className="mb-4 flex justify-center">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
                   <svg

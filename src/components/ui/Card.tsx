@@ -13,18 +13,17 @@ export interface CardProps {
  * コンテンツを包むカードレイアウトを提供
  */
 export function Card({ variant = "default", className, children, href }: CardProps) {
-  const baseStyles = "rounded-2xl border bg-white shadow transition-all duration-300";
+  const baseStyles = "rounded-2xl border bg-white transition-colors duration-300";
 
   const variantStyles = {
-    default: "border-gray-200 hover:shadow-lg",
-    featured:
-      "border-primary bg-gradient-to-br from-white to-primary/5 hover:shadow-xl hover:shadow-primary/10",
+    default: "border-gray-200 hover:border-gray-300",
+    featured: "border-primary",
   };
 
   const combinedStyles = cn(
     baseStyles,
     variantStyles[variant],
-    href && "cursor-pointer hover:-translate-y-1",
+    href && "cursor-pointer",
     className
   );
 

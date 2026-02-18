@@ -46,7 +46,7 @@ export function TimetableTabs({
             onClick={() => handleDateChange("day1")}
             className={`rounded-lg px-6 py-3 font-medium transition-all ${
               selectedDate === "day1"
-                ? "bg-primary text-white shadow-md"
+                ? "bg-primary text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
             }`}
           >
@@ -56,7 +56,7 @@ export function TimetableTabs({
             onClick={() => handleDateChange("day2")}
             className={`rounded-lg px-6 py-3 font-medium transition-all ${
               selectedDate === "day2"
-                ? "bg-primary text-white shadow-md"
+                ? "bg-primary text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
             }`}
           >
@@ -73,7 +73,7 @@ export function TimetableTabs({
             onClick={() => handleStageChange("all")}
             className={`rounded-lg px-6 py-3 font-medium transition-all ${
               selectedStage === "all"
-                ? "bg-primary text-white shadow-md"
+                ? "bg-primary text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
             }`}
           >
@@ -87,7 +87,7 @@ export function TimetableTabs({
                 onClick={() => handleStageChange(stage.id)}
                 className={`rounded-lg px-6 py-3 font-medium transition-all ${
                   selectedStage === stage.id
-                    ? "bg-primary text-white shadow-md"
+                    ? "bg-primary text-white"
                     : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
                 }`}
               >

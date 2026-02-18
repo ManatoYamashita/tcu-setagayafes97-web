@@ -21,7 +21,7 @@ export function TimetableChart({ events }: TimetableChartProps) {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-lg bg-white p-6 shadow-md">
+    <div className="relative overflow-hidden rounded-lg border border-gray-200 bg-white p-6">
       {/* デスクトップ: ガントチャート */}
       <div className="hidden md:block">
         <div className="relative" style={{ minHeight: "600px" }}>

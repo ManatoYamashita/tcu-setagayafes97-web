@@ -7,9 +7,6 @@ import Image from "next/image";
 export function AboutSection() {
   return (
     <section className="relative overflow-hidden bg-primary py-32 text-white">
-      {/* 斜め背景 */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary to-purple-600 diagonal-bg-reverse opacity-90" />
-
       <div className="container relative z-10 mx-auto px-4">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
           {/* 左側: 縦書きタイトル + テキスト */}

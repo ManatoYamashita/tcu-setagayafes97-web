@@ -58,7 +58,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
       {/* スライドインメニュー */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-[280px] transform bg-white shadow-2xl transition-transform duration-300 ${
+        className={`fixed inset-y-0 right-0 z-50 w-[280px] transform bg-white border-l border-gray-200 transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >

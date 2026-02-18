@@ -14,7 +14,7 @@ export function SNSLinks({ sns }: SNSLinksProps) {
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="rounded-lg border border-gray-200 bg-white p-6">
       <h3 className="mb-4 text-lg font-bold text-gray-900">SNS・関連リンク</h3>
       <div className="flex flex-wrap gap-3">
         {/* Twitter */}

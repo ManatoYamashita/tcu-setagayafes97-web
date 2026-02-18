@@ -16,7 +16,7 @@ interface EventCardProps {
 export function EventCard({ event, variant = "default" }: EventCardProps) {
   return (
     <Link href={`/events/${event.id}`} className="group block h-full">
-      <article className="h-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow transition-all hover:border-primary hover:shadow-lg">
+      <article className="h-full overflow-hidden rounded-2xl border border-gray-200 bg-white transition-colors hover:border-primary">
         {/* 円形サムネイル */}
         {event.thumbnail && (
           <div className="flex justify-center p-6">

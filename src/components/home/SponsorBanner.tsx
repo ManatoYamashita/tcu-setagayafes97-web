@@ -28,7 +28,7 @@ export async function SponsorBanner() {
             {sponsors.map((sponsor) => (
               <div
                 key={sponsor.id}
-                className="group flex items-center justify-center rounded-lg bg-white p-6 shadow-sm transition-all hover:shadow-md"
+                className="group flex items-center justify-center rounded-lg border border-gray-200 bg-white p-6 transition-colors hover:border-gray-300"
               >
                 {sponsor.url ? (
                   <Link

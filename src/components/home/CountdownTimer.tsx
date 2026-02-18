@@ -103,7 +103,7 @@ export function CountdownTimer() {
   // 開催中の表示
   if (state === "during") {
     return (
-      <section className="bg-gradient-to-r from-primary to-purple-600 py-20">
+      <section className="bg-primary py-20">
         <div className="container mx-auto px-4 text-center text-white">
           <div className="mb-4">
             <svg
@@ -118,8 +118,8 @@ export function CountdownTimer() {
               />
             </svg>
           </div>
-          <h2 className="mb-4 text-5xl font-bold drop-shadow-lg md:text-6xl">開催中！</h2>
-          <p className="text-xl drop-shadow-md md:text-2xl">
+          <h2 className="mb-4 text-5xl font-bold md:text-6xl">開催中！</h2>
+          <p className="text-xl md:text-2xl">
             ただいま第{siteConfig.edition}回世田谷祭を開催しています
           </p>
           <p className="mt-4 text-lg opacity-90">
@@ -133,14 +133,10 @@ export function CountdownTimer() {
   // 終了後の表示
   if (state === "after") {
     return (
-      <section className="bg-gradient-to-r from-gray-700 to-gray-900 py-20">
+      <section className="bg-gray-800 py-20">
         <div className="container mx-auto px-4 text-center text-white">
-          <h2 className="mb-4 text-4xl font-bold drop-shadow-lg md:text-5xl">
-            ご来場ありがとうございました
-          </h2>
-          <p className="text-xl drop-shadow-md md:text-2xl">
-            第{siteConfig.edition}回世田谷祭は終了しました
-          </p>
+          <h2 className="mb-4 text-4xl font-bold md:text-5xl">ご来場ありがとうございました</h2>
+          <p className="text-xl md:text-2xl">第{siteConfig.edition}回世田谷祭は終了しました</p>
           <p className="mt-6 text-lg opacity-90">また来年お会いしましょう</p>
         </div>
       </section>
@@ -149,63 +145,59 @@ export function CountdownTimer() {
 
   // 開催前のカウントダウン表示
   return (
-    <section className="bg-gradient-to-r from-purple-600 via-primary to-pink-600 py-20">
+    <section className="bg-primary py-20">
       <div className="container mx-auto px-4">
-        <h2 className="mb-12 text-center text-4xl font-bold text-white drop-shadow-lg md:text-5xl">
+        <h2 className="mb-12 text-center text-4xl font-bold text-white md:text-5xl">
           開催まであと
         </h2>
 
         <div className="mx-auto flex max-w-4xl justify-center gap-4 md:gap-8">
           {/* 日 */}
           <div className="flex flex-col items-center">
-            <div className="mb-3 flex h-24 w-24 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm md:h-32 md:w-32">
-              <span className="text-5xl font-bold text-white drop-shadow-lg md:text-6xl">
+            <div className="mb-3 flex h-24 w-24 items-center justify-center rounded-2xl border border-white/30 bg-white/15 md:h-32 md:w-32">
+              <span className="text-5xl font-bold text-white md:text-6xl">
                 {timeLeft.days.toString().padStart(2, "0")}
               </span>
             </div>
-            <span className="text-lg font-semibold uppercase text-white/90 drop-shadow md:text-xl">
-              DAYS
-            </span>
+            <span className="text-lg font-semibold uppercase text-white/90 md:text-xl">DAYS</span>
           </div>
 
           {/* 時 */}
           <div className="flex flex-col items-center">
-            <div className="mb-3 flex h-24 w-24 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm md:h-32 md:w-32">
-              <span className="text-5xl font-bold text-white drop-shadow-lg md:text-6xl">
+            <div className="mb-3 flex h-24 w-24 items-center justify-center rounded-2xl border border-white/30 bg-white/15 md:h-32 md:w-32">
+              <span className="text-5xl font-bold text-white md:text-6xl">
                 {timeLeft.hours.toString().padStart(2, "0")}
               </span>
             </div>
-            <span className="text-lg font-semibold uppercase text-white/90 drop-shadow md:text-xl">
-              HOURS
-            </span>
+            <span className="text-lg font-semibold uppercase text-white/90 md:text-xl">HOURS</span>
           </div>
 
           {/* 分 */}
           <div className="flex flex-col items-center">
-            <div className="mb-3 flex h-24 w-24 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm md:h-32 md:w-32">
-              <span className="text-5xl font-bold text-white drop-shadow-lg md:text-6xl">
+            <div className="mb-3 flex h-24 w-24 items-center justify-center rounded-2xl border border-white/30 bg-white/15 md:h-32 md:w-32">
+              <span className="text-5xl font-bold text-white md:text-6xl">
                 {timeLeft.minutes.toString().padStart(2, "0")}
               </span>
             </div>
-            <span className="text-lg font-semibold uppercase text-white/90 drop-shadow md:text-xl">
+            <span className="text-lg font-semibold uppercase text-white/90 md:text-xl">
               MINUTES
             </span>
           </div>
 
           {/* 秒 */}
           <div className="flex flex-col items-center">
-            <div className="mb-3 flex h-24 w-24 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm md:h-32 md:w-32">
-              <span className="text-5xl font-bold text-white drop-shadow-lg md:text-6xl">
+            <div className="mb-3 flex h-24 w-24 items-center justify-center rounded-2xl border border-white/30 bg-white/15 md:h-32 md:w-32">
+              <span className="text-5xl font-bold text-white md:text-6xl">
                 {timeLeft.seconds.toString().padStart(2, "0")}
               </span>
             </div>
-            <span className="text-lg font-semibold uppercase text-white/90 drop-shadow md:text-xl">
+            <span className="text-lg font-semibold uppercase text-white/90 md:text-xl">
               SECONDS
             </span>
           </div>
         </div>
 
-        <p className="mt-12 text-center text-xl text-white drop-shadow md:text-2xl">
+        <p className="mt-12 text-center text-xl text-white md:text-2xl">
           {siteConfig.dates.day1.replace(/-/g, ".")} - {siteConfig.dates.day2.replace(/-/g, ".")}
         </p>
       </div>

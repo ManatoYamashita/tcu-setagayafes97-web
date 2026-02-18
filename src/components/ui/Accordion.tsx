@@ -25,7 +25,7 @@ function AccordionItem({ item, index }: AccordionItemProps) {
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+    <div className="rounded-lg border border-gray-200 bg-white">
       {/* アコーディオンのヘッダー部分 */}
       <button
         type="button"

@@ -16,7 +16,7 @@ export function EventDetail({ event }: EventDetailProps) {
     <div className="space-y-8">
       {/* サムネイル画像 */}
       {event.thumbnail && (
-        <div className="relative aspect-video w-full overflow-hidden rounded-lg shadow-lg">
+        <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-gray-200">
           <Image
             src={event.thumbnail.url}
             alt={event.title}
@@ -44,7 +44,7 @@ export function EventDetail({ event }: EventDetailProps) {
       </div>
 
       {/* メタ情報 */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-lg border border-gray-200 bg-white p-6">
         <h2 className="mb-4 text-lg font-bold text-gray-900">開催情報</h2>
         <dl className="space-y-3">
           {/* 開催日 */}
@@ -154,14 +154,14 @@ export function EventDetail({ event }: EventDetailProps) {
       </div>
 
       {/* 企画概要 */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-lg border border-gray-200 bg-white p-6">
         <h2 className="mb-4 text-lg font-bold text-gray-900">企画概要</h2>
         <p className="whitespace-pre-wrap text-gray-700">{event.description}</p>
       </div>
 
       {/* 詳細説明（リッチテキスト） */}
       {event.content && (
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="rounded-lg border border-gray-200 bg-white p-6">
           <h2 className="mb-4 text-lg font-bold text-gray-900">詳細</h2>
           <div
             className="prose prose-gray max-w-none"

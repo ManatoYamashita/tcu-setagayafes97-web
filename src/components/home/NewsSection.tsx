@@ -55,7 +55,7 @@ export async function NewsSection() {
             <Link
               key={news.id}
               href={`/info/${news.id}`}
-              className="group flex items-center justify-between gap-6 rounded-2xl bg-white p-6 shadow transition-all hover:shadow-lg"
+              className="group flex items-center justify-between gap-6 border-b border-gray-200 bg-white p-6 transition-colors hover:bg-gray-50"
             >
               <div className="flex flex-1 items-center gap-4">
                 {/* 日付 */}
