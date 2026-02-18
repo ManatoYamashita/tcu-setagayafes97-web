@@ -92,7 +92,7 @@ export function CountdownTimer() {
   // SSR時の表示（ハイドレーションミス回避）
   if (!mounted) {
     return (
-      <div className="animate-pulse bg-gray-100 py-20">
+      <div className="bg-gray-100 py-20">
         <div className="container mx-auto px-4">
           <div className="h-32 rounded-lg bg-gray-200"></div>
         </div>
@@ -106,11 +106,7 @@ export function CountdownTimer() {
       <section className="bg-primary py-20">
         <div className="container mx-auto px-4 text-center text-white">
           <div className="mb-4">
-            <svg
-              className="mx-auto h-20 w-20 animate-pulse"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
+            <svg className="mx-auto h-20 w-20" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"

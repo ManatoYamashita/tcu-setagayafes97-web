@@ -5,6 +5,7 @@ export interface SocialIconsProps {
   layout?: "horizontal" | "vertical";
   size?: "sm" | "md" | "lg";
   showLabel?: boolean;
+  variant?: "minimal" | "circle" | "bordered";
   className?: string;
 }
 
@@ -12,6 +13,7 @@ export function SocialIcons({
   layout = "horizontal",
   size = "md",
   showLabel = false,
+  variant = "minimal",
   className = "",
 }: SocialIconsProps) {
   const iconSizes = {
@@ -23,6 +25,15 @@ export function SocialIcons({
   const containerStyles = {
     horizontal: "flex items-center gap-4",
     vertical: "flex flex-col gap-3",
+  };
+
+  const linkBase =
+    "inline-flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full";
+  const iconWrapperVariants = {
+    minimal: "",
+    circle: "w-10 h-10 text-gray-600 group-hover:text-primary",
+    bordered:
+      "w-10 h-10 border border-current text-gray-600 group-hover:border-primary group-hover:text-primary",
   };
 
   const socialLinks = [
@@ -52,21 +63,31 @@ export function SocialIcons({
       {showLabel && layout === "horizontal" && (
         <span className="text-sm font-semibold uppercase tracking-wider">Official SNS</span>
       )}
-      {socialLinks.map((social) => (
-        <a
-          key={social.name}
-          href={social.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="transition-colors hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-          aria-label={`${social.name}で世田谷祭をフォロー`}
-        >
-          {social.icon}
-          {showLabel && layout === "vertical" && (
-            <span className="ml-2 text-sm">{social.name}</span>
-          )}
-        </a>
-      ))}
+      {socialLinks.map((social) => {
+        const iconEl =
+          variant === "minimal" ? (
+            social.icon
+          ) : (
+            <span
+              className={`inline-flex items-center justify-center shrink-0 rounded-full ${iconWrapperVariants[variant]}`}
+            >
+              {social.icon}
+            </span>
+          );
+        return (
+          <a
+            key={social.name}
+            href={social.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${linkBase} ${variant === "minimal" ? "hover:text-primary hover:scale-110" : "group flex items-center gap-2"} ${variant !== "minimal" ? "shrink-0" : ""}`}
+            aria-label={`${social.name}で世田谷祭をフォロー`}
+          >
+            {iconEl}
+            {showLabel && layout === "vertical" && <span className="text-sm">{social.name}</span>}
+          </a>
+        );
+      })}
     </div>
   );
 }

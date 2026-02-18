@@ -2,7 +2,7 @@ import { siteConfig } from "@/data/site";
 
 /**
  * 開催概要セクション
- * イベントの基本情報を表示
+ * イベントの基本情報をテキスト中心のシンプルな3カラムで表示
  */
 export function EventOverview() {
   // 日付フォーマット変換（2026-10-31 → 10月31日）
@@ -16,111 +16,44 @@ export function EventOverview() {
   const year = new Date(siteConfig.dates.day1).getFullYear();
 
   return (
-    <section className="relative overflow-hidden bg-white py-32">
+    <section className="bg-white py-32">
       <div className="container mx-auto px-4">
-        <h2 className="mb-12 text-center text-5xl font-bold md:text-6xl">開催概要</h2>
+        <h2 className="mb-16 text-center text-5xl font-bold md:text-6xl">開催概要</h2>
 
         <div className="mx-auto max-w-4xl">
-          <div className="grid gap-8 md:grid-cols-3">
+          <div className="grid grid-cols-1 divide-y md:grid-cols-3 md:divide-x md:divide-y-0 divide-gray-200">
             {/* 開催日時 */}
-            <div className="rounded-xl border border-gray-200 bg-white p-6 text-center">
-              <div className="mb-4 flex justify-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                  <svg
-                    className="h-8 w-8 text-primary"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <h3 className="mb-3 text-lg font-semibold text-gray-800">開催日時</h3>
-              <p className="mb-1 text-2xl font-bold text-primary">{year}年</p>
-              <p className="mb-2 text-lg font-semibold">
+            <div className="py-8 md:py-0 md:px-10 text-center">
+              <p className="mb-3 text-xs uppercase tracking-widest text-gray-400">Date</p>
+              <p className="text-lg font-semibold text-gray-900">{year}年</p>
+              <p className="text-lg font-semibold text-gray-900">
                 {day1Formatted} (
                 {new Date(siteConfig.dates.day1).toLocaleDateString("ja-JP", { weekday: "short" })})
               </p>
-              <p className="mb-3 text-lg font-semibold">
+              <p className="text-lg font-semibold text-gray-900">
                 {day2Formatted} (
                 {new Date(siteConfig.dates.day2).toLocaleDateString("ja-JP", { weekday: "short" })})
               </p>
-              <p className="text-sm text-gray-600">
-                {siteConfig.openTime} - {siteConfig.closeTime}
+              <p className="mt-2 text-sm text-gray-500">
+                {siteConfig.openTime} – {siteConfig.closeTime}
               </p>
             </div>
 
             {/* 会場 */}
-            <div className="rounded-xl border border-gray-200 bg-white p-6 text-center">
-              <div className="mb-4 flex justify-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                  <svg
-                    className="h-8 w-8 text-primary"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <h3 className="mb-3 text-lg font-semibold text-gray-800">会場</h3>
-              <p className="mb-2 text-lg font-bold text-gray-900">{siteConfig.venue}</p>
-              <p className="text-sm text-gray-600">{siteConfig.address}</p>
+            <div className="py-8 md:py-0 md:px-10 text-center">
+              <p className="mb-3 text-xs uppercase tracking-widest text-gray-400">Venue</p>
+              <p className="text-lg font-semibold text-gray-900">{siteConfig.venue}</p>
+              <p className="mt-2 text-sm text-gray-500">{siteConfig.address}</p>
             </div>
 
             {/* 来場予定者数 */}
-            <div className="rounded-xl border border-gray-200 bg-white p-6 text-center">
-              <div className="mb-4 flex justify-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                  <svg
-                    className="h-8 w-8 text-primary"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <h3 className="mb-3 text-lg font-semibold text-gray-800">来場予定者数</h3>
-              <p className="mb-2 text-3xl font-bold text-primary">
-                {siteConfig.expectedVisitors.toLocaleString()}
-                <span className="ml-1 text-lg">名</span>
+            <div className="py-8 md:py-0 md:px-10 text-center">
+              <p className="mb-3 text-xs uppercase tracking-widest text-gray-400">Visitors</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {siteConfig.expectedVisitors.toLocaleString()} 名
               </p>
-              <p className="text-sm text-gray-600">（両日合計）</p>
+              <p className="mt-2 text-sm text-gray-500">入場無料・事前予約不要 / 雨天決行</p>
             </div>
-          </div>
-
-          {/* 補足情報 */}
-          <div className="mt-12 rounded-xl bg-primary/5 p-6 text-center">
-            <p className="text-sm text-gray-700">
-              入場無料・事前予約不要
-              <span className="mx-2">|</span>
-              雨天決行
-            </p>
           </div>
         </div>
       </div>

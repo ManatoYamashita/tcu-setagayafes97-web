@@ -26,7 +26,6 @@ export function CircularButton({
           ${sizeClasses[size]}
           flex flex-col items-center justify-center
           rounded-full bg-white border border-gray-200
-          transition-colors duration-300
           hover:border-primary
           focus:outline-none focus:ring-4 focus:ring-primary focus:ring-offset-2
           ${className}

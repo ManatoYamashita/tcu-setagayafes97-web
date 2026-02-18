@@ -13,7 +13,7 @@ export interface CardProps {
  * コンテンツを包むカードレイアウトを提供
  */
 export function Card({ variant = "default", className, children, href }: CardProps) {
-  const baseStyles = "rounded-2xl border bg-white transition-colors duration-300";
+  const baseStyles = "rounded-2xl border bg-white";
 
   const variantStyles = {
     default: "border-gray-200 hover:border-gray-300",

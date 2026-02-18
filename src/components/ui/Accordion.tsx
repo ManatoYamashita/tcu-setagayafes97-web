@@ -33,24 +33,18 @@ function AccordionItem({ item, index }: AccordionItemProps) {
         onKeyDown={handleKeyDown}
         aria-expanded={isOpen}
         aria-controls={`accordion-content-${index}`}
-        className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-gray-50"
+        className="flex w-full items-center justify-between p-4 text-left hover:bg-gray-50"
       >
         <span className="text-base font-semibold text-gray-900 md:text-lg">{item.title}</span>
         <ChevronDown
-          className={cn(
-            "h-5 w-5 flex-shrink-0 text-gray-500 transition-transform duration-300",
-            isOpen && "rotate-180"
-          )}
+          className={cn("h-5 w-5 flex-shrink-0 text-gray-500", isOpen && "rotate-180")}
         />
       </button>
 
       {/* アコーディオンのコンテンツ部分 */}
       <div
         id={`accordion-content-${index}`}
-        className={cn(
-          "overflow-hidden transition-all duration-300",
-          isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
-        )}
+        className={cn("overflow-hidden", isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0")}
       >
         <div className="border-t border-gray-200 p-4">
           <p className="whitespace-pre-wrap text-sm text-gray-700 md:text-base">{item.content}</p>
