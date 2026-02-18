@@ -13,7 +13,7 @@ export function TimetableEventCard({ event }: TimetableEventCardProps) {
   return (
     <Link
       href={`/events/${event.id}`}
-      className="block h-full rounded-lg bg-white p-3 shadow-md transition-all hover:shadow-lg hover:scale-105 border-l-4 border-primary"
+      className="block h-full rounded-lg bg-white p-3 border border-gray-200 transition-colors hover:border-primary border-l-4 border-l-primary"
     >
       {/* タイトル */}
       <h3 className="mb-1 text-sm font-bold text-gray-900 line-clamp-2">{event.title}</h3>

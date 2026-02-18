@@ -49,7 +49,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     <>
       {/* オーバーレイ */}
       <div
-        className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ${
+        className={`fixed inset-0 z-40 bg-black/50 ${
           isOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         onClick={onClose}
@@ -58,7 +58,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
       {/* スライドインメニュー */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-[280px] transform bg-white shadow-2xl transition-transform duration-300 ${
+        className={`fixed inset-y-0 right-0 z-50 w-[280px] transform bg-white border-l border-gray-200 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -68,7 +68,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           <button
             onClick={onClose}
             aria-label="メニューを閉じる"
-            className="rounded-lg p-1 transition-colors hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            className="rounded-lg p-1 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
           >
             <X className="h-6 w-6 text-gray-600" />
           </button>

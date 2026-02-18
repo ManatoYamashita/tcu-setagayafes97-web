@@ -1,51 +1,37 @@
-import Image from "next/image";
+import Link from "next/link";
 
 /**
  * ABOUTセクション
- * 世田谷祭の概要と理念を紹介
+ * 世田谷祭の概要と理念をシンプルなタイポグラフィで紹介
  */
 export function AboutSection() {
   return (
-    <section className="relative overflow-hidden bg-primary py-32 text-white">
-      {/* 斜め背景 */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary to-purple-600 diagonal-bg-reverse opacity-90" />
+    <section className="bg-white py-32">
+      <div className="container mx-auto px-4">
+        {/* ラベル */}
+        <p className="mb-6 text-xs uppercase tracking-widest text-gray-400">About</p>
 
-      <div className="container relative z-10 mx-auto px-4">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-          {/* 左側: 縦書きタイトル + テキスト */}
-          <div className="flex gap-8">
-            {/* 縦書きタイトル */}
-            <h2
-              className="text-6xl font-bold lg:text-7xl"
-              style={{ writingMode: "vertical-rl", textOrientation: "upright" }}
-              aria-label="ABOUT"
-            >
-              ABOUT
-            </h2>
+        {/* 大見出し */}
+        <h2 className="mb-12 text-5xl font-bold text-gray-900 md:text-6xl">世田谷祭について</h2>
 
-            {/* テキスト */}
-            <div className="flex flex-col justify-center space-y-6">
-              <p className="text-lg leading-relaxed">
-                東京都市大学 世田谷祭は、学生が主体となって企画・運営する、
-                年に一度の一大イベントです。
-              </p>
-              <p className="leading-relaxed">
-                教室企画、ステージ企画、模擬店など、様々な企画をご用意して
-                皆様のご来場をお待ちしております。
-              </p>
-            </div>
-          </div>
-
-          {/* 右側: 画像 */}
-          <div className="relative h-96 overflow-hidden rounded-2xl lg:h-full">
-            <Image
-              src="/images/placeholder/p.jpeg"
-              alt="世田谷祭の様子"
-              fill
-              className="object-cover"
-            />
-          </div>
+        {/* 本文 */}
+        <div className="max-w-2xl">
+          <p className="mb-4 text-lg leading-relaxed text-gray-700">
+            東京都市大学 世田谷祭は、学生が主体となって企画・運営する、 年に一度の一大イベントです。
+          </p>
+          <p className="leading-relaxed text-gray-600">
+            教室企画、ステージ企画、模擬店など、様々な企画をご用意して
+            皆様のご来場をお待ちしております。
+          </p>
         </div>
+
+        {/* CTA リンク */}
+        <Link
+          href="/about"
+          className="mt-10 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:opacity-70"
+        >
+          委員会について →
+        </Link>
       </div>
     </section>
   );

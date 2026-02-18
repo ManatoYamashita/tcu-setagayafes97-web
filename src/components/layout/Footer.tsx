@@ -28,7 +28,13 @@ export function Footer() {
           {/* SNSセクション */}
           <div>
             <h3 className="mb-4 font-bold text-gray-900">Follow Us</h3>
-            <SocialIcons layout="vertical" size="md" showLabel className="text-gray-600" />
+            <SocialIcons
+              layout="horizontal"
+              size="md"
+              showLabel={false}
+              variant="circle"
+              className="text-gray-600"
+            />
           </div>
         </div>
 

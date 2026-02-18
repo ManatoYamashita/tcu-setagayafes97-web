@@ -105,7 +105,7 @@ export function NavDropdown({ item }: NavDropdownProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 top-full z-60 mt-2 min-w-[200px] rounded-lg border border-gray-200 bg-white py-2 shadow-lg">
+        <div className="absolute left-0 top-full z-60 mt-2 min-w-[200px] rounded-lg border border-gray-200 bg-white py-2">
           {item.children?.map((child) => (
             <Link
               key={child.href}
