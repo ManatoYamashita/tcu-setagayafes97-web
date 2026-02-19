@@ -102,13 +102,13 @@ export function ContactForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* お問い合わせ種別 */}
         <div>
-          <label htmlFor="type" className="mb-2 block text-sm font-semibold text-gray-700">
+          <label htmlFor="type" className="mb-2 block text-sm font-semibold text-white/90">
             お問い合わせ種別 <span className="text-red-500">*</span>
           </label>
           <select
             id="type"
             {...register("type")}
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-lg border border-white/30 bg-white/10 px-4 py-3 text-white placeholder-white/50 transition-colors focus:border-white focus:outline-none focus:ring-2 focus:ring-white/20"
           >
             {(Object.keys(contactTypeLabels) as ContactType[]).map((type) => (
               <option key={type} value={type}>
@@ -121,7 +121,7 @@ export function ContactForm() {
 
         {/* お名前 */}
         <div>
-          <label htmlFor="name" className="mb-2 block text-sm font-semibold text-gray-700">
+          <label htmlFor="name" className="mb-2 block text-sm font-semibold text-white/90">
             お名前 <span className="text-red-500">*</span>
           </label>
           <input
@@ -129,14 +129,14 @@ export function ContactForm() {
             type="text"
             {...register("name")}
             placeholder="山田 太郎"
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-lg border border-white/30 bg-white/10 px-4 py-3 text-white placeholder-white/50 transition-colors focus:border-white focus:outline-none focus:ring-2 focus:ring-white/20"
           />
           {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
         </div>
 
         {/* メールアドレス */}
         <div>
-          <label htmlFor="email" className="mb-2 block text-sm font-semibold text-gray-700">
+          <label htmlFor="email" className="mb-2 block text-sm font-semibold text-white/90">
             メールアドレス <span className="text-red-500">*</span>
           </label>
           <input
@@ -144,29 +144,29 @@ export function ContactForm() {
             type="email"
             {...register("email")}
             placeholder="example@example.com"
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-lg border border-white/30 bg-white/10 px-4 py-3 text-white placeholder-white/50 transition-colors focus:border-white focus:outline-none focus:ring-2 focus:ring-white/20"
           />
           {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
         </div>
 
         {/* 電話番号（任意） */}
         <div>
-          <label htmlFor="phone" className="mb-2 block text-sm font-semibold text-gray-700">
-            電話番号 <span className="text-sm text-gray-500">（任意）</span>
+          <label htmlFor="phone" className="mb-2 block text-sm font-semibold text-white/90">
+            電話番号 <span className="text-sm text-white/60">（任意）</span>
           </label>
           <input
             id="phone"
             type="tel"
             {...register("phone")}
             placeholder="090-1234-5678"
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-lg border border-white/30 bg-white/10 px-4 py-3 text-white placeholder-white/50 transition-colors focus:border-white focus:outline-none focus:ring-2 focus:ring-white/20"
           />
           {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>}
         </div>
 
         {/* 件名 */}
         <div>
-          <label htmlFor="subject" className="mb-2 block text-sm font-semibold text-gray-700">
+          <label htmlFor="subject" className="mb-2 block text-sm font-semibold text-white/90">
             件名 <span className="text-red-500">*</span>
           </label>
           <input
@@ -174,14 +174,14 @@ export function ContactForm() {
             type="text"
             {...register("subject")}
             placeholder="企画について"
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-lg border border-white/30 bg-white/10 px-4 py-3 text-white placeholder-white/50 transition-colors focus:border-white focus:outline-none focus:ring-2 focus:ring-white/20"
           />
           {errors.subject && <p className="mt-1 text-sm text-red-600">{errors.subject.message}</p>}
         </div>
 
         {/* お問い合わせ内容 */}
         <div>
-          <label htmlFor="message" className="mb-2 block text-sm font-semibold text-gray-700">
+          <label htmlFor="message" className="mb-2 block text-sm font-semibold text-white/90">
             お問い合わせ内容 <span className="text-red-500">*</span>
           </label>
           <textarea
@@ -189,7 +189,7 @@ export function ContactForm() {
             {...register("message")}
             rows={8}
             placeholder="お問い合わせ内容を入力してください（10文字以上）"
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-lg border border-white/30 bg-white/10 px-4 py-3 text-white placeholder-white/50 transition-colors focus:border-white focus:outline-none focus:ring-2 focus:ring-white/20"
           />
           {errors.message && <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>}
         </div>
@@ -200,10 +200,10 @@ export function ContactForm() {
             <input
               type="checkbox"
               {...register("agreeToPrivacyPolicy")}
-              className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary/20"
+              className="mt-1 h-4 w-4 rounded border-white/30 text-primary focus:ring-2 focus:ring-white/20"
             />
-            <span className="text-sm text-gray-700">
-              <Link href="/about/privacy" className="text-primary hover:underline">
+            <span className="text-sm text-white/90">
+              <Link href="/about/privacy" className="text-primary-light hover:underline">
                 プライバシーポリシー
               </Link>
               に同意する <span className="text-red-500">*</span>
@@ -219,7 +219,7 @@ export function ContactForm() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-4 font-semibold text-white transition-all hover:bg-primary/90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-white px-6 py-4 font-semibold text-primary transition-all hover:bg-white/90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting ? (
               <>
@@ -236,8 +236,8 @@ export function ContactForm() {
         </div>
 
         {/* 注意事項 */}
-        <div className="rounded-lg bg-gray-50 p-4">
-          <p className="text-sm text-gray-700">
+        <div className="rounded-lg bg-white/10 p-4">
+          <p className="text-sm text-white/90">
             <span className="text-red-500">*</span> は必須項目です。
             <br />
             お問い合わせ内容によっては、回答までお時間をいただく場合がございます。

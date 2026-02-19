@@ -9,11 +9,11 @@ import { siteConfig } from "@/data/site";
  */
 export function HeroSection() {
   return (
-    <section className="w-full min-h-[calc(100vh-5rem)] pt-20 relative bg-white overflow-hidden flex items-center justify-center">
+    <section className="w-full min-h-[calc(100vh-5rem)] pt-20 relative bg-primary overflow-hidden flex items-center justify-center">
       {/* テキストエリア（absolute、左下寄り、z-20） */}
       <div className="absolute left-0 top-0 w-full h-full flex items-end pb-12 lg:pb-16 xl:pb-20 z-20 pointer-events-none">
         <div className="max-w-7xl mx-auto w-full px-6 lg:px-8 pointer-events-auto">
-          <h2 className="text-dark-green font-bold tracking-tight leading-tight text-4xl lg:text-5xl xl:text-6xl">
+          <h2 className="text-white font-bold tracking-tight leading-tight text-4xl lg:text-5xl xl:text-6xl">
             世田谷祭
             <br />
             世界を動かす
@@ -25,11 +25,11 @@ export function HeroSection() {
             <a
               href="/events"
               aria-label="企画一覧を見る"
-              className="w-16 h-16 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:border-primary"
+              className="w-16 h-16 rounded-full bg-white/10 border border-white/30 flex items-center justify-center hover:bg-white/20"
             >
-              <ArrowRight className="w-6 h-6 text-primary" />
+              <ArrowRight className="w-6 h-6 text-white" />
             </a>
-            <span className="text-base text-dark-green font-semibold uppercase tracking-wider">
+            <span className="text-base text-white font-semibold uppercase tracking-wider">
               View More
             </span>
           </div>

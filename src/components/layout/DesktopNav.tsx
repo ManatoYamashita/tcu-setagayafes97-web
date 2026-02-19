@@ -18,7 +18,7 @@ export function DesktopNav() {
             {"children" in item && item.children ? (
               <NavDropdown item={item} />
             ) : (
-              <Link href={item.href} className="text-gray-700 transition-colors hover:text-primary">
+              <Link href={item.href} className="text-white/80 transition-colors hover:text-white">
                 {item.label}
               </Link>
             )}

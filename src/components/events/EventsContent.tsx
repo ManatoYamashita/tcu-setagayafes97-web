@@ -49,8 +49,8 @@ export function EventsContent({ initialEvents }: EventsContentProps) {
         <main>
           {/* 検索結果件数 */}
           <div className="mb-6 flex items-center justify-between">
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold text-gray-900">{filteredEvents.length}</span>{" "}
+            <p className="text-sm text-white/80">
+              <span className="font-semibold text-white">{filteredEvents.length}</span>{" "}
               件の企画が見つかりました
             </p>
           </div>

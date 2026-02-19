@@ -115,13 +115,13 @@ export default async function EventPage({ params }: EventPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary">
         {/* パンくずリスト */}
-        <nav className="border-b border-gray-200 bg-white py-4" aria-label="パンくずリスト">
+        <nav className="border-b border-white/20 bg-white/10 py-4" aria-label="パンくずリスト">
           <div className="container mx-auto px-4">
-            <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+            <ol className="flex flex-wrap items-center gap-2 text-sm text-white/80">
               <li>
-                <Link href="/" className="hover:text-primary hover:underline">
+                <Link href="/" className="hover:text-white hover:underline">
                   トップ
                 </Link>
               </li>
@@ -142,7 +142,7 @@ export default async function EventPage({ params }: EventPageProps) {
                 </svg>
               </li>
               <li>
-                <Link href="/events" className="hover:text-primary hover:underline">
+                <Link href="/events" className="hover:text-white hover:underline">
                   企画を探す
                 </Link>
               </li>
@@ -162,7 +162,7 @@ export default async function EventPage({ params }: EventPageProps) {
                   />
                 </svg>
               </li>
-              <li className="font-semibold text-gray-900" aria-current="page">
+              <li className="font-semibold text-white" aria-current="page">
                 {event.title}
               </li>
             </ol>
@@ -179,7 +179,7 @@ export default async function EventPage({ params }: EventPageProps) {
           <div className="mx-auto mt-12 max-w-4xl">
             <Link
               href="/events"
-              className="inline-flex items-center gap-2 text-primary hover:underline"
+              className="inline-flex items-center gap-2 text-primary-light hover:underline"
             >
               <svg
                 className="h-5 w-5"

@@ -15,7 +15,7 @@ export async function SponsorBanner() {
   }
 
   return (
-    <section className="border-t bg-white py-16">
+    <section className="border-t border-white/20 bg-primary py-16">
       <div className="container mx-auto px-4">
         <div className="mb-10 text-center">
           <h2 className="text-3xl font-bold">協賛企業</h2>
@@ -44,7 +44,7 @@ export async function SponsorBanner() {
                         />
                       </div>
                     ) : (
-                      <p className="font-semibold text-gray-800">
+                      <p className="font-semibold text-white">
                         {sponsor.sponsorName || sponsor.title}
                       </p>
                     )}
@@ -62,7 +62,7 @@ export async function SponsorBanner() {
                         />
                       </div>
                     ) : (
-                      <p className="font-semibold text-gray-800">
+                      <p className="font-semibold text-white">
                         {sponsor.sponsorName || sponsor.title}
                       </p>
                     )}

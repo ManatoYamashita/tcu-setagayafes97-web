@@ -14,14 +14,14 @@ interface TimetableChartProps {
 export function TimetableChart({ events }: TimetableChartProps) {
   if (!events || events.length === 0) {
     return (
-      <div className="rounded-lg bg-gray-100 p-8 text-center">
-        <p className="text-gray-600">企画が見つかりませんでした。</p>
+      <div className="rounded-lg bg-white/10 p-8 text-center">
+        <p className="text-white/80">企画が見つかりませんでした。</p>
       </div>
     );
   }
 
   return (
-    <div className="relative overflow-hidden rounded-lg border border-gray-200 bg-white p-6">
+    <div className="relative overflow-hidden rounded-lg border border-white/20 bg-white/10 p-6">
       {/* デスクトップ: ガントチャート */}
       <div className="hidden md:block">
         <div className="relative" style={{ minHeight: "600px" }}>

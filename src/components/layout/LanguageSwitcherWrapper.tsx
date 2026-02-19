@@ -41,13 +41,13 @@ export function LanguageSwitcherWrapper() {
             href={`/${locale.code}`}
             className={
               currentLocale === locale.code
-                ? "text-primary font-bold"
-                : "text-gray-700 hover:text-primary transition-colors"
+                ? "text-white font-bold"
+                : "text-white/70 hover:text-white transition-colors"
             }
           >
             {locale.label}
           </Link>
-          {index < locales.length - 1 && <span className="text-gray-400">/</span>}
+          {index < locales.length - 1 && <span className="text-white/50">/</span>}
         </div>
       ))}
     </div>

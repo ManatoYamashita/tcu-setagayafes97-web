@@ -44,9 +44,9 @@ export async function RelatedEvents({ currentEvent }: RelatedEventsProps) {
   }
 
   return (
-    <section className="border-t border-gray-200 bg-gray-50 py-16">
+    <section className="border-t border-white/20 bg-primary-dark py-16">
       <div className="container mx-auto px-4">
-        <h2 className="mb-8 text-center text-3xl font-bold text-gray-900">関連企画</h2>
+        <h2 className="mb-8 text-center text-3xl font-bold text-white">関連企画</h2>
         <EventGrid events={relatedEvents} />
       </div>
     </section>

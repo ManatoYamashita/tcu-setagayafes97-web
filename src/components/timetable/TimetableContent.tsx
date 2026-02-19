@@ -50,7 +50,7 @@ export function TimetableContent({ initialEvents }: TimetableContentProps) {
                 .filter((stage) => eventsByStage[stage.id])
                 .map((stage) => (
                   <div key={stage.id}>
-                    <h2 className="mb-4 text-2xl font-bold text-gray-900">{stage.name}</h2>
+                    <h2 className="mb-4 text-2xl font-bold text-white">{stage.name}</h2>
                     <TimetableChart events={eventsByStage[stage.id]} />
                   </div>
                 ))}
@@ -61,11 +61,11 @@ export function TimetableContent({ initialEvents }: TimetableContentProps) {
           )
         ) : (
           // 企画が見つからない場合
-          <div className="rounded-lg bg-gray-100 p-12 text-center">
-            <p className="text-lg text-gray-600">
+          <div className="rounded-lg bg-white/10 p-12 text-center">
+            <p className="text-lg text-white/80">
               選択した条件に該当するステージ企画が見つかりませんでした。
             </p>
-            <p className="mt-2 text-sm text-gray-500">他の日程やステージを選択してみてください。</p>
+            <p className="mt-2 text-sm text-white/60">他の日程やステージを選択してみてください。</p>
           </div>
         )}
       </div>

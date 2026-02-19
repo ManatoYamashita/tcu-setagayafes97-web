@@ -63,7 +63,7 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: st
   }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary">
       {/* 言語切替（多言語対応ページのみ） */}
       <div className="fixed right-4 top-4 z-50">
         <LanguageSwitcher />
@@ -84,18 +84,18 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: st
         <div className="mx-auto max-w-4xl">
           {/* FAQ件数表示 */}
           <div className="mb-6">
-            <p className="text-sm text-gray-600">{t("count", { count: faqList.length })}</p>
+            <p className="text-sm text-white/80">{t("count", { count: faqList.length })}</p>
           </div>
 
           {/* FAQ一覧 */}
           {faqList.length > 0 ? (
             <Accordion items={accordionItems} />
           ) : (
-            <div className="rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
-              <p className="text-gray-500">{t("empty.title")}</p>
-              <p className="mt-2 text-sm text-gray-400">
+            <div className="rounded-lg border border-white/20 bg-white/10 p-8 text-center shadow-sm">
+              <p className="text-white/60">{t("empty.title")}</p>
+              <p className="mt-2 text-sm text-white/50">
                 {t("empty.prefix")}{" "}
-                <a href="/about/contact" className="text-primary hover:underline">
+                <a href="/about/contact" className="text-primary-light hover:underline">
                   {t("empty.contactLink")}
                 </a>{" "}
                 {t("empty.suffix")}

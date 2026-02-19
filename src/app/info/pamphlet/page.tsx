@@ -40,7 +40,7 @@ const pamphlets = [
  */
 export default function PamphletPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-primary">
       {/* ページヘッダー */}
       <div className="bg-primary py-16 text-white">
         <div className="container mx-auto px-4">
@@ -80,7 +80,7 @@ export default function PamphletPage() {
             {pamphlets.map((pamphlet) => (
               <article
                 key={pamphlet.id}
-                className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm"
+                className="overflow-hidden rounded-lg border border-white/20 bg-white/10 shadow-sm"
               >
                 <div className="lg:flex">
                   {/* 表紙画像 */}
@@ -93,7 +93,7 @@ export default function PamphletPage() {
                     </div>
                     {/* 準備中バッジ */}
                     {!pamphlet.isAvailable && (
-                      <div className="absolute right-2 top-2 rounded-full bg-gray-900 px-3 py-1 text-xs font-bold text-white">
+                      <div className="absolute right-2 top-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold text-white">
                         準備中
                       </div>
                     )}
@@ -102,18 +102,18 @@ export default function PamphletPage() {
                   {/* パンフレット情報 */}
                   <div className="flex flex-1 flex-col justify-between p-6">
                     <div>
-                      <h2 className="mb-3 text-2xl font-bold text-gray-900">{pamphlet.title}</h2>
-                      <p className="mb-4 text-gray-700">{pamphlet.description}</p>
+                      <h2 className="mb-3 text-2xl font-bold text-white">{pamphlet.title}</h2>
+                      <p className="mb-4 text-white/90">{pamphlet.description}</p>
 
                       {/* メタ情報 */}
                       <dl className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <dt className="font-semibold text-gray-500">ページ数</dt>
-                          <dd className="text-gray-900">{pamphlet.pages}ページ</dd>
+                          <dt className="font-semibold text-white/60">ページ数</dt>
+                          <dd className="text-white">{pamphlet.pages}ページ</dd>
                         </div>
                         <div>
-                          <dt className="font-semibold text-gray-500">ファイルサイズ</dt>
-                          <dd className="text-gray-900">{pamphlet.fileSize}</dd>
+                          <dt className="font-semibold text-white/60">ファイルサイズ</dt>
+                          <dd className="text-white">{pamphlet.fileSize}</dd>
                         </div>
                       </dl>
                     </div>
@@ -124,7 +124,7 @@ export default function PamphletPage() {
                         <a
                           href={pamphlet.fileUrl}
                           download
-                          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-white transition-all hover:bg-primary/90 hover:shadow-lg md:w-auto"
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-semibold text-primary transition-all hover:bg-white/90 hover:shadow-lg md:w-auto"
                         >
                           <Download className="h-5 w-5" />
                           <span>PDFをダウンロード</span>
@@ -132,7 +132,7 @@ export default function PamphletPage() {
                       ) : (
                         <button
                           disabled
-                          className="inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-gray-300 px-6 py-3 font-semibold text-gray-500 md:w-auto"
+                          className="inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-white/15 px-6 py-3 font-semibold text-white/60 md:w-auto"
                         >
                           <Download className="h-5 w-5" />
                           <span>準備中</span>
@@ -146,9 +146,9 @@ export default function PamphletPage() {
           </div>
 
           {/* 補足情報 */}
-          <div className="mt-8 rounded-lg border border-gray-200 bg-white p-6">
-            <h3 className="mb-4 text-lg font-bold text-gray-900">パンフレットについて</h3>
-            <ul className="space-y-2 text-sm text-gray-700">
+          <div className="mt-8 rounded-lg border border-white/20 bg-white/10 p-6">
+            <h3 className="mb-4 text-lg font-bold text-white">パンフレットについて</h3>
+            <ul className="space-y-2 text-sm text-white/90">
               <li className="flex items-start gap-2">
                 <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary"></span>
                 <span>パンフレットはPDF形式で提供しています。</span>

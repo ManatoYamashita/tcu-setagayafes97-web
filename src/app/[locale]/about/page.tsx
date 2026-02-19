@@ -48,7 +48,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   const t = await getTranslations("about");
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary">
       {/* 言語切替（多言語対応ページのみ） */}
       <div className="fixed right-4 top-4 z-50">
         <LanguageSwitcher />
@@ -68,10 +68,10 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       <div className="container mx-auto px-4 py-12">
         <div className="mx-auto max-w-4xl space-y-12">
           {/* 委員長挨拶 */}
-          <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm md:p-8">
+          <section className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm md:p-8">
             <div className="mb-6 flex items-center gap-3">
-              <Users className="h-6 w-6 text-primary" />
-              <h2 className="text-2xl font-bold text-gray-900">{t("chairperson.title")}</h2>
+              <Users className="h-6 w-6 text-primary-light" />
+              <h2 className="text-2xl font-bold text-white">{t("chairperson.title")}</h2>
             </div>
 
             {/* 委員長情報 */}
@@ -85,26 +85,26 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 
               {/* 委員長プロフィール */}
               <div className="flex-1 text-center md:text-left">
-                <h3 className="mb-2 text-2xl font-bold text-gray-900">
+                <h3 className="mb-2 text-2xl font-bold text-white">
                   {aboutConfig.chairpersonMessage.name}
                 </h3>
-                <p className="text-gray-600">{aboutConfig.chairpersonMessage.position}</p>
+                <p className="text-white/80">{aboutConfig.chairpersonMessage.position}</p>
               </div>
             </div>
 
             {/* 挨拶文 */}
             <div className="prose prose-lg max-w-none">
-              <p className="whitespace-pre-wrap leading-relaxed text-gray-700">
+              <p className="whitespace-pre-wrap leading-relaxed text-white/90">
                 {aboutConfig.chairpersonMessage.message}
               </p>
             </div>
           </section>
 
           {/* 理念・ビジョン */}
-          <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm md:p-8">
+          <section className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm md:p-8">
             <div className="mb-6 flex items-center gap-3">
               <Target className="h-6 w-6 text-blue-500" />
-              <h2 className="text-2xl font-bold text-gray-900">{t("vision.title")}</h2>
+              <h2 className="text-2xl font-bold text-white">{t("vision.title")}</h2>
             </div>
 
             {/* テーマ */}
@@ -114,7 +114,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             </div>
 
             {/* 理念説明 */}
-            <p className="mb-8 text-center text-lg text-gray-700">
+            <p className="mb-8 text-center text-lg text-white/90">
               {aboutConfig.vision.description}
             </p>
 
@@ -123,35 +123,35 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
               {aboutConfig.vision.values.map((value, index) => (
                 <div
                   key={index}
-                  className="rounded-lg border border-gray-200 bg-gray-50 p-6 transition-all hover:border-primary hover:shadow-md"
+                  className="rounded-lg border border-white/20 bg-white/10 p-6 transition-all hover:border-white hover:shadow-md"
                 >
                   <div className="mb-3 text-4xl">{value.icon}</div>
-                  <h4 className="mb-2 text-lg font-bold text-gray-900">{value.title}</h4>
-                  <p className="text-sm text-gray-700">{value.description}</p>
+                  <h4 className="mb-2 text-lg font-bold text-white">{value.title}</h4>
+                  <p className="text-sm text-white/90">{value.description}</p>
                 </div>
               ))}
             </div>
           </section>
 
           {/* 実行委員会について */}
-          <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm md:p-8">
+          <section className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm md:p-8">
             <div className="mb-6 flex items-center gap-3">
               <Building2 className="h-6 w-6 text-green-500" />
-              <h2 className="text-2xl font-bold text-gray-900">{t("committee.title")}</h2>
+              <h2 className="text-2xl font-bold text-white">{t("committee.title")}</h2>
             </div>
 
             {/* 基本情報 */}
             <div className="mb-6 grid gap-4 md:grid-cols-2">
-              <div className="rounded-lg bg-green-50 p-4">
-                <p className="mb-1 text-sm font-semibold text-gray-600">
+              <div className="rounded-lg bg-green-500/10 p-4">
+                <p className="mb-1 text-sm font-semibold text-white/80">
                   {t("committee.established")}
                 </p>
                 <p className="text-lg font-bold text-green-700">
                   {aboutConfig.committee.establishedYear}年
                 </p>
               </div>
-              <div className="rounded-lg bg-green-50 p-4">
-                <p className="mb-1 text-sm font-semibold text-gray-600">
+              <div className="rounded-lg bg-green-500/10 p-4">
+                <p className="mb-1 text-sm font-semibold text-white/80">
                   {t("committee.memberCount")}
                 </p>
                 <p className="text-lg font-bold text-green-700">
@@ -163,20 +163,18 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             </div>
 
             {/* 説明 */}
-            <p className="mb-6 text-gray-700">{aboutConfig.committee.description}</p>
+            <p className="mb-6 text-white/90">{aboutConfig.committee.description}</p>
 
             {/* 組織構成 */}
             <div>
-              <h3 className="mb-4 text-lg font-bold text-gray-900">
-                {t("committee.organization")}
-              </h3>
+              <h3 className="mb-4 text-lg font-bold text-white">{t("committee.organization")}</h3>
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                 {aboutConfig.committee.departments.map((dept, index) => (
                   <div
                     key={index}
-                    className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-center"
+                    className="rounded-lg border border-white/20 bg-white/10 p-3 text-center"
                   >
-                    <p className="font-semibold text-gray-900">{dept}</p>
+                    <p className="font-semibold text-white">{dept}</p>
                   </div>
                 ))}
               </div>
@@ -184,10 +182,8 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           </section>
 
           {/* SNSリンク */}
-          <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm md:p-8">
-            <h2 className="mb-6 text-center text-2xl font-bold text-gray-900">
-              {t("social.title")}
-            </h2>
+          <section className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm md:p-8">
+            <h2 className="mb-6 text-center text-2xl font-bold text-white">{t("social.title")}</h2>
             <div className="grid gap-4 md:grid-cols-3">
               {aboutConfig.social.map((social, index) => (
                 <a
@@ -195,7 +191,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-center justify-center gap-2 rounded-lg border-2 border-primary p-4 font-semibold text-primary transition-all hover:bg-primary hover:text-white"
+                  className="group flex items-center justify-center gap-2 rounded-lg border-2 border-white/30 p-4 font-semibold text-white transition-all hover:bg-white hover:text-primary"
                 >
                   <span>{social.name}</span>
                   <ExternalLink className="h-4 w-4" />
@@ -205,20 +201,20 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
           </section>
 
           {/* 関連リンク */}
-          <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm md:p-8">
-            <h2 className="mb-6 text-center text-2xl font-bold text-gray-900">
+          <section className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm md:p-8">
+            <h2 className="mb-6 text-center text-2xl font-bold text-white">
               {t("relatedPages.title")}
             </h2>
             <div className="grid gap-4 md:grid-cols-2">
               <Link
                 href="/about/sponsors"
-                className="rounded-lg border-2 border-gray-300 p-4 text-center font-semibold text-gray-700 transition-all hover:border-primary hover:bg-primary/5 hover:text-primary"
+                className="rounded-lg border-2 border-white/30 p-4 text-center font-semibold text-white transition-all hover:border-white hover:bg-white/10 hover:text-white"
               >
                 {t("relatedPages.sponsors")}
               </Link>
               <Link
                 href="/about/contact"
-                className="rounded-lg border-2 border-gray-300 p-4 text-center font-semibold text-gray-700 transition-all hover:border-primary hover:bg-primary/5 hover:text-primary"
+                className="rounded-lg border-2 border-white/30 p-4 text-center font-semibold text-white transition-all hover:border-white hover:bg-white/10 hover:text-white"
               >
                 {t("relatedPages.contact")}
               </Link>
