@@ -1,31 +1,72 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Menu } from "lucide-react";
 import { siteConfig } from "@/data/site";
-import { cardNavItems } from "@/data/navigation";
 import { LanguageSwitcherWrapper } from "@/components/layout/LanguageSwitcherWrapper";
-import { CardNav } from "@/components/layout/CardNav";
+import { DesktopNav } from "@/components/layout/DesktopNav";
+import { MobileMenu } from "@/components/layout/MobileMenu";
 
 /**
- * 共通ヘッダーコンポーネント（CardNav 浮遊型ナビゲーション）
+ * 共通ヘッダーコンポーネント（Glassmorphism デザイン）
  *
- * - GSAP アニメーション付き浮遊型カードナビゲーション
- * - ハンバーガーメニュー押下で3枚のカラーカードが展開
- * - position: fixed でページ上部に浮遊
+ * - 全ページで表示される共通ヘッダー
+ * - デスクトップ: ロゴ + ナビゲーション + 言語切り替え
+ * - モバイル: ロゴ + 言語切り替え + ハンバーガーメニュー
+ * - sticky top-0 で固定表示
+ * - スクロール前: 透明背景
+ * - スクロール時: 半透明glass背景（backdrop-blur-md）
+ *
+ * IMPORTANT: padding変更時は globals.css の --header-height も更新すること
+ * 現在: py-5 (1.25rem × 2) + 内容物約32px = 80px (5rem)
  */
 export function Header() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // スクロール検知
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <CardNav
-      items={cardNavItems}
-      logo={
-        <Link href="/" className="logo-link text-primary transition-colors hover:text-primary/80">
-          {siteConfig.shortName}
-        </Link>
-      }
-      ctaSlot={<LanguageSwitcherWrapper />}
-      baseColor="#fff"
-      menuColor="#000"
-      ease="power3.out"
-    />
+    <>
+      <header
+        className={`sticky top-0 z-40 bg-primary ${
+          isScrolled ? "border-b border-white/30" : "border-b border-white/10"
+        }`}
+      >
+        <div className="container mx-auto flex items-center justify-between px-6 py-5">
+          {/* 左: ロゴ */}
+          <Link href="/" className="text-3xl font-bold text-white hover:text-white/80">
+            {siteConfig.shortName}
+          </Link>
+
+          {/* 中央: デスクトップナビ */}
+          <DesktopNav />
+
+          {/* 右: 言語切り替え + モバイルメニューボタン */}
+          <div className="flex items-center gap-4">
+            <LanguageSwitcherWrapper />
+            <button
+              className="rounded-lg p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 md:hidden"
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="メニューを開く"
+            >
+              <Menu className="h-6 w-6 text-white" />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* モバイルメニュー */}
+      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
+    </>
   );
 }

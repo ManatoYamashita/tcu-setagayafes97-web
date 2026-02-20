@@ -25,15 +25,14 @@ export function CircularButton({
         className={`
           ${sizeClasses[size]}
           flex flex-col items-center justify-center
-          rounded-full bg-white
-          shadow-xl transition-all duration-300
-          hover:shadow-2xl hover:-translate-y-1
-          focus:outline-none focus:ring-4 focus:ring-primary focus:ring-offset-2
+          rounded-full bg-white/10 border border-white/30
+          hover:bg-white/20
+          focus:outline-none focus:ring-4 focus:ring-white focus:ring-offset-2
           ${className}
         `}
       >
-        <span className="font-semibold uppercase tracking-wider text-gray-900">{text}</span>
-        <ArrowRight className="mt-2 h-5 w-5 text-primary" />
+        <span className="font-semibold uppercase tracking-wider text-white">{text}</span>
+        <ArrowRight className="mt-2 h-5 w-5 text-white" />
       </div>
     </Link>
   );

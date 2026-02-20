@@ -42,12 +42,12 @@ export function EventFilters() {
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="rounded-lg border border-white/20 bg-white/10 p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-gray-900">絞り込み</h2>
+        <h2 className="text-lg font-bold text-white">絞り込み</h2>
         <button
           onClick={handleReset}
-          className="text-sm text-primary underline hover:text-primary/80"
+          className="text-sm text-white underline hover:text-white/80"
           aria-label="フィルターをリセット"
         >
           リセット
@@ -57,7 +57,7 @@ export function EventFilters() {
       <div className="space-y-6">
         {/* 日程フィルター */}
         <div>
-          <label className="mb-2 block text-sm font-semibold text-gray-700">開催日</label>
+          <label className="mb-2 block text-sm font-semibold text-white/90">開催日</label>
           <div className="flex flex-wrap gap-2">
             {dateFilterOptions.map((option) => (
               <button
@@ -65,8 +65,8 @@ export function EventFilters() {
                 onClick={() => handleFilterChange("date", option.value)}
                 className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${
                   currentDate === option.value
-                    ? "border-primary bg-primary text-white"
-                    : "border-gray-300 bg-white text-gray-700 hover:border-primary hover:bg-primary/10"
+                    ? "border-white bg-white text-primary"
+                    : "border-white/30 bg-white/10 text-white hover:border-white hover:bg-white/20"
                 }`}
                 aria-pressed={currentDate === option.value}
               >
@@ -78,7 +78,7 @@ export function EventFilters() {
 
         {/* 企画種別フィルター */}
         <div>
-          <label className="mb-2 block text-sm font-semibold text-gray-700">企画種別</label>
+          <label className="mb-2 block text-sm font-semibold text-white/90">企画種別</label>
           <div className="flex flex-wrap gap-2">
             {typeFilterOptions.map((option) => (
               <button
@@ -86,8 +86,8 @@ export function EventFilters() {
                 onClick={() => handleFilterChange("type", option.value)}
                 className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${
                   currentType === option.value
-                    ? "border-primary bg-primary text-white"
-                    : "border-gray-300 bg-white text-gray-700 hover:border-primary hover:bg-primary/10"
+                    ? "border-white bg-white text-primary"
+                    : "border-white/30 bg-white/10 text-white hover:border-white hover:bg-white/20"
                 }`}
                 aria-pressed={currentType === option.value}
               >
@@ -101,7 +101,7 @@ export function EventFilters() {
         <div>
           <label
             htmlFor="building-filter"
-            className="mb-2 block text-sm font-semibold text-gray-700"
+            className="mb-2 block text-sm font-semibold text-white/90"
           >
             建物
           </label>
@@ -109,7 +109,7 @@ export function EventFilters() {
             id="building-filter"
             value={currentBuilding}
             onChange={(e) => handleFilterChange("building", e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm text-white focus:border-white focus:outline-none focus:ring-2 focus:ring-white/20"
           >
             {buildingFilterOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -123,7 +123,7 @@ export function EventFilters() {
         <div>
           <label
             htmlFor="keyword-search"
-            className="mb-2 block text-sm font-semibold text-gray-700"
+            className="mb-2 block text-sm font-semibold text-white/90"
           >
             キーワード検索
           </label>
@@ -133,7 +133,7 @@ export function EventFilters() {
             placeholder="企画名、団体名などで検索"
             value={currentKeyword}
             onChange={(e) => handleFilterChange("keyword", e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm placeholder-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm text-white placeholder-white/50 focus:border-white focus:outline-none focus:ring-2 focus:ring-white/20"
           />
         </div>
       </div>

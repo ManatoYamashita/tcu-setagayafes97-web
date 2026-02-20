@@ -19,7 +19,7 @@ export function CircleImage({ src, alt, size = "md" }: CircleImageProps) {
   };
 
   return (
-    <div className={`relative overflow-hidden rounded-full ${sizeClasses[size]} shadow-md`}>
+    <div className={`relative overflow-hidden rounded-full ${sizeClasses[size]}`}>
       <Image src={src} alt={alt} fill className="object-cover" />
     </div>
   );

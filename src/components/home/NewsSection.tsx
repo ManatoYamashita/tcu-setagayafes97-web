@@ -1,111 +1,76 @@
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { getNewsList } from "@/lib/news";
-import { NewsCard } from "@/components/home/NewsCard";
 
 /**
  * お知らせセクション
- * 紫背景 + 白セミモーダルの二層構造
- * デスクトップ: 左25%見出し / 右75%カードグリッド
+ * 最新のお知らせ3件をカードグリッド形式で表示
  */
 export async function NewsSection() {
-  const newsList = await getNewsList(8);
+  const newsList = await getNewsList(3);
 
+  // データが取得できない場合の表示
   if (newsList.length === 0) {
     return (
-      <section className="pt-6 px-6 pb-0 md:pt-24">
-        <div className="rounded-t-3xl bg-white px-4 py-16 sm:px-6 md:py-20 lg:px-8">
-          <div className="mx-auto max-w-7xl">
-            <div className="mb-12">
-              <h2 className="text-5xl font-bold tracking-tight md:text-6xl">NEWS</h2>
-            </div>
-            <div className="text-center text-gray-500">現在、お知らせはありません。</div>
+      <section className="bg-primary py-32">
+        <div className="container mx-auto px-4">
+          <div className="mb-12 flex items-center justify-between">
+            <h2 className="text-5xl font-bold md:text-6xl">NEWS</h2>
           </div>
+          <div className="text-center text-white/60">現在、お知らせはありません。</div>
         </div>
       </section>
     );
   }
 
-  const largeCards = newsList.slice(0, 2);
-  const defaultCards = newsList.slice(2);
-
   return (
-    <section className="pt-6 px-6 pb-0 md:pt-24">
-      <div className="rounded-t-3xl bg-white px-4 py-16 sm:px-6 md:py-20 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          {/* デスクトップ: 左見出し + 右カードグリッド */}
-          <div className="hidden lg:grid lg:grid-cols-[280px_1fr] lg:gap-10">
-            {/* 左カラム: 見出し + リンク */}
-            <div className="flex flex-col justify-between lg:justify-start lg:gap-6 py-2">
-              <h2 className="text-5xl font-bold tracking-tight xl:text-6xl">NEWS</h2>
-              <Link
-                href="/info"
-                className="flex items-center gap-3 transition-opacity hover:opacity-70"
-              >
-                <span className="text-sm font-semibold tracking-wider">NEWS ALL</span>
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-900">
-                  <ArrowRight className="h-4 w-4 text-white" />
-                </span>
-              </Link>
-            </div>
+    <section className="bg-primary py-32">
+      <div className="container mx-auto px-4">
+        {/* セクションタイトル */}
+        <div className="mb-12 flex items-center justify-between">
+          <h2 className="text-5xl font-bold md:text-6xl">NEWS</h2>
+          <Link href="/info" className="flex items-center gap-2 text-white hover:text-white/80">
+            <span className="font-semibold">もっと見る</span>
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
 
-            {/* 右カラム: カードグリッド */}
-            <div className="space-y-6">
-              {/* 上段: largeカード 2枚 */}
-              <div className="grid grid-cols-2 gap-6">
-                {largeCards.map((news) => (
-                  <NewsCard key={news.id} news={news} variant="large" />
-                ))}
-              </div>
-
-              {/* 下段: defaultカード 3列 */}
-              {defaultCards.length > 0 && (
-                <div className="grid grid-cols-3 gap-6">
-                  {defaultCards.map((news) => (
-                    <NewsCard key={news.id} news={news} variant="default" />
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* タブレット・モバイル */}
-          <div className="lg:hidden">
-            {/* 見出し + ボタン */}
-            <div className="mb-8 flex items-end justify-between">
-              <h2 className="text-5xl font-bold tracking-tight md:text-6xl">NEWS</h2>
-              <Link
-                href="/info"
-                className="flex items-center gap-3 transition-opacity hover:opacity-70"
-              >
-                <span className="text-sm font-semibold tracking-wider">NEWS ALL</span>
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-900">
-                  <ArrowRight className="h-4 w-4 text-white" />
-                </span>
-              </Link>
-            </div>
-
-            {/* Largeカード */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
-              {largeCards.map((news) => (
-                <NewsCard key={news.id} news={news} variant="large" />
-              ))}
-            </div>
-
-            {/* Defaultカード（最大4件表示） */}
-            {defaultCards.length > 0 && (
-              <div className="mt-6 grid grid-cols-2 gap-4 md:gap-6">
-                {defaultCards.map((news, index) => (
-                  <NewsCard
-                    key={news.id}
-                    news={news}
-                    variant="default"
-                    className={index >= 4 ? "hidden" : undefined}
+        {/* カードグリッド */}
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {newsList.map((news) => (
+            <Link key={news.id} href={`/info/${news.id}`} className="group block hover:opacity-80">
+              {/* サムネイル */}
+              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md bg-white/10 mb-4">
+                {news.thumbnail ? (
+                  <Image
+                    src={news.thumbnail.url}
+                    alt={news.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
-                ))}
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-white/10">
+                    <span className="text-sm text-white/50">No Image</span>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+
+              {/* 日付 */}
+              <time className="text-xs text-white/50">
+                {new Date(news.publishedAt || news.createdAt).toLocaleDateString("ja-JP", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                })}
+              </time>
+
+              {/* タイトル */}
+              <h3 className="mt-1 font-semibold text-white line-clamp-2">{news.title}</h3>
+            </Link>
+          ))}
         </div>
       </div>
     </section>

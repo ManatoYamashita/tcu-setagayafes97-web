@@ -2,31 +2,20 @@
 
 @theme {
   /* OKLCHカラー空間での色定義 */
-  --color-primary: oklch(75% 0.18 305);
-  --color-accent-yellow: oklch(85% 0.15 145);
-  --color-accent-green: oklch(95% 0.05 140);
-  --color-dark-green: oklch(20% 0.02 140);
+  --color-primary: oklch(55% 0.18 305);
+  --color-primary-light: oklch(75% 0.18 305);
+  --color-primary-dark: oklch(40% 0.18 305);
   --font-sans: var(--font-noto-sans-jp), sans-serif;
 }
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255, 255, 255;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+  /* レイアウト定数 */
+  --header-height: 5rem; /* 80px (py-5 × 2 + 内容物高さ約32px) */
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb)))
-    rgb(var(--background-start-rgb));
+  color: white;
+  background-color: var(--color-primary);
 }
 
 @utility text-balance {

@@ -18,7 +18,7 @@ export default function TestUIPage() {
           <Card variant="default">
             <div className="p-6">
               <h3 className="mb-2 text-lg font-semibold">Default Card</h3>
-              <p className="text-gray-600">
+              <p className="text-white/80">
                 デフォルトスタイルのカードです。ホバーで影が濃くなります。
               </p>
             </div>
@@ -27,7 +27,7 @@ export default function TestUIPage() {
           <Card variant="featured">
             <div className="p-6">
               <h3 className="mb-2 text-lg font-semibold">Featured Card</h3>
-              <p className="text-gray-600">
+              <p className="text-white/80">
                 注目コンテンツ用のカードです。グラデーション背景とプライマリカラーの影が特徴です。
               </p>
             </div>
@@ -36,14 +36,14 @@ export default function TestUIPage() {
           <Card variant="default" href="/test">
             <div className="p-6">
               <h3 className="mb-2 text-lg font-semibold">Clickable Card (Default)</h3>
-              <p className="text-gray-600">リンク付きカード。ホバーで上に移動します。</p>
+              <p className="text-white/80">リンク付きカード。ホバーで上に移動します。</p>
             </div>
           </Card>
 
           <Card variant="featured" href="/test">
             <div className="p-6">
               <h3 className="mb-2 text-lg font-semibold">Clickable Card (Featured)</h3>
-              <p className="text-gray-600">リンク付きの注目カード。ホバーで上に移動します。</p>
+              <p className="text-white/80">リンク付きの注目カード。ホバーで上に移動します。</p>
             </div>
           </Card>
         </div>

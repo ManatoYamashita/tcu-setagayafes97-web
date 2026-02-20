@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 /**
  * シンプルな言語切り替えコンポーネント
@@ -10,21 +10,14 @@ import Link from "next/link";
  * [locale] ルート配下（/en, /zh, /ko, /ja で始まるパス）の場合のみ表示
  */
 export function LanguageSwitcherWrapper() {
-  const [currentLocale, setCurrentLocale] = useState<string | null>(null);
+  const pathname = usePathname();
+  const localeMatch = pathname.match(/^\/(ja|en|zh|ko)/);
 
-  useEffect(() => {
-    const pathname = window.location.pathname;
-    const localeMatch = pathname.match(/^\/(ja|en|zh|ko)/);
-
-    if (localeMatch) {
-      setCurrentLocale(localeMatch[1]);
-    }
-  }, []);
-
-  // next-intl コンテキストがない場合は何も表示しない
-  if (!currentLocale) {
+  if (!localeMatch) {
     return null;
   }
+
+  const currentLocale = localeMatch[1];
 
   const locales = [
     { code: "ja", label: "JP" },
@@ -41,13 +34,13 @@ export function LanguageSwitcherWrapper() {
             href={`/${locale.code}`}
             className={
               currentLocale === locale.code
-                ? "text-primary font-bold"
-                : "text-gray-700 hover:text-primary transition-colors"
+                ? "text-white font-bold"
+                : "text-white/70 hover:text-white transition-colors"
             }
           >
             {locale.label}
           </Link>
-          {index < locales.length - 1 && <span className="text-gray-400">/</span>}
+          {index < locales.length - 1 && <span className="text-white/50">/</span>}
         </div>
       ))}
     </div>

@@ -67,7 +67,7 @@ export function LanguageSwitcher() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         onKeyDown={handleKeyDown}
-        className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-all hover:border-primary hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        className="flex items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-sm font-medium text-white transition-all hover:border-white hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-label={t("label")}
@@ -81,7 +81,7 @@ export function LanguageSwitcher() {
       {/* ドロップダウンメニュー */}
       {isOpen && (
         <div
-          className="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-lg border border-gray-200 bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+          className="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-lg border border-white/20 bg-primary-dark py-1 focus:outline-none"
           role="listbox"
           aria-label={t("label")}
         >
@@ -92,7 +92,7 @@ export function LanguageSwitcher() {
                 key={language.code}
                 onClick={() => handleLanguageChange(language.code)}
                 className={`flex w-full items-center justify-between px-4 py-2 text-sm transition-colors ${
-                  isSelected ? "bg-primary/10 text-primary" : "text-gray-700 hover:bg-gray-100"
+                  isSelected ? "bg-white/20 text-white" : "text-white/80 hover:bg-white/10"
                 }`}
                 role="option"
                 aria-selected={isSelected}

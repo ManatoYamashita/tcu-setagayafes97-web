@@ -16,7 +16,7 @@ export function EventGrid({ events, variant = "default" }: EventGridProps) {
     return (
       <div className="py-16 text-center">
         <svg
-          className="mx-auto mb-4 h-16 w-16 text-gray-300"
+          className="mx-auto mb-4 h-16 w-16 text-white/30"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -29,8 +29,8 @@ export function EventGrid({ events, variant = "default" }: EventGridProps) {
             d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <p className="text-lg font-semibold text-gray-600">該当する企画が見つかりませんでした</p>
-        <p className="mt-2 text-sm text-gray-500">フィルター条件を変更してお試しください</p>
+        <p className="text-lg font-semibold text-white/80">該当する企画が見つかりませんでした</p>
+        <p className="mt-2 text-sm text-white/60">フィルター条件を変更してお試しください</p>
       </div>
     );
   }
