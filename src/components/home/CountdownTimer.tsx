@@ -92,9 +92,9 @@ export function CountdownTimer() {
   // SSR時の表示（ハイドレーションミス回避）
   if (!mounted) {
     return (
-      <div className="bg-gray-100 py-20">
+      <div className="bg-primary py-20">
         <div className="container mx-auto px-4">
-          <div className="h-32 rounded-lg bg-gray-200"></div>
+          <div className="h-32 rounded-lg bg-white/10"></div>
         </div>
       </div>
     );
@@ -129,7 +129,7 @@ export function CountdownTimer() {
   // 終了後の表示
   if (state === "after") {
     return (
-      <section className="bg-gray-800 py-20">
+      <section className="bg-primary-dark py-20">
         <div className="container mx-auto px-4 text-center text-white">
           <h2 className="mb-4 text-4xl font-bold md:text-5xl">ご来場ありがとうございました</h2>
           <p className="text-xl md:text-2xl">第{siteConfig.edition}回世田谷祭は終了しました</p>

@@ -37,7 +37,7 @@ export default async function FAQPage() {
   }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-primary">
       {/* ページヘッダー */}
       <div className="bg-primary py-16 text-white">
         <div className="container mx-auto px-4">
@@ -55,9 +55,8 @@ export default async function FAQPage() {
         <div className="mx-auto max-w-4xl">
           {/* FAQ件数表示 */}
           <div className="mb-6">
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold text-gray-900">{faqList.length}</span>{" "}
-              件の質問があります
+            <p className="text-sm text-white/80">
+              <span className="font-semibold text-white">{faqList.length}</span> 件の質問があります
             </p>
           </div>
 
@@ -65,11 +64,11 @@ export default async function FAQPage() {
           {faqList.length > 0 ? (
             <Accordion items={accordionItems} />
           ) : (
-            <div className="rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
-              <p className="text-gray-500">現在、FAQは準備中です。</p>
-              <p className="mt-2 text-sm text-gray-400">
+            <div className="rounded-lg border border-white/20 bg-white/10 p-8 text-center shadow-sm">
+              <p className="text-white/60">現在、FAQは準備中です。</p>
+              <p className="mt-2 text-sm text-white/50">
                 ご不明な点がございましたら、
-                <a href="/about/contact" className="text-primary hover:underline">
+                <a href="/about/contact" className="text-primary-light hover:underline">
                   お問い合わせフォーム
                 </a>
                 よりお問い合わせください。

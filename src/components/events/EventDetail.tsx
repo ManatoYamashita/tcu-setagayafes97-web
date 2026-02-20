@@ -16,7 +16,7 @@ export function EventDetail({ event }: EventDetailProps) {
     <div className="space-y-8">
       {/* サムネイル画像 */}
       {event.thumbnail && (
-        <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-gray-200">
+        <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-white/20">
           <Image
             src={event.thumbnail.url}
             alt={event.title}
@@ -37,21 +37,21 @@ export function EventDetail({ event }: EventDetailProps) {
         </div>
 
         {/* タイトル */}
-        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl">{event.title}</h1>
+        <h1 className="mb-3 text-3xl font-bold text-white md:text-4xl">{event.title}</h1>
 
         {/* 主催団体 */}
-        <p className="text-xl font-semibold text-primary">{event.organizer}</p>
+        <p className="text-xl font-semibold text-primary-light">{event.organizer}</p>
       </div>
 
       {/* メタ情報 */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-bold text-gray-900">開催情報</h2>
+      <div className="rounded-lg border border-white/20 bg-white/10 p-6">
+        <h2 className="mb-4 text-lg font-bold text-white">開催情報</h2>
         <dl className="space-y-3">
           {/* 開催日 */}
           <div className="flex items-start gap-3">
-            <dt className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+            <dt className="flex items-center gap-2 text-sm font-semibold text-white/90">
               <svg
-                className="h-5 w-5 text-primary"
+                className="h-5 w-5 text-primary-light"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -66,7 +66,7 @@ export function EventDetail({ event }: EventDetailProps) {
               </svg>
               開催日
             </dt>
-            <dd className="text-sm text-gray-900">
+            <dd className="text-sm text-white">
               {event.date === "day1" && "1日目（10月31日）"}
               {event.date === "day2" && "2日目（11月1日）"}
               {event.date === "both" && "両日開催"}
@@ -77,9 +77,9 @@ export function EventDetail({ event }: EventDetailProps) {
           {/* 開催時間 */}
           {event.startTime && event.endTime && (
             <div className="flex items-start gap-3">
-              <dt className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+              <dt className="flex items-center gap-2 text-sm font-semibold text-white/90">
                 <svg
-                  className="h-5 w-5 text-primary"
+                  className="h-5 w-5 text-primary-light"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -94,7 +94,7 @@ export function EventDetail({ event }: EventDetailProps) {
                 </svg>
                 開催時間
               </dt>
-              <dd className="text-sm text-gray-900">
+              <dd className="text-sm text-white">
                 {event.startTime} 〜 {event.endTime}
               </dd>
             </div>
@@ -102,9 +102,9 @@ export function EventDetail({ event }: EventDetailProps) {
 
           {/* 場所 */}
           <div className="flex items-start gap-3">
-            <dt className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+            <dt className="flex items-center gap-2 text-sm font-semibold text-white/90">
               <svg
-                className="h-5 w-5 text-primary"
+                className="h-5 w-5 text-primary-light"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -119,16 +119,16 @@ export function EventDetail({ event }: EventDetailProps) {
               </svg>
               場所
             </dt>
-            <dd className="text-sm text-gray-900">
+            <dd className="text-sm text-white">
               {event.building} {event.place}
             </dd>
           </div>
 
           {/* 企画種別 */}
           <div className="flex items-start gap-3">
-            <dt className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+            <dt className="flex items-center gap-2 text-sm font-semibold text-white/90">
               <svg
-                className="h-5 w-5 text-primary"
+                className="h-5 w-5 text-primary-light"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -143,7 +143,7 @@ export function EventDetail({ event }: EventDetailProps) {
               </svg>
               種別
             </dt>
-            <dd className="text-sm text-gray-900">
+            <dd className="text-sm text-white">
               {event.type === "room" && "教室企画"}
               {event.type === "stage" && "ステージ企画"}
               {event.type === "special" && "スペシャル企画"}
@@ -154,17 +154,17 @@ export function EventDetail({ event }: EventDetailProps) {
       </div>
 
       {/* 企画概要 */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-bold text-gray-900">企画概要</h2>
-        <p className="whitespace-pre-wrap text-gray-700">{event.description}</p>
+      <div className="rounded-lg border border-white/20 bg-white/10 p-6">
+        <h2 className="mb-4 text-lg font-bold text-white">企画概要</h2>
+        <p className="whitespace-pre-wrap text-white/90">{event.description}</p>
       </div>
 
       {/* 詳細説明（リッチテキスト） */}
       {event.content && (
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
-          <h2 className="mb-4 text-lg font-bold text-gray-900">詳細</h2>
+        <div className="rounded-lg border border-white/20 bg-white/10 p-6">
+          <h2 className="mb-4 text-lg font-bold text-white">詳細</h2>
           <div
-            className="prose prose-gray max-w-none"
+            className="prose prose-invert max-w-none"
             dangerouslySetInnerHTML={{ __html: event.content }}
           />
         </div>

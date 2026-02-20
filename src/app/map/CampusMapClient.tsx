@@ -39,10 +39,10 @@ export function CampusMapClient({ buildings, infoDesks }: CampusMapClientProps) 
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
           {/* SVGマップ */}
-          <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-            <div className="bg-gray-100 p-4">
-              <h2 className="text-lg font-bold text-gray-900">世田谷キャンパス</h2>
-              <p className="text-sm text-gray-600">建物をクリックして企画を検索</p>
+          <div className="overflow-hidden rounded-lg border border-white/20 bg-white/10 shadow-sm">
+            <div className="bg-white/10 p-4">
+              <h2 className="text-lg font-bold text-white">世田谷キャンパス</h2>
+              <p className="text-sm text-white/80">建物をクリックして企画を検索</p>
             </div>
             <svg
               viewBox="0 0 1000 750"
@@ -193,43 +193,43 @@ export function CampusMapClient({ buildings, infoDesks }: CampusMapClientProps) 
           {/* サイドパネル */}
           <div className="space-y-6">
             {/* 選択中の建物情報 */}
-            <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-xl font-bold text-gray-900">建物情報</h2>
+            <div className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm">
+              <h2 className="mb-4 text-xl font-bold text-white">建物情報</h2>
               {selectedBuilding ? (
                 <div className="space-y-4">
                   <div>
                     <h3 className="text-2xl font-bold text-primary">{selectedBuilding.name}</h3>
-                    <p className="mt-2 text-gray-700">{selectedBuilding.description}</p>
+                    <p className="mt-2 text-white/90">{selectedBuilding.description}</p>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <p className="text-sm font-semibold text-gray-500">階数</p>
-                      <p className="text-lg font-bold text-gray-900">
+                      <p className="text-sm font-semibold text-white/60">階数</p>
+                      <p className="text-lg font-bold text-white">
                         {selectedBuilding.floors}階建て
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-gray-500">建物ID</p>
-                      <p className="text-lg font-bold text-gray-900">{selectedBuilding.id}</p>
+                      <p className="text-sm font-semibold text-white/60">建物ID</p>
+                      <p className="text-lg font-bold text-white">{selectedBuilding.id}</p>
                     </div>
                   </div>
                   <Link
                     href={`/events?building=${selectedBuilding.name}`}
-                    className="inline-flex w-full items-center justify-center rounded-lg bg-primary px-4 py-3 font-semibold text-white transition-all hover:bg-primary/90 hover:shadow-lg"
+                    className="inline-flex w-full items-center justify-center rounded-lg bg-white px-4 py-3 font-semibold text-primary transition-all hover:bg-white/90 hover:shadow-lg"
                   >
                     この建物の企画を見る
                   </Link>
                 </div>
               ) : (
                 <div className="py-8 text-center">
-                  <p className="text-gray-500">建物をクリックして詳細を表示</p>
+                  <p className="text-white/60">建物をクリックして詳細を表示</p>
                 </div>
               )}
             </div>
 
             {/* 建物一覧 */}
-            <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-xl font-bold text-gray-900">建物一覧</h2>
+            <div className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm">
+              <h2 className="mb-4 text-xl font-bold text-white">建物一覧</h2>
               <div className="max-h-96 space-y-2 overflow-y-auto">
                 {buildings.map((building) => (
                   <button
@@ -237,14 +237,14 @@ export function CampusMapClient({ buildings, infoDesks }: CampusMapClientProps) 
                     onClick={() => setSelectedBuilding(building)}
                     className={`w-full rounded-lg border-2 p-3 text-left transition-all ${
                       selectedBuilding?.id === building.id
-                        ? "border-primary bg-purple-50"
-                        : "border-gray-200 bg-white hover:border-primary/50 hover:bg-gray-50"
+                        ? "border-white bg-white/15"
+                        : "border-white/20 bg-white/10 hover:border-white/50 hover:bg-white/10"
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-bold text-gray-900">{building.name}</p>
-                        <p className="text-sm text-gray-600">{building.description}</p>
+                        <p className="font-bold text-white">{building.name}</p>
+                        <p className="text-sm text-white/80">{building.description}</p>
                       </div>
                       <div
                         className="h-8 w-8 flex-shrink-0 rounded"
@@ -259,7 +259,7 @@ export function CampusMapClient({ buildings, infoDesks }: CampusMapClientProps) 
             {/* アクセスリンク */}
             <Link
               href="/map/access"
-              className="block rounded-lg border-2 border-primary bg-white p-4 text-center font-semibold text-primary transition-all hover:bg-primary hover:text-white"
+              className="block rounded-lg border-2 border-white bg-white/10 p-4 text-center font-semibold text-white transition-all hover:bg-white hover:text-primary"
             >
               交通アクセスを見る
             </Link>

@@ -20,7 +20,7 @@ export default async function APITestPage() {
     <div className="container mx-auto px-4 py-16">
       <div className="mb-8">
         <h1 className="mb-4 text-4xl font-bold">API / ヘルパー関数テスト</h1>
-        <div className="rounded-lg bg-yellow-100 p-4">
+        <div className="rounded-lg bg-yellow-500/10 p-4">
           <p className="font-semibold">
             現在のモード:{" "}
             {USE_MOCK ? (
@@ -29,7 +29,7 @@ export default async function APITestPage() {
               <span className="text-green-600">microCMS本番接続中</span>
             )}
           </p>
-          <p className="mt-2 text-sm text-gray-700">
+          <p className="mt-2 text-sm text-white/90">
             環境変数 NEXT_PUBLIC_USE_MOCK_DATA で切り替え可能
           </p>
         </div>
@@ -39,7 +39,7 @@ export default async function APITestPage() {
       <section className="mb-16">
         <h2 className="mb-6 text-2xl font-bold">
           お知らせ（getNewsList）
-          <span className="ml-3 text-sm text-gray-500">取得件数: {newsList.length}</span>
+          <span className="ml-3 text-sm text-white/60">取得件数: {newsList.length}</span>
         </h2>
         <div className="grid gap-6 md:grid-cols-3">
           {newsList.map((news) => (
@@ -48,8 +48,8 @@ export default async function APITestPage() {
                 <Badge variant={news.type} label={news.type.toUpperCase()} />
               </div>
               <h3 className="mb-2 font-semibold">{news.title}</h3>
-              <p className="text-sm text-gray-600">{news.description}</p>
-              <div className="mt-3 text-xs text-gray-400">ID: {news.id}</div>
+              <p className="text-sm text-white/80">{news.description}</p>
+              <div className="mt-3 text-xs text-white/50">ID: {news.id}</div>
             </div>
           ))}
         </div>
@@ -59,7 +59,7 @@ export default async function APITestPage() {
       <section className="mb-16">
         <h2 className="mb-6 text-2xl font-bold">
           企画一覧（getEventsList）
-          <span className="ml-3 text-sm text-gray-500">取得件数: {eventsList.length}</span>
+          <span className="ml-3 text-sm text-white/60">取得件数: {eventsList.length}</span>
         </h2>
         <div className="grid gap-6 md:grid-cols-3">
           {eventsList.map((event) => (
@@ -69,9 +69,9 @@ export default async function APITestPage() {
                 <Badge variant={event.type} label={event.type} />
               </div>
               <h3 className="mb-1 font-semibold">{event.title}</h3>
-              <p className="mb-2 text-sm text-gray-500">主催: {event.organizer}</p>
-              <p className="text-sm text-gray-600">{event.description}</p>
-              <div className="mt-2 text-xs text-gray-400">
+              <p className="mb-2 text-sm text-white/60">主催: {event.organizer}</p>
+              <p className="text-sm text-white/80">{event.description}</p>
+              <div className="mt-2 text-xs text-white/50">
                 場所: {event.building} {event.place}
               </div>
             </div>
@@ -83,7 +83,7 @@ export default async function APITestPage() {
       <section className="mb-16">
         <h2 className="mb-6 text-2xl font-bold">
           おすすめ企画（getFeaturedEvents）
-          <span className="ml-3 text-sm text-gray-500">取得件数: {featuredEvents.length}</span>
+          <span className="ml-3 text-sm text-white/60">取得件数: {featuredEvents.length}</span>
         </h2>
         <div className="grid gap-6 md:grid-cols-3">
           {featuredEvents.map((event) => (
@@ -93,8 +93,8 @@ export default async function APITestPage() {
                 <Badge variant={event.type} label={event.type} />
               </div>
               <h3 className="mb-1 font-semibold">{event.title}</h3>
-              <p className="mb-2 text-sm text-gray-500">主催: {event.organizer}</p>
-              <p className="text-sm text-gray-600">{event.description.slice(0, 80)}...</p>
+              <p className="mb-2 text-sm text-white/60">主催: {event.organizer}</p>
+              <p className="text-sm text-white/80">{event.description.slice(0, 80)}...</p>
             </div>
           ))}
         </div>
@@ -104,26 +104,26 @@ export default async function APITestPage() {
       <section className="mb-16">
         <h2 className="mb-6 text-2xl font-bold">
           協賛企業（getSponsorsList）
-          <span className="ml-3 text-sm text-gray-500">取得件数: {sponsorsList.length}</span>
+          <span className="ml-3 text-sm text-white/60">取得件数: {sponsorsList.length}</span>
         </h2>
         <div className="grid gap-6 md:grid-cols-3">
           {sponsorsList.map((sponsor) => (
             <div key={sponsor.id} className="rounded-lg border p-4">
               <div className="mb-3">
-                <div className="flex h-32 items-center justify-center rounded bg-gray-100">
-                  <span className="text-sm text-gray-400">LOGO: {sponsor.logo?.url}</span>
+                <div className="flex h-32 items-center justify-center rounded bg-white/10">
+                  <span className="text-sm text-white/50">LOGO: {sponsor.logo?.url}</span>
                 </div>
               </div>
               <h3 className="mb-1 font-semibold">{sponsor.sponsorName}</h3>
-              <p className="mb-2 text-sm text-gray-600">{sponsor.sponsorDescription}</p>
-              <div className="mt-2 flex items-center justify-between text-xs text-gray-400">
+              <p className="mb-2 text-sm text-white/80">{sponsor.sponsorDescription}</p>
+              <div className="mt-2 flex items-center justify-between text-xs text-white/50">
                 <span>優先度: {sponsor.priority}</span>
                 {sponsor.url && (
                   <a
                     href={sponsor.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary hover:underline"
+                    className="text-primary-light hover:underline"
                   >
                     Website
                   </a>
@@ -134,9 +134,9 @@ export default async function APITestPage() {
         </div>
       </section>
 
-      <section className="rounded-lg bg-green-100 p-6">
-        <h2 className="mb-2 text-xl font-bold text-green-800">検証完了</h2>
-        <p className="text-green-700">
+      <section className="rounded-lg bg-green-500/10 p-6">
+        <h2 className="mb-2 text-xl font-bold text-green-400">検証完了</h2>
+        <p className="text-green-300">
           すべてのヘルパー関数が正常に動作しています。環境変数を切り替えてmicroCMS本番接続のテストも可能です。
         </p>
       </section>

@@ -13,11 +13,11 @@ export interface CardProps {
  * コンテンツを包むカードレイアウトを提供
  */
 export function Card({ variant = "default", className, children, href }: CardProps) {
-  const baseStyles = "rounded-2xl border bg-white";
+  const baseStyles = "rounded-2xl border bg-white/10";
 
   const variantStyles = {
-    default: "border-gray-200 hover:border-gray-300",
-    featured: "border-primary",
+    default: "border-white/20 hover:border-white/40",
+    featured: "border-white",
   };
 
   const combinedStyles = cn(

@@ -28,12 +28,12 @@ export function SocialIcons({
   };
 
   const linkBase =
-    "inline-flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full";
+    "inline-flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 rounded-full";
   const iconWrapperVariants = {
     minimal: "",
-    circle: "w-10 h-10 text-gray-600 group-hover:text-primary",
+    circle: "w-10 h-10 text-white/70 group-hover:text-white",
     bordered:
-      "w-10 h-10 border border-current text-gray-600 group-hover:border-primary group-hover:text-primary",
+      "w-10 h-10 border border-current text-white/70 group-hover:border-white group-hover:text-white",
   };
 
   const socialLinks = [
@@ -80,7 +80,7 @@ export function SocialIcons({
             href={social.url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`${linkBase} ${variant === "minimal" ? "hover:text-primary hover:scale-110" : "group flex items-center gap-2"} ${variant !== "minimal" ? "shrink-0" : ""}`}
+            className={`${linkBase} ${variant === "minimal" ? "hover:text-white hover:scale-110" : "group flex items-center gap-2"} ${variant !== "minimal" ? "shrink-0" : ""}`}
             aria-label={`${social.name}で世田谷祭をフォロー`}
           >
             {iconEl}

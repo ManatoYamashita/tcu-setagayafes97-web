@@ -9,10 +9,9 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: "oklch(75% 0.18 305)",
-        "accent-yellow": "oklch(85% 0.15 145)",
-        "accent-green": "oklch(95% 0.05 140)",
-        "dark-green": "oklch(20% 0.02 140)",
+        primary: "oklch(55% 0.18 305)",
+        "primary-light": "oklch(75% 0.18 305)",
+        "primary-dark": "oklch(40% 0.18 305)",
       },
       fontFamily: {
         sans: ["var(--font-noto-sans-jp)", "sans-serif"],

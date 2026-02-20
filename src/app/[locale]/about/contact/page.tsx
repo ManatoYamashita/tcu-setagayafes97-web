@@ -46,7 +46,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
   const t = await getTranslations("contact");
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary">
       {/* 言語切替（多言語対応ページのみ） */}
       <div className="fixed right-4 top-4 z-50">
         <LanguageSwitcher />
@@ -67,47 +67,47 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
         {/* お問い合わせ種別説明 */}
         <section className="mx-auto mb-12 max-w-4xl">
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm">
               <div className="mb-3 flex items-center gap-2">
                 <Mail className="h-5 w-5 text-blue-500" />
-                <h3 className="font-bold text-gray-900">{t("types.general.title")}</h3>
+                <h3 className="font-bold text-white">{t("types.general.title")}</h3>
               </div>
-              <p className="text-sm text-gray-700">{t("types.general.description")}</p>
+              <p className="text-sm text-white/90">{t("types.general.description")}</p>
             </div>
 
-            <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm">
               <div className="mb-3 flex items-center gap-2">
                 <Phone className="h-5 w-5 text-green-500" />
-                <h3 className="font-bold text-gray-900">{t("types.media.title")}</h3>
+                <h3 className="font-bold text-white">{t("types.media.title")}</h3>
               </div>
-              <p className="text-sm text-gray-700">{t("types.media.description")}</p>
+              <p className="text-sm text-white/90">{t("types.media.description")}</p>
             </div>
 
-            <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm">
               <div className="mb-3 flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-orange-500" />
-                <h3 className="font-bold text-gray-900">{t("types.lostFound.title")}</h3>
+                <h3 className="font-bold text-white">{t("types.lostFound.title")}</h3>
               </div>
-              <p className="text-sm text-gray-700">{t("types.lostFound.description")}</p>
+              <p className="text-sm text-white/90">{t("types.lostFound.description")}</p>
             </div>
           </div>
         </section>
 
         {/* お問い合わせフォーム */}
-        <section className="mx-auto mb-12 max-w-4xl rounded-lg border border-gray-200 bg-white p-6 shadow-sm md:p-8">
-          <h2 className="mb-6 text-2xl font-bold text-gray-900">{t("form.title")}</h2>
+        <section className="mx-auto mb-12 max-w-4xl rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm md:p-8">
+          <h2 className="mb-6 text-2xl font-bold text-white">{t("form.title")}</h2>
           <ContactForm />
         </section>
 
         {/* よくある質問へのリンク */}
-        <section className="mx-auto max-w-4xl rounded-lg border border-blue-200 bg-blue-50 p-6">
+        <section className="mx-auto max-w-4xl rounded-lg border border-blue-400/30 bg-blue-500/10 p-6">
           <div className="flex items-start gap-3">
-            <Mail className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
+            <Mail className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-400" />
             <div>
-              <p className="font-semibold text-blue-900">{t("beforeContact.title")}</p>
-              <p className="mt-1 text-sm text-blue-700">
+              <p className="font-semibold text-white">{t("beforeContact.title")}</p>
+              <p className="mt-1 text-sm text-white/90">
                 {t("beforeContact.prefix")}{" "}
-                <a href="/info/faq" className="underline hover:text-blue-900">
+                <a href="/info/faq" className="underline hover:text-white">
                   {t("beforeContact.faqLink")}
                 </a>{" "}
                 {t("beforeContact.suffix")}
