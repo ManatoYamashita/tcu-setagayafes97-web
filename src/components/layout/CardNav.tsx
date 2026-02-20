@@ -52,9 +52,10 @@ export function CardNav({
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const pathname = usePathname();
 
-  // ページ遷移時にメニューを閉じる
+  // ページ遷移時にメニューを閉じる（外部ナビゲーションイベントとの同期）
   useEffect(() => {
     if (isExpanded) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- pathname変更に伴うGSAPアニメーション制御
       setIsHamburgerOpen(false);
       const tl = tlRef.current;
       if (tl) {
@@ -62,7 +63,7 @@ export function CardNav({
         tl.reverse();
       }
     }
-  }, [pathname]);
+  }, [pathname, isExpanded]);
 
   const calculateHeight = useCallback(() => {
     const navEl = navRef.current;

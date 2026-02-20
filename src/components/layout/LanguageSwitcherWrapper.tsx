@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 /**
  * シンプルな言語切り替えコンポーネント
@@ -10,21 +10,14 @@ import Link from "next/link";
  * [locale] ルート配下（/en, /zh, /ko, /ja で始まるパス）の場合のみ表示
  */
 export function LanguageSwitcherWrapper() {
-  const [currentLocale, setCurrentLocale] = useState<string | null>(null);
+  const pathname = usePathname();
+  const localeMatch = pathname.match(/^\/(ja|en|zh|ko)/);
 
-  useEffect(() => {
-    const pathname = window.location.pathname;
-    const localeMatch = pathname.match(/^\/(ja|en|zh|ko)/);
-
-    if (localeMatch) {
-      setCurrentLocale(localeMatch[1]);
-    }
-  }, []);
-
-  // next-intl コンテキストがない場合は何も表示しない
-  if (!currentLocale) {
+  if (!localeMatch) {
     return null;
   }
+
+  const currentLocale = localeMatch[1];
 
   const locales = [
     { code: "ja", label: "JP" },
