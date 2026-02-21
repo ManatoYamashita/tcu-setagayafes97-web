@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { siteConfig } from "@/data/site";
 
 /**
@@ -22,13 +23,13 @@ export function HeroSection() {
           </h2>
 
           <div className="flex items-center gap-4 mt-6">
-            <a
+            <Link
               href="/events"
               aria-label="企画一覧を見る"
               className="w-16 h-16 rounded-full bg-primary-400 border border-primary-500 text-white flex items-center justify-center hover:bg-primary-500 transition-colors"
             >
               <ArrowRight className="w-6 h-6" />
-            </a>
+            </Link>
             <span className="text-base text-gray-900 font-semibold uppercase tracking-wider">
               View More
             </span>

@@ -4,6 +4,7 @@ import "./globals.css";
 import { siteConfig } from "@/data/site";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { Opener } from "@/components/layout/Opener";
 
 const notoSansJP = Noto_Sans_JP({
   subsets: ["latin"],
@@ -52,6 +53,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={`${notoSansJP.variable} font-sans antialiased bg-secondary text-gray-900`}>
+        <Opener />
         <Header />
         {children}
         <Footer />
