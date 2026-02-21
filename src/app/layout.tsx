@@ -51,7 +51,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={`${notoSansJP.variable} font-sans antialiased bg-primary text-white`}>
+      <body className={`${notoSansJP.variable} font-sans antialiased bg-secondary text-gray-900`}>
         <Header />
         {children}
         <Footer />

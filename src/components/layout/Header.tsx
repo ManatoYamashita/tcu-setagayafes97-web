@@ -38,13 +38,13 @@ export function Header() {
   return (
     <>
       <header
-        className={`sticky top-0 z-40 bg-primary ${
-          isScrolled ? "border-b border-white/30" : "border-b border-white/10"
+        className={`sticky top-0 z-40 bg-secondary ${
+          isScrolled ? "border-b border-gray-400/30" : "border-b border-gray-200/20"
         }`}
       >
         <div className="container mx-auto flex items-center justify-between px-6 py-5">
           {/* 左: ロゴ */}
-          <Link href="/" className="text-3xl font-bold text-white hover:text-white/80">
+          <Link href="/" className="text-3xl font-bold text-gray-900 hover:text-gray-700">
             {siteConfig.shortName}
           </Link>
 
@@ -55,11 +55,11 @@ export function Header() {
           <div className="flex items-center gap-4">
             <LanguageSwitcherWrapper />
             <button
-              className="rounded-lg p-2 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 md:hidden"
+              className="rounded-lg p-2 hover:bg-gray-900/10 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 md:hidden"
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label="メニューを開く"
             >
-              <Menu className="h-6 w-6 text-white" />
+              <Menu className="h-6 w-6 text-gray-900" />
             </button>
           </div>
         </div>

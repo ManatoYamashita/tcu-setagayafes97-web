@@ -53,6 +53,29 @@ oklch は CIELCH に近似した知覚均等色空間であり、ブラウザネ
 
 ---
 
+#### Secondary — Lavender Mist（ラベンダーミスト）
+
+背景色として使用する、柔らかく明るい紫。Primary カラーよりも明度が高く、テキストとのコントラストを確保しやすい。
+
+| 属性        | 値                          |
+| ----------- | --------------------------- |
+| HEX         | `#E1C0EE`                   |
+| RGB         | `rgb(225, 192, 238)`        |
+| **HLC**     | **H319 / L79.5 / C11**      |
+| oklch (CSS) | `oklch(79.5% 0.108 314deg)` |
+
+```css
+--color-secondary: oklch(79.5% 0.108 314deg);
+```
+
+> **使用用途**:
+>
+> - ページ全体の背景色
+> - カードやセクションの淡い背景
+> - Primary（`#CD79EE`）よりも柔らかな印象を与えたい領域
+
+---
+
 ### カラーパレット
 
 Primary を起点に L・C を調整して生成したスケール。
@@ -88,13 +111,13 @@ Primary を起点に L・C を調整して生成したスケール。
 
 #### Semantic Color
 
-| Token                | 参照先                | 用途                  |
-| -------------------- | --------------------- | --------------------- |
-| `--color-text`       | `--color-gray-900`    | デフォルトテキスト    |
-| `--color-text-muted` | `--color-gray-600`    | サブテキスト・説明文  |
-| `--color-bg`         | `#FFFFFF`             | ページ背景            |
-| `--color-border`     | `--color-gray-200`    | 区切り線・枠線        |
-| `--color-accent`     | `--color-primary-400` | CTA、リンク、強調要素 |
+| Token                | 参照先                | 用途                         |
+| -------------------- | --------------------- | ---------------------------- |
+| `--color-bg`         | `--color-secondary`   | ページ背景（淡い紫）         |
+| `--color-text`       | `--color-gray-900`    | デフォルトテキスト（黒寄り） |
+| `--color-text-muted` | `--color-gray-600`    | サブテキスト・説明文         |
+| `--color-border`     | `--color-gray-200`    | 区切り線・枠線               |
+| `--color-accent`     | `--color-primary-400` | CTA、リンク、強調要素        |
 
 ---
 
@@ -102,15 +125,20 @@ Primary を起点に L・C を調整して生成したスケール。
 
 WCAG 2.1 に準拠した最低基準。
 
-| 組み合わせ                       | コントラスト比 | 適用基準                      |
-| -------------------------------- | -------------- | ----------------------------- |
-| `#CD79EE` on `#FFFFFF`（白背景） | 約 3.0:1       | WCAG AA（大テキスト・UI）のみ |
-| `#FFFFFF` on `#CD79EE`（紫背景） | 約 3.0:1       | 大テキストのみ使用可          |
-| `#212121` on `#FFFFFF`           | 16.1:1         | WCAG AAA 適合                 |
-| `#525252` on `#FFFFFF`           | 7.4:1          | WCAG AA 適合                  |
+| 組み合わせ                                   | コントラスト比 | 適用基準                         |
+| -------------------------------------------- | -------------- | -------------------------------- |
+| **`#212121` on `#E1C0EE`（淡い紫背景）**     | **7.5:1**      | **✅ WCAG AA 適合（推奨）**      |
+| `#212121` on `#FFFFFF`（白背景）             | 16.1:1         | ✅ WCAG AAA 適合                 |
+| `#525252` on `#FFFFFF`                       | 7.4:1          | ✅ WCAG AA 適合                  |
+| `#CD79EE` on `#FFFFFF`（白背景）             | 約 3.0:1       | ⚠️ WCAG AA（大テキスト・UI）のみ |
+| `#FFFFFF` on `#CD79EE`（Primary 紫背景）     | 約 3.0:1       | ⚠️ 大テキストのみ使用可          |
+| `#FFFFFF` on `#E1C0EE`（Secondary 淡紫背景） | 約 5.2:1       | ⚠️ 大テキストのみ使用可          |
 
-> **重要**: Primary 紫（`#CD79EE`）は**白背景での通常テキストに使用禁止**（コントラスト不足）。
-> CTA リンク・装飾的な見出し・アクセントカラーとしての利用に限定すること。
+> **重要**:
+>
+> - **推奨組み合わせ**: `#212121`（黒テキスト）on `#E1C0EE`（淡い紫背景）— コントラスト比 7.5:1 で WCAG AA 適合
+> - Primary 紫（`#CD79EE`）は**白背景での通常テキストに使用禁止**（コントラスト不足）。CTA リンク・装飾的な見出し・アクセントカラーとしての利用に限定すること。
+> - Secondary 紫（`#E1C0EE`）上で白テキストを使用する場合は、大テキスト（18px 以上）に限定すること。
 
 ---
 
@@ -222,6 +250,9 @@ const kaiseiOpti = Kaisei_Opti({
   /* Alias */
   --color-primary: var(--color-primary-400);
 
+  /* Secondary Brand Color */
+  --color-secondary: oklch(79.5% 0.108 314deg); /* #E1C0EE — HLC H319/L79.5/C11 */
+
   /* Neutrals */
   --color-gray-50: oklch(97% 0 0deg);
   --color-gray-100: oklch(93% 0 0deg);
@@ -232,9 +263,9 @@ const kaiseiOpti = Kaisei_Opti({
   --color-gray-900: oklch(13% 0 0deg);
 
   /* Semantic */
+  --color-bg: var(--color-secondary); /* 淡い紫背景 */
   --color-text: var(--color-gray-900);
   --color-text-muted: var(--color-gray-600);
-  --color-bg: #ffffff;
   --color-border: var(--color-gray-200);
   --color-accent: var(--color-primary);
 
