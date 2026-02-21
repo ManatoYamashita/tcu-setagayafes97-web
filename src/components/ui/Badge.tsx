@@ -25,15 +25,15 @@ export function Badge({ variant, label, className }: BadgeProps) {
   const baseStyles = "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold";
 
   const variantStyles: Record<BadgeVariant, string> = {
-    urgent: "bg-red-500 text-white",
-    news: "bg-blue-500 text-white",
-    other: "bg-gray-500 text-white",
-    day1: "bg-primary text-white",
-    day2: "bg-purple-600 text-white",
-    both: "bg-primary text-white",
-    room: "bg-green-500 text-white",
-    stage: "bg-orange-500 text-white",
-    special: "bg-pink-500 text-white",
+    urgent: "bg-red-500 text-gray-900",
+    news: "bg-blue-500 text-gray-900",
+    other: "bg-gray-500 text-gray-900",
+    day1: "bg-secondary text-gray-900",
+    day2: "bg-purple-600 text-gray-900",
+    both: "bg-secondary text-gray-900",
+    room: "bg-green-500 text-gray-900",
+    stage: "bg-orange-500 text-gray-900",
+    special: "bg-pink-500 text-gray-900",
   };
 
   return <span className={cn(baseStyles, variantStyles[variant], className)}>{label}</span>;

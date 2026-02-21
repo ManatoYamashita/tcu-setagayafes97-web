@@ -33,7 +33,7 @@ export default async function InfoPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* ページヘッダー */}
-      <div className="bg-primary py-16 text-white">
+      <div className="bg-secondary py-16 text-gray-900">
         <div className="container mx-auto px-4">
           <h1 className="mb-4 text-center text-4xl font-bold md:text-5xl">お知らせ</h1>
           <p className="text-center text-lg opacity-90">

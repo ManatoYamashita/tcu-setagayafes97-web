@@ -12,24 +12,24 @@ export async function FeaturedEvents() {
   // データが取得できない場合の表示
   if (events.length === 0) {
     return (
-      <section className="bg-primary py-32">
+      <section className="bg-secondary py-32">
         <div className="container mx-auto px-4">
           <div className="mb-12 text-center">
             <h2 className="mb-4 text-5xl font-bold md:text-6xl">おすすめ企画</h2>
-            <p className="text-lg text-white/80">実行委員会が選ぶ注目の企画</p>
+            <p className="text-lg text-gray-900/80">実行委員会が選ぶ注目の企画</p>
           </div>
-          <div className="text-center text-white/60">現在、おすすめ企画はありません。</div>
+          <div className="text-center text-gray-900/60">現在、おすすめ企画はありません。</div>
         </div>
       </section>
     );
   }
 
   return (
-    <section className="bg-primary py-32">
+    <section className="bg-secondary py-32">
       <div className="container mx-auto px-4">
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-5xl font-bold md:text-6xl">おすすめ企画</h2>
-          <p className="text-lg text-white/80">実行委員会が選ぶ注目の企画</p>
+          <p className="text-lg text-gray-900/80">実行委員会が選ぶ注目の企画</p>
         </div>
 
         <EventGrid events={events} variant="featured" />

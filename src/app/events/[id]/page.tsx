@@ -117,11 +117,11 @@ export default async function EventPage({ params }: EventPageProps) {
 
       <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary">
         {/* パンくずリスト */}
-        <nav className="border-b border-white/20 bg-white/10 py-4" aria-label="パンくずリスト">
+        <nav className="border-b border-gray-200/20 bg-white/10 py-4" aria-label="パンくずリスト">
           <div className="container mx-auto px-4">
-            <ol className="flex flex-wrap items-center gap-2 text-sm text-white/80">
+            <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-900/80">
               <li>
-                <Link href="/" className="hover:text-white hover:underline">
+                <Link href="/" className="hover:text-gray-900 hover:underline">
                   トップ
                 </Link>
               </li>
@@ -142,7 +142,7 @@ export default async function EventPage({ params }: EventPageProps) {
                 </svg>
               </li>
               <li>
-                <Link href="/events" className="hover:text-white hover:underline">
+                <Link href="/events" className="hover:text-gray-900 hover:underline">
                   企画を探す
                 </Link>
               </li>
@@ -162,7 +162,7 @@ export default async function EventPage({ params }: EventPageProps) {
                   />
                 </svg>
               </li>
-              <li className="font-semibold text-white" aria-current="page">
+              <li className="font-semibold text-gray-900" aria-current="page">
                 {event.title}
               </li>
             </ol>

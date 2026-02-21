@@ -25,8 +25,9 @@ export function Button({
 
   const variantStyles = {
     primary: "bg-white text-primary hover:opacity-90 focus:ring-white",
-    secondary: "bg-white/20 text-white hover:opacity-90 focus:ring-white",
-    outline: "border-2 border-white text-white hover:bg-white hover:text-primary focus:ring-white",
+    secondary: "bg-white/20 text-gray-900 hover:opacity-90 focus:ring-white",
+    outline:
+      "border-2 border-gray-200 text-gray-900 hover:bg-white hover:text-primary focus:ring-white",
   };
 
   const sizeStyles = {

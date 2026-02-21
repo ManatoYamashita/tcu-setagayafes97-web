@@ -5,7 +5,7 @@ export default function EventsLoading() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary">
       {/* ページヘッダー */}
-      <div className="bg-primary py-16 text-white">
+      <div className="bg-secondary py-16 text-gray-900">
         <div className="container mx-auto px-4">
           <h1 className="mb-4 text-center text-4xl font-bold md:text-5xl">企画を探す</h1>
           <p className="text-center text-lg opacity-90">
@@ -19,7 +19,7 @@ export default function EventsLoading() {
         <div className="lg:grid lg:grid-cols-[300px_1fr] lg:gap-8">
           {/* サイドバー: フィルタースケルトン */}
           <aside className="mb-8 lg:mb-0">
-            <div className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm">
+            <div className="rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
                 <div className="h-6 w-24 animate-pulse rounded bg-white/15" />
                 <div className="h-4 w-16 animate-pulse rounded bg-white/15" />
@@ -67,7 +67,7 @@ export default function EventsLoading() {
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div
                   key={i}
-                  className="overflow-hidden rounded-lg border border-white/20 bg-white/10 shadow-sm"
+                  className="overflow-hidden rounded-lg border border-gray-200/20 bg-white/10 shadow-sm"
                 >
                   {/* サムネイルスケルトン */}
                   <div className="aspect-video w-full animate-pulse bg-white/15" />

@@ -12,12 +12,12 @@ export function TimeAxis() {
       {timeAxis.map((time, index) => (
         <div
           key={time}
-          className="absolute left-0 w-full border-t border-white/20"
+          className="absolute left-0 w-full border-t border-gray-200/20"
           style={{
             top: `${(index / (timeAxis.length - 1)) * 100}%`,
           }}
         >
-          <span className="absolute -top-3 left-0 bg-primary px-2 text-sm font-medium text-white/80">
+          <span className="absolute -top-3 left-0 bg-secondary px-2 text-sm font-medium text-gray-900/80">
             {time}
           </span>
         </div>

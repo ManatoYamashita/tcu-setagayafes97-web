@@ -12,24 +12,27 @@ export async function NewsSection() {
   // データが取得できない場合の表示
   if (newsList.length === 0) {
     return (
-      <section className="bg-primary py-32">
+      <section className="bg-secondary py-32">
         <div className="container mx-auto px-4">
           <div className="mb-12 flex items-center justify-between">
             <h2 className="text-5xl font-bold md:text-6xl">NEWS</h2>
           </div>
-          <div className="text-center text-white/60">現在、お知らせはありません。</div>
+          <div className="text-center text-gray-900/60">現在、お知らせはありません。</div>
         </div>
       </section>
     );
   }
 
   return (
-    <section className="bg-primary py-32">
+    <section className="bg-secondary py-32">
       <div className="container mx-auto px-4">
         {/* セクションタイトル */}
         <div className="mb-12 flex items-center justify-between">
           <h2 className="text-5xl font-bold md:text-6xl">NEWS</h2>
-          <Link href="/info" className="flex items-center gap-2 text-white hover:text-white/80">
+          <Link
+            href="/info"
+            className="flex items-center gap-2 text-gray-900 hover:text-gray-900/80"
+          >
             <span className="font-semibold">もっと見る</span>
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -53,13 +56,13 @@ export async function NewsSection() {
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-white/10">
-                    <span className="text-sm text-white/50">No Image</span>
+                    <span className="text-sm text-gray-900/50">No Image</span>
                   </div>
                 )}
               </div>
 
               {/* 日付 */}
-              <time className="text-xs text-white/50">
+              <time className="text-xs text-gray-900/50">
                 {new Date(news.publishedAt || news.createdAt).toLocaleDateString("ja-JP", {
                   year: "numeric",
                   month: "2-digit",
@@ -68,7 +71,7 @@ export async function NewsSection() {
               </time>
 
               {/* タイトル */}
-              <h3 className="mt-1 font-semibold text-white line-clamp-2">{news.title}</h3>
+              <h3 className="mt-1 font-semibold text-gray-900 line-clamp-2">{news.title}</h3>
             </Link>
           ))}
         </div>

@@ -45,7 +45,7 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
       <button
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/30 bg-white/10 text-white transition-all hover:border-white hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-white/30 disabled:hover:bg-white/10"
+        className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200/30 bg-white/10 text-gray-900 transition-all hover:border-gray-200 hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-gray-200/30 disabled:hover:bg-white/10"
         aria-label="前のページへ"
       >
         <svg
@@ -66,8 +66,8 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
           onClick={() => handlePageChange(pageNum)}
           className={`flex h-10 min-w-[2.5rem] items-center justify-center rounded-lg border px-3 font-medium transition-all ${
             currentPage === pageNum
-              ? "border-white bg-white text-primary"
-              : "border-white/30 bg-white/10 text-white hover:border-white hover:bg-white/20"
+              ? "border-gray-200 bg-white text-primary"
+              : "border-gray-200/30 bg-white/10 text-gray-900 hover:border-gray-200 hover:bg-white/20"
           }`}
           aria-current={currentPage === pageNum ? "page" : undefined}
           aria-label={`ページ ${pageNum}`}
@@ -80,7 +80,7 @@ export function Pagination({ currentPage, totalPages }: PaginationProps) {
       <button
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/30 bg-white/10 text-white transition-all hover:border-white hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-white/30 disabled:hover:bg-white/10"
+        className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200/30 bg-white/10 text-gray-900 transition-all hover:border-gray-200 hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-gray-200/30 disabled:hover:bg-white/10"
         aria-label="次のページへ"
       >
         <svg

@@ -53,7 +53,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
       </div>
 
       {/* ページヘッダー */}
-      <div className="bg-primary py-16 text-white">
+      <div className="bg-secondary py-16 text-gray-900">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center gap-3">
             <Mail className="h-10 w-10 md:h-12 md:w-12" />
@@ -67,35 +67,35 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
         {/* お問い合わせ種別説明 */}
         <section className="mx-auto mb-12 max-w-4xl">
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm">
+            <div className="rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm">
               <div className="mb-3 flex items-center gap-2">
                 <Mail className="h-5 w-5 text-blue-500" />
-                <h3 className="font-bold text-white">{t("types.general.title")}</h3>
+                <h3 className="font-bold text-gray-900">{t("types.general.title")}</h3>
               </div>
-              <p className="text-sm text-white/90">{t("types.general.description")}</p>
+              <p className="text-sm text-gray-900/90">{t("types.general.description")}</p>
             </div>
 
-            <div className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm">
+            <div className="rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm">
               <div className="mb-3 flex items-center gap-2">
                 <Phone className="h-5 w-5 text-green-500" />
-                <h3 className="font-bold text-white">{t("types.media.title")}</h3>
+                <h3 className="font-bold text-gray-900">{t("types.media.title")}</h3>
               </div>
-              <p className="text-sm text-white/90">{t("types.media.description")}</p>
+              <p className="text-sm text-gray-900/90">{t("types.media.description")}</p>
             </div>
 
-            <div className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm">
+            <div className="rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm">
               <div className="mb-3 flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-orange-500" />
-                <h3 className="font-bold text-white">{t("types.lostFound.title")}</h3>
+                <h3 className="font-bold text-gray-900">{t("types.lostFound.title")}</h3>
               </div>
-              <p className="text-sm text-white/90">{t("types.lostFound.description")}</p>
+              <p className="text-sm text-gray-900/90">{t("types.lostFound.description")}</p>
             </div>
           </div>
         </section>
 
         {/* お問い合わせフォーム */}
-        <section className="mx-auto mb-12 max-w-4xl rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm md:p-8">
-          <h2 className="mb-6 text-2xl font-bold text-white">{t("form.title")}</h2>
+        <section className="mx-auto mb-12 max-w-4xl rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm md:p-8">
+          <h2 className="mb-6 text-2xl font-bold text-gray-900">{t("form.title")}</h2>
           <ContactForm />
         </section>
 
@@ -104,10 +104,10 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
           <div className="flex items-start gap-3">
             <Mail className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-400" />
             <div>
-              <p className="font-semibold text-white">{t("beforeContact.title")}</p>
-              <p className="mt-1 text-sm text-white/90">
+              <p className="font-semibold text-gray-900">{t("beforeContact.title")}</p>
+              <p className="mt-1 text-sm text-gray-900/90">
                 {t("beforeContact.prefix")}{" "}
-                <a href="/info/faq" className="underline hover:text-white">
+                <a href="/info/faq" className="underline hover:text-gray-900">
                   {t("beforeContact.faqLink")}
                 </a>{" "}
                 {t("beforeContact.suffix")}

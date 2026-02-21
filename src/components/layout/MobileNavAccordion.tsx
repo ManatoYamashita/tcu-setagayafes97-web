@@ -31,7 +31,7 @@ export function MobileNavAccordion({ item, onNavigate }: MobileNavAccordionProps
       <Link
         href={item.href}
         onClick={onNavigate}
-        className="block py-3 text-white/80 transition-colors hover:text-white"
+        className="block py-3 text-gray-900/80 transition-colors hover:text-gray-900"
       >
         {item.label}
       </Link>
@@ -40,10 +40,10 @@ export function MobileNavAccordion({ item, onNavigate }: MobileNavAccordionProps
 
   // children がある場合はアコーディオン
   return (
-    <div className="border-b border-white/20 py-2">
+    <div className="border-b border-gray-200/20 py-2">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between py-2 text-left text-white/80 transition-colors hover:text-white"
+        className="flex w-full items-center justify-between py-2 text-left text-gray-900/80 transition-colors hover:text-gray-900"
         aria-expanded={isOpen}
       >
         <span className="font-medium">{item.label}</span>
@@ -63,7 +63,7 @@ export function MobileNavAccordion({ item, onNavigate }: MobileNavAccordionProps
               key={child.href}
               href={child.href}
               onClick={onNavigate}
-              className="block py-2 text-sm text-white/70 transition-colors hover:text-white"
+              className="block py-2 text-sm text-gray-900/70 transition-colors hover:text-gray-900"
             >
               {child.label}
             </Link>

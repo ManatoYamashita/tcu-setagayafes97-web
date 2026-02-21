@@ -53,7 +53,7 @@ export function NewsCard({ news, variant = "default", className }: NewsCardProps
         />
         {/* NEWバッジ */}
         {isNew(news) && (
-          <span className="absolute top-3 left-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-500 text-xs font-bold text-white">
+          <span className="absolute top-3 left-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-500 text-xs font-bold text-gray-900">
             NEW
           </span>
         )}

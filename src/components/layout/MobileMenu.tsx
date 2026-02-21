@@ -58,19 +58,19 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
       {/* スライドインメニュー */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 w-[280px] transform bg-primary-dark border-l border-white/20 ${
+        className={`fixed inset-y-0 right-0 z-50 w-[280px] transform bg-secondary border-l border-gray-200/20 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* ヘッダー */}
-        <div className="flex items-center justify-between border-b border-white/20 p-4">
-          <span className="text-lg font-bold text-white">MENU</span>
+        <div className="flex items-center justify-between border-b border-gray-200/20 p-4">
+          <span className="text-lg font-bold text-gray-900">MENU</span>
           <button
             onClick={onClose}
             aria-label="メニューを閉じる"
-            className="rounded-lg p-1 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
+            className="rounded-lg p-1 hover:bg-gray-900/10 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
           >
-            <X className="h-6 w-6 text-white" />
+            <X className="h-6 w-6 text-gray-900" />
           </button>
         </div>
 
@@ -82,7 +82,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         </nav>
 
         {/* 言語切り替え */}
-        <div className="border-t border-white/20 p-4">
+        <div className="border-t border-gray-200/20 p-4">
           <LanguageSwitcherWrapper />
         </div>
       </div>
