@@ -5,7 +5,13 @@
   --color-primary: oklch(55% 0.18 305);
   --color-primary-light: oklch(75% 0.18 305);
   --color-primary-dark: oklch(40% 0.18 305);
+  --color-primary-200: oklch(80% 0.11 314deg);
+  --color-primary-300: oklch(74% 0.14 314deg);
+  --color-page-bg: #e1c0ee;
+  --color-hero-cream: oklch(92% 0.08 90deg);
+  --color-hero-cream-shadow: oklch(50% 0.08 90deg);
   --font-sans: var(--font-noto-sans-jp), sans-serif;
+  --font-display: var(--font-kaisei-opti), "Hiragino Mincho Pro", "Yu Mincho", serif;
 }
 
 :root {
@@ -15,11 +21,38 @@
 
 body {
   color: white;
-  background-color: var(--color-primary);
+  background-color: var(--color-page-bg);
 }
 
 @utility text-balance {
   text-wrap: balance;
+}
+
+/* Hero紙テクスチャノイズ */
+@layer components {
+  .hero-noise::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.08;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 200px 200px;
+  }
+
+  .hero-text-shadow {
+    text-shadow:
+      2px 2px 0px oklch(50% 0.08 90deg),
+      4px 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .hero-text-shadow-sm {
+    text-shadow:
+      1px 1px 0px oklch(50% 0.08 90deg),
+      2px 2px 4px rgba(0, 0, 0, 0.15);
+  }
 }
 
 @layer utilities {

@@ -12,6 +12,7 @@ const config: Config = {
         primary: "oklch(55% 0.18 305)",
         "primary-light": "oklch(75% 0.18 305)",
         "primary-dark": "oklch(40% 0.18 305)",
+        "page-bg": "#E1C0EE",
       },
       fontFamily: {
         sans: ["var(--font-noto-sans-jp)", "sans-serif"],

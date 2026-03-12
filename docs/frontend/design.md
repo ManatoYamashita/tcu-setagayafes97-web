@@ -95,6 +95,7 @@ Primary を起点に L・C を調整して生成したスケール。
 | `--color-bg`         | `#FFFFFF`             | ページ背景            |
 | `--color-border`     | `--color-gray-200`    | 区切り線・枠線        |
 | `--color-accent`     | `--color-primary-400` | CTA、リンク、強調要素 |
+| `--color-page-bg`    | `#E1C0EE`             | ページ全体の背景色    |
 
 ---
 
