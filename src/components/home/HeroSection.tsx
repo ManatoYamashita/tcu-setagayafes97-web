@@ -3,9 +3,11 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Menu } from "lucide-react";
 import { siteConfig } from "@/data/site";
-import { MobileMenu } from "@/components/layout/MobileMenu";
+import { useCountdown } from "@/hooks/useCountdown";
+import { LogoVideo } from "./LogoVideo";
+
+type DebugDisplayMode = "countdown" | "karakuri" | null;
 
 const GearScene = dynamic(() => import("@/components/three/GearScene"), {
   ssr: false,
@@ -56,14 +58,30 @@ function DateBlock({ dateStr }: { dateStr: string }) {
  * 5レイヤー構成: 白背景 / 装飾テキスト / Three.js歯車（中央） / 左下日付 / 右下テキスト+CTA
  */
 const heroNavItems = [
-  { label: "EVENTS", href: "/events" },
-  { label: "TIMETABLE", href: "/timetable" },
-  { label: "MAP", href: "/map" },
-  { label: "INFO", href: "/info" },
+  { label: "企画を探す", href: "/events" },
+  { label: "タイムテーブル", href: "/timetable" },
+  { label: "マップ", href: "/map" },
+  { label: "インフォメーション", href: "/info" },
 ] as const;
 
 export function HeroSection() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { formatted, isFinished } = useCountdown();
+  const [debugMode, setDebugMode] = useState<DebugDisplayMode>(null);
+
+  // 表示判定: デバッグモード優先、なければ実カウントダウン状態
+  const showKarakuri = debugMode === "karakuri" || (debugMode === null && isFinished);
+  const showCountdown = debugMode === "countdown" || (debugMode === null && !isFinished);
+
+  const cycleDebug = () => {
+    setDebugMode((prev) => {
+      if (prev === null) return "countdown";
+      if (prev === "countdown") return "karakuri";
+      return null;
+    });
+  };
+
+  const debugLabel =
+    debugMode === null ? "自動" : debugMode === "countdown" ? "Countdown" : "KARAKURI";
 
   return (
     <section
@@ -82,33 +100,50 @@ export function HeroSection() {
           <Link
             key={item.href}
             href={item.href}
-            className="text-sm font-medium tracking-widest text-gray-700 hover:text-primary-400 transition-colors"
+            className="text-sm font-medium tracking-wider text-gray-700 hover:text-primary-400 transition-colors"
           >
             {item.label}
           </Link>
         ))}
       </nav>
 
-      {/* [z-40] 左上 ハンバーガー（モバイル） */}
-      <button
-        className="absolute top-6 left-6 z-40 rounded-lg p-2 hover:bg-gray-900/10 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 md:hidden"
-        onClick={() => setIsMobileMenuOpen(true)}
-        aria-label="メニューを開く"
-      >
-        <Menu className="h-6 w-6 text-gray-900" />
-      </button>
-
-      {/* モバイルメニュー */}
-      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
-
-      {/* [z-10] 装飾テキスト "TOKYO CITY UNIVERSITY" */}
+      {/* [z-10] 装飾テキスト: カウントダウン or KARAKURI */}
       <div
         className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none select-none"
         aria-hidden="true"
       >
-        <span className="text-[8vw] font-black tracking-widest text-gray-200 whitespace-nowrap leading-none">
-          TOKYO CITY UNIVERSITY
-        </span>
+        {showKarakuri ? (
+          <span className="text-[8vw] font-black tracking-widest text-gray-200 whitespace-nowrap leading-none">
+            KARAKURI
+          </span>
+        ) : showCountdown && formatted ? (
+          <span className="text-[8vw] font-black tracking-widest text-gray-200 whitespace-nowrap leading-none tabular-nums">
+            {formatted}
+          </span>
+        ) : (
+          <span className="text-[8vw] font-black tracking-widest text-gray-200 whitespace-nowrap leading-none">
+            &nbsp;
+          </span>
+        )}
+      </div>
+
+      {/* デバッグトグル（開発環境のみ） */}
+      {process.env.NODE_ENV === "development" && (
+        <button
+          type="button"
+          onClick={cycleDebug}
+          className="absolute top-4 right-4 z-50 bg-black/50 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm hover:bg-black/70 transition-colors"
+        >
+          {debugLabel}
+        </button>
+      )}
+
+      {/* [z-5] ロゴ動画（背景として歯車・テキストより奥） */}
+      <div
+        className="absolute top-[10%] left-1/2 -translate-x-1/2 z-[5] pointer-events-none"
+        aria-hidden="true"
+      >
+        <LogoVideo className="w-[45vw] md:w-[20vw]" waitForOpener />
       </div>
 
       {/* [z-20] Three.js歯車（中央配置） */}
@@ -131,16 +166,23 @@ export function HeroSection() {
         <p className="text-xs md:text-sm tracking-[0.2em] text-primary-400/80 mt-2 md:mt-3">
           {siteConfig.openTime} - {siteConfig.closeTime}
         </p>
+        {/* モバイル用CTA（md以上では非表示） */}
+        <Link
+          href="/events"
+          className="inline-block bg-primary-400 text-white text-sm font-medium px-6 py-3 rounded-full hover:bg-primary-500 transition-colors mt-4 md:hidden"
+        >
+          企画を探す
+        </Link>
       </div>
 
-      {/* [z-30] 右下 テキスト+CTAボタン */}
-      <div className="absolute right-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 max-w-sm">
+      {/* [z-30] 右下 テキスト+CTAボタン（デスクトップのみ） */}
+      <div className="absolute right-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 max-w-sm hidden md:block">
         <p className="text-sm md:text-base text-gray-600 line-clamp-2 mb-4">
           {siteConfig.description}
         </p>
         <Link
           href="/events"
-          className="inline-block bg-gray-900 text-white text-sm md:text-base font-medium px-6 py-3 rounded-full hover:bg-gray-800 transition-colors"
+          className="inline-block bg-primary-400 text-white text-sm md:text-base font-medium px-6 py-3 rounded-full hover:bg-primary-500 transition-colors"
         >
           企画を探す
         </Link>

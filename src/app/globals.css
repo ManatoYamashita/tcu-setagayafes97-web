@@ -43,7 +43,7 @@
 
 :root {
   /* レイアウト定数 */
-  --header-height: 5rem; /* 80px (py-5 × 2 + 内容物高さ約32px) */
+  --header-height: 5.5rem; /* pt-2 + py-3×2 + ロゴ高さ約56px (ピル型ヘッダー) */
 }
 
 body {
@@ -51,9 +51,12 @@ body {
   background-color: var(--color-bg); /* #E1C0EE */
 }
 
-h1,
-h2 {
-  font-family: var(--font-heading);
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-kaisei-opti), serif;
+  }
 }
 
 @utility text-balance {

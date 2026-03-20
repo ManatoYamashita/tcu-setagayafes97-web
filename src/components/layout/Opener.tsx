@@ -14,11 +14,11 @@ import { gsap } from "gsap";
  * 4. アイコンを拡大しながらフェードアウト
  * 5. 2層レイヤーを時間差（0.2s）で下にスライドして非表示
  *
- * power4イージングによる優雅で滑らかなアニメーション（合計4.5秒）。
+ * power4イージングによる優雅で滑らかなアニメーション（合計約2秒）。
  * pulseアニメーションはGPUアクセラレーション（force3D）で最適化。
  */
 export function Opener() {
-  const [showOpener, setShowOpener] = useState(false);
+  const [showOpener, setShowOpener] = useState(true);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const whiteLayerRef = useRef<HTMLDivElement | null>(null);
   const primaryLayerRef = useRef<HTMLDivElement | null>(null);
@@ -30,10 +30,12 @@ export function Opener() {
     // サーバーサイドレンダリング時はスキップ
     if (typeof window === "undefined") return;
 
-    // オープナーを表示状態に設定
-    setShowOpener(true);
+    // フェイルセーフ: アニメーション未完了時に強制非表示（通常2秒の約2.5倍）
+    const safetyTimeout = setTimeout(() => {
+      setShowOpener(false);
+      window.dispatchEvent(new CustomEvent("opener-done"));
+    }, 5000);
 
-    // ページ読み込み完了を待機
     const startAnimation = () => {
       if (
         !containerRef.current ||
@@ -71,34 +73,33 @@ export function Opener() {
         const tl = gsap.timeline({
           paused: false, // 自動再生
           onComplete: () => {
-            // アニメーション完了後、オープナーを非表示
+            clearTimeout(safetyTimeout);
             setShowOpener(false);
+            window.dispatchEvent(new CustomEvent("opener-done"));
           },
         });
 
-        // Phase 1: アイコンフェードイン (1.0s) + pulse開始
+        // Phase 1: アイコンフェードイン (0.5s) + pulse開始
         tl.to(iconRef.current, {
           opacity: 1,
           scale: 1,
-          duration: 1.0,
+          duration: 0.5,
           ease: "power4.out",
           onComplete: () => {
-            // フェードイン完了後、pulseを開始
             pulseTl.play();
           },
         });
 
-        // Phase 2: 待機 (1.5s) - pulse継続中
-        tl.to({}, { duration: 1.5 });
+        // Phase 2: 待機 (0.3s) - pulse継続中
+        tl.to({}, { duration: 0.3 });
 
-        // Phase 3: アイコンフェードアウト (0.8s) - pulse継続中
+        // Phase 3: アイコンフェードアウト (0.4s) - pulse継続中
         tl.to(iconRef.current, {
           opacity: 0,
           scale: 1.1,
-          duration: 0.8,
+          duration: 0.4,
           ease: "power4.in",
           onStart: () => {
-            // フェードアウト開始時にpulseを停止
             pulseTl.kill();
           },
         });
@@ -120,9 +121,9 @@ export function Opener() {
           {
             y: "100%",
             duration: 1.3,
-            ease: "power4.out", // 下層はやや軽めのイージング
+            ease: "power4.out",
           },
-          "-=1.1" // primaryスライドの0.2秒後に開始
+          "-=1.1"
         );
       }, containerRef);
 
@@ -133,18 +134,14 @@ export function Opener() {
     if (document.readyState === "complete") {
       startAnimation();
     } else {
-      const onLoad = () => startAnimation();
-      window.addEventListener("load", onLoad);
-      return () => {
-        window.removeEventListener("load", onLoad);
-        pulseTlRef.current?.kill(); // pulseタイムライン停止
-        ctxRef.current?.revert(); // GSAPクリーンアップ
-      };
+      window.addEventListener("load", startAnimation);
     }
 
     // クリーンアップ
     return () => {
-      pulseTlRef.current?.kill(); // pulseタイムライン停止
+      clearTimeout(safetyTimeout);
+      window.removeEventListener("load", startAnimation);
+      pulseTlRef.current?.kill();
       ctxRef.current?.revert();
     };
   }, []);

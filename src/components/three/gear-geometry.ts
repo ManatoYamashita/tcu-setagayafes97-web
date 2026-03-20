@@ -50,7 +50,7 @@ export function createGearGeometry({
   }
 
   const n = pts.length;
-  const r = 0.03; // 角丸ほぼ除去（シャープな歯形状）
+  const r = 0.08; // 歯底の谷間を自然に丸くする
   const lerp = (a: [number, number], b: [number, number], t: number): [number, number] => [
     a[0] + (b[0] - a[0]) * t,
     a[1] + (b[1] - a[1]) * t,
@@ -81,7 +81,7 @@ export function createGearGeometry({
     bevelEnabled: true,
     bevelThickness: 0.18,
     bevelSize: 0.12,
-    bevelSegments: 1,
+    bevelSegments: 2,
     curveSegments: 32,
   });
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { Environment } from "@react-three/drei";
 import { Gear } from "./Gear";
 
 /**
@@ -13,19 +12,17 @@ export default function GearScene() {
     <Canvas
       gl={{ alpha: true, antialias: true }}
       dpr={[1, 1.5]}
-      camera={{ position: [0, 0, 6], fov: 45 }}
+      camera={{ position: [0, 0, 7.5], fov: 45 }}
       style={{ width: "100%", height: "100%" }}
     >
       {/* メインライト（右上、白） */}
-      <directionalLight position={[4, 4, 5]} intensity={1.0} color="#ffffff" />
+      <directionalLight position={[4, 4, 5]} intensity={1.15} color="#ffffff" />
       {/* フィルライト（左下、ピンク系） */}
       <directionalLight position={[-3, -2, 3]} intensity={0.6} color="#EEC0D8" />
       {/* バックライト（背面、ピンク系） */}
       <directionalLight position={[0, 0, -4]} intensity={0.4} color="#D880C0" />
       {/* 環境光 */}
-      <ambientLight intensity={0.5} />
-      {/* 環境マップ（映り込み抑制でマット感） */}
-      <Environment preset="studio" environmentIntensity={0.15} />
+      <ambientLight intensity={0.45} />
 
       <Gear />
     </Canvas>

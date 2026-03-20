@@ -1,25 +1,53 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useState, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
-import type { Mesh, Group } from "three";
+import * as THREE from "three";
+import type { Group } from "three";
 import { GEAR_DEFAULTS, createGearGeometry, createHubRingGeometry } from "./gear-geometry";
 
 /**
  * ピンク紫クレイ風歯車メッシュ（ハブリング付き）
- * Z軸回転 + Y軸微揺れアニメーション
+ * Z軸回転 + マウス追従チルトアニメーション
  */
 export function Gear() {
   const groupRef = useRef<Group>(null);
   const gearGeometry = useMemo(() => createGearGeometry(), []);
   const hubGeometry = useMemo(() => createHubRingGeometry(), []);
+  const [isMobile, setIsMobile] = useState(false);
 
-  useFrame((_state, delta) => {
+  useEffect(() => {
+    const check = () => setIsMobile(window.matchMedia("(max-width: 768px)").matches);
+    check();
+    const mql = window.matchMedia("(max-width: 768px)");
+    mql.addEventListener("change", check);
+    return () => mql.removeEventListener("change", check);
+  }, []);
+
+  useFrame((state, delta) => {
     if (!groupRef.current) return;
     // Z軸回転（0.15 rad/s）
     groupRef.current.rotation.z += 0.15 * delta;
-    // Y軸微揺れ
-    groupRef.current.rotation.y = Math.sin(groupRef.current.rotation.z * 0.5) * 0.15;
+
+    if (isMobile) return;
+
+    // マウス追従チルト（lerpで滑らかに補間）
+    const tiltStrength = 0.3;
+    const lerpFactor = 0.05;
+
+    const targetX = 0.4 - state.pointer.y * tiltStrength;
+    const targetY = 0.2 + state.pointer.x * tiltStrength;
+
+    groupRef.current.rotation.x = THREE.MathUtils.lerp(
+      groupRef.current.rotation.x,
+      targetX,
+      lerpFactor
+    );
+    groupRef.current.rotation.y = THREE.MathUtils.lerp(
+      groupRef.current.rotation.y,
+      targetY,
+      lerpFactor
+    );
   });
 
   return (
@@ -27,13 +55,11 @@ export function Gear() {
       {/* 歯車本体 */}
       <mesh geometry={gearGeometry}>
         <meshPhysicalMaterial
-          color="#DDA8D0"
-          roughness={0.45}
+          color="#F5B8E8"
+          roughness={0.65}
           metalness={0}
-          clearcoat={0.1}
-          clearcoatRoughness={0.6}
-          sheen={0.3}
-          sheenColor="#F0D0E8"
+          clearcoat={0}
+          sheen={0}
         />
       </mesh>
       {/* 中央ハブリング（ExtrudeGeometryはz=0→depth押出のため中心をdepth/2ずらす） */}
@@ -43,13 +69,11 @@ export function Gear() {
         position={[0, 0, GEAR_DEFAULTS.depth / 2]}
       >
         <meshPhysicalMaterial
-          color="#DDA8D0"
-          roughness={0.45}
+          color="#F5B8E8"
+          roughness={0.65}
           metalness={0}
-          clearcoat={0.1}
-          clearcoatRoughness={0.6}
-          sheen={0.3}
-          sheenColor="#F0D0E8"
+          clearcoat={0}
+          sheen={0}
         />
       </mesh>
     </group>

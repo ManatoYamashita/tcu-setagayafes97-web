@@ -11,7 +11,7 @@ import { NavDropdown } from "@/components/layout/NavDropdown";
  */
 export function DesktopNav() {
   return (
-    <nav className="hidden md:block">
+    <nav className="hidden lg:block">
       <ul className="flex gap-8">
         {navigationConfig.header.map((item) => (
           <li key={item.href}>
