@@ -68,8 +68,8 @@ export function useCountdown(): CountdownState {
       };
     }
 
-    // 初回即計算
-    setState(calc());
+    // 初回即計算（非同期コールバックで実行）
+    const immediateId = setTimeout(() => setState(calc()), 0);
 
     const id = setInterval(() => {
       const next = calc();
@@ -77,7 +77,10 @@ export function useCountdown(): CountdownState {
       if (next.isFinished) clearInterval(id);
     }, 1000);
 
-    return () => clearInterval(id);
+    return () => {
+      clearTimeout(immediateId);
+      clearInterval(id);
+    };
   }, []);
 
   return state;

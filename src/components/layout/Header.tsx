@@ -43,16 +43,10 @@ export function Header() {
 
   // HeroSection可視判定（ホームページのみ）
   useEffect(() => {
-    if (pathname !== "/") {
-      setIsHeroVisible(false);
-      return;
-    }
+    if (pathname !== "/") return;
 
     const heroEl = document.getElementById("hero-section");
-    if (!heroEl) {
-      setIsHeroVisible(false);
-      return;
-    }
+    if (!heroEl) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
