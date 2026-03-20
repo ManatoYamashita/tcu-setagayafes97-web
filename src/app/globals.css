@@ -38,6 +38,7 @@
 
   /* フォント設定 */
   --font-sans: var(--font-noto-sans-jp), sans-serif;
+  --font-heading: var(--font-kaisei-opti), serif;
 }
 
 :root {
@@ -48,6 +49,11 @@
 body {
   color: var(--color-text); /* #212121 */
   background-color: var(--color-bg); /* #E1C0EE */
+}
+
+h1,
+h2 {
+  font-family: var(--font-heading);
 }
 
 @utility text-balance {

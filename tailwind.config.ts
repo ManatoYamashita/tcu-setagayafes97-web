@@ -46,6 +46,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-noto-sans-jp)", "sans-serif"],
+        heading: ["var(--font-kaisei-opti)", "serif"],
       },
     },
   },

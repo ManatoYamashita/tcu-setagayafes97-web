@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans_JP } from "next/font/google";
+import { Noto_Sans_JP, Kaisei_Opti } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/data/site";
 import { Header } from "@/components/layout/Header";
@@ -10,6 +10,14 @@ const notoSansJP = Noto_Sans_JP({
   subsets: ["latin"],
   weight: ["400", "500", "700"],
   variable: "--font-noto-sans-jp",
+  display: "swap",
+  preload: true,
+});
+
+const kaiseiOpti = Kaisei_Opti({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-kaisei-opti",
   display: "swap",
   preload: true,
 });
@@ -52,7 +60,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={`${notoSansJP.variable} font-sans antialiased bg-secondary text-gray-900`}>
+      <body
+        className={`${notoSansJP.variable} ${kaiseiOpti.variable} font-sans antialiased bg-secondary text-gray-900`}
+      >
         <Opener />
         <Header />
         {children}

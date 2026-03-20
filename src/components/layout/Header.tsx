@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { siteConfig } from "@/data/site";
 import { LanguageSwitcherWrapper } from "@/components/layout/LanguageSwitcherWrapper";
@@ -24,6 +25,8 @@ import { MobileMenu } from "@/components/layout/MobileMenu";
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHeroVisible, setIsHeroVisible] = useState(true);
+  const pathname = usePathname();
 
   // スクロール検知
   useEffect(() => {
@@ -35,12 +38,38 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // HeroSection可視判定（ホームページのみ）
+  useEffect(() => {
+    if (pathname !== "/") {
+      setIsHeroVisible(false);
+      return;
+    }
+
+    const heroEl = document.getElementById("hero-section");
+    if (!heroEl) {
+      setIsHeroVisible(false);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsHeroVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(heroEl);
+    return () => observer.disconnect();
+  }, [pathname]);
+
+  const shouldHide = pathname === "/" && isHeroVisible;
+
   return (
     <>
       <header
-        className={`sticky top-0 z-40 bg-secondary ${
-          isScrolled ? "border-b border-gray-400/30" : "border-b border-gray-200/20"
-        }`}
+        className={`sticky top-0 z-40 bg-secondary transition-transform duration-300 ${
+          shouldHide ? "-translate-y-full" : "translate-y-0"
+        } ${isScrolled ? "border-b border-gray-400/30" : "border-b border-gray-200/20"}`}
       >
         <div className="container mx-auto flex items-center justify-between px-6 py-5">
           {/* 左: ロゴ */}

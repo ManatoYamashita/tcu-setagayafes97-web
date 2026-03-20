@@ -17,7 +17,13 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    optimizePackageImports: ["gsap", "lucide-react"],
+    optimizePackageImports: [
+      "gsap",
+      "lucide-react",
+      "three",
+      "@react-three/fiber",
+      "@react-three/drei",
+    ],
   },
 };
 

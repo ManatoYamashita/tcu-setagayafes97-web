@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Users, Target, Building2, ExternalLink } from "lucide-react";
 import { aboutConfig } from "@/data/about";
+import { AboutHeroSection } from "@/components/about/AboutHeroSection";
 
 /**
  * メタデータ
@@ -25,16 +26,8 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-secondary">
-      {/* ページヘッダー */}
-      <div className="bg-secondary py-16 text-gray-900">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center gap-3">
-            <Users className="h-10 w-10 md:h-12 md:w-12" />
-            <h1 className="text-4xl font-bold md:text-5xl">委員会について</h1>
-          </div>
-          <p className="mt-4 text-center text-lg opacity-90">世田谷祭実行委員会の理念とビジョン</p>
-        </div>
-      </div>
+      {/* Hero */}
+      <AboutHeroSection />
 
       <div className="container mx-auto px-4 py-12">
         <div className="mx-auto max-w-4xl space-y-12">
