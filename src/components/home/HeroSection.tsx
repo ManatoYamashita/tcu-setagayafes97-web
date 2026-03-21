@@ -109,6 +109,9 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
     if (typeof window === "undefined") return;
     if (ctxRef.current) return;
 
+    // Openerが稼働中かどうかをDOM存在で判定
+    const hasOpener = !!document.querySelector(".opener-container");
+
     const runEntrance = () => {
       if (!sectionRef.current || ctxRef.current) return;
 
@@ -131,7 +134,8 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
           gsap.set(navItems, { opacity: 0, x: -15 });
         }
 
-        const tl = gsap.timeline({ delay: 0.3 });
+        // Opener後は0.3sの"呼吸"、不在時はdelay無し
+        const tl = gsap.timeline({ delay: hasOpener ? 0.3 : 0 });
 
         // メイン要素: stagger 0.12s で順次出現
         tl.to(
@@ -170,15 +174,23 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       ctxRef.current = ctx;
     };
 
-    // opener-doneイベント監視
-    window.addEventListener("opener-done", runEntrance);
+    if (!hasOpener) {
+      // Opener完了済み/不在 → 即座にアニメーション実行
+      runEntrance();
+    } else {
+      // Opener稼働中 → イベント待機 + フェイルセーフ
+      window.addEventListener("opener-done", runEntrance);
+      const failsafe = setTimeout(runEntrance, 5000);
 
-    // フェイルセーフ: 5秒後に強制開始（ページ内遷移等でopener-done未発火時）
-    const failsafe = setTimeout(runEntrance, 5000);
+      return () => {
+        window.removeEventListener("opener-done", runEntrance);
+        clearTimeout(failsafe);
+        ctxRef.current?.revert();
+        ctxRef.current = null;
+      };
+    }
 
     return () => {
-      window.removeEventListener("opener-done", runEntrance);
-      clearTimeout(failsafe);
       ctxRef.current?.revert();
       ctxRef.current = null;
     };

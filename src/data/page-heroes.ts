@@ -61,4 +61,32 @@ export const pageHeroes: Record<string, PageHeroData> = {
     imageSrc: "/images/placeholder/pastel-castle.webp",
     imageAlt: "実行委員会の活動風景",
   },
+  contact: {
+    title: "お問い合わせ",
+    subtitle: "Contact",
+    description: "第97回 世田谷祭に関するご質問・ご相談",
+    imageSrc: "/images/placeholder/pastel-castle.webp",
+    imageAlt: "お問い合わせ",
+  },
+  privacy: {
+    title: "プライバシーポリシー",
+    subtitle: "Privacy Policy",
+    description: "個人情報保護方針",
+    imageSrc: "/images/placeholder/pastel-castle.webp",
+    imageAlt: "プライバシーポリシー",
+  },
+  guide: {
+    title: "ご来場の方へ",
+    subtitle: "Visitor Guide",
+    description: "皆様に安全で快適にお過ごしいただくためのご案内",
+    imageSrc: "/images/placeholder/pastel-castle.webp",
+    imageAlt: "来場ガイド",
+  },
+  faq: {
+    title: "よくある質問",
+    subtitle: "FAQ",
+    description: "第97回 世田谷祭に関するよくある質問と回答",
+    imageSrc: "/images/placeholder/pastel-castle.webp",
+    imageAlt: "よくある質問",
+  },
 };

@@ -25,7 +25,7 @@ function AccordionItem({ item, index }: AccordionItemProps) {
   };
 
   return (
-    <div className="rounded-lg border border-gray-200/20 bg-white/10">
+    <div className="rounded-lg border border-gray-200 bg-gray-50">
       {/* アコーディオンのヘッダー部分 */}
       <button
         type="button"
@@ -33,7 +33,7 @@ function AccordionItem({ item, index }: AccordionItemProps) {
         onKeyDown={handleKeyDown}
         aria-expanded={isOpen}
         aria-controls={`accordion-content-${index}`}
-        className="flex w-full items-center justify-between p-4 text-left hover:bg-white/10"
+        className="flex w-full items-center justify-between p-4 text-left hover:bg-gray-100"
       >
         <span className="text-base font-semibold text-gray-900 md:text-lg">{item.title}</span>
         <ChevronDown
@@ -46,7 +46,7 @@ function AccordionItem({ item, index }: AccordionItemProps) {
         id={`accordion-content-${index}`}
         className={cn("overflow-hidden", isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0")}
       >
-        <div className="border-t border-gray-200/20 p-4">
+        <div className="border-t border-gray-200 p-4">
           <p className="whitespace-pre-wrap text-sm text-gray-900/90 md:text-base">
             {item.content}
           </p>
