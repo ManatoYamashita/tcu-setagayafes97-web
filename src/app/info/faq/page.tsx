@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { HelpCircle } from "lucide-react";
 import { getFAQList } from "@/lib/informations";
 import { Accordion } from "@/components/ui/Accordion";
+import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
+import { pageHeroes } from "@/data/page-heroes";
 import type { AccordionItem } from "@/types/accordion";
 
 /**
@@ -37,47 +38,31 @@ export default async function FAQPage() {
   }));
 
   return (
-    <div className="min-h-screen bg-secondary">
-      {/* ページヘッダー */}
-      <div className="bg-secondary py-16 text-gray-900">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center gap-3">
-            <HelpCircle className="h-10 w-10 md:h-12 md:w-12" />
-            <h1 className="text-4xl font-bold md:text-5xl">よくある質問</h1>
-          </div>
-          <p className="mt-4 text-center text-lg opacity-90">
-            第97回 世田谷祭に関するよくある質問と回答
+    <PageSheetLayout hero={pageHeroes.faq}>
+      <div className="mx-auto max-w-4xl">
+        {/* FAQ件数表示 */}
+        <div className="mb-6">
+          <p className="text-sm text-gray-500">
+            <span className="font-semibold text-gray-900">{faqList.length}</span> 件の質問があります
           </p>
         </div>
-      </div>
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="mx-auto max-w-4xl">
-          {/* FAQ件数表示 */}
-          <div className="mb-6">
-            <p className="text-sm text-gray-900/80">
-              <span className="font-semibold text-gray-900">{faqList.length}</span>{" "}
-              件の質問があります
+        {/* FAQ一覧 */}
+        {faqList.length > 0 ? (
+          <Accordion items={accordionItems} />
+        ) : (
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-8 text-center shadow-sm">
+            <p className="text-gray-500">現在、FAQは準備中です。</p>
+            <p className="mt-2 text-sm text-gray-400">
+              ご不明な点がございましたら、
+              <a href="/about/contact" className="text-primary hover:underline">
+                お問い合わせフォーム
+              </a>
+              よりお問い合わせください。
             </p>
           </div>
-
-          {/* FAQ一覧 */}
-          {faqList.length > 0 ? (
-            <Accordion items={accordionItems} />
-          ) : (
-            <div className="rounded-lg border border-gray-200/20 bg-white/10 p-8 text-center shadow-sm">
-              <p className="text-gray-900/60">現在、FAQは準備中です。</p>
-              <p className="mt-2 text-sm text-gray-900/50">
-                ご不明な点がございましたら、
-                <a href="/about/contact" className="text-primary-light hover:underline">
-                  お問い合わせフォーム
-                </a>
-                よりお問い合わせください。
-              </p>
-            </div>
-          )}
-        </div>
+        )}
       </div>
-    </div>
+    </PageSheetLayout>
   );
 }
