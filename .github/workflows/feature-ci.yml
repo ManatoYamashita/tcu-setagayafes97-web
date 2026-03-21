@@ -65,4 +65,4 @@ jobs:
         run: pnpm run build
         env:
           NEXT_PUBLIC_USE_MOCK_DATA: "true"
-          NEXT_PUBLIC_SITE_URL: https://setagayafes.tcu.ac.jp
+          NEXT_PUBLIC_URL: https://setagayafes.tcu.ac.jp

@@ -85,8 +85,9 @@ export async function getFAQList(): Promise<Information[]> {
   const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
 
   if (USE_MOCK) {
-    // モックデータにFAQがない場合は空配列を返す
-    return [];
+    const { mockFAQ } = await import("@/data/mock-faq");
+    // priority 降順でソート
+    return [...mockFAQ].sort((a, b) => (b.priority || 0) - (a.priority || 0));
   }
 
   try {
