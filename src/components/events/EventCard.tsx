@@ -16,7 +16,7 @@ interface EventCardProps {
 export function EventCard({ event, variant = "default" }: EventCardProps) {
   return (
     <Link href={`/events/${event.id}`} className="group block h-full">
-      <article className="h-full overflow-hidden rounded-2xl border border-white/20 bg-white/10 transition-colors hover:border-white/40">
+      <article className="h-full overflow-hidden rounded-2xl border border-gray-200/20 bg-white/10 transition-colors hover:border-gray-200/40">
         {/* 円形サムネイル */}
         {event.thumbnail && (
           <div className="flex justify-center p-6">
@@ -33,7 +33,7 @@ export function EventCard({ event, variant = "default" }: EventCardProps) {
 
           {/* タイトル */}
           <h3
-            className={`mb-2 line-clamp-2 font-bold text-white ${
+            className={`mb-2 line-clamp-2 font-bold text-gray-900 ${
               variant === "featured" ? "text-xl" : "text-lg"
             }`}
           >
@@ -44,10 +44,10 @@ export function EventCard({ event, variant = "default" }: EventCardProps) {
           <p className="mb-3 text-sm font-semibold text-primary-light">{event.organizer}</p>
 
           {/* 説明文 */}
-          <p className="mb-4 line-clamp-3 text-sm text-white/80">{event.description}</p>
+          <p className="mb-4 line-clamp-3 text-sm text-gray-900/80">{event.description}</p>
 
           {/* メタ情報 */}
-          <div className="flex flex-wrap gap-x-4 gap-y-2 border-t border-white/20 pt-3 text-xs text-white/60">
+          <div className="flex flex-wrap gap-x-4 gap-y-2 border-t border-gray-200/20 pt-3 text-xs text-gray-900/60">
             {/* 場所 */}
             <div className="flex items-center gap-1">
               <svg

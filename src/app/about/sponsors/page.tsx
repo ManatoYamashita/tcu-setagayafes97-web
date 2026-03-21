@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Heart, ExternalLink } from "lucide-react";
 import { getSponsorsList } from "@/lib/informations";
 import type { Information } from "@/types/informations";
+import { isDataPublished } from "@/lib/publish";
+import { ComingSoon } from "@/components/ui/ComingSoon";
 
 /**
  * メタデータ
@@ -29,13 +31,35 @@ export const revalidate = 3600;
  * 協賛企業一覧ページ
  */
 export default async function SponsorsPage() {
+  if (!isDataPublished) {
+    return (
+      <div className="min-h-screen bg-secondary">
+        {/* ページヘッダー */}
+        <div className="bg-secondary py-16 text-gray-900">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-center gap-3">
+              <Heart className="h-10 w-10 md:h-12 md:w-12" />
+              <h1 className="text-4xl font-bold md:text-5xl">協賛企業</h1>
+            </div>
+            <p className="mt-4 text-center text-lg opacity-90">
+              第97回 世田谷祭を支援してくださる企業様
+            </p>
+          </div>
+        </div>
+        <div className="container mx-auto px-4 py-12">
+          <ComingSoon />
+        </div>
+      </div>
+    );
+  }
+
   // 協賛企業一覧を取得
   const sponsors = await getSponsorsList();
 
   return (
-    <div className="min-h-screen bg-primary">
+    <div className="min-h-screen bg-secondary">
       {/* ページヘッダー */}
-      <div className="bg-primary py-16 text-white">
+      <div className="bg-secondary py-16 text-gray-900">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center gap-3">
             <Heart className="h-10 w-10 md:h-12 md:w-12" />
@@ -50,9 +74,9 @@ export default async function SponsorsPage() {
       <div className="container mx-auto px-4 py-12">
         <div className="mx-auto max-w-6xl">
           {/* 感謝メッセージ */}
-          <section className="mb-12 rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm md:p-8">
-            <h2 className="mb-4 text-center text-2xl font-bold text-white">協賛企業の皆様へ</h2>
-            <p className="text-center text-white/90">
+          <section className="mb-12 rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm md:p-8">
+            <h2 className="mb-4 text-center text-2xl font-bold text-gray-900">協賛企業の皆様へ</h2>
+            <p className="text-center text-gray-900/90">
               第97回
               世田谷祭の開催にあたり、多大なるご支援を賜りました協賛企業の皆様に、心より感謝申し上げます。
               <br />
@@ -62,8 +86,8 @@ export default async function SponsorsPage() {
 
           {/* 協賛企業件数表示 */}
           <div className="mb-6">
-            <p className="text-sm text-white/80">
-              <span className="font-semibold text-white">{sponsors.length}</span> 社の企業様
+            <p className="text-sm text-gray-900/80">
+              <span className="font-semibold text-gray-900">{sponsors.length}</span> 社の企業様
             </p>
           </div>
 
@@ -75,8 +99,8 @@ export default async function SponsorsPage() {
               ))}
             </div>
           ) : (
-            <div className="rounded-lg border border-white/20 bg-white/10 p-12 text-center shadow-sm">
-              <p className="text-white/60">現在、協賛企業情報は準備中です。</p>
+            <div className="rounded-lg border border-gray-200/20 bg-white/10 p-12 text-center shadow-sm">
+              <p className="text-gray-900/60">現在、協賛企業情報は準備中です。</p>
             </div>
           )}
         </div>
@@ -94,13 +118,13 @@ interface SponsorCardProps {
 
 function SponsorCard({ sponsor }: SponsorCardProps) {
   const CardContent = (
-    <div className="group h-full overflow-hidden rounded-lg border border-white/20 bg-white/10 shadow-sm transition-all hover:border-white hover:shadow-lg">
+    <div className="group h-full overflow-hidden rounded-lg border border-gray-200/20 bg-white/10 shadow-sm transition-all hover:border-gray-200 hover:shadow-lg">
       {/* ロゴ */}
-      {sponsor.logo ? (
+      {sponsor.image ? (
         <div className="relative aspect-video w-full overflow-hidden bg-white/10">
           <Image
-            src={sponsor.logo.url}
-            alt={sponsor.sponsorName || sponsor.title}
+            src={sponsor.image.url}
+            alt={sponsor.title}
             fill
             className="object-contain p-6 transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
@@ -108,19 +132,17 @@ function SponsorCard({ sponsor }: SponsorCardProps) {
         </div>
       ) : (
         <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-primary to-purple-600">
-          <Heart className="h-16 w-16 text-white opacity-50" />
+          <Heart className="h-16 w-16 text-gray-900 opacity-50" />
         </div>
       )}
 
       <div className="p-6">
         {/* 企業名 */}
-        <h3 className="mb-2 text-lg font-bold text-white">
-          {sponsor.sponsorName || sponsor.title}
-        </h3>
+        <h3 className="mb-2 text-lg font-bold text-gray-900">{sponsor.title}</h3>
 
         {/* 説明文 */}
-        {sponsor.sponsorDescription && (
-          <p className="mb-4 line-clamp-3 text-sm text-white/80">{sponsor.sponsorDescription}</p>
+        {sponsor.description && (
+          <p className="mb-4 line-clamp-3 text-sm text-gray-900/80">{sponsor.description}</p>
         )}
 
         {/* Webサイトリンク */}

@@ -96,7 +96,7 @@ export function NavDropdown({ item }: NavDropdownProps) {
         onKeyDown={handleKeyDown}
         aria-expanded={isOpen}
         aria-haspopup="true"
-        className="flex items-center gap-1 text-white/80 transition-colors hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
+        className="flex items-center gap-1 text-gray-900/80 transition-colors hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
       >
         {item.label}
         <ChevronDown
@@ -105,12 +105,12 @@ export function NavDropdown({ item }: NavDropdownProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 top-full z-60 mt-2 min-w-[200px] rounded-lg border border-white/20 bg-primary-dark py-2">
+        <div className="absolute left-0 top-full z-60 mt-2 min-w-[200px] rounded-lg border border-gray-200/20 bg-secondary py-2">
           {item.children?.map((child) => (
             <Link
               key={child.href}
               href={child.href}
-              className="block px-4 py-2 text-sm text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+              className="block px-4 py-2 text-sm text-gray-900/80 transition-colors hover:bg-white/10 hover:text-gray-900"
               onClick={() => setIsOpen(false)}
             >
               {child.label}

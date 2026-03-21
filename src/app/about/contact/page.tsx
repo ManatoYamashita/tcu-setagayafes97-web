@@ -22,9 +22,9 @@ export const metadata: Metadata = {
  */
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-primary">
+    <div className="min-h-screen bg-secondary">
       {/* ページヘッダー */}
-      <div className="bg-primary py-16 text-white">
+      <div className="bg-secondary py-16 text-gray-900">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center gap-3">
             <Mail className="h-10 w-10 md:h-12 md:w-12" />
@@ -40,32 +40,32 @@ export default function ContactPage() {
         {/* お問い合わせ種別説明 */}
         <section className="mx-auto mb-12 max-w-4xl">
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm">
+            <div className="rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm">
               <div className="mb-3 flex items-center gap-2">
                 <Mail className="h-5 w-5 text-blue-500" />
-                <h3 className="font-bold text-white">一般・来場者向け</h3>
+                <h3 className="font-bold text-gray-900">一般・来場者向け</h3>
               </div>
-              <p className="text-sm text-white/90">
+              <p className="text-sm text-gray-900/90">
                 企画内容、開催時間、会場案内など、来場に関するお問い合わせ
               </p>
             </div>
 
-            <div className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm">
+            <div className="rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm">
               <div className="mb-3 flex items-center gap-2">
                 <Phone className="h-5 w-5 text-green-500" />
-                <h3 className="font-bold text-white">取材・メディア向け</h3>
+                <h3 className="font-bold text-gray-900">取材・メディア向け</h3>
               </div>
-              <p className="text-sm text-white/90">
+              <p className="text-sm text-gray-900/90">
                 取材申し込み、プレスリリース、メディア掲載に関するお問い合わせ
               </p>
             </div>
 
-            <div className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm">
+            <div className="rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm">
               <div className="mb-3 flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-orange-500" />
-                <h3 className="font-bold text-white">落とし物</h3>
+                <h3 className="font-bold text-gray-900">落とし物</h3>
               </div>
-              <p className="text-sm text-white/90">
+              <p className="text-sm text-gray-900/90">
                 世田谷祭会場で紛失された物品に関するお問い合わせ
               </p>
             </div>
@@ -73,8 +73,8 @@ export default function ContactPage() {
         </section>
 
         {/* お問い合わせフォーム */}
-        <section className="mx-auto mb-12 max-w-4xl rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm md:p-8">
-          <h2 className="mb-6 text-2xl font-bold text-white">お問い合わせフォーム</h2>
+        <section className="mx-auto mb-12 max-w-4xl rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm md:p-8">
+          <h2 className="mb-6 text-2xl font-bold text-gray-900">お問い合わせフォーム</h2>
 
           <ContactForm />
         </section>

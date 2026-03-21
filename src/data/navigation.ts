@@ -1,3 +1,5 @@
+import { isPathHidden } from "@/lib/publish";
+
 /**
  * ナビゲーション構成
  */
@@ -233,3 +235,55 @@ export const cardNavItems = [
  * ナビゲーション設定の型定義
  */
 export type NavigationConfig = typeof navigationConfig;
+
+// ------- データ公開状態に基づくフィルタ関数 -------
+
+/**
+ * ヘッダーナビを公開状態でフィルタ
+ * - 子要素も個別フィルタ
+ * - 子が1件になったら親の href をその子に差し替え & children 削除
+ */
+export function getFilteredHeaderNav() {
+  return navigationConfig.header
+    .filter((item) => !isPathHidden(item.href))
+    .map((item) => {
+      if (!("children" in item) || !item.children) return { ...item };
+
+      const filteredChildren = item.children.filter((c) => !isPathHidden(c.href));
+      if (filteredChildren.length === 0) return null;
+      if (filteredChildren.length === 1) {
+        return { label: filteredChildren[0].label, href: filteredChildren[0].href };
+      }
+      return { ...item, children: filteredChildren };
+    })
+    .filter(Boolean) as Array<{
+    label: string;
+    href: string;
+    children?: Array<{ label: string; href: string }>;
+  }>;
+}
+
+/**
+ * フッターナビを公開状態でフィルタ
+ * - links が 0 件になったセクションは丸ごと除外
+ */
+export function getFilteredFooterNav() {
+  return navigationConfig.footer
+    .map((section) => ({
+      ...section,
+      links: section.links.filter((link) => !isPathHidden(link.href)),
+    }))
+    .filter((section) => section.links.length > 0);
+}
+
+/**
+ * CardNav 用リンクを公開状態でフィルタ
+ */
+export function getFilteredCardNavItems() {
+  return cardNavItems
+    .map((card) => ({
+      ...card,
+      links: card.links.filter((link) => !isPathHidden(link.href)),
+    }))
+    .filter((card) => card.links.length > 0);
+}

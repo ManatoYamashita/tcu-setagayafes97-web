@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { getEventsList } from "@/lib/events";
 import { getNewsList } from "@/lib/news";
+import { isDataPublished, isPathHidden } from "@/lib/publish";
 
 /**
  * サイトマップ自動生成
@@ -10,7 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://setagayafes97.tcu.ac.jp"; // 本番URLに変更
 
   // 静的ページ
-  const staticPages: MetadataRoute.Sitemap = [
+  const allStaticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -91,18 +92,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // 動的ページ: 企画詳細
+  // データ公開状態に応じて静的ページをフィルタ
+  const staticPages = allStaticPages.filter((page) => !isPathHidden(page.url.replace(baseUrl, "")));
+
+  // 動的ページ: 企画詳細（非公開時はスキップ）
   let eventPages: MetadataRoute.Sitemap = [];
-  try {
-    const events = await getEventsList(200);
-    eventPages = events.map((event) => ({
-      url: `${baseUrl}/events/${event.id}`,
-      lastModified: new Date(event.updatedAt || event.publishedAt || Date.now()),
-      changeFrequency: "daily" as const,
-      priority: 0.7,
-    }));
-  } catch (error) {
-    console.error("Failed to fetch events for sitemap:", error);
+  if (isDataPublished) {
+    try {
+      const events = await getEventsList(200);
+      eventPages = events.map((event) => ({
+        url: `${baseUrl}/events/${event.id}`,
+        lastModified: new Date(event.updatedAt || event.publishedAt || Date.now()),
+        changeFrequency: "daily" as const,
+        priority: 0.7,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch events for sitemap:", error);
+    }
   }
 
   // 動的ページ: お知らせ詳細

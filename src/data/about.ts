@@ -2,6 +2,19 @@
  * About（委員会について）情報
  */
 export const aboutConfig = {
+  // トップページ用Aboutセクション
+  topSection: {
+    label: "東京都市大学 第97回 世田谷祭",
+    heading: "からくり",
+    tagline: "2026年10月31日(土)〜11月1日(日)",
+    paragraphs: [
+      "東京都市大学 世田谷祭は、学生が主体となって企画・運営する、年に一度の一大イベントです。第97回を数える歴史ある学園祭として、毎年多くの来場者の皆様に楽しんでいただいています。",
+      "教室企画、ステージ企画、模擬店など、様々な企画をご用意して皆様のご来場をお待ちしております。学生の創造性と情熱が詰まった世田谷祭を、ぜひお楽しみください。",
+    ],
+    cta: { label: "委員会について", href: "/about" },
+    image: { src: "/images/placeholder/pastel-castle.webp", alt: "世田谷祭の様子" },
+  },
+
   // 委員長挨拶
   chairpersonMessage: {
     name: "実行委員長 山田 太郎",

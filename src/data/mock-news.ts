@@ -13,7 +13,7 @@ export const mockNews: News[] = [
     type: "urgent",
     title: "台風接近に伴う開催可否について",
     thumbnail: {
-      url: "/images/placeholder/p.jpeg",
+      url: "/images/placeholder/pastel-castle.webp",
       height: 630,
       width: 1200,
     },
@@ -30,7 +30,7 @@ export const mockNews: News[] = [
     type: "news",
     title: "第97回世田谷祭公式サイトを公開しました",
     thumbnail: {
-      url: "/images/placeholder/p.jpeg",
+      url: "/images/placeholder/pastel-castle.webp",
       height: 630,
       width: 1200,
     },
@@ -47,7 +47,7 @@ export const mockNews: News[] = [
     type: "other",
     title: "協賛企業を募集しています",
     thumbnail: {
-      url: "/images/placeholder/p.jpeg",
+      url: "/images/placeholder/pastel-castle.webp",
       height: 630,
       width: 1200,
     },
@@ -64,7 +64,7 @@ export const mockNews: News[] = [
     type: "news",
     title: "企画エントリーの受付を開始しました",
     thumbnail: {
-      url: "/images/placeholder/p.jpeg",
+      url: "/images/placeholder/pastel-castle.webp",
       height: 630,
       width: 1200,
     },
@@ -81,7 +81,7 @@ export const mockNews: News[] = [
     type: "urgent",
     title: "ボランティアスタッフを募集中",
     thumbnail: {
-      url: "/images/placeholder/p.jpeg",
+      url: "/images/placeholder/pastel-castle.webp",
       height: 630,
       width: 1200,
     },
@@ -97,7 +97,7 @@ export const mockNews: News[] = [
     type: "news",
     title: "公式SNSアカウントを開設しました",
     thumbnail: {
-      url: "/images/placeholder/p.jpeg",
+      url: "/images/placeholder/pastel-castle.webp",
       height: 630,
       width: 1200,
     },
@@ -114,7 +114,7 @@ export const mockNews: News[] = [
     type: "other",
     title: "第97回世田谷祭のテーマが決定しました",
     thumbnail: {
-      url: "/images/placeholder/p.jpeg",
+      url: "/images/placeholder/pastel-castle.webp",
       height: 630,
       width: 1200,
     },
@@ -130,7 +130,7 @@ export const mockNews: News[] = [
     type: "news",
     title: "実行委員会の新体制が発足しました",
     thumbnail: {
-      url: "/images/placeholder/p.jpeg",
+      url: "/images/placeholder/pastel-castle.webp",
       height: 630,
       width: 1200,
     },

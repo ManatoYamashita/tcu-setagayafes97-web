@@ -110,13 +110,13 @@ export default async function NewsPage({ params }: NewsPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="min-h-screen bg-primary">
+      <div className="min-h-screen bg-secondary">
         {/* パンくずリスト */}
-        <nav className="border-b border-white/20 bg-primary py-4" aria-label="パンくずリスト">
+        <nav className="border-b border-gray-200/20 bg-secondary py-4" aria-label="パンくずリスト">
           <div className="container mx-auto px-4">
-            <ol className="flex flex-wrap items-center gap-2 text-sm text-white/80">
+            <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-900/80">
               <li>
-                <Link href="/" className="hover:text-white hover:underline">
+                <Link href="/" className="hover:text-gray-900 hover:underline">
                   トップ
                 </Link>
               </li>
@@ -137,7 +137,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
                 </svg>
               </li>
               <li>
-                <Link href="/info" className="hover:text-white hover:underline">
+                <Link href="/info" className="hover:text-gray-900 hover:underline">
                   お知らせ一覧
                 </Link>
               </li>
@@ -157,7 +157,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
                   />
                 </svg>
               </li>
-              <li className="font-semibold text-white" aria-current="page">
+              <li className="font-semibold text-gray-900" aria-current="page">
                 {news.title}
               </li>
             </ol>
@@ -177,11 +177,11 @@ export default async function NewsPage({ params }: NewsPageProps) {
                     news.type === "urgent" ? "重要" : news.type === "news" ? "お知らせ" : "その他"
                   }
                 />
-                <time className="text-sm text-white/60">{publishedDate}</time>
+                <time className="text-sm text-gray-900/60">{publishedDate}</time>
               </div>
 
               {/* タイトル */}
-              <h1 className="mb-6 text-3xl font-bold text-white md:text-4xl">{news.title}</h1>
+              <h1 className="mb-6 text-3xl font-bold text-gray-900 md:text-4xl">{news.title}</h1>
 
               {/* サムネイル */}
               {news.thumbnail && (
@@ -202,7 +202,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             <div className="prose prose-lg prose-invert max-w-none">
               {/* 説明文 */}
               {news.description && (
-                <p className="text-xl leading-relaxed text-white/90">{news.description}</p>
+                <p className="text-xl leading-relaxed text-gray-900/90">{news.description}</p>
               )}
 
               {/* HTMLコンテンツ */}

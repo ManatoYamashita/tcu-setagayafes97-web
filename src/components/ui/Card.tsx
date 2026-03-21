@@ -16,8 +16,8 @@ export function Card({ variant = "default", className, children, href }: CardPro
   const baseStyles = "rounded-2xl border bg-white/10";
 
   const variantStyles = {
-    default: "border-white/20 hover:border-white/40",
-    featured: "border-white",
+    default: "border-gray-200/20 hover:border-gray-200/40",
+    featured: "border-gray-200",
   };
 
   const combinedStyles = cn(

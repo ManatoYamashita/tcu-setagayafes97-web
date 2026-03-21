@@ -4,6 +4,8 @@ import Link from "next/link";
 import { getEventById, getEventsList } from "@/lib/events";
 import { EventDetail } from "@/components/events/EventDetail";
 import { RelatedEvents } from "@/components/events/RelatedEvents";
+import { isDataPublished } from "@/lib/publish";
+import { ComingSoon } from "@/components/ui/ComingSoon";
 
 interface EventPageProps {
   params: Promise<{ id: string }>;
@@ -69,6 +71,16 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
  * 企画詳細ページ
  */
 export default async function EventPage({ params }: EventPageProps) {
+  if (!isDataPublished) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary">
+        <div className="container mx-auto px-4 py-12">
+          <ComingSoon />
+        </div>
+      </div>
+    );
+  }
+
   const { id } = await params;
   const event = await getEventById(id);
 
@@ -117,11 +129,11 @@ export default async function EventPage({ params }: EventPageProps) {
 
       <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary">
         {/* パンくずリスト */}
-        <nav className="border-b border-white/20 bg-white/10 py-4" aria-label="パンくずリスト">
+        <nav className="border-b border-gray-200/20 bg-white/10 py-4" aria-label="パンくずリスト">
           <div className="container mx-auto px-4">
-            <ol className="flex flex-wrap items-center gap-2 text-sm text-white/80">
+            <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-900/80">
               <li>
-                <Link href="/" className="hover:text-white hover:underline">
+                <Link href="/" className="hover:text-gray-900 hover:underline">
                   トップ
                 </Link>
               </li>
@@ -142,7 +154,7 @@ export default async function EventPage({ params }: EventPageProps) {
                 </svg>
               </li>
               <li>
-                <Link href="/events" className="hover:text-white hover:underline">
+                <Link href="/events" className="hover:text-gray-900 hover:underline">
                   企画を探す
                 </Link>
               </li>
@@ -162,7 +174,7 @@ export default async function EventPage({ params }: EventPageProps) {
                   />
                 </svg>
               </li>
-              <li className="font-semibold text-white" aria-current="page">
+              <li className="font-semibold text-gray-900" aria-current="page">
                 {event.title}
               </li>
             </ol>

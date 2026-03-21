@@ -55,8 +55,8 @@ export function NewsContent({ initialNews }: NewsContentProps) {
 
       {/* 検索結果件数 */}
       <div className="mb-6">
-        <p className="text-sm text-white/80">
-          <span className="font-semibold text-white">{filteredNews.length}</span>{" "}
+        <p className="text-sm text-gray-900/80">
+          <span className="font-semibold text-gray-900">{filteredNews.length}</span>{" "}
           件のお知らせが見つかりました
         </p>
       </div>
@@ -70,7 +70,7 @@ export function NewsContent({ initialNews }: NewsContentProps) {
         </div>
       ) : (
         <div className="py-16 text-center">
-          <p className="text-white/60">該当するお知らせがありません</p>
+          <p className="text-gray-900/60">該当するお知らせがありません</p>
         </div>
       )}
     </div>
@@ -93,8 +93,8 @@ function FilterButton({ label, isActive, onClick, count }: FilterButtonProps) {
       onClick={onClick}
       className={`rounded-full border px-5 py-2 text-sm font-semibold transition-all ${
         isActive
-          ? "border-white bg-white text-primary shadow-md"
-          : "border-white/30 bg-white/10 text-white/90 hover:border-white hover:bg-white/10"
+          ? "border-gray-200 bg-white text-primary shadow-md"
+          : "border-gray-200/30 bg-white/10 text-gray-900/90 hover:border-gray-200 hover:bg-white/10"
       }`}
     >
       {label} <span className="ml-1 opacity-75">({count})</span>
@@ -119,7 +119,7 @@ function NewsCard({ news }: NewsCardProps) {
 
   return (
     <Link href={`/info/${news.id}`} className="group block h-full">
-      <article className="h-full overflow-hidden rounded-lg border border-white/20 bg-white/10 shadow-sm transition-all hover:border-white hover:shadow-lg">
+      <article className="h-full overflow-hidden rounded-lg border border-gray-200/20 bg-white/10 shadow-sm transition-all hover:border-gray-200 hover:shadow-lg">
         {/* サムネイル */}
         {news.thumbnail && (
           <div className="relative aspect-video w-full overflow-hidden">
@@ -140,15 +140,15 @@ function NewsCard({ news }: NewsCardProps) {
               variant={news.type}
               label={news.type === "urgent" ? "重要" : news.type === "news" ? "お知らせ" : "その他"}
             />
-            <time className="text-xs text-white/60">{publishedDate}</time>
+            <time className="text-xs text-gray-900/60">{publishedDate}</time>
           </div>
 
           {/* タイトル */}
-          <h3 className="mb-2 line-clamp-2 text-lg font-bold text-white">{news.title}</h3>
+          <h3 className="mb-2 line-clamp-2 text-lg font-bold text-gray-900">{news.title}</h3>
 
           {/* 説明文 */}
           {news.description && (
-            <p className="line-clamp-3 text-sm text-white/80">{news.description}</p>
+            <p className="line-clamp-3 text-sm text-gray-900/80">{news.description}</p>
           )}
         </div>
       </article>

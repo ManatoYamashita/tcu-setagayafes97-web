@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { getEventsList } from "@/lib/events";
 import { EventsContent } from "@/components/events/EventsContent";
+import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
+import { pageHeroes } from "@/data/page-heroes";
+import { isDataPublished } from "@/lib/publish";
+import { ComingSoon } from "@/components/ui/ComingSoon";
 
 /**
  * メタデータ
@@ -27,23 +31,21 @@ export const revalidate = 3600;
  * SSG + クライアントサイドフィルタリング
  */
 export default async function EventsPage() {
+  if (!isDataPublished) {
+    return (
+      <PageSheetLayout hero={pageHeroes.events}>
+        <ComingSoon />
+      </PageSheetLayout>
+    );
+  }
+
   // 全企画を取得（最大200件）
   const events = await getEventsList(200);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* ページヘッダー */}
-      <div className="bg-primary py-16 text-white">
-        <div className="container mx-auto px-4">
-          <h1 className="mb-4 text-center text-4xl font-bold md:text-5xl">企画を探す</h1>
-          <p className="text-center text-lg opacity-90">
-            第97回 世田谷祭の企画を検索・閲覧できます
-          </p>
-        </div>
-      </div>
-
+    <PageSheetLayout hero={pageHeroes.events}>
       {/* 企画一覧コンテンツ */}
       <EventsContent initialEvents={events} />
-    </div>
+    </PageSheetLayout>
   );
 }

@@ -1,25 +1,86 @@
 @import "tailwindcss";
 
 @theme {
-  /* OKLCHカラー空間での色定義 */
-  --color-primary: oklch(55% 0.18 305);
-  --color-primary-light: oklch(75% 0.18 305);
-  --color-primary-dark: oklch(40% 0.18 305);
+  /* ===== Primary Scale (デザインドキュメント準拠) ===== */
+  --color-primary-50: oklch(95% 0.035 314deg); /* #F9F0FD */
+  --color-primary-100: oklch(88% 0.07 314deg); /* #F0DAFA */
+  --color-primary-200: oklch(80% 0.11 314deg); /* #E3C0F7 */
+  --color-primary-300: oklch(74% 0.14 314deg); /* #DAA7F3 */
+  --color-primary-400: oklch(68% 0.175 314deg); /* #CD79EE - ブランドカラー */
+  --color-primary-500: oklch(57% 0.175 314deg); /* #B04FD6 */
+  --color-primary-600: oklch(47% 0.165 314deg); /* #8E3AB0 */
+  --color-primary-700: oklch(37% 0.14 314deg); /* #6B2588 */
+  --color-primary-900: oklch(18% 0.075 314deg); /* #2D0D40 */
+
+  /* ===== Secondary Brand Color (新規追加) ===== */
+  --color-secondary: oklch(79.5% 0.108 314deg); /* #E1C0EE - 背景用 */
+
+  /* ===== Neutral Scale ===== */
+  --color-gray-50: oklch(97% 0 0deg); /* #F7F7F7 */
+  --color-gray-100: oklch(93% 0 0deg); /* #EDEDED */
+  --color-gray-200: oklch(86% 0 0deg); /* #DBDBDB */
+  --color-gray-400: oklch(65% 0 0deg); /* #A3A3A3 */
+  --color-gray-600: oklch(45% 0 0deg); /* #737373 */
+  --color-gray-700: oklch(35% 0 0deg); /* #525252 */
+  --color-gray-900: oklch(13% 0 0deg); /* #212121 */
+
+  /* ===== Semantic Colors ===== */
+  --color-bg: var(--color-secondary); /* ページ背景: 淡い紫 */
+  --color-text: var(--color-gray-900); /* デフォルトテキスト: 黒寄り */
+  --color-text-muted: var(--color-gray-600); /* サブテキスト */
+  --color-border: var(--color-gray-200); /* 区切り線 */
+  --color-accent: var(--color-primary-400); /* CTA・強調 */
+
+  /* ===== Alias（後方互換性のため残す） ===== */
+  --color-primary: var(--color-primary-400);
+  --color-primary-light: var(--color-primary-300);
+  --color-primary-dark: var(--color-primary-600);
+
+  /* フォント設定 */
   --font-sans: var(--font-noto-sans-jp), sans-serif;
+  --font-serif: var(--font-kaisei-opti), serif;
+  --font-heading: var(--font-kaisei-opti), serif;
 }
 
 :root {
   /* レイアウト定数 */
-  --header-height: 5rem; /* 80px (py-5 × 2 + 内容物高さ約32px) */
+  --header-height: 5.5rem; /* pt-2 + py-3×2 + ロゴ高さ約56px (ピル型ヘッダー) */
 }
 
 body {
-  color: white;
-  background-color: var(--color-primary);
+  color: var(--color-text); /* #212121 */
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    160deg,
+    oklch(79.5% 0.108 314deg),
+    oklch(83% 0.07 345deg) 35%,
+    oklch(81% 0.08 330deg) 60%,
+    oklch(85% 0.06 355deg) 85%,
+    oklch(80% 0.09 320deg)
+  );
+}
+
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-kaisei-opti), serif;
+  }
 }
 
 @utility text-balance {
   text-wrap: balance;
+}
+
+@utility font-display-mincho {
+  font-family:
+    var(--font-shippori-mincho, "Shippori Mincho"), "Hiragino Mincho ProN", "Yu Mincho", serif;
 }
 
 @layer utilities {
@@ -39,5 +100,114 @@ body {
   /* Container Queries用のユーティリティ */
   .container-inline {
     container-type: inline-size;
+  }
+
+  /* CircularText 回転アニメーション */
+  .animate-spin-slow {
+    animation: spin-slow 20s linear infinite;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
+/* Dialog モーダルアニメーション */
+@keyframes dialog-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dialog-modal[open] {
+  animation: dialog-fade-in 0.2s ease-out;
+}
+
+.dialog-modal[open]::backdrop {
+  animation: dialog-backdrop-fade 0.2s ease-out;
+}
+
+@keyframes dialog-backdrop-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===== Dreamy Fade — Page Transition ===== */
+
+/* View Transitions API (対応ブラウザ) */
+::view-transition-old(root) {
+  animation: dreamy-fade-out 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+::view-transition-new(root) {
+  animation: dreamy-fade-in 0.5s cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+
+@keyframes dreamy-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(4px);
+  }
+}
+@keyframes dreamy-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* フォールバック (VT非対応ブラウザ) */
+@supports not (view-transition-name: a) {
+  .page-transition-wrapper {
+    animation: dreamy-fallback-in 0.55s cubic-bezier(0, 0, 0.2, 1) both;
+  }
+}
+
+@keyframes dreamy-fallback-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* アクセシビリティ: モーション軽減設定 */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+  .page-transition-wrapper {
+    animation: none !important;
   }
 }

@@ -16,7 +16,7 @@ export function EventOverview() {
   const year = new Date(siteConfig.dates.day1).getFullYear();
 
   return (
-    <section className="bg-primary py-32">
+    <section className="bg-secondary py-32">
       <div className="container mx-auto px-4">
         <h2 className="mb-16 text-center text-5xl font-bold md:text-6xl">開催概要</h2>
 
@@ -24,35 +24,35 @@ export function EventOverview() {
           <div className="grid grid-cols-1 divide-y md:grid-cols-3 md:divide-x md:divide-y-0 divide-white/20">
             {/* 開催日時 */}
             <div className="py-8 md:py-0 md:px-10 text-center">
-              <p className="mb-3 text-xs uppercase tracking-widest text-white/50">Date</p>
-              <p className="text-lg font-semibold text-white">{year}年</p>
-              <p className="text-lg font-semibold text-white">
+              <p className="mb-3 text-xs uppercase tracking-widest text-gray-900/50">Date</p>
+              <p className="text-lg font-semibold text-gray-900">{year}年</p>
+              <p className="text-lg font-semibold text-gray-900">
                 {day1Formatted} (
                 {new Date(siteConfig.dates.day1).toLocaleDateString("ja-JP", { weekday: "short" })})
               </p>
-              <p className="text-lg font-semibold text-white">
+              <p className="text-lg font-semibold text-gray-900">
                 {day2Formatted} (
                 {new Date(siteConfig.dates.day2).toLocaleDateString("ja-JP", { weekday: "short" })})
               </p>
-              <p className="mt-2 text-sm text-white/60">
+              <p className="mt-2 text-sm text-gray-900/60">
                 {siteConfig.openTime} – {siteConfig.closeTime}
               </p>
             </div>
 
             {/* 会場 */}
             <div className="py-8 md:py-0 md:px-10 text-center">
-              <p className="mb-3 text-xs uppercase tracking-widest text-white/50">Venue</p>
-              <p className="text-lg font-semibold text-white">{siteConfig.venue}</p>
-              <p className="mt-2 text-sm text-white/60">{siteConfig.address}</p>
+              <p className="mb-3 text-xs uppercase tracking-widest text-gray-900/50">Venue</p>
+              <p className="text-lg font-semibold text-gray-900">{siteConfig.venue}</p>
+              <p className="mt-2 text-sm text-gray-900/60">{siteConfig.address}</p>
             </div>
 
             {/* 来場予定者数 */}
             <div className="py-8 md:py-0 md:px-10 text-center">
-              <p className="mb-3 text-xs uppercase tracking-widest text-white/50">Visitors</p>
-              <p className="text-lg font-semibold text-white">
+              <p className="mb-3 text-xs uppercase tracking-widest text-gray-900/50">Visitors</p>
+              <p className="text-lg font-semibold text-gray-900">
                 {siteConfig.expectedVisitors.toLocaleString()} 名
               </p>
-              <p className="mt-2 text-sm text-white/60">入場無料・事前予約不要 / 雨天決行</p>
+              <p className="mt-2 text-sm text-gray-900/60">入場無料・事前予約不要 / 雨天決行</p>
             </div>
           </div>
         </div>

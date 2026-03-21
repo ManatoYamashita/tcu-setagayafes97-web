@@ -5,7 +5,7 @@ export default function EventDetailLoading() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary">
       {/* パンくずリストスケルトン */}
-      <nav className="border-b border-white/20 bg-white/10 py-4">
+      <nav className="border-b border-gray-200/20 bg-white/10 py-4">
         <div className="container mx-auto px-4">
           <div className="h-5 w-64 animate-pulse rounded bg-white/15" />
         </div>
@@ -28,14 +28,14 @@ export default function EventDetailLoading() {
           </div>
 
           {/* メタ情報スケルトン */}
-          <div className="space-y-3 rounded-lg border border-white/20 bg-white/10 p-6">
+          <div className="space-y-3 rounded-lg border border-gray-200/20 bg-white/10 p-6">
             <div className="h-6 w-32 animate-pulse rounded bg-white/15" />
             <div className="h-5 w-full animate-pulse rounded bg-white/15" />
             <div className="h-5 w-3/4 animate-pulse rounded bg-white/15" />
           </div>
 
           {/* 詳細スケルトン */}
-          <div className="space-y-3 rounded-lg border border-white/20 bg-white/10 p-6">
+          <div className="space-y-3 rounded-lg border border-gray-200/20 bg-white/10 p-6">
             <div className="h-6 w-32 animate-pulse rounded bg-white/15" />
             <div className="h-4 w-full animate-pulse rounded bg-white/15" />
             <div className="h-4 w-full animate-pulse rounded bg-white/15" />

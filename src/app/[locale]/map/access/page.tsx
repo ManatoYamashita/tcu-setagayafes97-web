@@ -57,7 +57,7 @@ export default async function AccessPage({ params }: { params: Promise<{ locale:
       </div>
 
       {/* ページヘッダー */}
-      <div className="bg-primary py-16 text-white">
+      <div className="bg-secondary py-16 text-gray-900">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center gap-3">
             <MapPin className="h-10 w-10 md:h-12 md:w-12" />
@@ -70,7 +70,7 @@ export default async function AccessPage({ params }: { params: Promise<{ locale:
       <div className="container mx-auto px-4 py-12">
         <div className="mx-auto max-w-5xl space-y-8">
           {/* Google Maps埋め込み */}
-          <section className="overflow-hidden rounded-lg border border-white/20 bg-white/10 shadow-sm">
+          <section className="overflow-hidden rounded-lg border border-gray-200/20 bg-white/10 shadow-sm">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3244.0968953087473!2d139.63361431525804!3d35.60891598021282!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6018f4e3b3b3b3b3%3A0x3b3b3b3b3b3b3b3b!2z5p2x5Lqs6YO95biC5aSn5a2mIOS4lueUsOiwt-OCrOODqeOCueOCreODo-ODs-ODkeOCuQ!5e0!3m2!1sja!2sjp!4v1234567890123!5m2!1sja!2sjp"
               width="100%"
@@ -84,21 +84,21 @@ export default async function AccessPage({ params }: { params: Promise<{ locale:
           </section>
 
           {/* 住所 */}
-          <section className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm md:p-8">
+          <section className="rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm md:p-8">
             <div className="mb-4 flex items-center gap-3">
               <MapPin className="h-6 w-6 text-primary-light" />
-              <h2 className="text-2xl font-bold text-white">{t("sections.address")}</h2>
+              <h2 className="text-2xl font-bold text-gray-900">{t("sections.address")}</h2>
             </div>
-            <p className="text-lg text-white/90">{accessConfig.address}</p>
-            <p className="mt-2 text-sm text-white/80">TEL: {accessConfig.phone}</p>
+            <p className="text-lg text-gray-900/90">{accessConfig.address}</p>
+            <p className="mt-2 text-sm text-gray-900/80">TEL: {accessConfig.phone}</p>
           </section>
 
           {/* 電車アクセス */}
           {trainInfo && (
-            <section className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm md:p-8">
+            <section className="rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm md:p-8">
               <div className="mb-6 flex items-center gap-3">
                 <Train className="h-6 w-6 text-blue-400" />
-                <h2 className="text-2xl font-bold text-white">{t("sections.byTrain")}</h2>
+                <h2 className="text-2xl font-bold text-gray-900">{t("sections.byTrain")}</h2>
               </div>
               <div className="space-y-6">
                 {trainInfo.routes.map((route, index) => (
@@ -109,7 +109,7 @@ export default async function AccessPage({ params }: { params: Promise<{ locale:
                     <div className="mb-3 flex items-center justify-between">
                       <div>
                         <p className="text-sm font-semibold text-blue-400">{route.line}</p>
-                        <p className="text-xl font-bold text-white">{route.station}</p>
+                        <p className="text-xl font-bold text-gray-900">{route.station}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-2xl font-bold text-blue-400">
@@ -117,20 +117,20 @@ export default async function AccessPage({ params }: { params: Promise<{ locale:
                         </p>
                       </div>
                     </div>
-                    <p className="text-sm text-white/90">{route.description}</p>
+                    <p className="text-sm text-gray-900/90">{route.description}</p>
                   </div>
                 ))}
               </div>
-              <p className="mt-4 text-sm text-white/80">※ {t("notes.trainNote")}</p>
+              <p className="mt-4 text-sm text-gray-900/80">※ {t("notes.trainNote")}</p>
             </section>
           )}
 
           {/* バスアクセス */}
           {busInfo && (
-            <section className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm md:p-8">
+            <section className="rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm md:p-8">
               <div className="mb-6 flex items-center gap-3">
                 <Bus className="h-6 w-6 text-green-400" />
-                <h2 className="text-2xl font-bold text-white">{t("sections.byBus")}</h2>
+                <h2 className="text-2xl font-bold text-gray-900">{t("sections.byBus")}</h2>
               </div>
               <div className="space-y-6">
                 {busInfo.routes.map((route, index) => (
@@ -141,7 +141,7 @@ export default async function AccessPage({ params }: { params: Promise<{ locale:
                     <div className="mb-3 flex items-center justify-between">
                       <div>
                         <p className="text-sm font-semibold text-green-400">{route.line}</p>
-                        <p className="text-xl font-bold text-white">
+                        <p className="text-xl font-bold text-gray-900">
                           {route.from} → {route.stop}
                         </p>
                       </div>
@@ -151,7 +151,7 @@ export default async function AccessPage({ params }: { params: Promise<{ locale:
                         </p>
                       </div>
                     </div>
-                    <p className="text-sm text-white/90">{route.description}</p>
+                    <p className="text-sm text-gray-900/90">{route.description}</p>
                   </div>
                 ))}
               </div>
@@ -161,14 +161,14 @@ export default async function AccessPage({ params }: { params: Promise<{ locale:
           {/* 駐車場・駐輪場情報 */}
           <div className="grid gap-6 md:grid-cols-2">
             {/* 駐車場 */}
-            <section className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm">
+            <section className="rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm">
               <div className="mb-4 flex items-center gap-3">
                 <Car className="h-6 w-6 text-red-400" />
-                <h2 className="text-xl font-bold text-white">{t("sections.parking")}</h2>
+                <h2 className="text-xl font-bold text-gray-900">{t("sections.parking")}</h2>
               </div>
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm font-semibold text-white/60">{t("labels.available")}</p>
+                  <p className="text-sm font-semibold text-gray-900/60">{t("labels.available")}</p>
                   <p className="text-lg font-bold text-red-400">
                     {accessConfig.car.parkingAvailable
                       ? t("labels.available")
@@ -182,14 +182,14 @@ export default async function AccessPage({ params }: { params: Promise<{ locale:
             </section>
 
             {/* 駐輪場 */}
-            <section className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm">
+            <section className="rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm">
               <div className="mb-4 flex items-center gap-3">
                 <Bike className="h-6 w-6 text-purple-300" />
-                <h2 className="text-xl font-bold text-white">{t("sections.bicycle")}</h2>
+                <h2 className="text-xl font-bold text-gray-900">{t("sections.bicycle")}</h2>
               </div>
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm font-semibold text-white/60">{t("labels.available")}</p>
+                  <p className="text-sm font-semibold text-gray-900/60">{t("labels.available")}</p>
                   <p className="text-lg font-bold text-purple-300">
                     {accessConfig.bicycle.parkingAvailable
                       ? t("labels.available")
@@ -200,19 +200,19 @@ export default async function AccessPage({ params }: { params: Promise<{ locale:
                   <>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <p className="text-sm font-semibold text-white/60">
+                        <p className="text-sm font-semibold text-gray-900/60">
                           {t("labels.capacity")}
                         </p>
-                        <p className="font-bold text-white">
+                        <p className="font-bold text-gray-900">
                           {t("labels.about")} {accessConfig.bicycle.capacity}
                           {t("labels.units")}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-white/60">
+                        <p className="text-sm font-semibold text-gray-900/60">
                           {t("labels.location")}
                         </p>
-                        <p className="font-bold text-white">{accessConfig.bicycle.location}</p>
+                        <p className="font-bold text-gray-900">{accessConfig.bicycle.location}</p>
                       </div>
                     </div>
                     <div className="rounded-lg bg-purple-500/10 p-4">
@@ -225,19 +225,19 @@ export default async function AccessPage({ params }: { params: Promise<{ locale:
           </div>
 
           {/* 補足情報 */}
-          <section className="rounded-lg border border-white/20 bg-white/10 p-6 shadow-sm md:p-8">
-            <h2 className="mb-4 text-xl font-bold text-white">{t("sections.notes")}</h2>
-            <ul className="space-y-2 text-sm text-white/90">
+          <section className="rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm md:p-8">
+            <h2 className="mb-4 text-xl font-bold text-gray-900">{t("sections.notes")}</h2>
+            <ul className="space-y-2 text-sm text-gray-900/90">
               <li className="flex items-start gap-2">
-                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary"></span>
+                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-secondary"></span>
                 <span>{t("notes.crowded")}</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary"></span>
+                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-secondary"></span>
                 <span>{t("notes.signs")}</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary"></span>
+                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-secondary"></span>
                 <span>{t("notes.inquiry")}</span>
               </li>
             </ul>

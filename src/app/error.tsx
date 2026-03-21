@@ -16,7 +16,7 @@ export default function Error({
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-24">
       <h2 className="mb-4 text-2xl font-bold">エラーが発生しました</h2>
-      <p className="mb-8 text-white/80">申し訳ございません。問題が発生しました。</p>
+      <p className="mb-8 text-gray-900/80">申し訳ございません。問題が発生しました。</p>
       <button
         onClick={() => reset()}
         className="rounded-md bg-white px-4 py-2 text-primary hover:opacity-80"

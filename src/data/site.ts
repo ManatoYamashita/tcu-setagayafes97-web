@@ -42,7 +42,7 @@ export const siteConfig = {
   metadata: {
     siteName: "東京都市大学 第97回 世田谷祭",
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://setagayafes.tcu.ac.jp",
-    ogImage: "/images/og-image.png",
+    ogImage: "/ogp.png",
   },
 
   // 想定来場者数

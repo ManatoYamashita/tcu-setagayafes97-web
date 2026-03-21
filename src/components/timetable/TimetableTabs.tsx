@@ -40,14 +40,14 @@ export function TimetableTabs({
     <div className="space-y-6">
       {/* 日程タブ */}
       <div>
-        <h2 className="mb-3 text-sm font-semibold text-white/90">日程</h2>
+        <h2 className="mb-3 text-sm font-semibold text-gray-900/90">日程</h2>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => handleDateChange("day1")}
             className={`rounded-lg px-6 py-3 font-medium transition-all ${
               selectedDate === "day1"
                 ? "bg-white text-primary"
-                : "bg-white/10 text-white/90 hover:bg-white/10 border border-white/20"
+                : "bg-white/10 text-gray-900/90 hover:bg-white/10 border border-gray-200/20"
             }`}
           >
             Day 1（10/31）
@@ -57,7 +57,7 @@ export function TimetableTabs({
             className={`rounded-lg px-6 py-3 font-medium transition-all ${
               selectedDate === "day2"
                 ? "bg-white text-primary"
-                : "bg-white/10 text-white/90 hover:bg-white/10 border border-white/20"
+                : "bg-white/10 text-gray-900/90 hover:bg-white/10 border border-gray-200/20"
             }`}
           >
             Day 2（11/1）
@@ -67,14 +67,14 @@ export function TimetableTabs({
 
       {/* ステージタブ */}
       <div>
-        <h2 className="mb-3 text-sm font-semibold text-white/90">ステージ</h2>
+        <h2 className="mb-3 text-sm font-semibold text-gray-900/90">ステージ</h2>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => handleStageChange("all")}
             className={`rounded-lg px-6 py-3 font-medium transition-all ${
               selectedStage === "all"
                 ? "bg-white text-primary"
-                : "bg-white/10 text-white/90 hover:bg-white/10 border border-white/20"
+                : "bg-white/10 text-gray-900/90 hover:bg-white/10 border border-gray-200/20"
             }`}
           >
             すべて
@@ -88,7 +88,7 @@ export function TimetableTabs({
                 className={`rounded-lg px-6 py-3 font-medium transition-all ${
                   selectedStage === stage.id
                     ? "bg-white text-primary"
-                    : "bg-white/10 text-white/90 hover:bg-white/10 border border-white/20"
+                    : "bg-white/10 text-gray-900/90 hover:bg-white/10 border border-gray-200/20"
                 }`}
               >
                 {getStageName(stage.id)}

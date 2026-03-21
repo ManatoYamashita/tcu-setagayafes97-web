@@ -1,16 +1,21 @@
 import Link from "next/link";
 import { siteConfig } from "@/data/site";
-import { navigationConfig } from "@/data/navigation";
+import { getFilteredFooterNav } from "@/data/navigation";
 import { SocialIcons } from "@/components/ui/SocialIcons";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-white/20 bg-primary-dark">
+    <footer className="border-t border-white/20 bg-primary-600">
       <div className="container mx-auto px-4 py-8">
+        {/* ロゴ: 左上 */}
+        <div className="mb-6">
+          <img src="/logo-white.webp" alt={siteConfig.shortName} className="w-48" />
+        </div>
+
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
-          {navigationConfig.footer.map((section) => (
+          {getFilteredFooterNav().map((section) => (
             <div key={section.title}>
               <h3 className="mb-4 font-bold text-white">{section.title}</h3>
               <ul className="space-y-2">
@@ -38,7 +43,8 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-white/20 pt-8 text-center text-white/60">
+        <div className="mt-8 border-t border-white/20 pt-8 flex flex-col items-center text-white/60">
+          <img src="/logo-white.webp" alt={siteConfig.shortName} className="mb-3 w-12" />
           <p className="mb-2">{siteConfig.name}</p>
           <p className="text-sm">
             © {currentYear} 東京都市大学 世田谷祭実行委員会. All rights reserved.

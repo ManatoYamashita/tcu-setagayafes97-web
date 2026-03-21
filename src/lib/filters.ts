@@ -41,7 +41,9 @@ export function filterEvents(events: Event[], filters: FilterParams): Event[] {
       (e) =>
         e.title.toLowerCase().includes(keyword) ||
         e.organizer.toLowerCase().includes(keyword) ||
-        e.description.toLowerCase().includes(keyword)
+        e.description.toLowerCase().includes(keyword) ||
+        e.place.toLowerCase().includes(keyword) ||
+        e.building.toLowerCase().includes(keyword)
     );
   }
 

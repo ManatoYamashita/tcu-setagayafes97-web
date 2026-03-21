@@ -14,8 +14,8 @@ export function SNSLinks({ sns }: SNSLinksProps) {
   }
 
   return (
-    <div className="rounded-lg border border-white/20 bg-white/10 p-6">
-      <h3 className="mb-4 text-lg font-bold text-white">SNS・関連リンク</h3>
+    <div className="rounded-lg border border-gray-200/20 bg-white/10 p-6">
+      <h3 className="mb-4 text-lg font-bold text-gray-900">SNS・関連リンク</h3>
       <div className="flex flex-wrap gap-3">
         {/* Twitter */}
         {sns.twitter && (
@@ -23,7 +23,7 @@ export function SNSLinks({ sns }: SNSLinksProps) {
             href={sns.twitter}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-all hover:border-[#1DA1F2] hover:bg-[#1DA1F2] hover:text-white"
+            className="flex items-center gap-2 rounded-lg border border-gray-200/30 bg-white/10 px-4 py-2 text-sm font-medium text-gray-900 transition-all hover:border-[#1DA1F2] hover:bg-[#1DA1F2] hover:text-gray-900"
             aria-label="Twitterで開く"
           >
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -39,7 +39,7 @@ export function SNSLinks({ sns }: SNSLinksProps) {
             href={sns.instagram}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-all hover:border-[#E4405F] hover:bg-[#E4405F] hover:text-white"
+            className="flex items-center gap-2 rounded-lg border border-gray-200/30 bg-white/10 px-4 py-2 text-sm font-medium text-gray-900 transition-all hover:border-[#E4405F] hover:bg-[#E4405F] hover:text-gray-900"
             aria-label="Instagramで開く"
           >
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -59,7 +59,7 @@ export function SNSLinks({ sns }: SNSLinksProps) {
             href={sns.website}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white transition-all hover:border-primary-light hover:bg-primary-light"
+            className="flex items-center gap-2 rounded-lg border border-gray-200/30 bg-white/10 px-4 py-2 text-sm font-medium text-gray-900 transition-all hover:border-primary-light hover:bg-primary-200"
             aria-label="公式サイトを開く"
           >
             <svg

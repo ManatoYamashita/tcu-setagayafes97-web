@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { getNewsList } from "@/lib/news";
 import { NewsContent } from "./NewsContent";
+import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
+import { pageHeroes } from "@/data/page-heroes";
 
 /**
  * メタデータ
@@ -31,19 +33,9 @@ export default async function InfoPage() {
   const newsList = await getNewsList(100);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* ページヘッダー */}
-      <div className="bg-primary py-16 text-white">
-        <div className="container mx-auto px-4">
-          <h1 className="mb-4 text-center text-4xl font-bold md:text-5xl">お知らせ</h1>
-          <p className="text-center text-lg opacity-90">
-            第97回 世田谷祭に関する最新情報をお届けします
-          </p>
-        </div>
-      </div>
-
+    <PageSheetLayout hero={pageHeroes.info}>
       {/* お知らせ一覧コンテンツ */}
       <NewsContent initialNews={newsList} />
-    </div>
+    </PageSheetLayout>
   );
 }

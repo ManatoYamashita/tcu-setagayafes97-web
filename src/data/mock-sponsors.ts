@@ -12,10 +12,9 @@ export const mockSponsors: Information[] = [
     publishedAt: "2026-08-01T10:00:00.000Z",
     category: "sponsor",
     title: "株式会社テクノロジーソリューションズ",
-    sponsorName: "株式会社テクノロジーソリューションズ",
-    sponsorDescription: "最先端のITソリューションを提供する企業です。学生の成長を応援しています。",
-    logo: {
-      url: "/images/placeholder/p.jpeg",
+    description: "最先端のITソリューションを提供する企業です。学生の成長を応援しています。",
+    image: {
+      url: "/logo.webp",
       height: 400,
       width: 800,
     },
@@ -29,10 +28,9 @@ export const mockSponsors: Information[] = [
     publishedAt: "2026-08-01T10:00:00.000Z",
     category: "sponsor",
     title: "グローバルエンジニアリング株式会社",
-    sponsorName: "グローバルエンジニアリング株式会社",
-    sponsorDescription: "世界を舞台に活躍するエンジニアリング企業。未来の技術者を育成します。",
-    logo: {
-      url: "/images/placeholder/p.jpeg",
+    description: "世界を舞台に活躍するエンジニアリング企業。未来の技術者を育成します。",
+    image: {
+      url: "/logo.webp",
       height: 400,
       width: 800,
     },
@@ -46,10 +44,9 @@ export const mockSponsors: Information[] = [
     publishedAt: "2026-08-01T10:00:00.000Z",
     category: "sponsor",
     title: "世田谷商工会議所",
-    sponsorName: "世田谷商工会議所",
-    sponsorDescription: "地域経済の発展と学生支援を目指して活動しています。",
-    logo: {
-      url: "/images/placeholder/p.jpeg",
+    description: "地域経済の発展と学生支援を目指して活動しています。",
+    image: {
+      url: "/logo.webp",
       height: 400,
       width: 800,
     },
@@ -63,10 +60,9 @@ export const mockSponsors: Information[] = [
     publishedAt: "2026-08-01T10:00:00.000Z",
     category: "sponsor",
     title: "株式会社アカデミックサポート",
-    sponsorName: "株式会社アカデミックサポート",
-    sponsorDescription: "教育支援事業を通じて、次世代の人材育成に貢献します。",
-    logo: {
-      url: "/images/placeholder/p.jpeg",
+    description: "教育支援事業を通じて、次世代の人材育成に貢献します。",
+    image: {
+      url: "/logo.webp",
       height: 400,
       width: 800,
     },
@@ -80,10 +76,9 @@ export const mockSponsors: Information[] = [
     publishedAt: "2026-08-01T10:00:00.000Z",
     category: "sponsor",
     title: "ユニバーサルデザイン株式会社",
-    sponsorName: "ユニバーサルデザイン株式会社",
-    sponsorDescription: "誰もが使いやすいデザインを追求する企業です。",
-    logo: {
-      url: "/images/placeholder/p.jpeg",
+    description: "誰もが使いやすいデザインを追求する企業です。",
+    image: {
+      url: "/logo.webp",
       height: 400,
       width: 800,
     },
@@ -97,10 +92,9 @@ export const mockSponsors: Information[] = [
     publishedAt: "2026-08-01T10:00:00.000Z",
     category: "sponsor",
     title: "株式会社フューチャーイノベーション",
-    sponsorName: "株式会社フューチャーイノベーション",
-    sponsorDescription: "革新的な技術で未来を切り開くスタートアップ企業です。",
-    logo: {
-      url: "/images/placeholder/p.jpeg",
+    description: "革新的な技術で未来を切り開くスタートアップ企業です。",
+    image: {
+      url: "/logo.webp",
       height: 400,
       width: 800,
     },
