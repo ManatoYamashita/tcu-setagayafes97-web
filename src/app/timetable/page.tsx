@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { getEventsList } from "@/lib/events";
 import { filterStageEvents } from "@/lib/timetable";
 import { TimetableContent } from "@/components/timetable/TimetableContent";
+import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
+import { pageHeroes } from "@/data/page-heroes";
+import { isDataPublished } from "@/lib/publish";
 
 /**
  * メタデータ
@@ -28,6 +32,8 @@ export const revalidate = 3600;
  * SSG + クライアントサイドフィルタリング
  */
 export default async function TimetablePage() {
+  if (!isDataPublished) notFound();
+
   // 全企画を取得（最大200件）
   const allEvents = await getEventsList(200);
 
@@ -35,19 +41,9 @@ export default async function TimetablePage() {
   const stageEvents = filterStageEvents(allEvents);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* ページヘッダー */}
-      <div className="bg-secondary py-16 text-gray-900">
-        <div className="container mx-auto px-4">
-          <h1 className="mb-4 text-center text-4xl font-bold md:text-5xl">タイムテーブル</h1>
-          <p className="text-center text-lg opacity-90">
-            第97回 世田谷祭のステージ企画スケジュール
-          </p>
-        </div>
-      </div>
-
+    <PageSheetLayout hero={pageHeroes.timetable}>
       {/* タイムテーブルコンテンツ */}
       <TimetableContent initialEvents={stageEvents} />
-    </div>
+    </PageSheetLayout>
   );
 }

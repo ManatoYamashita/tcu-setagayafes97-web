@@ -146,11 +146,9 @@ interface Information {
   updatedAt: string;
   category: "sponsor" | "faq" | "other"; // カテゴリ分類（今後拡張される可能性あり）
   title: string;
-  // Sponsor用フィールド
-  spnonsorName: string; // 企業名（協賛企業用）
-  sponsorDescription?: string; // 企業説明（協賛企業用）
-  logo?: MicroCMSImage;
-  url?: string; // 企業サイトURL（任意）
+  description?: string; // 概要（汎用テキストフィールド）
+  image?: MicroCMSImage; // 画像
+  url?: string; // URL（任意）
   priority?: number; // 表示順（任意）
 }
 ```

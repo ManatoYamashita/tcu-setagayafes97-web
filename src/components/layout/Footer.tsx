@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { siteConfig } from "@/data/site";
-import { navigationConfig } from "@/data/navigation";
+import { getFilteredFooterNav } from "@/data/navigation";
 import { SocialIcons } from "@/components/ui/SocialIcons";
 
 export function Footer() {
@@ -15,7 +15,7 @@ export function Footer() {
         </div>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
-          {navigationConfig.footer.map((section) => (
+          {getFilteredFooterNav().map((section) => (
             <div key={section.title}>
               <h3 className="mb-4 font-bold text-white">{section.title}</h3>
               <ul className="space-y-2">

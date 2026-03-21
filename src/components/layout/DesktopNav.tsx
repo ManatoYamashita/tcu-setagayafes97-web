@@ -1,19 +1,21 @@
 import Link from "next/link";
-import { navigationConfig } from "@/data/navigation";
+import { getFilteredHeaderNav } from "@/data/navigation";
 import { NavDropdown } from "@/components/layout/NavDropdown";
 
 /**
  * デスクトップ用ナビゲーションコンポーネント
  *
- * navigationConfig.header からナビゲーションを生成
+ * getFilteredHeaderNav() でデータ公開状態に応じたナビゲーションを生成
  * - children がない項目: 通常リンク
  * - children がある項目: NavDropdown を使用
  */
 export function DesktopNav() {
+  const headerItems = getFilteredHeaderNav();
+
   return (
     <nav className="hidden lg:block">
       <ul className="flex gap-8">
-        {navigationConfig.header.map((item) => (
+        {headerItems.map((item) => (
           <li key={item.href}>
             {"children" in item && item.children ? (
               <NavDropdown item={item} />

@@ -55,10 +55,11 @@ export function Gear() {
       {/* 歯車本体 */}
       <mesh geometry={gearGeometry}>
         <meshPhysicalMaterial
-          color="#F5B8E8"
-          roughness={0.65}
+          color="#FFA8CC"
+          roughness={0.75}
           metalness={0}
-          clearcoat={0}
+          clearcoat={0.05}
+          clearcoatRoughness={0.8}
           sheen={0}
         />
       </mesh>
@@ -69,10 +70,11 @@ export function Gear() {
         position={[0, 0, GEAR_DEFAULTS.depth / 2]}
       >
         <meshPhysicalMaterial
-          color="#F5B8E8"
-          roughness={0.65}
+          color="#FFA8CC"
+          roughness={0.75}
           metalness={0}
-          clearcoat={0}
+          clearcoat={0.05}
+          clearcoatRoughness={0.8}
           sheen={0}
         />
       </mesh>

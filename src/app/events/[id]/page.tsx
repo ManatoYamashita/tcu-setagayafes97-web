@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getEventById, getEventsList } from "@/lib/events";
 import { EventDetail } from "@/components/events/EventDetail";
 import { RelatedEvents } from "@/components/events/RelatedEvents";
+import { isDataPublished } from "@/lib/publish";
 
 interface EventPageProps {
   params: Promise<{ id: string }>;
@@ -69,6 +70,8 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
  * 企画詳細ページ
  */
 export default async function EventPage({ params }: EventPageProps) {
+  if (!isDataPublished) notFound();
+
   const { id } = await params;
   const event = await getEventById(id);
 

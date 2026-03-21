@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Heart, ExternalLink } from "lucide-react";
 import { getSponsorsList } from "@/lib/informations";
 import type { Information } from "@/types/informations";
+import { isDataPublished } from "@/lib/publish";
 
 /**
  * メタデータ
@@ -29,6 +31,8 @@ export const revalidate = 3600;
  * 協賛企業一覧ページ
  */
 export default async function SponsorsPage() {
+  if (!isDataPublished) notFound();
+
   // 協賛企業一覧を取得
   const sponsors = await getSponsorsList();
 
@@ -96,11 +100,11 @@ function SponsorCard({ sponsor }: SponsorCardProps) {
   const CardContent = (
     <div className="group h-full overflow-hidden rounded-lg border border-gray-200/20 bg-white/10 shadow-sm transition-all hover:border-gray-200 hover:shadow-lg">
       {/* ロゴ */}
-      {sponsor.logo ? (
+      {sponsor.image ? (
         <div className="relative aspect-video w-full overflow-hidden bg-white/10">
           <Image
-            src={sponsor.logo.url}
-            alt={sponsor.sponsorName || sponsor.title}
+            src={sponsor.image.url}
+            alt={sponsor.title}
             fill
             className="object-contain p-6 transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
@@ -114,13 +118,11 @@ function SponsorCard({ sponsor }: SponsorCardProps) {
 
       <div className="p-6">
         {/* 企業名 */}
-        <h3 className="mb-2 text-lg font-bold text-gray-900">
-          {sponsor.sponsorName || sponsor.title}
-        </h3>
+        <h3 className="mb-2 text-lg font-bold text-gray-900">{sponsor.title}</h3>
 
         {/* 説明文 */}
-        {sponsor.sponsorDescription && (
-          <p className="mb-4 line-clamp-3 text-sm text-gray-900/80">{sponsor.sponsorDescription}</p>
+        {sponsor.description && (
+          <p className="mb-4 line-clamp-3 text-sm text-gray-900/80">{sponsor.description}</p>
         )}
 
         {/* Webサイトリンク */}

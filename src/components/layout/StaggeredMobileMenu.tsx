@@ -4,7 +4,7 @@ import React, { useCallback, useLayoutEffect, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { X } from "lucide-react";
-import { navigationConfig } from "@/data/navigation";
+import { getFilteredHeaderNav } from "@/data/navigation";
 import { siteConfig } from "@/data/site";
 
 /**
@@ -26,7 +26,7 @@ interface SocialItem {
   link: string;
 }
 
-const menuItems: MenuItem[] = navigationConfig.header.map((item) => ({
+const menuItems: MenuItem[] = getFilteredHeaderNav().map((item) => ({
   label: item.label,
   ariaLabel: `${item.label}ページへ`,
   link: item.href,

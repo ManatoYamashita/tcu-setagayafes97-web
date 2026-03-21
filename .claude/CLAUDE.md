@@ -165,7 +165,7 @@ refactor/<refactor-target> # リファクタリング
 
 - **News API**: `type` (urgent/news/other), `title`, `thumbnail`, `description`, `content`
 - **Events API**: `date` (day1/day2/both/other), `type` (room/stage/special/other), `place`, `building`, `title`, `organizer`, `thumbnail`, `description`, `content`, `startTime`, `endTime`, `sns`
-- **Informations API**: `category` (sponsor/faq/other), `title`, `sponsorName`, `sponsorDescription`, `logo`, `url`, `priority`
+- **Informations API**: `category` (sponsor/faq/other), `title`, `description`, `image`, `url`, `priority`
 
 ### パフォーマンス最適化
 

@@ -111,11 +111,11 @@ export default async function APITestPage() {
             <div key={sponsor.id} className="rounded-lg border p-4">
               <div className="mb-3">
                 <div className="flex h-32 items-center justify-center rounded bg-white/10">
-                  <span className="text-sm text-gray-900/50">LOGO: {sponsor.logo?.url}</span>
+                  <span className="text-sm text-gray-900/50">IMAGE: {sponsor.image?.url}</span>
                 </div>
               </div>
-              <h3 className="mb-1 font-semibold">{sponsor.sponsorName}</h3>
-              <p className="mb-2 text-sm text-gray-900/80">{sponsor.sponsorDescription}</p>
+              <h3 className="mb-1 font-semibold">{sponsor.title}</h3>
+              <p className="mb-2 text-sm text-gray-900/80">{sponsor.description}</p>
               <div className="mt-2 flex items-center justify-between text-xs text-gray-900/50">
                 <span>優先度: {sponsor.priority}</span>
                 {sponsor.url && (

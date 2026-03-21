@@ -36,7 +36,7 @@ function isNew(news: News): boolean {
 }
 
 export function NewsCard({ news, variant = "default", className }: NewsCardProps) {
-  const imageUrl = news.thumbnail?.url || "/images/placeholder/p.jpeg";
+  const imageUrl = news.thumbnail?.url || "/images/placeholder/pastel-castle.webp";
   const dateStr = formatDate(news.publishedAt || news.createdAt);
 
   return (

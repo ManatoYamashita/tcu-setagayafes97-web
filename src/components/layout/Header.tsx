@@ -26,20 +26,18 @@ import { LogoVideo } from "@/components/home/LogoVideo";
  * 現在: pt-2 + py-3×2 + ロゴ高さ約56px = 5.5rem
  */
 export function Header() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isHeroVisible, setIsHeroVisible] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  // スクロール検知
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // pathname変更時にisHeroVisibleをリセット（レンダー時ステートリセットパターン）
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
+    if (pathname === "/") {
+      setIsHeroVisible(true);
+    }
+  }
 
   // HeroSection可視判定（ホームページのみ）
   useEffect(() => {

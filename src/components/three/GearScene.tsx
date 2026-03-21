@@ -12,17 +12,17 @@ export default function GearScene() {
     <Canvas
       gl={{ alpha: true, antialias: true }}
       dpr={[1, 1.5]}
-      camera={{ position: [0, 0, 7.5], fov: 45 }}
+      camera={{ position: [0, 0, 8.0], fov: 45 }}
       style={{ width: "100%", height: "100%" }}
     >
-      {/* メインライト（右上、白） */}
-      <directionalLight position={[4, 4, 5]} intensity={1.15} color="#ffffff" />
-      {/* フィルライト（左下、ピンク系） */}
-      <directionalLight position={[-3, -2, 3]} intensity={0.6} color="#EEC0D8" />
-      {/* バックライト（背面、ピンク系） */}
-      <directionalLight position={[0, 0, -4]} intensity={0.4} color="#D880C0" />
-      {/* 環境光 */}
-      <ambientLight intensity={0.45} />
+      {/* メインライト（やや上方、強度下げ） */}
+      <directionalLight position={[3, 5, 6]} intensity={0.95} color="#ffffff" />
+      {/* フィルライト（左下、ラベンダー系） */}
+      <directionalLight position={[-4, -1, 4]} intensity={0.5} color="#F0C8D8" />
+      {/* バックライト（背面、紫寄り） */}
+      <directionalLight position={[0, 0, -5]} intensity={0.3} color="#E0A0C0" />
+      {/* 環境光（シャドウを柔らかく） */}
+      <ambientLight intensity={0.55} />
 
       <Gear />
     </Canvas>

@@ -12,7 +12,7 @@ export const aboutConfig = {
       "教室企画、ステージ企画、模擬店など、様々な企画をご用意して皆様のご来場をお待ちしております。学生の創造性と情熱が詰まった世田谷祭を、ぜひお楽しみください。",
     ],
     cta: { label: "委員会について", href: "/about" },
-    image: { src: "/images/placeholder/p.jpeg", alt: "世田谷祭の様子" },
+    image: { src: "/images/placeholder/pastel-castle.webp", alt: "世田谷祭の様子" },
   },
 
   // 委員長挨拶

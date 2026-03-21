@@ -58,7 +58,7 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: st
   // AccordionItem形式に変換
   const accordionItems: AccordionItem[] = faqList.map((faq) => ({
     title: faq.title,
-    content: faq.sponsorDescription || "",
+    content: faq.description || "",
     defaultOpen: false,
   }));
 

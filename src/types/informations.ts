@@ -20,16 +20,11 @@ export interface RawInformation {
   category: string[] | string;
   title: string;
 
-  // 協賛企業用フィールド
-  sponsorName?: string;
-  sponsorDescription?: string;
-  logo?: MicroCMSImage;
+  // 汎用フィールド
+  description?: string;
+  image?: MicroCMSImage;
   url?: string;
   priority?: number;
-
-  // FAQ用フィールド
-  question?: string;
-  answer?: string;
 }
 
 /**
@@ -48,16 +43,11 @@ export interface Information {
   category: InformationCategory;
   title: string;
 
-  // 協賛企業用フィールド
-  sponsorName?: string;
-  sponsorDescription?: string;
-  logo?: MicroCMSImage;
+  // 汎用フィールド
+  description?: string;
+  image?: MicroCMSImage;
   url?: string;
-  priority?: number; // 表示優先度（数値が大きいほど優先）
-
-  // FAQ用フィールド
-  question?: string;
-  answer?: string;
+  priority?: number;
 }
 
 /**

@@ -11,7 +11,7 @@ const { topSection } = aboutConfig;
  */
 export function AboutSection() {
   return (
-    <section className="bg-gradient-to-b from-primary-400 to-secondary py-24 lg:py-32">
+    <section className="relative -mt-48 bg-gradient-to-b from-white via-secondary to-transparent pt-72 pb-24 lg:pt-80 lg:pb-32">
       <div className="mx-auto max-w-6xl px-8 sm:px-12 lg:px-20">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
           {/* 左: 円形画像 + 歯車装飾 */}
@@ -43,22 +43,22 @@ export function AboutSection() {
           {/* 右: テキストコンテンツ */}
           <div>
             {/* ラベル */}
-            <p className="mb-4 text-xs uppercase tracking-widest text-white/70">
+            <p className="mb-4 text-xs uppercase tracking-widest text-gray-500">
               {topSection.label}
             </p>
 
             {/* 見出し */}
-            <h2 className="mb-4 text-4xl font-bold text-white md:text-5xl lg:text-6xl">
+            <h2 className="mb-4 text-4xl font-bold text-primary-400 md:text-5xl lg:text-6xl">
               {topSection.heading}
             </h2>
 
             {/* タグライン */}
-            <p className="mb-8 text-lg font-medium text-white/90">{topSection.tagline}</p>
+            <p className="mb-8 text-lg font-medium text-gray-700">{topSection.tagline}</p>
 
             {/* 本文 */}
             <div className="mb-10 space-y-4">
               {topSection.paragraphs.map((paragraph, i) => (
-                <p key={i} className="leading-relaxed text-white/80">
+                <p key={i} className="leading-relaxed text-gray-600">
                   {paragraph}
                 </p>
               ))}
@@ -67,7 +67,7 @@ export function AboutSection() {
             {/* CTA */}
             <Link
               href={topSection.cta.href}
-              className="group inline-flex items-center gap-2 text-sm font-semibold text-white underline underline-offset-4 transition-opacity hover:opacity-70"
+              className="group inline-flex items-center gap-2 text-sm font-semibold text-primary-400 underline underline-offset-4 transition-opacity hover:opacity-70"
             >
               {topSection.cta.label}
               <svg

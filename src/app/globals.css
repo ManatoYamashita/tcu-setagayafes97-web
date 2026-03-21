@@ -38,6 +38,7 @@
 
   /* フォント設定 */
   --font-sans: var(--font-noto-sans-jp), sans-serif;
+  --font-serif: var(--font-kaisei-opti), serif;
   --font-heading: var(--font-kaisei-opti), serif;
 }
 
@@ -48,7 +49,21 @@
 
 body {
   color: var(--color-text); /* #212121 */
-  background-color: var(--color-bg); /* #E1C0EE */
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    160deg,
+    oklch(79.5% 0.108 314deg),
+    oklch(83% 0.07 345deg) 35%,
+    oklch(81% 0.08 330deg) 60%,
+    oklch(85% 0.06 355deg) 85%,
+    oklch(80% 0.09 320deg)
+  );
 }
 
 @layer base {
@@ -61,6 +76,11 @@ body {
 
 @utility text-balance {
   text-wrap: balance;
+}
+
+@utility font-display-mincho {
+  font-family:
+    var(--font-shippori-mincho, "Shippori Mincho"), "Hiragino Mincho ProN", "Yu Mincho", serif;
 }
 
 @layer utilities {
@@ -80,5 +100,48 @@ body {
   /* Container Queries用のユーティリティ */
   .container-inline {
     container-type: inline-size;
+  }
+
+  /* CircularText 回転アニメーション */
+  .animate-spin-slow {
+    animation: spin-slow 20s linear infinite;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
+/* Dialog モーダルアニメーション */
+@keyframes dialog-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dialog-modal[open] {
+  animation: dialog-fade-in 0.2s ease-out;
+}
+
+.dialog-modal[open]::backdrop {
+  animation: dialog-backdrop-fade 0.2s ease-out;
+}
+
+@keyframes dialog-backdrop-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

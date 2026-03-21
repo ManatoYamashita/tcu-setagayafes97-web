@@ -11,9 +11,9 @@ interface GearParams {
 export const GEAR_DEFAULTS = {
   teeth: 8,
   outerRadius: 2.0,
-  innerRadius: 1.65,
-  holeRadius: 0.7,
-  depth: 0.85,
+  innerRadius: 1.55,
+  holeRadius: 0.65,
+  depth: 1.1,
 } as const;
 
 /**
@@ -31,7 +31,7 @@ export function createGearGeometry({
   const anglePerTooth = (Math.PI * 2) / teeth;
   // 歯1つを4分割: 歯底→歯先立ち上がり→歯先→歯先立ち下がり
   const toothTop = anglePerTooth * 0.5;
-  const toothGap = anglePerTooth * 0.05;
+  const toothGap = anglePerTooth * 0.045;
 
   // 全コーナー座標を収集（1歯あたり4点）
   const pts: [number, number][] = [];
@@ -50,7 +50,7 @@ export function createGearGeometry({
   }
 
   const n = pts.length;
-  const r = 0.08; // 歯底の谷間を自然に丸くする
+  const r = 0.04; // コーナーをほぼ直角に（角張った台形歯）
   const lerp = (a: [number, number], b: [number, number], t: number): [number, number] => [
     a[0] + (b[0] - a[0]) * t,
     a[1] + (b[1] - a[1]) * t,
@@ -79,10 +79,10 @@ export function createGearGeometry({
   return new THREE.ExtrudeGeometry(shape, {
     depth,
     bevelEnabled: true,
-    bevelThickness: 0.18,
-    bevelSize: 0.12,
-    bevelSegments: 2,
-    curveSegments: 32,
+    bevelThickness: 0.35,
+    bevelSize: 0.25,
+    bevelSegments: 1,
+    curveSegments: 48,
   });
 }
 
@@ -92,10 +92,10 @@ export function createGearGeometry({
  */
 export function createHubRingGeometry({
   holeRadius = GEAR_DEFAULTS.holeRadius,
-  ringWidth = 0.5,
+  ringWidth = 0.55,
   gearDepth = GEAR_DEFAULTS.depth,
-  protrusion = 0.3,
-  chamfer = 0.1,
+  protrusion = 0.38,
+  chamfer = 0.18,
 }: {
   holeRadius?: number;
   ringWidth?: number;
@@ -120,5 +120,5 @@ export function createHubRingGeometry({
     new THREE.Vector2(innerR, -halfH),
   ];
 
-  return new THREE.LatheGeometry(points, 48);
+  return new THREE.LatheGeometry(points, 64);
 }

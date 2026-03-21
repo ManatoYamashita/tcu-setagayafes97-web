@@ -33,7 +33,7 @@ interface LogoNodeItem {
   href?: string;
 }
 
-type LogoItem = LogoImageItem | LogoNodeItem;
+export type LogoItem = LogoImageItem | LogoNodeItem;
 
 interface LogoLoopProps {
   logos: LogoItem[];

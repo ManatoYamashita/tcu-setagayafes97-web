@@ -6,6 +6,8 @@ import Link from "next/link";
 import { siteConfig } from "@/data/site";
 import { useCountdown } from "@/hooks/useCountdown";
 import { LogoVideo } from "./LogoVideo";
+import { cn } from "@/lib/utils";
+import type { News, NewsType } from "@/types/news";
 
 type DebugDisplayMode = "countdown" | "karakuri" | null;
 
@@ -39,23 +41,46 @@ function DateBlock({ dateStr }: { dateStr: string }) {
 
   return (
     <div className="flex items-center text-primary-400">
-      <span className="text-5xl md:text-6xl lg:text-7xl font-serif italic leading-none">
+      <span className="text-5xl md:text-6xl lg:text-7xl font-serif italic leading-none -translate-y-1.5 md:-translate-y-2">
         {month}
       </span>
       <div className="relative mx-0.5 md:mx-1 flex items-center justify-center">
         <div className="w-px h-14 md:h-20 lg:h-24 bg-primary-400/60 rotate-[-25deg]" />
       </div>
-      <span className="text-5xl md:text-6xl lg:text-7xl font-serif italic leading-none">{day}</span>
-      <span className="text-[10px] md:text-xs lg:text-sm tracking-wide font-sans self-end ml-0.5 mb-0.5">
+      <span className="text-5xl md:text-6xl lg:text-7xl font-serif italic leading-none translate-y-1.5 md:translate-y-2">
+        {day}
+      </span>
+      <span className="text-[10px] md:text-xs lg:text-sm tracking-wide font-sans self-end ml-0.5 mb-0.5 translate-y-1.5 md:translate-y-2">
         {dayOfWeek}
       </span>
     </div>
   );
 }
 
+function getNewsTypeLabel(type: NewsType): string {
+  switch (type) {
+    case "urgent":
+      return "緊急";
+    case "news":
+      return "お知らせ";
+    case "other":
+      return "その他";
+  }
+}
+
+function formatNewsDate(dateStr?: string): string {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+}
+
+interface HeroSectionProps {
+  latestNews?: News | null;
+}
+
 /**
  * ヒーローセクション
- * 5レイヤー構成: 白背景 / 装飾テキスト / Three.js歯車（中央） / 左下日付 / 右下テキスト+CTA
+ * 5レイヤー構成: 白背景 / 装飾テキスト / Three.js歯車（中央） / 左下日付 / 右下最新ニュース
  */
 const heroNavItems = [
   { label: "企画を探す", href: "/events" },
@@ -64,7 +89,7 @@ const heroNavItems = [
   { label: "インフォメーション", href: "/info" },
 ] as const;
 
-export function HeroSection() {
+export function HeroSection({ latestNews }: HeroSectionProps) {
   const { formatted, isFinished } = useCountdown();
   const [debugMode, setDebugMode] = useState<DebugDisplayMode>(null);
 
@@ -113,15 +138,15 @@ export function HeroSection() {
         aria-hidden="true"
       >
         {showKarakuri ? (
-          <span className="text-[8vw] font-black tracking-widest text-gray-200 whitespace-nowrap leading-none">
+          <span className="text-[12vw] font-display-mincho font-extrabold tracking-tight text-gray-200 whitespace-nowrap leading-none">
             KARAKURI
           </span>
         ) : showCountdown && formatted ? (
-          <span className="text-[8vw] font-black tracking-widest text-gray-200 whitespace-nowrap leading-none tabular-nums">
+          <span className="text-[12vw] font-display-mincho font-extrabold tracking-tight text-gray-200 whitespace-nowrap leading-none tabular-nums">
             {formatted}
           </span>
         ) : (
-          <span className="text-[8vw] font-black tracking-widest text-gray-200 whitespace-nowrap leading-none">
+          <span className="text-[12vw] font-display-mincho font-extrabold tracking-tight text-gray-200 whitespace-nowrap leading-none">
             &nbsp;
           </span>
         )}
@@ -175,18 +200,33 @@ export function HeroSection() {
         </Link>
       </div>
 
-      {/* [z-30] 右下 テキスト+CTAボタン（デスクトップのみ） */}
-      <div className="absolute right-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 max-w-sm hidden md:block">
-        <p className="text-sm md:text-base text-gray-600 line-clamp-2 mb-4">
-          {siteConfig.description}
-        </p>
-        <Link
-          href="/events"
-          className="inline-block bg-primary-400 text-white text-sm md:text-base font-medium px-6 py-3 rounded-full hover:bg-primary-500 transition-colors"
-        >
-          企画を探す
-        </Link>
-      </div>
+      {/* [z-30] 右下 最新ニュース（デスクトップのみ） */}
+      {latestNews && (
+        <div className="absolute right-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 max-w-sm hidden md:block">
+          <div className="flex items-center gap-2 mb-2">
+            <span
+              className={cn(
+                "text-xs font-medium px-2 py-0.5 rounded",
+                latestNews.type === "urgent"
+                  ? "bg-red-500 text-white"
+                  : "bg-primary-400/15 text-primary-400"
+              )}
+            >
+              {getNewsTypeLabel(latestNews.type)}
+            </span>
+            <span className="text-xs text-gray-400">{formatNewsDate(latestNews.publishedAt)}</span>
+          </div>
+          <p className="text-sm md:text-base text-gray-700 font-medium line-clamp-2 mb-3">
+            {latestNews.title}
+          </p>
+          <Link
+            href={`/info/${latestNews.id}`}
+            className="text-sm text-primary-400 hover:text-primary-500 transition-colors font-medium"
+          >
+            詳しく見る →
+          </Link>
+        </div>
+      )}
     </section>
   );
 }

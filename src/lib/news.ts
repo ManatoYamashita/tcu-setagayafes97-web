@@ -77,6 +77,17 @@ export async function getNewsList(limit: number = 10): Promise<News[]> {
 }
 
 /**
+ * ヒーローセクション用の最新ニュースを1件取得
+ * urgentタイプが存在する場合はそれを優先表示
+ * @returns 最新ニュース1件、なければnull
+ */
+export async function getLatestHeroNews(): Promise<News | null> {
+  const newsList = await getNewsList(10);
+  if (newsList.length === 0) return null;
+  return newsList.find((news) => news.type === "urgent") || newsList[0];
+}
+
+/**
  * 特定のお知らせを取得
  * @param id お知らせID
  * @returns お知らせ情報、見つからない場合はnull

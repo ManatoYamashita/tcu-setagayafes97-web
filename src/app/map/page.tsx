@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { buildingsConfig } from "@/data/buildings";
 import { facilitiesConfig } from "@/data/facilities";
 import { CampusMapClient } from "./CampusMapClient";
+import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
+import { pageHeroes } from "@/data/page-heroes";
+import { isDataPublished } from "@/lib/publish";
 
 /**
  * メタデータ
@@ -22,20 +26,12 @@ export const metadata: Metadata = {
  * キャンパスマップページ
  */
 export default function CampusMapPage() {
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* ページヘッダー */}
-      <div className="bg-secondary py-16 text-gray-900">
-        <div className="container mx-auto px-4">
-          <h1 className="mb-4 text-center text-4xl font-bold md:text-5xl">キャンパスマップ</h1>
-          <p className="text-center text-lg opacity-90">
-            建物をクリックすると、開催企画を検索できます
-          </p>
-        </div>
-      </div>
+  if (!isDataPublished) notFound();
 
+  return (
+    <PageSheetLayout hero={pageHeroes.map}>
       {/* マップコンテンツ */}
       <CampusMapClient buildings={buildingsConfig} infoDesks={facilitiesConfig.infoDesks} />
-    </div>
+    </PageSheetLayout>
   );
 }

@@ -32,7 +32,7 @@ export default async function FAQPage() {
   // AccordionItem形式に変換
   const accordionItems: AccordionItem[] = faqList.map((faq) => ({
     title: faq.title,
-    content: faq.sponsorDescription || "", // sponsorDescriptionフィールドを回答として使用
+    content: faq.description || "",
     defaultOpen: false,
   }));
 

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Download, FileText, AlertCircle } from "lucide-react";
+import { isDataPublished } from "@/lib/publish";
 
 /**
  * メタデータ
@@ -39,6 +41,8 @@ const pamphlets = [
  * パンフレットダウンロードページ
  */
 export default function PamphletPage() {
+  if (!isDataPublished) notFound();
+
   return (
     <div className="min-h-screen bg-secondary">
       {/* ページヘッダー */}

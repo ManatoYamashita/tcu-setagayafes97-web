@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans_JP, Kaisei_Opti } from "next/font/google";
+import { Noto_Sans_JP, Kaisei_Opti, Shippori_Mincho } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/data/site";
 import { Header } from "@/components/layout/Header";
@@ -12,6 +12,14 @@ const notoSansJP = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
   display: "swap",
   preload: true,
+});
+
+const shipporiMincho = Shippori_Mincho({
+  subsets: ["latin"],
+  weight: ["400", "700", "800"],
+  variable: "--font-shippori-mincho",
+  display: "swap",
+  preload: false,
 });
 
 const kaiseiOpti = Kaisei_Opti({
@@ -61,7 +69,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body
-        className={`${notoSansJP.variable} ${kaiseiOpti.variable} font-sans antialiased bg-secondary text-gray-900`}
+        className={`${notoSansJP.variable} ${kaiseiOpti.variable} ${shipporiMincho.variable} font-sans antialiased text-gray-900`}
       >
         <Opener />
         <Header />
