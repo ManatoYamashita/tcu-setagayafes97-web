@@ -4,13 +4,14 @@ import { useRef, useMemo, useState, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import type { Group } from "three";
+import type { ThreeElements } from "@react-three/fiber";
 import { GEAR_DEFAULTS, createGearGeometry, createHubRingGeometry } from "./gear-geometry";
 
 /**
  * ピンク紫クレイ風歯車メッシュ（ハブリング付き）
  * Z軸回転 + マウス追従チルトアニメーション
  */
-export function Gear() {
+export function Gear(props: ThreeElements["group"]) {
   const groupRef = useRef<Group>(null);
   const gearGeometry = useMemo(() => createGearGeometry(), []);
   const hubGeometry = useMemo(() => createHubRingGeometry(), []);
@@ -51,7 +52,7 @@ export function Gear() {
   });
 
   return (
-    <group ref={groupRef} rotation={[0.4, 0.2, 0]}>
+    <group ref={groupRef} rotation={[0.4, 0.2, 0]} {...props}>
       {/* 歯車本体 */}
       <mesh geometry={gearGeometry}>
         <meshPhysicalMaterial

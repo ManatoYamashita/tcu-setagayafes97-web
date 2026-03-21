@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
+    viewTransition: true,
     optimizePackageImports: [
       "gsap",
       "lucide-react",

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { getEventsList } from "@/lib/events";
 import { filterStageEvents } from "@/lib/timetable";
 import { TimetableContent } from "@/components/timetable/TimetableContent";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
 import { pageHeroes } from "@/data/page-heroes";
 import { isDataPublished } from "@/lib/publish";
+import { ComingSoon } from "@/components/ui/ComingSoon";
 
 /**
  * メタデータ
@@ -32,7 +32,13 @@ export const revalidate = 3600;
  * SSG + クライアントサイドフィルタリング
  */
 export default async function TimetablePage() {
-  if (!isDataPublished) notFound();
+  if (!isDataPublished) {
+    return (
+      <PageSheetLayout hero={pageHeroes.timetable}>
+        <ComingSoon />
+      </PageSheetLayout>
+    );
+  }
 
   // 全企画を取得（最大200件）
   const allEvents = await getEventsList(200);

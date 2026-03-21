@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { gsap } from "gsap";
 import { siteConfig } from "@/data/site";
 import { useCountdown } from "@/hooks/useCountdown";
 import { LogoVideo } from "./LogoVideo";
@@ -93,6 +94,96 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
   const { formatted, isFinished } = useCountdown();
   const [debugMode, setDebugMode] = useState<DebugDisplayMode>(null);
 
+  // --- Entrance animation refs ---
+  const sectionRef = useRef<HTMLElement>(null);
+  const decorTextRef = useRef<HTMLDivElement>(null);
+  const logoVideoRef = useRef<HTMLDivElement>(null);
+  const gearRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const dateBlockRef = useRef<HTMLDivElement>(null);
+  const newsBlockRef = useRef<HTMLDivElement>(null);
+  const ctxRef = useRef<gsap.Context | null>(null);
+
+  // --- Entrance animation ---
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (ctxRef.current) return;
+
+    const runEntrance = () => {
+      if (!sectionRef.current || ctxRef.current) return;
+
+      const ctx = gsap.context(() => {
+        // メイン要素を出現順に収集（null除外）
+        const mainTargets = [
+          decorTextRef.current,
+          logoVideoRef.current,
+          gearRef.current,
+          dateBlockRef.current,
+          newsBlockRef.current,
+        ].filter(Boolean) as HTMLElement[];
+
+        gsap.set(mainTargets, { opacity: 0, y: 30 });
+
+        // ナビ: コンテナのopacityを解除し、子要素を個別制御
+        if (navRef.current) {
+          gsap.set(navRef.current, { opacity: 1 });
+          const navItems = navRef.current.querySelectorAll("a");
+          gsap.set(navItems, { opacity: 0, x: -15 });
+        }
+
+        const tl = gsap.timeline({ delay: 0.3 });
+
+        // メイン要素: stagger 0.12s で順次出現
+        tl.to(
+          mainTargets,
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: "power4.out",
+            stagger: 0.12,
+            force3D: true,
+          },
+          0
+        );
+
+        // ナビリンク: stagger 0.08s、メイン要素の途中から開始
+        if (navRef.current) {
+          const navItems = navRef.current.querySelectorAll("a");
+          if (navItems.length > 0) {
+            tl.to(
+              navItems,
+              {
+                opacity: 1,
+                x: 0,
+                duration: 0.5,
+                ease: "power3.out",
+                stagger: 0.08,
+                force3D: true,
+              },
+              0.5
+            );
+          }
+        }
+      }, sectionRef);
+
+      ctxRef.current = ctx;
+    };
+
+    // opener-doneイベント監視
+    window.addEventListener("opener-done", runEntrance);
+
+    // フェイルセーフ: 5秒後に強制開始（ページ内遷移等でopener-done未発火時）
+    const failsafe = setTimeout(runEntrance, 5000);
+
+    return () => {
+      window.removeEventListener("opener-done", runEntrance);
+      clearTimeout(failsafe);
+      ctxRef.current?.revert();
+      ctxRef.current = null;
+    };
+  }, []);
+
   // 表示判定: デバッグモード優先、なければ実カウントダウン状態
   const showKarakuri = debugMode === "karakuri" || (debugMode === null && isFinished);
   const showCountdown = debugMode === "countdown" || (debugMode === null && !isFinished);
@@ -110,6 +201,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
 
   return (
     <section
+      ref={sectionRef}
       id="hero-section"
       className="w-full min-h-screen -mt-20 relative bg-white overflow-hidden flex items-center justify-center"
     >
@@ -118,7 +210,8 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
 
       {/* [z-40] 左上 独自ナビ（デスクトップ） */}
       <nav
-        className="absolute top-8 left-8 z-40 hidden md:flex flex-col gap-3"
+        ref={navRef}
+        className="absolute top-8 left-8 z-40 hidden md:flex flex-col gap-3 will-change-transform opacity-0"
         aria-label="ヒーローナビゲーション"
       >
         {heroNavItems.map((item) => (
@@ -134,7 +227,8 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
 
       {/* [z-10] 装飾テキスト: カウントダウン or KARAKURI */}
       <div
-        className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none select-none"
+        ref={decorTextRef}
+        className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none select-none will-change-transform opacity-0"
         aria-hidden="true"
       >
         {showKarakuri ? (
@@ -165,20 +259,25 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
 
       {/* [z-5] ロゴ動画（背景として歯車・テキストより奥） */}
       <div
-        className="absolute top-[10%] left-1/2 -translate-x-1/2 z-[5] pointer-events-none"
+        ref={logoVideoRef}
+        className="absolute top-[10%] left-1/2 -translate-x-1/2 z-[5] pointer-events-none will-change-transform opacity-0"
         aria-hidden="true"
       >
         <LogoVideo className="w-[45vw] md:w-[20vw]" waitForOpener />
       </div>
 
       {/* [z-20] Three.js歯車（中央配置） */}
-      <div className="relative z-20 w-[90vw] sm:w-[85vw] md:w-[80vw] lg:w-[75vw] xl:w-[70vw] h-[60vh] sm:h-[65vh] md:h-[70vh] lg:h-[75vh] xl:h-[80vh]">
+      <div
+        ref={gearRef}
+        className="relative z-20 w-[90vw] sm:w-[85vw] md:w-[80vw] lg:w-[75vw] xl:w-[70vw] h-[60vh] sm:h-[65vh] md:h-[70vh] lg:h-[75vh] xl:h-[80vh] will-change-transform opacity-0"
+      >
         <GearScene />
       </div>
 
       {/* [z-30] 左下 日付表示 */}
       <div
-        className="absolute left-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16"
+        ref={dateBlockRef}
+        className="absolute left-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 will-change-transform opacity-0"
         aria-label={`開催日: ${siteConfig.dates.day1} - ${siteConfig.dates.day2}`}
       >
         <p className="text-sm md:text-base font-serif italic tracking-[0.3em] text-primary-400 mb-2 md:mb-3">
@@ -202,7 +301,10 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
 
       {/* [z-30] 右下 最新ニュース（デスクトップのみ） */}
       {latestNews && (
-        <div className="absolute right-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 max-w-sm hidden md:block">
+        <div
+          ref={newsBlockRef}
+          className="absolute right-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 max-w-sm hidden md:block will-change-transform opacity-0"
+        >
           <div className="flex items-center gap-2 mb-2">
             <span
               className={cn(

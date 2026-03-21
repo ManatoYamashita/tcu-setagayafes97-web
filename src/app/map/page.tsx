@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { buildingsConfig } from "@/data/buildings";
 import { facilitiesConfig } from "@/data/facilities";
 import { CampusMapClient } from "./CampusMapClient";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
 import { pageHeroes } from "@/data/page-heroes";
 import { isDataPublished } from "@/lib/publish";
+import { ComingSoon } from "@/components/ui/ComingSoon";
 
 /**
  * メタデータ
@@ -26,7 +26,13 @@ export const metadata: Metadata = {
  * キャンパスマップページ
  */
 export default function CampusMapPage() {
-  if (!isDataPublished) notFound();
+  if (!isDataPublished) {
+    return (
+      <PageSheetLayout hero={pageHeroes.map}>
+        <ComingSoon />
+      </PageSheetLayout>
+    );
+  }
 
   return (
     <PageSheetLayout hero={pageHeroes.map}>

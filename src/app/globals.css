@@ -145,3 +145,69 @@ body::before {
     opacity: 1;
   }
 }
+
+/* ===== Dreamy Fade — Page Transition ===== */
+
+/* View Transitions API (対応ブラウザ) */
+::view-transition-old(root) {
+  animation: dreamy-fade-out 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+::view-transition-new(root) {
+  animation: dreamy-fade-in 0.5s cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+
+@keyframes dreamy-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(4px);
+  }
+}
+@keyframes dreamy-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* フォールバック (VT非対応ブラウザ) */
+@supports not (view-transition-name: a) {
+  .page-transition-wrapper {
+    animation: dreamy-fallback-in 0.55s cubic-bezier(0, 0, 0.2, 1) both;
+  }
+}
+
+@keyframes dreamy-fallback-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* アクセシビリティ: モーション軽減設定 */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+  .page-transition-wrapper {
+    animation: none !important;
+  }
+}

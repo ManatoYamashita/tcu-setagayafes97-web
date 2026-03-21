@@ -1,7 +1,9 @@
-export default function Loading() {
+import { Loading } from "@/components/ui/Loading";
+
+export default function RootLoading() {
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <p className="text-sm text-gray-900/50">読み込み中...</p>
+      <Loading label="読み込み中..." />
     </div>
   );
 }

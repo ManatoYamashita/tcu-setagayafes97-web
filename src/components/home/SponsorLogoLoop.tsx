@@ -78,7 +78,7 @@ export function SponsorLogoLoop({ sponsors }: SponsorLogoLoopProps) {
         logoHeight={40}
         gap={48}
         fadeOut
-        fadeOutColor="#ffffff"
+        fadeOutColor="oklch(83% 0.07 345deg)"
         ariaLabel="協賛企業ロゴ"
         renderItem={renderItem}
       />
