@@ -44,7 +44,7 @@ cp .env.example .env.local
 | ------------------------- | ------------------------- | :--: |
 | `MICROCMS_SERVICE_DOMAIN` | microCMS サービスドメイン | Yes  |
 | `MICROCMS_API_KEY`        | microCMS API キー         | Yes  |
-| `NEXT_PUBLIC_SITE_URL`    | サイトの公開URL           | Yes  |
+| `NEXT_PUBLIC_URL`         | サイトの公開URL           | Yes  |
 | `NEXT_PUBLIC_GTM_ID`      | Google Tag Manager ID     |  -   |
 | `SMTP_HOST` / `SMTP_PORT` | SMTP サーバー設定         |  -   |
 | `SMTP_USER` / `SMTP_PASS` | SMTP 認証情報             |  -   |
