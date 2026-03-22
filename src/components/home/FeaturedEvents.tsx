@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getFeaturedEvents } from "@/lib/events";
+import { FeaturedGearScene } from "./FeaturedGearScene";
 import type { Event } from "@/types/events";
 
 /**
@@ -130,18 +131,10 @@ export async function FeaturedEvents() {
 
         {/* 下部: イラスト + カード（重なり配置） */}
         <div className="relative mt-8 lg:grid lg:grid-cols-12 lg:items-end">
-          {/* イラスト: col 1-7, 背面（デスクトップのみ） */}
+          {/* 3D歯車: col 1-7, 背面（デスクトップのみ） */}
           <div className="hidden lg:col-start-1 lg:col-end-7 lg:row-start-1 lg:flex lg:items-end z-0">
-            <div className="relative w-full max-w-[440px]">
-              <Image
-                src="/images/placeholder/pastel-castle.webp"
-                alt="おすすめ企画のイラスト"
-                width={440}
-                height={440}
-                className="h-auto w-full"
-                sizes="440px"
-                priority={false}
-              />
+            <div className="relative w-full max-w-[440px] aspect-square">
+              <FeaturedGearScene />
             </div>
           </div>
 
@@ -178,18 +171,10 @@ export async function FeaturedEvents() {
             </div>
           </div>
 
-          {/* モバイル用イラスト */}
+          {/* モバイル用3D歯車 */}
           <div className="mt-8 flex justify-center lg:hidden">
-            <div className="relative w-full max-w-[320px] sm:max-w-[380px]">
-              <Image
-                src="/images/placeholder/pastel-castle.webp"
-                alt="おすすめ企画のイラスト"
-                width={440}
-                height={440}
-                className="h-auto w-full"
-                sizes="(max-width: 640px) 320px, 380px"
-                priority={false}
-              />
+            <div className="relative w-full max-w-[320px] sm:max-w-[380px] aspect-square">
+              <FeaturedGearScene />
             </div>
           </div>
         </div>

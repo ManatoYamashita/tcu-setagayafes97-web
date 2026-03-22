@@ -1,25 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import dynamic from "next/dynamic";
+import { useEffect, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { siteConfig } from "@/data/site";
-import { useCountdown } from "@/hooks/useCountdown";
 import { LogoVideo } from "./LogoVideo";
 import { cn } from "@/lib/utils";
 import type { News, NewsType } from "@/types/news";
-
-type DebugDisplayMode = "countdown" | "karakuri" | null;
-
-const GearScene = dynamic(() => import("@/components/three/GearScene"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-full flex items-center justify-center">
-      <div className="w-12 h-12 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
-    </div>
-  ),
-});
 
 /**
  * 日付文字列(YYYY-MM-DD)から年・月・日・曜日を分解
@@ -91,14 +79,11 @@ const heroNavItems = [
 ] as const;
 
 export function HeroSection({ latestNews }: HeroSectionProps) {
-  const { formatted, isFinished } = useCountdown();
-  const [debugMode, setDebugMode] = useState<DebugDisplayMode>(null);
-
   // --- Entrance animation refs ---
   const sectionRef = useRef<HTMLElement>(null);
-  const decorTextRef = useRef<HTMLDivElement>(null);
   const logoVideoRef = useRef<HTMLDivElement>(null);
   const gearRef = useRef<HTMLDivElement>(null);
+  const h1Ref = useRef<HTMLHeadingElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const dateBlockRef = useRef<HTMLDivElement>(null);
   const newsBlockRef = useRef<HTMLDivElement>(null);
@@ -118,9 +103,9 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       const ctx = gsap.context(() => {
         // メイン要素を出現順に収集（null除外）
         const mainTargets = [
-          decorTextRef.current,
           logoVideoRef.current,
           gearRef.current,
+          h1Ref.current,
           dateBlockRef.current,
           newsBlockRef.current,
         ].filter(Boolean) as HTMLElement[];
@@ -195,30 +180,12 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
     };
   }, []);
 
-  // 表示判定: デバッグモード優先、なければ実カウントダウン状態
-  const showKarakuri = debugMode === "karakuri" || (debugMode === null && isFinished);
-  const showCountdown = debugMode === "countdown" || (debugMode === null && !isFinished);
-
-  const cycleDebug = () => {
-    setDebugMode((prev) => {
-      if (prev === null) return "countdown";
-      if (prev === "countdown") return "karakuri";
-      return null;
-    });
-  };
-
-  const debugLabel =
-    debugMode === null ? "自動" : debugMode === "countdown" ? "Countdown" : "KARAKURI";
-
   return (
     <section
       ref={sectionRef}
       id="hero-section"
       className="w-full min-h-screen -mt-20 relative bg-white overflow-hidden flex items-center justify-center"
     >
-      {/* SEO用 隠しh1 */}
-      <h1 className="sr-only">東京都市大学 第97回 世田谷祭</h1>
-
       {/* [z-40] 左上 独自ナビ（デスクトップ） */}
       <nav
         ref={navRef}
@@ -236,38 +203,6 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
         ))}
       </nav>
 
-      {/* [z-10] 装飾テキスト: カウントダウン or KARAKURI */}
-      <div
-        ref={decorTextRef}
-        className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none select-none will-change-transform opacity-0"
-        aria-hidden="true"
-      >
-        {showKarakuri ? (
-          <span className="text-[12vw] font-display-mincho font-extrabold tracking-tight text-gray-200 whitespace-nowrap leading-none">
-            KARAKURI
-          </span>
-        ) : showCountdown && formatted ? (
-          <span className="text-[12vw] font-display-mincho font-extrabold tracking-tight text-gray-200 whitespace-nowrap leading-none tabular-nums">
-            {formatted}
-          </span>
-        ) : (
-          <span className="text-[12vw] font-display-mincho font-extrabold tracking-tight text-gray-200 whitespace-nowrap leading-none">
-            &nbsp;
-          </span>
-        )}
-      </div>
-
-      {/* デバッグトグル（開発環境のみ） */}
-      {process.env.NODE_ENV === "development" && (
-        <button
-          type="button"
-          onClick={cycleDebug}
-          className="absolute top-4 right-4 z-50 bg-black/50 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm hover:bg-black/70 transition-colors"
-        >
-          {debugLabel}
-        </button>
-      )}
-
       {/* [z-5] ロゴ動画（背景として歯車・テキストより奥） */}
       <div
         ref={logoVideoRef}
@@ -277,13 +212,77 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
         <LogoVideo className="w-[45vw] md:w-[20vw]" waitForOpener />
       </div>
 
-      {/* [z-20] Three.js歯車（中央配置） */}
+      {/* [z-20] ロゴ画像（中央配置） */}
       <div
         ref={gearRef}
-        className="relative z-20 w-[90vw] sm:w-[85vw] md:w-[80vw] lg:w-[75vw] xl:w-[70vw] h-[60vh] sm:h-[65vh] md:h-[70vh] lg:h-[75vh] xl:h-[80vh] will-change-transform opacity-0"
+        className="relative z-20 flex items-center justify-center w-full max-w-[75vw] sm:max-w-[50vw] md:max-w-[40vw] will-change-transform opacity-0"
       >
-        <GearScene />
+        <Image
+          src="/images/brand/outline.webp"
+          alt="世田谷祭のアイコン"
+          width={800}
+          height={800}
+          className="h-auto w-full animate-spin-slow"
+          priority
+        />
       </div>
+
+      {/* [z-30] h1 タイトル（2行アーチ型・アイコンの上に重なる） */}
+      <h1
+        ref={h1Ref}
+        className="absolute z-30 w-[85vw] sm:w-[70vw] md:w-[55vw] lg:w-[50vw] will-change-transform opacity-0"
+      >
+        <svg
+          viewBox="0 0 600 280"
+          className="w-full h-auto overflow-visible"
+          role="img"
+          aria-label="第97回世田谷祭"
+        >
+          <defs>
+            <path id="hero-arch-top" d="M 80,50 Q 300,25 520,50" fill="none" />
+            <path id="hero-arch-bottom" d="M 20,165 Q 300,125 580,165" fill="none" />
+            <filter id="hero-text-shadow">
+              <feDropShadow
+                dx="0"
+                dy="3"
+                stdDeviation="4"
+                floodColor="#1e3a5f"
+                floodOpacity="0.35"
+              />
+            </filter>
+          </defs>
+          {/* 第97回（上段・小さめ） */}
+          <text
+            className="font-dela-gothic"
+            fontSize="56"
+            letterSpacing="-1"
+            fill="#fffde6"
+            stroke="#1e3a5f"
+            strokeWidth="4"
+            paintOrder="stroke fill"
+            filter="url(#hero-text-shadow)"
+          >
+            <textPath href="#hero-arch-top" startOffset="50%" textAnchor="middle">
+              第97回
+            </textPath>
+          </text>
+          {/* 世田谷祭（下段・大きく） */}
+          <text
+            className="font-dela-gothic"
+            fontSize="120"
+            letterSpacing="-2"
+            fill="#fffde6"
+            stroke="#1e3a5f"
+            strokeWidth="5.5"
+            paintOrder="stroke fill"
+            filter="url(#hero-text-shadow)"
+          >
+            <textPath href="#hero-arch-bottom" startOffset="50%" textAnchor="middle">
+              世田谷祭
+            </textPath>
+          </text>
+        </svg>
+      </h1>
 
       {/* [z-30] 左下 日付表示 */}
       <div
