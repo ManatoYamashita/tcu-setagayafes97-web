@@ -1,4 +1,4 @@
-import { client } from "./microcms";
+import { client, isMicrocmsConfigured } from "./microcms";
 import type { News, NewsListResponse, NewsType, RawNews, RawNewsListResponse } from "@/types/news";
 
 // 型を再エクスポート
@@ -53,6 +53,7 @@ function normalizeNews(rawNews: RawNews): News {
  * @returns お知らせの配列
  */
 export async function getNewsList(limit: number = 10): Promise<News[]> {
+  if (!isMicrocmsConfigured) return [];
   try {
     const response: RawNewsListResponse = await client.get({
       endpoint: "news",
@@ -86,6 +87,7 @@ export async function getLatestHeroNews(): Promise<News | null> {
  * @returns お知らせ情報、見つからない場合はnull
  */
 export async function getNewsById(id: string): Promise<News | null> {
+  if (!isMicrocmsConfigured) return null;
   try {
     const response: RawNews = await client.get({
       endpoint: "news",

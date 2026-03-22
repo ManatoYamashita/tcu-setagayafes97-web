@@ -1,22 +1,29 @@
 import { createClient } from "microcms-js-sdk";
 
-if (!process.env.MICROCMS_SERVICE_DOMAIN) {
-  throw new Error("MICROCMS_SERVICE_DOMAIN is required");
-}
+const serviceDomain = process.env.MICROCMS_SERVICE_DOMAIN ?? "";
+const apiKey = process.env.MICROCMS_API_KEY ?? "";
 
-if (!process.env.MICROCMS_API_KEY) {
-  throw new Error("MICROCMS_API_KEY is required");
+/**
+ * microCMS の認証情報が設定されているか
+ * CI等で未設定の場合、API呼び出しは空データを返す
+ */
+export const isMicrocmsConfigured = !!(serviceDomain && apiKey);
+
+if (!isMicrocmsConfigured) {
+  console.warn(
+    "[microcms] MICROCMS_SERVICE_DOMAIN / MICROCMS_API_KEY が未設定です。API呼び出しは空データを返します。"
+  );
 }
 
 /**
  * microCMS クライアント
  */
 export const client = createClient({
-  serviceDomain: process.env.MICROCMS_SERVICE_DOMAIN,
-  apiKey: process.env.MICROCMS_API_KEY,
+  serviceDomain: serviceDomain || "dummy",
+  apiKey: apiKey || "dummy",
 });
 
 /**
  * microCMS のベース URL
  */
-export const MICROCMS_BASE_URL = `https://${process.env.MICROCMS_SERVICE_DOMAIN}.microcms.io`;
+export const MICROCMS_BASE_URL = serviceDomain ? `https://${serviceDomain}.microcms.io` : "";

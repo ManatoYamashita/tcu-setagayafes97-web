@@ -1,4 +1,4 @@
-import { client } from "./microcms";
+import { client, isMicrocmsConfigured } from "./microcms";
 import type {
   Event,
   EventListResponse,
@@ -132,6 +132,7 @@ export async function getEventsList(
   limit: number = 50,
   filters?: EventsFilterOptions
 ): Promise<Event[]> {
+  if (!isMicrocmsConfigured) return [];
   try {
     // microCMS filters パラメータの構築
     const filterQueries: string[] = [];
@@ -195,6 +196,7 @@ export async function getEventsList(
  * @returns おすすめ企画の配列
  */
 export async function getFeaturedEvents(): Promise<Event[]> {
+  if (!isMicrocmsConfigured) return [];
   try {
     // microCMSにfeaturedフラグがある場合の実装例
     // 実際のフィールド名に合わせて調整してください
@@ -221,6 +223,7 @@ export async function getFeaturedEvents(): Promise<Event[]> {
  * @returns 企画情報、見つからない場合はnull
  */
 export async function getEventById(id: string): Promise<Event | null> {
+  if (!isMicrocmsConfigured) return null;
   try {
     const response: RawEvent = await client.get({
       endpoint: "events",

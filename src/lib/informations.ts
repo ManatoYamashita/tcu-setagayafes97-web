@@ -1,4 +1,4 @@
-import { client } from "./microcms";
+import { client, isMicrocmsConfigured } from "./microcms";
 import type {
   Information,
   InformationListResponse,
@@ -52,6 +52,7 @@ function normalizeInformation(rawInfo: RawInformation): Information {
  * @returns 協賛企業の配列（優先度順）
  */
 export async function getSponsorsList(): Promise<Information[]> {
+  if (!isMicrocmsConfigured) return [];
   try {
     const response: RawInformationListResponse = await client.get({
       endpoint: "informations",
@@ -74,6 +75,7 @@ export async function getSponsorsList(): Promise<Information[]> {
  * @returns FAQの配列
  */
 export async function getFAQList(): Promise<Information[]> {
+  if (!isMicrocmsConfigured) return [];
   try {
     const response: RawInformationListResponse = await client.get({
       endpoint: "informations",
@@ -97,6 +99,7 @@ export async function getFAQList(): Promise<Information[]> {
  * @returns 情報、見つからない場合はnull
  */
 export async function getInformationById(id: string): Promise<Information | null> {
+  if (!isMicrocmsConfigured) return null;
   try {
     const response: RawInformation = await client.get({
       endpoint: "informations",
