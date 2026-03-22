@@ -3,8 +3,6 @@ import { getEventsList } from "@/lib/events";
 import { EventsContent } from "@/components/events/EventsContent";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
 import { pageHeroes } from "@/data/page-heroes";
-import { isDataPublished } from "@/lib/publish";
-import { ComingSoon } from "@/components/ui/ComingSoon";
 
 /**
  * メタデータ
@@ -31,14 +29,6 @@ export const revalidate = 3600;
  * SSG + クライアントサイドフィルタリング
  */
 export default async function EventsPage() {
-  if (!isDataPublished) {
-    return (
-      <PageSheetLayout hero={pageHeroes.events}>
-        <ComingSoon />
-      </PageSheetLayout>
-    );
-  }
-
   // 全企画を取得（最大200件）
   const events = await getEventsList(200);
 

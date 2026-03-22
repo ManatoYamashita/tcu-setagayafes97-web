@@ -14,23 +14,13 @@ export default async function APITestPage() {
   const featuredEvents = await getFeaturedEvents();
   const sponsorsList = await getSponsorsList();
 
-  const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
-
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="mb-8">
         <h1 className="mb-4 text-4xl font-bold">API / ヘルパー関数テスト</h1>
-        <div className="rounded-lg bg-yellow-500/10 p-4">
+        <div className="rounded-lg bg-green-500/10 p-4">
           <p className="font-semibold">
-            現在のモード:{" "}
-            {USE_MOCK ? (
-              <span className="text-orange-600">モックデータ使用中</span>
-            ) : (
-              <span className="text-green-600">microCMS本番接続中</span>
-            )}
-          </p>
-          <p className="mt-2 text-sm text-gray-900/90">
-            環境変数 NEXT_PUBLIC_USE_MOCK_DATA で切り替え可能
+            <span className="text-green-600">microCMS接続中</span>
           </p>
         </div>
       </div>

@@ -9,7 +9,7 @@ import { gsap } from "gsap";
  *
  * ページ読み込み完了後に以下のアニメーションを実行:
  * 1. 2層レイヤー表示（下層: white、上層: primary）
- * 2. 中央にアイコン（favicon.webp, 256px）をゆっくりフェードイン
+ * 2. 中央にアイコン（favicon.ico, 256px）をゆっくりフェードイン
  * 3. アイコンにpulseアニメーション（scale: 1↔1.04, 1.5s周期）
  * 4. アイコンを拡大しながらフェードアウト
  * 5. 2層レイヤーを時間差（0.2s）で下にスライドして非表示
@@ -71,11 +71,10 @@ export function Opener() {
 
         // メインタイムライン作成
         const tl = gsap.timeline({
-          paused: false, // 自動再生
+          paused: false,
           onComplete: () => {
             clearTimeout(safetyTimeout);
             setShowOpener(false);
-            window.dispatchEvent(new CustomEvent("opener-done"));
           },
         });
 
@@ -125,6 +124,15 @@ export function Opener() {
           },
           "-=1.1"
         );
+
+        // レイヤースライド中にHeroアニメーション開始トリガー（完了0.4秒前）
+        tl.call(
+          () => {
+            window.dispatchEvent(new CustomEvent("opener-done"));
+          },
+          [],
+          tl.duration() - 0.4
+        );
       }, containerRef);
 
       ctxRef.current = ctx;
@@ -169,7 +177,7 @@ export function Opener() {
         {/* 中央アイコン（256px） */}
         <div ref={iconRef} className="relative w-64 h-64 will-change-transform opacity-0">
           <Image
-            src="/favicon.webp"
+            src="/favicon.ico"
             alt="世田谷祭ロゴ"
             fill
             priority

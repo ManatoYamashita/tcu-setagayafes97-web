@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Download, FileText, AlertCircle } from "lucide-react";
-import { isDataPublished } from "@/lib/publish";
-import { ComingSoon } from "@/components/ui/ComingSoon";
-
 /**
  * メタデータ
  */
@@ -41,28 +38,6 @@ const pamphlets = [
  * パンフレットダウンロードページ
  */
 export default function PamphletPage() {
-  if (!isDataPublished) {
-    return (
-      <div className="min-h-screen bg-secondary">
-        {/* ページヘッダー */}
-        <div className="bg-secondary py-16 text-gray-900">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-center gap-3">
-              <FileText className="h-10 w-10 md:h-12 md:w-12" />
-              <h1 className="text-4xl font-bold md:text-5xl">パンフレット</h1>
-            </div>
-            <p className="mt-4 text-center text-lg opacity-90">
-              第97回 世田谷祭の公式パンフレットをダウンロード
-            </p>
-          </div>
-        </div>
-        <div className="container mx-auto px-4 py-12">
-          <ComingSoon />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-secondary">
       {/* ページヘッダー */}

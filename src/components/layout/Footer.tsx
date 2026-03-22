@@ -11,7 +11,7 @@ export function Footer() {
       <div className="container mx-auto px-4 py-8">
         {/* ロゴ: 左上 */}
         <div className="mb-6">
-          <img src="/logo-white.webp" alt={siteConfig.shortName} className="w-48" />
+          <img src="/images/brand/logo-white.webp" alt={siteConfig.shortName} className="w-48" />
         </div>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
@@ -44,7 +44,11 @@ export function Footer() {
         </div>
 
         <div className="mt-8 border-t border-white/20 pt-8 flex flex-col items-center text-white/60">
-          <img src="/logo-white.webp" alt={siteConfig.shortName} className="mb-3 w-12" />
+          <img
+            src="/images/brand/logo-white.webp"
+            alt={siteConfig.shortName}
+            className="mb-3 w-12"
+          />
           <p className="mb-2">{siteConfig.name}</p>
           <p className="text-sm">
             © {currentYear} 東京都市大学 世田谷祭実行委員会. All rights reserved.
