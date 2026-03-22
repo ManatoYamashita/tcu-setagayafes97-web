@@ -1,4 +1,4 @@
-import { client } from "./microcms";
+import { client, isMicrocmsConfigured } from "./microcms";
 import type {
   Event,
   EventListResponse,
@@ -118,8 +118,12 @@ function normalizeEvent(rawEvent: RawEvent): Event {
   };
 }
 
+/** microCMS API の1リクエストあたり取得上限 */
+const MICROCMS_MAX_LIMIT = 100;
+
 /**
  * 企画一覧を取得
+ * limit が microCMS 上限(100)を超える場合は自動的にページネーションで全件取得
  * @param limit 取得件数（デフォルト: 50）
  * @param filters フィルタオプション
  * @returns 企画の配列
@@ -128,26 +132,7 @@ export async function getEventsList(
   limit: number = 50,
   filters?: EventsFilterOptions
 ): Promise<Event[]> {
-  const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
-
-  if (USE_MOCK) {
-    const { mockEvents } = await import("@/data/mock-events");
-    let filtered = mockEvents;
-
-    // フィルタリング処理
-    if (filters?.date) {
-      filtered = filtered.filter((event) => event.date === filters.date);
-    }
-    if (filters?.type) {
-      filtered = filtered.filter((event) => event.type === filters.type);
-    }
-    if (filters?.building) {
-      filtered = filtered.filter((event) => event.building === filters.building);
-    }
-
-    return filtered.slice(0, limit);
-  }
-
+  if (!isMicrocmsConfigured) return [];
   try {
     // microCMS filters パラメータの構築
     const filterQueries: string[] = [];
@@ -161,18 +146,45 @@ export async function getEventsList(
       filterQueries.push(`building[equals]${filters.building}`);
     }
 
-    const response: RawEventListResponse = await client.get({
-      endpoint: "events",
-      queries: {
-        limit,
-        orders: "-publishedAt",
-        ...(filterQueries.length > 0 && {
-          filters: filterQueries.join("[and]"),
-        }),
-      },
-    });
-    // データを正規化して返す
-    return response.contents.map(normalizeEvent);
+    const filterParam = filterQueries.length > 0 ? { filters: filterQueries.join("[and]") } : {};
+
+    // 100件以下なら1回で取得
+    if (limit <= MICROCMS_MAX_LIMIT) {
+      const response: RawEventListResponse = await client.get({
+        endpoint: "events",
+        queries: {
+          limit,
+          orders: "-publishedAt",
+          ...filterParam,
+        },
+      });
+      return response.contents.map(normalizeEvent);
+    }
+
+    // 100件超: ページネーションで全件取得
+    const allContents: RawEvent[] = [];
+    let offset = 0;
+
+    while (allContents.length < limit) {
+      const perPage = Math.min(MICROCMS_MAX_LIMIT, limit - allContents.length);
+      const response: RawEventListResponse = await client.get({
+        endpoint: "events",
+        queries: {
+          limit: perPage,
+          offset,
+          orders: "-publishedAt",
+          ...filterParam,
+        },
+      });
+
+      allContents.push(...response.contents);
+
+      // 取得件数が要求数未満 = これ以上データがない
+      if (response.contents.length < perPage) break;
+      offset += perPage;
+    }
+
+    return allContents.map(normalizeEvent);
   } catch (error) {
     console.error("[getEventsList] Error:", error);
     return [];
@@ -184,14 +196,7 @@ export async function getEventsList(
  * @returns おすすめ企画の配列
  */
 export async function getFeaturedEvents(): Promise<Event[]> {
-  const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
-
-  if (USE_MOCK) {
-    const { mockEvents } = await import("@/data/mock-events");
-    // モックデータは全てfeatured扱い（最大6件）
-    return mockEvents.slice(0, 6);
-  }
-
+  if (!isMicrocmsConfigured) return [];
   try {
     // microCMSにfeaturedフラグがある場合の実装例
     // 実際のフィールド名に合わせて調整してください
@@ -218,13 +223,7 @@ export async function getFeaturedEvents(): Promise<Event[]> {
  * @returns 企画情報、見つからない場合はnull
  */
 export async function getEventById(id: string): Promise<Event | null> {
-  const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
-
-  if (USE_MOCK) {
-    const { mockEvents } = await import("@/data/mock-events");
-    return mockEvents.find((e) => e.id === id) || null;
-  }
-
+  if (!isMicrocmsConfigured) return null;
   try {
     const response: RawEvent = await client.get({
       endpoint: "events",

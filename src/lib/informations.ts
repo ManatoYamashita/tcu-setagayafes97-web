@@ -1,4 +1,4 @@
-import { client } from "./microcms";
+import { client, isMicrocmsConfigured } from "./microcms";
 import type {
   Information,
   InformationListResponse,
@@ -52,14 +52,7 @@ function normalizeInformation(rawInfo: RawInformation): Information {
  * @returns 協賛企業の配列（優先度順）
  */
 export async function getSponsorsList(): Promise<Information[]> {
-  const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
-
-  if (USE_MOCK) {
-    const { mockSponsors } = await import("@/data/mock-sponsors");
-    // priority 降順でソート
-    return [...mockSponsors].sort((a, b) => (b.priority || 0) - (a.priority || 0));
-  }
-
+  if (!isMicrocmsConfigured) return [];
   try {
     const response: RawInformationListResponse = await client.get({
       endpoint: "informations",
@@ -82,14 +75,7 @@ export async function getSponsorsList(): Promise<Information[]> {
  * @returns FAQの配列
  */
 export async function getFAQList(): Promise<Information[]> {
-  const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
-
-  if (USE_MOCK) {
-    const { mockFAQ } = await import("@/data/mock-faq");
-    // priority 降順でソート
-    return [...mockFAQ].sort((a, b) => (b.priority || 0) - (a.priority || 0));
-  }
-
+  if (!isMicrocmsConfigured) return [];
   try {
     const response: RawInformationListResponse = await client.get({
       endpoint: "informations",
@@ -113,13 +99,7 @@ export async function getFAQList(): Promise<Information[]> {
  * @returns 情報、見つからない場合はnull
  */
 export async function getInformationById(id: string): Promise<Information | null> {
-  const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
-
-  if (USE_MOCK) {
-    const { mockSponsors } = await import("@/data/mock-sponsors");
-    return mockSponsors.find((s) => s.id === id) || null;
-  }
-
+  if (!isMicrocmsConfigured) return null;
   try {
     const response: RawInformation = await client.get({
       endpoint: "informations",

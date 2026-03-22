@@ -134,8 +134,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
           gsap.set(navItems, { opacity: 0, x: -15 });
         }
 
-        // Opener後は0.3sの"呼吸"、不在時はdelay無し
-        const tl = gsap.timeline({ delay: hasOpener ? 0.3 : 0 });
+        const tl = gsap.timeline();
 
         // メイン要素: stagger 0.12s で順次出現
         tl.to(

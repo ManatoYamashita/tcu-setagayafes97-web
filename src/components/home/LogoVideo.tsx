@@ -46,8 +46,12 @@ export function LogoVideo({
       <source src="/videos/logo-animation.webm" type="video/webm" />
       <source src="/videos/logo-animation.mp4" type="video/mp4" />
       <picture>
-        <source srcSet="/logo.webp" type="image/webp" />
-        <img src="/logo.png" alt="世田谷祭ロゴ" className={`${className} h-auto object-contain`} />
+        <source srcSet="/images/brand/logo.webp" type="image/webp" />
+        <img
+          src="/images/brand/logo.png"
+          alt="世田谷祭ロゴ"
+          className={`${className} h-auto object-contain`}
+        />
       </picture>
     </video>
   );

@@ -14,7 +14,9 @@
 docs/
 ├── INDEX.md          # 本索引ファイル
 ├── dev/              # 開発関連ドキュメント
-│   └── git.md        # ブランチ戦略とCI/CDワークフロー
+│   ├── git.md        # ブランチ戦略とCI/CDワークフロー
+│   ├── ci-env.md     # GitHub Actions 環境変数管理（Secrets/Variables）
+│   └── microcms.md   # microCMS API 制約と実装パターン
 ├── frontend/         # フロントエンド関連ドキュメント
 │   ├── design.md                  # デザインシステム（カラー・タイポグラフィトークン）
 │   ├── agent-browser-workflow.md  # agent-browserを使用したデザイン再現とデバッグフロー
@@ -74,6 +76,17 @@ docs/
   - コミットメッセージ規約
   - 運用フロー例とトラブルシューティング
 
+- **[ci-env.md](./dev/ci-env.md)** - GitHub Actions 環境変数管理
+  - Repository Secrets / Variables の使い分け基準
+  - 本プロジェクトの登録一覧（MICROCMS*\*, NEXT_PUBLIC*\*）
+  - ワークフローでの参照方法（`secrets.` vs `vars.`）
+  - ローカル開発（.env.local）との対応表
+
+- **[microcms.md](./dev/microcms.md)** - microCMS API 制約と実装パターン
+  - limit 上限100件の制約と offset ページネーション実装
+  - 適用済み関数（getEventsList）と未適用関数の一覧
+  - 使用 API エンドポイント一覧
+
 ### フロントエンド関連（frontend/）
 
 - **[design.md](./frontend/design.md)** - デザインシステム（カラー・タイポグラフィトークン）
@@ -105,4 +118,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-02-19
+**最終更新日**: 2026-03-22

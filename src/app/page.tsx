@@ -4,7 +4,6 @@ import { NewsSection } from "@/components/home/NewsSection";
 import { FeaturedEvents } from "@/components/home/FeaturedEvents";
 import { SponsorBanner } from "@/components/home/SponsorBanner";
 import { getLatestHeroNews } from "@/lib/news";
-import { isDataPublished } from "@/lib/publish";
 /**
  * トップページ
  * 第97回世田谷祭の公式Webサイト
@@ -17,7 +16,7 @@ export default async function Home() {
       <HeroSection latestNews={heroNews} />
       <AboutSection />
       <NewsSection />
-      {isDataPublished && <FeaturedEvents />}
+      <FeaturedEvents />
       <SponsorBanner />
     </main>
   );
