@@ -11,7 +11,7 @@ const { topSection } = aboutConfig;
  */
 export function AboutSection() {
   return (
-    <section className="relative -mt-48 bg-gradient-to-b from-white via-secondary to-transparent pt-72 pb-24 lg:pt-80 lg:pb-32">
+    <section className="relative -mt-48 bg-gradient-to-b from-primary-400 via-secondary to-transparent pt-72 pb-24 lg:pt-80 lg:pb-32">
       <div className="mx-auto max-w-6xl px-8 sm:px-12 lg:px-20">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
           {/* 左: 円形画像 + 歯車装飾 */}

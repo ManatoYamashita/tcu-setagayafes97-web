@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { siteConfig } from "@/data/site";
-import { LogoVideo } from "./LogoVideo";
 import { cn } from "@/lib/utils";
 import type { News, NewsType } from "@/types/news";
 
@@ -29,12 +28,12 @@ function DateBlock({ dateStr }: { dateStr: string }) {
   const { month, day, dayOfWeek } = getDateParts(dateStr);
 
   return (
-    <div className="flex items-center text-primary-400">
+    <div className="flex items-center text-white">
       <span className="text-5xl md:text-6xl lg:text-7xl font-serif italic leading-none -translate-y-1.5 md:-translate-y-2">
         {month}
       </span>
       <div className="relative mx-0.5 md:mx-1 flex items-center justify-center">
-        <div className="w-px h-14 md:h-20 lg:h-24 bg-primary-400/60 rotate-[-25deg]" />
+        <div className="w-px h-14 md:h-20 lg:h-24 bg-white/60 rotate-[-25deg]" />
       </div>
       <span className="text-5xl md:text-6xl lg:text-7xl font-serif italic leading-none translate-y-1.5 md:translate-y-2">
         {day}
@@ -71,20 +70,11 @@ interface HeroSectionProps {
  * ヒーローセクション
  * 5レイヤー構成: 白背景 / 装飾テキスト / Three.js歯車（中央） / 左下日付 / 右下最新ニュース
  */
-const heroNavItems = [
-  { label: "企画を探す", href: "/events" },
-  { label: "タイムテーブル", href: "/timetable" },
-  { label: "マップ", href: "/map" },
-  { label: "インフォメーション", href: "/info" },
-] as const;
-
 export function HeroSection({ latestNews }: HeroSectionProps) {
   // --- Entrance animation refs ---
   const sectionRef = useRef<HTMLElement>(null);
-  const logoVideoRef = useRef<HTMLDivElement>(null);
   const gearRef = useRef<HTMLDivElement>(null);
   const h1Ref = useRef<HTMLHeadingElement>(null);
-  const navRef = useRef<HTMLElement>(null);
   const dateBlockRef = useRef<HTMLDivElement>(null);
   const newsBlockRef = useRef<HTMLDivElement>(null);
   const ctxRef = useRef<gsap.Context | null>(null);
@@ -103,7 +93,6 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       const ctx = gsap.context(() => {
         // メイン要素を出現順に収集（null除外）
         const mainTargets = [
-          logoVideoRef.current,
           gearRef.current,
           h1Ref.current,
           dateBlockRef.current,
@@ -111,13 +100,6 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
         ].filter(Boolean) as HTMLElement[];
 
         gsap.set(mainTargets, { opacity: 0, y: 30 });
-
-        // ナビ: コンテナのopacityを解除し、子要素を個別制御
-        if (navRef.current) {
-          gsap.set(navRef.current, { opacity: 1 });
-          const navItems = navRef.current.querySelectorAll("a");
-          gsap.set(navItems, { opacity: 0, x: -15 });
-        }
 
         const tl = gsap.timeline();
 
@@ -134,25 +116,6 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
           },
           0
         );
-
-        // ナビリンク: stagger 0.08s、メイン要素の途中から開始
-        if (navRef.current) {
-          const navItems = navRef.current.querySelectorAll("a");
-          if (navItems.length > 0) {
-            tl.to(
-              navItems,
-              {
-                opacity: 1,
-                x: 0,
-                duration: 0.5,
-                ease: "power3.out",
-                stagger: 0.08,
-                force3D: true,
-              },
-              0.5
-            );
-          }
-        }
       }, sectionRef);
 
       ctxRef.current = ctx;
@@ -184,34 +147,8 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
     <section
       ref={sectionRef}
       id="hero-section"
-      className="w-full min-h-screen -mt-20 relative bg-white overflow-hidden flex items-center justify-center"
+      className="w-full min-h-[calc(100vh-var(--header-height))] relative bg-primary-400 overflow-hidden flex items-center justify-center"
     >
-      {/* [z-40] 左上 独自ナビ（デスクトップ） */}
-      <nav
-        ref={navRef}
-        className="absolute top-8 left-8 z-40 hidden md:flex flex-col gap-3 will-change-transform opacity-0"
-        aria-label="ヒーローナビゲーション"
-      >
-        {heroNavItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className="text-sm font-medium tracking-wider text-gray-700 hover:text-primary-400 transition-colors"
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-
-      {/* [z-5] ロゴ動画（背景として歯車・テキストより奥） */}
-      <div
-        ref={logoVideoRef}
-        className="absolute top-[10%] left-1/2 -translate-x-1/2 z-[5] pointer-events-none will-change-transform opacity-0"
-        aria-hidden="true"
-      >
-        <LogoVideo className="w-[45vw] md:w-[20vw]" waitForOpener />
-      </div>
-
       {/* [z-20] ロゴ画像（中央配置） */}
       <div
         ref={gearRef}
@@ -290,20 +227,20 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
         className="absolute left-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 will-change-transform opacity-0"
         aria-label={`開催日: ${siteConfig.dates.day1} - ${siteConfig.dates.day2}`}
       >
-        <p className="text-sm md:text-base font-serif italic tracking-[0.3em] text-primary-400 mb-2 md:mb-3">
+        <p className="text-sm md:text-base font-serif italic tracking-[0.3em] text-white mb-2 md:mb-3">
           {getDateParts(siteConfig.dates.day1).year}
         </p>
         <div className="flex items-center gap-4 md:gap-6 lg:gap-8">
           <DateBlock dateStr={siteConfig.dates.day1} />
           <DateBlock dateStr={siteConfig.dates.day2} />
         </div>
-        <p className="text-xs md:text-sm tracking-[0.2em] text-primary-400/80 mt-2 md:mt-3">
+        <p className="text-xs md:text-sm tracking-[0.2em] text-white/80 mt-2 md:mt-3">
           {siteConfig.openTime} - {siteConfig.closeTime}
         </p>
         {/* モバイル用CTA（md以上では非表示） */}
         <Link
           href="/events"
-          className="inline-block bg-primary-400 text-white text-sm font-medium px-6 py-3 rounded-full hover:bg-primary-500 transition-colors mt-4 md:hidden"
+          className="inline-block bg-white text-primary-400 text-sm font-medium px-6 py-3 rounded-full hover:bg-white/90 transition-colors mt-4 md:hidden"
         >
           企画を探す
         </Link>
@@ -319,21 +256,19 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
             <span
               className={cn(
                 "text-xs font-medium px-2 py-0.5 rounded",
-                latestNews.type === "urgent"
-                  ? "bg-red-500 text-white"
-                  : "bg-primary-400/15 text-primary-400"
+                latestNews.type === "urgent" ? "bg-red-500 text-white" : "bg-white/15 text-white"
               )}
             >
               {getNewsTypeLabel(latestNews.type)}
             </span>
-            <span className="text-xs text-gray-400">{formatNewsDate(latestNews.publishedAt)}</span>
+            <span className="text-xs text-white/60">{formatNewsDate(latestNews.publishedAt)}</span>
           </div>
-          <p className="text-sm md:text-base text-gray-700 font-medium line-clamp-2 mb-3">
+          <p className="text-sm md:text-base text-white font-medium line-clamp-2 mb-3">
             {latestNews.title}
           </p>
           <Link
             href={`/info/${latestNews.id}`}
-            className="text-sm text-primary-400 hover:text-primary-500 transition-colors font-medium"
+            className="text-sm text-white hover:text-white/80 transition-colors font-medium"
           >
             詳しく見る →
           </Link>

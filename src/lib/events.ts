@@ -192,28 +192,26 @@ export async function getEventsList(
 }
 
 /**
- * おすすめ企画（featured）を取得
+ * おすすめ企画を取得（全企画からランダムに最大6件）
+ * ISR再検証のたびにランダムが更新される
  * @returns おすすめ企画の配列
  */
 export async function getFeaturedEvents(): Promise<Event[]> {
   if (!isMicrocmsConfigured) return [];
   try {
-    // microCMSにfeaturedフラグがある場合の実装例
-    // 実際のフィールド名に合わせて調整してください
-    const response: RawEventListResponse = await client.get({
-      endpoint: "events",
-      queries: {
-        limit: 6,
-        filters: "featured[equals]true",
-        orders: "-publishedAt",
-      },
-    });
-    // データを正規化して返す
-    return response.contents.map(normalizeEvent);
+    const allEvents = await getEventsList(100);
+    if (allEvents.length === 0) return [];
+
+    // Fisher-Yatesシャッフルで均一ランダム選択
+    const shuffled = [...allEvents];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled.slice(0, 6);
   } catch (error) {
     console.error("[getFeaturedEvents] Error:", error);
-    // featuredフラグがない場合は、最新6件を返す
-    return getEventsList(6);
+    return [];
   }
 }
 

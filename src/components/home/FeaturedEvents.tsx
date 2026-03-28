@@ -98,10 +98,7 @@ export async function FeaturedEvents() {
   return (
     <section className="relative overflow-hidden py-24 lg:py-32">
       {/* 背景グラデーション: 上下フェードで前後セクションと自然に接続 */}
-      <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-secondary via-10% to-secondary"
-        aria-hidden="true"
-      />
+      <div className="pointer-events-none absolute inset-0 bg-secondary" aria-hidden="true" />
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-secondary to-transparent"
         aria-hidden="true"

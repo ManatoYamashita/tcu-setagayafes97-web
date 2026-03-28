@@ -2,6 +2,19 @@
  * About（委員会について）情報
  */
 export const aboutConfig = {
+  // Aboutページ ヒーロー フォトコラージュ
+  heroCollage: {
+    subtitle: "About Us",
+    heading: ["世田谷祭", "こころを動かす", "からくり"],
+    description: "東京都市大学 世田谷祭実行委員会について",
+    photos: [
+      { src: "/images/placeholder/pastel-castle.webp", alt: "活動風景1" },
+      { src: "/images/placeholder/pastel-castle.webp", alt: "活動風景2" },
+      { src: "/images/placeholder/pastel-castle.webp", alt: "活動風景3" },
+      { src: "/images/placeholder/pastel-castle.webp", alt: "活動風景4" },
+    ],
+  },
+
   // トップページ用Aboutセクション
   topSection: {
     label: "東京都市大学 第97回 世田谷祭",
