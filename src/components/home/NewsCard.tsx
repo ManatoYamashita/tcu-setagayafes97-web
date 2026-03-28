@@ -57,7 +57,7 @@ export function NewsCard({ news, variant = "default", className }: NewsCardProps
           sizes={
             variant === "large"
               ? "(max-width: 1024px) 100vw, 50vw"
-              : "(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              : "(max-width: 1024px) 50vw, 33vw"
           }
         />
         {/* 日付オーバーレイ */}

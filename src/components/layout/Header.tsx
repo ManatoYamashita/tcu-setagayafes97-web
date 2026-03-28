@@ -4,8 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import { siteConfig } from "@/data/site";
-// TODO: 多言語対応完成後に有効化
-// import { LanguageSwitcherWrapper } from "@/components/layout/LanguageSwitcherWrapper";
 import { DesktopNav } from "@/components/layout/DesktopNav";
 import dynamic from "next/dynamic";
 const StaggeredMobileMenu = dynamic(
@@ -64,10 +62,8 @@ export function Header() {
           {/* 中央: デスクトップナビ */}
           <DesktopNav />
 
-          {/* 右: 言語切り替え + ハンバーガー */}
+          {/* 右: ハンバーガー */}
           <div className="flex items-center gap-3">
-            {/* TODO: 多言語対応完成後に有効化 */}
-            {/* <LanguageSwitcherWrapper /> */}
             <button
               className="inline-flex items-center justify-center rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900 lg:hidden"
               aria-label="メニューを開く"
