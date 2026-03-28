@@ -177,7 +177,7 @@ export function Opener() {
         {/* 中央アイコン（256px） */}
         <div ref={iconRef} className="relative w-64 h-64 will-change-transform opacity-0">
           <Image
-            src="/favicon.webp"
+            src="/images/brand/favicon.webp"
             alt="世田谷祭ロゴ"
             fill
             priority
