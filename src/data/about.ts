@@ -2,6 +2,13 @@
  * About（委員会について）情報
  */
 export const aboutConfig = {
+  // Aboutページ ヒーロー（ミニマルデザイン）
+  hero: {
+    title: "About Us",
+    description: "東京都市大学 世田谷祭実行委員会について",
+    scrollIndicator: "( scroll down )",
+  },
+
   // トップページ用Aboutセクション
   topSection: {
     label: "東京都市大学 第97回 世田谷祭",
@@ -17,9 +24,13 @@ export const aboutConfig = {
 
   // 委員長挨拶
   chairpersonMessage: {
+    sectionLabel: "MESSAGE",
+    heading: "つながる、\nひろがる、\n世田谷祭。",
+    briefDescription: "希望と創造の先にある本当の想いを汲み取り、\n心に残る学園祭を。",
     name: "実行委員長 山田 太郎",
     position: "第97回 世田谷祭 実行委員長",
-    image: "/images/chairperson-placeholder.jpg", // プレースホルダー画像
+    image: "/images/placeholder/pastel-castle.webp",
+    subImage: "/images/placeholder/pastel-castle.webp",
     message: `
 ご来場の皆様、こんにちは。
 第97回 世田谷祭 実行委員長の山田太郎と申します。

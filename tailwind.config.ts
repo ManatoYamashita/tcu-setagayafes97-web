@@ -21,7 +21,7 @@ const config: Config = {
         "primary-900": "oklch(18% 0.075 314deg)",
 
         // Secondary Brand Color
-        secondary: "oklch(79.5% 0.108 314deg)", // #E1C0EE
+        secondary: "oklch(72% 0.13 314deg)", // やや濃い紫
 
         // Neutral Scale
         "gray-50": "oklch(97% 0 0deg)",

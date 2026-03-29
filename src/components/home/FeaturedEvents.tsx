@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getFeaturedEvents } from "@/lib/events";
+import { FeaturedGearScene } from "./FeaturedGearScene";
 import type { Event } from "@/types/events";
 
 /**
@@ -12,7 +13,7 @@ function FeaturedEventCard({ event }: { event: Event }) {
   return (
     <Link
       href={`/events/${event.id}`}
-      className="group relative block aspect-[16/5] overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+      className="group relative block aspect-[16/9] lg:aspect-[16/5] overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
     >
       {/* 背景画像 */}
       <Image
@@ -97,10 +98,7 @@ export async function FeaturedEvents() {
   return (
     <section className="relative overflow-hidden py-24 lg:py-32">
       {/* 背景グラデーション: 上下フェードで前後セクションと自然に接続 */}
-      <div
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-secondary via-10% to-secondary"
-        aria-hidden="true"
-      />
+      <div className="pointer-events-none absolute inset-0 bg-secondary" aria-hidden="true" />
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-secondary to-transparent"
         aria-hidden="true"
@@ -130,23 +128,15 @@ export async function FeaturedEvents() {
 
         {/* 下部: イラスト + カード（重なり配置） */}
         <div className="relative mt-8 lg:grid lg:grid-cols-12 lg:items-end">
-          {/* イラスト: col 1-7, 背面（デスクトップのみ） */}
-          <div className="hidden lg:col-start-1 lg:col-end-7 lg:row-start-1 lg:flex lg:items-end z-0">
-            <div className="relative w-full max-w-[440px]">
-              <Image
-                src="/images/placeholder/pastel-castle.webp"
-                alt="おすすめ企画のイラスト"
-                width={440}
-                height={440}
-                className="h-auto w-full"
-                sizes="440px"
-                priority={false}
-              />
+          {/* 3D歯車: モバイルはabsolute大サイズ / デスクトップはgrid col 1-7 */}
+          <div className="pointer-events-none absolute -left-[20%] top-1/2 w-[80%] -translate-y-1/2 lg:pointer-events-auto lg:static lg:w-auto lg:translate-y-0 lg:col-start-1 lg:col-end-7 lg:row-start-1 lg:flex lg:items-start lg:z-0 lg:-mt-24">
+            <div className="relative w-full aspect-square lg:max-w-[650px] lg:-ml-16">
+              <FeaturedGearScene />
             </div>
           </div>
 
-          {/* カード + CTA: col 5-13, 前面 */}
-          <div className="lg:col-start-5 lg:col-end-13 lg:row-start-1 z-10 flex flex-col gap-5">
+          {/* カード + CTA: モバイルは右寄せ70% / デスクトップはcol 5-13 */}
+          <div className="relative z-10 ml-auto w-[70%] flex flex-col gap-5 lg:ml-0 lg:w-auto lg:col-start-5 lg:col-end-13 lg:row-start-1 lg:z-10">
             {featured.length > 0 ? (
               <>
                 {featured.map((event) => (
@@ -175,21 +165,6 @@ export async function FeaturedEvents() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
-            </div>
-          </div>
-
-          {/* モバイル用イラスト */}
-          <div className="mt-8 flex justify-center lg:hidden">
-            <div className="relative w-full max-w-[320px] sm:max-w-[380px]">
-              <Image
-                src="/images/placeholder/pastel-castle.webp"
-                alt="おすすめ企画のイラスト"
-                width={440}
-                height={440}
-                className="h-auto w-full"
-                sizes="(max-width: 640px) 320px, 380px"
-                priority={false}
-              />
             </div>
           </div>
         </div>

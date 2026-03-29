@@ -13,8 +13,10 @@ export default async function Home() {
 
   return (
     <main className="overflow-x-clip">
-      <HeroSection latestNews={heroNews} />
-      <AboutSection />
+      <div className="bg-secondary">
+        <HeroSection latestNews={heroNews} />
+        <AboutSection />
+      </div>
       <NewsSection />
       <FeaturedEvents />
       <SponsorBanner />

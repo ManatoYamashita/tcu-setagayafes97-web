@@ -24,7 +24,7 @@ export default function GearScene() {
       {/* 環境光（シャドウを柔らかく） */}
       <ambientLight intensity={0.55} />
 
-      <Gear scale={0.8} />
+      <Gear scale={1.15} />
     </Canvas>
   );
 }

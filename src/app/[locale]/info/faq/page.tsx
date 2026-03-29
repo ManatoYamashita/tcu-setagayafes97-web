@@ -4,7 +4,6 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getFAQList } from "@/lib/informations";
 import { Accordion } from "@/components/ui/Accordion";
 import { routing } from "@/i18n/routing";
-import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import type { AccordionItem } from "@/types/accordion";
 
 /**
@@ -64,11 +63,6 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: st
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary">
-      {/* 言語切替（多言語対応ページのみ） */}
-      <div className="fixed right-4 top-4 z-50">
-        <LanguageSwitcher />
-      </div>
-
       {/* ページヘッダー */}
       <div className="bg-secondary py-16 text-gray-900">
         <div className="container mx-auto px-4">

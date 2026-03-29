@@ -49,21 +49,33 @@
 
 body {
   color: var(--color-text); /* #212121 */
+  background-color: oklch(68% 0.175 314deg); /* primary-400 */
 }
 
-body::before {
+/* Hero: 淡いピンクのradial gradientを散りばめる装飾 */
+#hero-section::before,
+#hero-section::after {
   content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(
-    160deg,
-    oklch(79.5% 0.108 314deg),
-    oklch(83% 0.07 345deg) 35%,
-    oklch(81% 0.08 330deg) 60%,
-    oklch(85% 0.06 355deg) 85%,
-    oklch(80% 0.09 320deg)
-  );
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+#hero-section::before {
+  width: 70%;
+  height: 80%;
+  top: -15%;
+  right: -20%;
+  background: radial-gradient(ellipse at center, rgba(255, 150, 200, 0.35), transparent 65%);
+}
+
+#hero-section::after {
+  width: 60%;
+  height: 70%;
+  bottom: -10%;
+  left: -15%;
+  background: radial-gradient(ellipse at center, rgba(245, 130, 190, 0.3), transparent 65%);
 }
 
 @layer base {
@@ -81,6 +93,26 @@ body::before {
 @utility font-display-mincho {
   font-family:
     var(--font-shippori-mincho, "Shippori Mincho"), "Hiragino Mincho ProN", "Yu Mincho", serif;
+}
+
+@utility animate-spin-slow {
+  animation: spin 240s linear infinite;
+}
+
+@utility font-dela-gothic {
+  font-family: var(--font-dela-gothic-one, "Dela Gothic One"), sans-serif;
+}
+
+@utility text-hero-title {
+  color: #fffde6;
+  -webkit-text-stroke: 1.5px #1e3a5f;
+  paint-order: stroke fill;
+  text-shadow:
+    2px 2px 0 #1e3a5f,
+    -1px -1px 0 #1e3a5f,
+    1px -1px 0 #1e3a5f,
+    -1px 1px 0 #1e3a5f,
+    0 4px 8px rgba(30, 58, 95, 0.3);
 }
 
 @layer utilities {
@@ -114,6 +146,33 @@ body::before {
   }
   to {
     rotate: 360deg;
+  }
+}
+
+/* Blob浮遊アニメーション（2パターンでずらして有機的な動きに） */
+@keyframes blob-drift-1 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -25px) scale(1.05);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+}
+
+@keyframes blob-drift-2 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-25px, 15px) scale(0.97);
+  }
+  66% {
+    transform: translate(20px, -20px) scale(1.03);
   }
 }
 
@@ -208,6 +267,9 @@ body::before {
     animation: none !important;
   }
   .page-transition-wrapper {
+    animation: none !important;
+  }
+  [class*="animate-blob"] {
     animation: none !important;
   }
 }

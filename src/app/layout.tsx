@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans_JP, Kaisei_Opti, Shippori_Mincho } from "next/font/google";
+import { Noto_Sans_JP, Kaisei_Opti, Shippori_Mincho, Dela_Gothic_One } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/data/site";
 import { Header } from "@/components/layout/Header";
@@ -18,6 +18,14 @@ const shipporiMincho = Shippori_Mincho({
   subsets: ["latin"],
   weight: ["400", "700", "800"],
   variable: "--font-shippori-mincho",
+  display: "swap",
+  preload: false,
+});
+
+const delaGothicOne = Dela_Gothic_One({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-dela-gothic-one",
   display: "swap",
   preload: false,
 });
@@ -72,7 +80,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body
-        className={`${notoSansJP.variable} ${kaiseiOpti.variable} ${shipporiMincho.variable} font-sans antialiased text-gray-900`}
+        className={`${notoSansJP.variable} ${kaiseiOpti.variable} ${shipporiMincho.variable} ${delaGothicOne.variable} font-sans antialiased text-gray-900`}
       >
         <Opener />
         <Header />
