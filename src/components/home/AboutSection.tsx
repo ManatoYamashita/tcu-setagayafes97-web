@@ -11,12 +11,38 @@ const { topSection } = aboutConfig;
  */
 export function AboutSection() {
   return (
-    <section className="relative -mt-48 bg-secondary pt-72 pb-24 lg:pt-80 lg:pb-32 overflow-hidden">
-      {/* 背景グラデーションblob */}
+    <section
+      className="relative -mt-48 pt-72 pb-24 lg:pt-80 lg:pb-32 overflow-hidden"
+      style={{
+        background: "linear-gradient(to bottom, transparent 0%, var(--color-secondary) 380px)",
+      }}
+    >
+      {/* 背景グラデーションblob（ピンク系グロウ） */}
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div className="absolute top-[10%] right-[0%] h-[40%] w-[35%] rounded-full bg-pink-300/30 blur-[100px]" />
-        <div className="absolute top-[40%] -left-[5%] h-[35%] w-[30%] rounded-full bg-sky-300/25 blur-[90px]" />
-        <div className="absolute bottom-[5%] right-[15%] h-[30%] w-[25%] rounded-full bg-white/20 blur-[80px]" />
+        <div
+          className="animate-blob absolute top-[10%] right-[0%] h-[50%] w-[45%] rounded-full"
+          style={{
+            background: "radial-gradient(circle at center, rgba(255,140,200,0.4), transparent 70%)",
+            animation: "blob-drift-2 20s ease-in-out infinite",
+          }}
+        />
+        <div
+          className="animate-blob absolute top-[40%] -left-[5%] h-[45%] w-[40%] rounded-full"
+          style={{
+            background:
+              "radial-gradient(circle at center, rgba(255,160,210,0.35), transparent 70%)",
+            animation: "blob-drift-1 24s ease-in-out infinite",
+            animationDelay: "-8s",
+          }}
+        />
+        <div
+          className="animate-blob absolute bottom-[5%] right-[15%] h-[40%] w-[35%] rounded-full"
+          style={{
+            background: "radial-gradient(circle at center, rgba(255,180,220,0.4), transparent 70%)",
+            animation: "blob-drift-2 18s ease-in-out infinite",
+            animationDelay: "-11s",
+          }}
+        />
       </div>
 
       <div className="mx-auto max-w-6xl px-8 sm:px-12 lg:px-20">

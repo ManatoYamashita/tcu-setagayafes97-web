@@ -149,12 +149,40 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       id="hero-section"
       className="w-full min-h-[calc(100vh-var(--header-height))] relative bg-secondary overflow-hidden flex items-center justify-center"
     >
-      {/* [z-10] 背景グラデーションblob */}
+      {/* [z-10] 背景グラデーションblob（ピンク系グロウ） */}
       <div className="pointer-events-none absolute inset-0 z-10" aria-hidden="true">
-        <div className="absolute -top-[10%] -left-[5%] h-[45%] w-[40%] rounded-full bg-white/20 blur-[80px]" />
-        <div className="absolute top-[15%] right-[5%] h-[35%] w-[30%] rounded-full bg-pink-300/30 blur-[100px]" />
-        <div className="absolute bottom-[5%] left-[20%] h-[40%] w-[35%] rounded-full bg-sky-300/25 blur-[90px]" />
-        <div className="absolute bottom-[15%] right-[10%] h-[30%] w-[25%] rounded-full bg-white/15 blur-[80px]" />
+        <div
+          className="animate-blob absolute -top-[10%] -left-[5%] h-[55%] w-[50%] rounded-full"
+          style={{
+            background: "radial-gradient(circle at center, rgba(255,180,220,0.5), transparent 70%)",
+            animation: "blob-drift-1 18s ease-in-out infinite",
+          }}
+        />
+        <div
+          className="animate-blob absolute top-[15%] right-[5%] h-[45%] w-[40%] rounded-full"
+          style={{
+            background:
+              "radial-gradient(circle at center, rgba(255,140,200,0.45), transparent 70%)",
+            animation: "blob-drift-2 22s ease-in-out infinite",
+            animationDelay: "-7s",
+          }}
+        />
+        <div
+          className="animate-blob absolute bottom-[5%] left-[20%] h-[50%] w-[45%] rounded-full"
+          style={{
+            background: "radial-gradient(circle at center, rgba(255,160,210,0.4), transparent 70%)",
+            animation: "blob-drift-1 20s ease-in-out infinite",
+            animationDelay: "-12s",
+          }}
+        />
+        <div
+          className="animate-blob absolute bottom-[15%] right-[10%] h-[40%] w-[35%] rounded-full"
+          style={{
+            background: "radial-gradient(circle at center, rgba(255,120,190,0.4), transparent 70%)",
+            animation: "blob-drift-2 16s ease-in-out infinite",
+            animationDelay: "-4s",
+          }}
+        />
       </div>
 
       {/* [z-20] ロゴ画像（中央配置） */}
