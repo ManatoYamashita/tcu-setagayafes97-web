@@ -13,7 +13,7 @@ export async function NewsSection() {
   // データが取得できない場合の表示
   if (newsList.length === 0) {
     return (
-      <section className="relative py-32">
+      <section className="relative bg-secondary py-32">
         {/* CircularText装飾 */}
         <CircularText
           text="· SETAGAYA FES 97th · SETAGAYA FES 97th "
@@ -35,7 +35,7 @@ export async function NewsSection() {
   }
 
   return (
-    <section className="relative py-32">
+    <section className="relative bg-secondary py-32">
       {/* CircularText装飾 */}
       <CircularText
         text="· SETAGAYA FES 97th · SETAGAYA FES 97th "

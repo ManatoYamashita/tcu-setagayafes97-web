@@ -147,8 +147,16 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
     <section
       ref={sectionRef}
       id="hero-section"
-      className="w-full min-h-[calc(100vh-var(--header-height))] relative bg-primary-400 overflow-hidden flex items-center justify-center"
+      className="w-full min-h-[calc(100vh-var(--header-height))] relative bg-secondary overflow-hidden flex items-center justify-center"
     >
+      {/* [z-10] 背景グラデーションblob */}
+      <div className="pointer-events-none absolute inset-0 z-10" aria-hidden="true">
+        <div className="absolute -top-[10%] -left-[5%] h-[45%] w-[40%] rounded-full bg-white/20 blur-[80px]" />
+        <div className="absolute top-[15%] right-[5%] h-[35%] w-[30%] rounded-full bg-pink-300/30 blur-[100px]" />
+        <div className="absolute bottom-[5%] left-[20%] h-[40%] w-[35%] rounded-full bg-sky-300/25 blur-[90px]" />
+        <div className="absolute bottom-[15%] right-[10%] h-[30%] w-[25%] rounded-full bg-white/15 blur-[80px]" />
+      </div>
+
       {/* [z-20] ロゴ画像（中央配置） */}
       <div
         ref={gearRef}

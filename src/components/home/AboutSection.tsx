@@ -11,7 +11,14 @@ const { topSection } = aboutConfig;
  */
 export function AboutSection() {
   return (
-    <section className="relative -mt-48 bg-gradient-to-b from-primary-400 via-secondary to-transparent pt-72 pb-24 lg:pt-80 lg:pb-32">
+    <section className="relative -mt-48 bg-secondary pt-72 pb-24 lg:pt-80 lg:pb-32 overflow-hidden">
+      {/* 背景グラデーションblob */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div className="absolute top-[10%] right-[0%] h-[40%] w-[35%] rounded-full bg-pink-300/30 blur-[100px]" />
+        <div className="absolute top-[40%] -left-[5%] h-[35%] w-[30%] rounded-full bg-sky-300/25 blur-[90px]" />
+        <div className="absolute bottom-[5%] right-[15%] h-[30%] w-[25%] rounded-full bg-white/20 blur-[80px]" />
+      </div>
+
       <div className="mx-auto max-w-6xl px-8 sm:px-12 lg:px-20">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
           {/* 左: 円形画像 + 歯車装飾 */}

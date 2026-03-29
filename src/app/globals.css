@@ -96,7 +96,7 @@ body {
 }
 
 @utility animate-spin-slow {
-  animation: spin 60s linear infinite;
+  animation: spin 240s linear infinite;
 }
 
 @utility font-dela-gothic {
