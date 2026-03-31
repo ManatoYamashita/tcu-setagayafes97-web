@@ -28,12 +28,12 @@ function DateBlock({ dateStr }: { dateStr: string }) {
   const { month, day, dayOfWeek } = getDateParts(dateStr);
 
   return (
-    <div className="flex items-center text-white">
+    <div className="flex items-center text-primary-400">
       <span className="text-5xl md:text-6xl lg:text-7xl font-serif italic leading-none -translate-y-1.5 md:-translate-y-2">
         {month}
       </span>
       <div className="relative mx-0.5 md:mx-1 flex items-center justify-center">
-        <div className="w-px h-14 md:h-20 lg:h-24 bg-white/60 rotate-[-25deg]" />
+        <div className="w-px h-14 md:h-20 lg:h-24 bg-primary-400/60 rotate-[-25deg]" />
       </div>
       <span className="text-5xl md:text-6xl lg:text-7xl font-serif italic leading-none translate-y-1.5 md:translate-y-2">
         {day}
@@ -263,20 +263,20 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
         className="absolute left-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 will-change-transform opacity-0"
         aria-label={`開催日: ${siteConfig.dates.day1} - ${siteConfig.dates.day2}`}
       >
-        <p className="text-sm md:text-base font-serif italic tracking-[0.3em] text-white mb-2 md:mb-3">
+        <p className="text-sm md:text-base font-serif italic tracking-[0.3em] text-primary-400 mb-2 md:mb-3">
           {getDateParts(siteConfig.dates.day1).year}
         </p>
         <div className="flex items-center gap-4 md:gap-6 lg:gap-8">
           <DateBlock dateStr={siteConfig.dates.day1} />
           <DateBlock dateStr={siteConfig.dates.day2} />
         </div>
-        <p className="text-xs md:text-sm tracking-[0.2em] text-white/80 mt-2 md:mt-3">
+        <p className="text-xs md:text-sm tracking-[0.2em] text-primary-400/70 mt-2 md:mt-3">
           {siteConfig.openTime} - {siteConfig.closeTime}
         </p>
         {/* モバイル用CTA（md以上では非表示） */}
         <Link
           href="/events"
-          className="inline-block bg-white text-primary-400 text-sm font-medium px-6 py-3 rounded-full hover:bg-white/90 transition-colors mt-4 md:hidden"
+          className="inline-block bg-primary-400 text-white text-sm font-medium px-6 py-3 rounded-full hover:bg-primary-300 transition-colors mt-4 md:hidden"
         >
           企画を探す
         </Link>
@@ -292,24 +292,34 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
             <span
               className={cn(
                 "text-xs font-medium px-2 py-0.5 rounded",
-                latestNews.type === "urgent" ? "bg-red-500 text-white" : "bg-white/15 text-white"
+                latestNews.type === "urgent" ? "bg-red-500 text-white" : "bg-gray-200 text-gray-700"
               )}
             >
               {getNewsTypeLabel(latestNews.type)}
             </span>
-            <span className="text-xs text-white/60">{formatNewsDate(latestNews.publishedAt)}</span>
+            <span className="text-xs text-gray-500">{formatNewsDate(latestNews.publishedAt)}</span>
           </div>
-          <p className="text-sm md:text-base text-white font-medium line-clamp-2 mb-3">
+          <p className="text-sm md:text-base text-gray-700 font-medium line-clamp-2 mb-3">
             {latestNews.title}
           </p>
           <Link
             href={`/info/${latestNews.id}`}
-            className="text-sm text-white hover:text-white/80 transition-colors font-medium"
+            className="text-sm text-gray-700 hover:text-gray-500 transition-colors font-medium"
           >
             詳しく見る →
           </Link>
         </div>
       )}
+
+      {/* 下部グラデーションオーバーレイ（transparent → white） */}
+      <div
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-48 md:h-56"
+        aria-hidden="true"
+        style={{
+          background: "linear-gradient(to bottom, transparent, white)",
+          zIndex: 15,
+        }}
+      />
     </section>
   );
 }
