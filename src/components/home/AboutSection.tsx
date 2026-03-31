@@ -11,9 +11,14 @@ const { topSection } = aboutConfig;
  */
 export function AboutSection() {
   return (
-    <section className="relative -mt-48 pt-72 pb-24 lg:pt-80 lg:pb-32 overflow-hidden bg-[var(--color-secondary)]">
-      {/* z-0: 背景グラデーションblob（ピンク系グロウ） */}
-      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+    <section
+      className="relative -mt-48 pt-72 pb-24 lg:pt-80 lg:pb-32 overflow-hidden"
+      style={{
+        background: "linear-gradient(to bottom, transparent 0%, var(--color-secondary) 380px)",
+      }}
+    >
+      {/* 背景グラデーションblob（ピンク系グロウ） */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div
           className="animate-blob absolute top-[10%] right-[0%] h-[50%] w-[45%] rounded-full"
           style={{
@@ -40,17 +45,7 @@ export function AboutSection() {
         />
       </div>
 
-      {/* z-10: 白グラデーションオーバーレイ（上部白→下部透明） */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-48 bottom-0 z-10"
-        aria-hidden="true"
-        style={{
-          background:
-            "linear-gradient(to bottom, white 0%, white 15%, rgba(255,255,255,0.7) 30%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.08) 70%, transparent 85%)",
-        }}
-      />
-
-      <div className="relative z-20 mx-auto max-w-6xl px-8 sm:px-12 lg:px-20">
+      <div className="mx-auto max-w-6xl px-8 sm:px-12 lg:px-20">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
           {/* 左: 円形画像 + 歯車装飾 */}
           <div className="flex justify-center">
@@ -86,7 +81,7 @@ export function AboutSection() {
             </p>
 
             {/* 見出し */}
-            <h2 className="mb-4 text-4xl font-bold text-primary md:text-5xl lg:text-6xl">
+            <h2 className="mb-4 text-4xl font-bold text-primary-400 md:text-5xl lg:text-6xl">
               {topSection.heading}
             </h2>
 
@@ -105,7 +100,7 @@ export function AboutSection() {
             {/* CTA */}
             <Link
               href={topSection.cta.href}
-              className="group inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-primary/85 hover:shadow-lg"
+              className="group inline-flex items-center gap-2 text-sm font-semibold text-primary-400 underline underline-offset-4 transition-opacity hover:opacity-70"
             >
               {topSection.cta.label}
               <svg
