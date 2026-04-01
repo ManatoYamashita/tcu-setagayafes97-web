@@ -58,7 +58,7 @@ export async function getSponsorsList(): Promise<Information[]> {
       endpoint: "informations",
       queries: {
         limit: 100,
-        filters: "category[contains]sponsor : 協賛企業",
+        filters: "category[contains]sponsor",
         orders: "-priority",
       },
     });

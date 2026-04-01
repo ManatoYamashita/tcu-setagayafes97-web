@@ -81,22 +81,22 @@ export function AboutSection() {
           {/* 右: テキストコンテンツ */}
           <div>
             {/* ラベル */}
-            <p className="mb-4 text-xs uppercase tracking-widest text-gray-500">
+            <p className="mb-4 text-xs uppercase tracking-widest text-white/60">
               {topSection.label}
             </p>
 
             {/* 見出し */}
-            <h2 className="mb-4 text-4xl font-bold text-primary md:text-5xl lg:text-6xl">
+            <h2 className="mb-4 text-4xl font-bold text-white md:text-5xl lg:text-6xl">
               {topSection.heading}
             </h2>
 
             {/* タグライン */}
-            <p className="mb-8 text-lg font-medium text-gray-700">{topSection.tagline}</p>
+            <p className="mb-8 text-lg font-medium text-white/80">{topSection.tagline}</p>
 
             {/* 本文 */}
             <div className="mb-10 space-y-4">
               {topSection.paragraphs.map((paragraph, i) => (
-                <p key={i} className="leading-relaxed text-gray-600">
+                <p key={i} className="leading-relaxed text-white/70">
                   {paragraph}
                 </p>
               ))}
