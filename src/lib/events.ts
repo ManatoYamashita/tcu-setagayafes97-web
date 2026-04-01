@@ -137,10 +137,10 @@ export async function getEventsList(
     // microCMS filters パラメータの構築
     const filterQueries: string[] = [];
     if (filters?.date) {
-      filterQueries.push(`date[equals]${filters.date}`);
+      filterQueries.push(`date[contains]${filters.date}`);
     }
     if (filters?.type) {
-      filterQueries.push(`type[equals]${filters.type}`);
+      filterQueries.push(`type[contains]${filters.type}`);
     }
     if (filters?.building) {
       filterQueries.push(`building[equals]${filters.building}`);

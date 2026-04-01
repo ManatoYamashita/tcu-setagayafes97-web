@@ -185,6 +185,15 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
         />
       </div>
 
+      {/* [z-15] 白グラデーションマスク（上:透明 → 下:白） */}
+      <div
+        className="pointer-events-none absolute inset-0 z-15"
+        aria-hidden="true"
+        style={{
+          background: "linear-gradient(to top, transparent 0%, white 100%)",
+        }}
+      />
+
       {/* [z-20] ロゴ画像（中央配置） */}
       <div
         ref={gearRef}
