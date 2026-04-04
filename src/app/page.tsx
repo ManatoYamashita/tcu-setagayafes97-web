@@ -13,7 +13,9 @@ export default async function Home() {
 
   return (
     <main className="overflow-x-clip">
-      <div className="bg-secondary">
+      <div
+        style={{ background: "linear-gradient(to top, var(--color-secondary) 40%, #ffffff 100%)" }}
+      >
         <HeroSection latestNews={heroNews} />
         <AboutSection />
       </div>
