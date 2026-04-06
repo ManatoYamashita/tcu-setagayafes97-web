@@ -147,60 +147,15 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
     <section
       ref={sectionRef}
       id="hero-section"
-      className="w-full min-h-[calc(100vh-var(--header-height))] relative bg-secondary overflow-hidden flex items-center justify-center"
+      className="w-full min-h-[calc(100svh-var(--header-height))] relative z-10 overflow-hidden flex items-center justify-center"
     >
-      {/* [z-10] 背景グラデーションblob（ピンク系グロウ） */}
-      <div className="pointer-events-none absolute inset-0 z-10" aria-hidden="true">
-        <div
-          className="animate-blob absolute -top-[10%] -left-[5%] h-[55%] w-[50%] rounded-full"
-          style={{
-            background: "radial-gradient(circle at center, rgba(255,180,220,0.5), transparent 70%)",
-            animation: "blob-drift-1 18s ease-in-out infinite",
-          }}
-        />
-        <div
-          className="animate-blob absolute top-[15%] right-[5%] h-[45%] w-[40%] rounded-full"
-          style={{
-            background:
-              "radial-gradient(circle at center, rgba(255,140,200,0.45), transparent 70%)",
-            animation: "blob-drift-2 22s ease-in-out infinite",
-            animationDelay: "-7s",
-          }}
-        />
-        <div
-          className="animate-blob absolute bottom-[5%] left-[20%] h-[50%] w-[45%] rounded-full"
-          style={{
-            background: "radial-gradient(circle at center, rgba(255,160,210,0.4), transparent 70%)",
-            animation: "blob-drift-1 20s ease-in-out infinite",
-            animationDelay: "-12s",
-          }}
-        />
-        <div
-          className="animate-blob absolute bottom-[15%] right-[10%] h-[40%] w-[35%] rounded-full"
-          style={{
-            background: "radial-gradient(circle at center, rgba(255,120,190,0.4), transparent 70%)",
-            animation: "blob-drift-2 16s ease-in-out infinite",
-            animationDelay: "-4s",
-          }}
-        />
-      </div>
-
-      {/* [z-15] 白グラデーションマスク（上:透明 → 下:白） */}
-      <div
-        className="pointer-events-none absolute inset-0 z-15"
-        aria-hidden="true"
-        style={{
-          background: "linear-gradient(to top, transparent 0%, white 100%)",
-        }}
-      />
-
       {/* [z-20] ロゴ画像（中央配置） */}
       <div
         ref={gearRef}
-        className="relative z-20 flex items-center justify-center w-full max-w-[75vw] sm:max-w-[50vw] md:max-w-[40vw] will-change-transform opacity-0"
+        className="relative z-20 flex items-center justify-center w-full max-w-[75vw] sm:max-w-[50vw] md:max-w-[40vw] will-change-transform opacity-0 -translate-y-10 sm:-translate-y-6 md:translate-y-0"
       >
         <Image
-          src="/images/brand/outline.webp"
+          src="/images/brand/favicon-outline.webp"
           alt="世田谷祭のアイコン"
           width={800}
           height={800}
@@ -212,7 +167,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       {/* [z-30] h1 タイトル（2行アーチ型・アイコンの上に重なる） */}
       <h1
         ref={h1Ref}
-        className="absolute z-30 w-[85vw] sm:w-[70vw] md:w-[55vw] lg:w-[50vw] will-change-transform opacity-0"
+        className="absolute z-30 w-[85vw] sm:w-[70vw] md:w-[55vw] lg:w-[50vw] will-change-transform opacity-0 -translate-y-10 sm:-translate-y-6 md:translate-y-0"
       >
         <svg
           viewBox="0 0 600 280"
@@ -238,7 +193,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
             className="font-dela-gothic"
             fontSize="56"
             letterSpacing="-1"
-            fill="#fffde6"
+            fill="#f5e6b8"
             stroke="#1e3a5f"
             strokeWidth="4"
             paintOrder="stroke fill"
@@ -253,7 +208,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
             className="font-dela-gothic"
             fontSize="120"
             letterSpacing="-2"
-            fill="#fffde6"
+            fill="#f5e6b8"
             stroke="#1e3a5f"
             strokeWidth="5.5"
             paintOrder="stroke fill"
@@ -319,16 +274,6 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
           </Link>
         </div>
       )}
-
-      {/* 下部グラデーションオーバーレイ（transparent → white） */}
-      <div
-        className="pointer-events-none absolute bottom-0 left-0 right-0 h-48 md:h-56"
-        aria-hidden="true"
-        style={{
-          background: "linear-gradient(to bottom, transparent, white)",
-          zIndex: 15,
-        }}
-      />
     </section>
   );
 }

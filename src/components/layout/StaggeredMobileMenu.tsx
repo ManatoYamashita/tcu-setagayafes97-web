@@ -358,7 +358,7 @@ export function StaggeredMobileMenu({ isOpen, onClose }: StaggeredMobileMenuProp
                   key={it.link}
                 >
                   <a
-                    className="sm-panel-item relative inline-block cursor-pointer pr-[1.4em] text-[2.5rem] font-semibold leading-none tracking-[-1px] text-black no-underline transition-[background,color] duration-150 ease-linear"
+                    className="sm-panel-item relative inline-block cursor-pointer pr-[1.4em] text-[1.8rem] font-normal leading-none tracking-[-1px] text-black no-underline transition-[background,color] duration-150 ease-linear"
                     href={it.link}
                     aria-label={it.ariaLabel}
                     data-index={idx + 1}

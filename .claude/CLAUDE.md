@@ -237,11 +237,11 @@ refactor/<refactor-target> # リファクタリング
 │   ├── /[id]               # お知らせ詳細 [動的生成]
 │   ├── /guide              # ご来場の方へ
 │   ├── /faq                # よくある質問
-│   └── /pamphlet           # パンフレットDL
+│   ├── /pamphlet           # パンフレットDL
+│   └── /contact            # お問い合わせ
 ├── /about                  # 委員会・その他
 │   ├── /                   # 委員長挨拶・理念
 │   ├── /sponsors           # 協賛企業一覧
-│   ├── /contact            # お問い合わせ
 │   └── /privacy            # プライバシーポリシー
 └── /[locale]               # 多言語ページ (en, zh, ko)
 ```
@@ -266,7 +266,7 @@ refactor/<refactor-target> # リファクタリング
 - **日程切替**: Day1 / Day2 タブ
 - **ステージ切替**: ステージごとのタブ（7A, 7B, 体育館, ホール等）
 
-### お問い合わせフォーム (/about/contact)
+### お問い合わせフォーム (/info/contact)
 
 **フォーム種別:**
 

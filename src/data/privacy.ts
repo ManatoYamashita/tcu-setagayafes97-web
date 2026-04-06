@@ -47,7 +47,7 @@ export const privacyPolicyConfig = {
   // お問い合わせ窓口
   contact: {
     method: "お問い合わせフォーム",
-    url: "/about/contact",
+    url: "/info/contact",
     description:
       "個人情報の取り扱いに関するご質問・ご相談は、お問い合わせフォームからご連絡ください。",
   },

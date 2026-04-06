@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getNewsList } from "@/lib/news";
 import { CircularText } from "@/components/ui/CircularText";
 import { NewsFilter } from "./NewsFilter";
+import Image from "next/image";
 
 /**
  * お知らせセクション
@@ -35,82 +36,104 @@ export async function NewsSection() {
   }
 
   return (
-    <section className="relative bg-secondary py-32">
+    <section className="relative bg-secondary">
+      {/* 背景画像: 画面幅いっぱい */}
+      <div className="relative h-[40vh] w-full overflow-hidden sm:h-[50vh] md:h-[60vh]">
+        <Image
+          src="/images/photos/tcu-7.webp"
+          alt="キャンパス風景"
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        />
+      </div>
+
       {/* CircularText装飾 */}
       <CircularText
         text="· SETAGAYA FES 97th · SETAGAYA FES 97th "
         spinDuration={20}
         className="pointer-events-none absolute right-0 top-32 z-0 w-72 -translate-y-1/2 translate-x-1/2 text-primary-400/60 md:w-80 lg:w-96"
       />
-      <div className="container mx-auto px-4">
-        <div className="relative">
-          {/* 白シート */}
-          <div className="relative z-10 rounded-3xl bg-white px-6 py-12 sm:px-10 md:px-12 md:py-16 lg:px-16">
-            {/* セクションヘッダー */}
-            <div className="mb-10 flex items-center justify-between">
-              <h2 className="text-5xl font-bold md:text-6xl">NEWS</h2>
-              <Link
-                href="/info"
-                className="flex items-center gap-2 font-semibold text-gray-900 transition-opacity hover:opacity-60"
-              >
-                <span>NEWS ALL</span>
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </Link>
-            </div>
 
-            {/* タブ絞り込み + ニュース一覧 */}
-            <NewsFilter newsList={newsList} />
+      {/* 白シートエリア: 画像に重なるように上にオフセット */}
+      <div className="relative z-10 -mt-20 pb-32 sm:-mt-28 md:-mt-36">
+        <div className="container mx-auto px-4">
+          <div className="relative">
+            {/* 白シート */}
+            <div className="relative z-10 rounded-3xl bg-white px-6 py-12 shadow-xl sm:px-10 md:px-12 md:py-16 lg:px-16">
+              {/* タブ絞り込み + ニュース一覧（2カラム） */}
+              <NewsFilter
+                newsList={newsList}
+                header={
+                  <>
+                    <h2 className="text-5xl font-bold md:text-6xl">NEWS</h2>
+                    <Link
+                      href="/info"
+                      className="mt-4 inline-flex items-center gap-2 font-semibold text-gray-900 transition-opacity hover:opacity-60"
+                    >
+                      <span>NEWS ALL</span>
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17 8l4 4m0 0l-4 4m4-4H3"
+                        />
+                      </svg>
+                    </Link>
+                  </>
+                }
+              />
 
-            {/* CTA: お知らせ一覧へ */}
-            <div className="mt-10 flex justify-center">
-              <Link
-                href="/info"
-                className="group inline-flex items-center gap-3 rounded-full border-2 border-gray-900 px-8 py-3 font-semibold text-gray-900 transition-all hover:bg-gray-900 hover:text-white"
-              >
-                <span>お知らせ一覧を見る</span>
-                <svg
-                  className="h-5 w-5 transition-transform group-hover:translate-x-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              {/* CTA: お知らせ一覧へ */}
+              <div className="mt-10 flex justify-center">
+                <Link
+                  href="/info"
+                  className="group inline-flex items-center gap-3 rounded-full border-2 border-gray-900 px-8 py-3 font-semibold text-gray-900 transition-all hover:bg-gray-900 hover:text-white"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </Link>
+                  <span>お知らせ一覧を見る</span>
+                  <svg
+                    className="h-5 w-5 transition-transform group-hover:translate-x-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    />
+                  </svg>
+                </Link>
+              </div>
             </div>
+
+            {/* 歯車装飾: 右下（複数歯車） */}
+            <img
+              src="/materials/geers.webp"
+              alt=""
+              aria-hidden="true"
+              className="pointer-events-none absolute -bottom-8 right-8 z-20 w-28 select-none md:w-40 lg:w-48"
+              loading="lazy"
+              draggable={false}
+            />
+
+            {/* 歯車装飾: 左下（単体歯車） */}
+            <img
+              src="/materials/geer1.webp"
+              alt="歯車"
+              aria-hidden="true"
+              className="pointer-events-none absolute -bottom-6 left-12 z-20 w-14 select-none md:w-20 lg:w-24"
+              loading="lazy"
+              draggable={false}
+            />
           </div>
-
-          {/* 歯車装飾: 右下（複数歯車） */}
-          <img
-            src="/materials/geers.webp"
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute -bottom-8 right-8 z-20 w-28 select-none md:w-40 lg:w-48"
-            loading="lazy"
-            draggable={false}
-          />
-
-          {/* 歯車装飾: 左下（単体歯車） */}
-          <img
-            src="/materials/geer1.webp"
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute -bottom-6 left-12 z-20 w-14 select-none md:w-20 lg:w-24"
-            loading="lazy"
-            draggable={false}
-          />
         </div>
       </div>
     </section>

@@ -89,7 +89,7 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: st
               <p className="text-gray-900/60">{t("empty.title")}</p>
               <p className="mt-2 text-sm text-gray-900/50">
                 {t("empty.prefix")}{" "}
-                <a href="/about/contact" className="text-primary-light hover:underline">
+                <a href="/info/contact" className="text-primary-light hover:underline">
                   {t("empty.contactLink")}
                 </a>{" "}
                 {t("empty.suffix")}

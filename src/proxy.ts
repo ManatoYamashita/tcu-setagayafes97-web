@@ -15,8 +15,8 @@ export default createMiddleware(routing);
  * マッチャー設定
  *
  * 多言語対応ページ:
- * - /about, /about/contact, /about/privacy
- * - /info/guide, /info/faq
+ * - /about, /about/privacy
+ * - /info/guide, /info/faq, /info/contact
  * - /map/access
  *
  * 多言語非対応ページ（除外）:
@@ -31,10 +31,10 @@ export const config = {
   matcher: [
     // デフォルトロケール（ja）用のルート
     "/about",
-    "/about/contact",
     "/about/privacy",
     "/info/guide",
     "/info/faq",
+    "/info/contact",
     "/map/access",
 
     // 他言語用のルート（プレフィックス付き）

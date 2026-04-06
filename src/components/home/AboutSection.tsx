@@ -11,7 +11,7 @@ const { topSection } = aboutConfig;
  */
 export function AboutSection() {
   return (
-    <section className="relative -mt-48 pt-72 pb-24 lg:pt-80 lg:pb-32 overflow-hidden bg-[var(--color-secondary)]">
+    <section className="relative z-0 -mt-48 pt-72 pb-24 lg:pt-80 lg:pb-32 overflow-visible">
       {/* z-0: 背景グラデーションblob（ピンク系グロウ） */}
       <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
         <div
@@ -39,16 +39,6 @@ export function AboutSection() {
           }}
         />
       </div>
-
-      {/* z-10: 白グラデーションオーバーレイ（上部白→下部透明） */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-48 bottom-0 z-10"
-        aria-hidden="true"
-        style={{
-          background:
-            "linear-gradient(to bottom, white 0%, white 15%, rgba(255,255,255,0.7) 30%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.08) 70%, transparent 85%)",
-        }}
-      />
 
       <div className="relative z-20 mx-auto max-w-6xl px-8 sm:px-12 lg:px-20">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">

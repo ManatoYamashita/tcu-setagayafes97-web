@@ -180,7 +180,7 @@ export function FAQContent({ initialFAQ }: FAQContentProps) {
             </p>
           </div>
           <Link
-            href="/about/contact"
+            href="/info/contact"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
           >
             お問い合わせ

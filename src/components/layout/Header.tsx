@@ -26,14 +26,23 @@ import { LogoVideo } from "@/components/home/LogoVideo";
 export function Header() {
   const [isAtTop, setIsAtTop] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openerDone, setOpenerDone] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsAtTop(window.scrollY < 10);
+      const y = window.scrollY;
+      setIsAtTop((prev) => (prev ? y < 50 : y < 10));
     };
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    const handleOpenerDone = () => setOpenerDone(true);
+    window.addEventListener("opener-done", handleOpenerDone);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("opener-done", handleOpenerDone);
+    };
   }, []);
 
   const handleCloseMobileMenu = useCallback(() => {
@@ -56,7 +65,9 @@ export function Header() {
         >
           {/* 左: ロゴ */}
           <Link href="/" className="hover:opacity-80" aria-label={siteConfig.shortName}>
-            <LogoVideo className="w-28" />
+            <LogoVideo
+              className={`transition-[width,opacity] duration-300 ${openerDone ? (isAtTop ? "w-52" : "w-28") : "w-0 opacity-0"}`}
+            />
           </Link>
 
           {/* 中央: デスクトップナビ */}
