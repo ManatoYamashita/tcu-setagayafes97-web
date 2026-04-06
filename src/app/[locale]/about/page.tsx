@@ -174,7 +174,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                 {t("relatedPages.sponsors")}
               </Link>
               <Link
-                href="/about/contact"
+                href="/info/contact"
                 className="rounded-lg border-2 border-gray-200/30 p-4 text-center font-semibold text-gray-900 transition-all hover:border-gray-200 hover:bg-gray-50 hover:text-gray-900"
               >
                 {t("relatedPages.contact")}

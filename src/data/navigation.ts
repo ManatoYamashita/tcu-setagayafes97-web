@@ -46,6 +46,10 @@ export const navigationConfig = {
           label: "パンフレットDL",
           href: "/info/pamphlet",
         },
+        {
+          label: "お問い合わせ",
+          href: "/info/contact",
+        },
       ],
     },
     {
@@ -59,10 +63,6 @@ export const navigationConfig = {
         {
           label: "協賛企業一覧",
           href: "/about/sponsors",
-        },
-        {
-          label: "お問い合わせ",
-          href: "/about/contact",
         },
         {
           label: "プライバシーポリシー",
@@ -115,6 +115,10 @@ export const navigationConfig = {
           label: "よくある質問",
           href: "/info/faq",
         },
+        {
+          label: "お問い合わせ",
+          href: "/info/contact",
+        },
       ],
     },
     {
@@ -127,10 +131,6 @@ export const navigationConfig = {
         {
           label: "協賛企業一覧",
           href: "/about/sponsors",
-        },
-        {
-          label: "お問い合わせ",
-          href: "/about/contact",
         },
         {
           label: "プライバシーポリシー",
@@ -217,7 +217,7 @@ export const cardNavItems = [
       },
       {
         label: "お問い合わせ",
-        href: "/about/contact",
+        href: "/info/contact",
         ariaLabel: "お問い合わせ",
       },
       {

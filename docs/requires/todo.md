@@ -195,7 +195,7 @@
 - [x] 協賛企業一覧ページルート（`/src/app/about/sponsors/page.tsx`）を作成
 - [x] 協賛企業データをmicroCMS Informations APIから取得（category: sponsor）
 - [x] 協賛企業ロゴ表示を実装（グリッドレイアウト、リンク付き）
-- [x] お問い合わせページルート（`/src/app/about/contact/page.tsx`）を作成
+- [x] お問い合わせページルート（`/src/app/info/contact/page.tsx`）を作成
 - [x] お問い合わせフォームを実装（3種別: 一般、取材、落とし物）
 - [x] フォーム送信ロジックを実装（Nodemailer + Vercel Serverless Functions）
 - [x] フォームバリデーションを実装（zod等）

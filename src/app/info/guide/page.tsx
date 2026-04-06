@@ -405,7 +405,7 @@ export default function GuidePage() {
               </div>
             </Link>
             <Link
-              href="/about/contact"
+              href="/info/contact"
               className="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 transition-all hover:border-primary-300 hover:shadow-md"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-50 transition-colors group-hover:bg-primary-100">

@@ -152,10 +152,10 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       {/* [z-20] ロゴ画像（中央配置） */}
       <div
         ref={gearRef}
-        className="relative z-20 flex items-center justify-center w-full max-w-[75vw] sm:max-w-[50vw] md:max-w-[40vw] will-change-transform opacity-0"
+        className="relative z-20 flex items-center justify-center w-full max-w-[75vw] sm:max-w-[50vw] md:max-w-[40vw] will-change-transform opacity-0 -translate-y-10 sm:-translate-y-6 md:translate-y-0"
       >
         <Image
-          src="/images/brand/outline.webp"
+          src="/images/brand/favicon-outline.webp"
           alt="世田谷祭のアイコン"
           width={800}
           height={800}
@@ -167,7 +167,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       {/* [z-30] h1 タイトル（2行アーチ型・アイコンの上に重なる） */}
       <h1
         ref={h1Ref}
-        className="absolute z-30 w-[85vw] sm:w-[70vw] md:w-[55vw] lg:w-[50vw] will-change-transform opacity-0"
+        className="absolute z-30 w-[85vw] sm:w-[70vw] md:w-[55vw] lg:w-[50vw] will-change-transform opacity-0 -translate-y-10 sm:-translate-y-6 md:translate-y-0"
       >
         <svg
           viewBox="0 0 600 280"
@@ -193,7 +193,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
             className="font-dela-gothic"
             fontSize="56"
             letterSpacing="-1"
-            fill="#fffde6"
+            fill="#f5e6b8"
             stroke="#1e3a5f"
             strokeWidth="4"
             paintOrder="stroke fill"
@@ -208,7 +208,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
             className="font-dela-gothic"
             fontSize="120"
             letterSpacing="-2"
-            fill="#fffde6"
+            fill="#f5e6b8"
             stroke="#1e3a5f"
             strokeWidth="5.5"
             paintOrder="stroke fill"

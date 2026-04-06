@@ -169,7 +169,7 @@ export default function AboutPage() {
                   協賛企業一覧
                 </Link>
                 <Link
-                  href="/about/contact"
+                  href="/info/contact"
                   className="rounded-lg border-2 border-gray-200/30 p-4 text-center font-semibold text-gray-900 transition-all hover:border-gray-200 hover:bg-gray-50 hover:text-gray-900"
                 >
                   お問い合わせ
