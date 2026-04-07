@@ -147,7 +147,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
     <section
       ref={sectionRef}
       id="hero-section"
-      className="w-full min-h-[calc(100svh-var(--header-height))] relative z-10 overflow-hidden flex items-center justify-center"
+      className="w-full min-h-[calc(100svh-var(--header-height))] relative z-10 overflow-hidden flex items-center justify-center pb-24 md:pb-32 lg:pb-40"
     >
       {/* [z-20] ロゴ画像（中央配置） */}
       <div
@@ -193,7 +193,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
             className="font-dela-gothic"
             fontSize="56"
             letterSpacing="-1"
-            fill="#f5e6b8"
+            fill="#f7edd0"
             stroke="#1e3a5f"
             strokeWidth="4"
             paintOrder="stroke fill"
@@ -208,7 +208,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
             className="font-dela-gothic"
             fontSize="120"
             letterSpacing="-2"
-            fill="#f5e6b8"
+            fill="#f7edd0"
             stroke="#1e3a5f"
             strokeWidth="5.5"
             paintOrder="stroke fill"

@@ -77,6 +77,24 @@ body {
   font-family: var(--font-dela-gothic-one, "Dela Gothic One"), sans-serif;
 }
 
+@utility animate-scroll-line {
+  animation: scroll-line 1.5s ease-in-out infinite;
+}
+
+@keyframes scroll-line {
+  0% {
+    top: 0;
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
 @utility text-hero-title {
   color: #fffde6;
   -webkit-text-stroke: 1.5px #1e3a5f;
@@ -244,6 +262,9 @@ body {
     animation: none !important;
   }
   [class*="animate-blob"] {
+    animation: none !important;
+  }
+  .animate-scroll-line {
     animation: none !important;
   }
 }
