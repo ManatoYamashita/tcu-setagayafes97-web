@@ -31,6 +31,14 @@ export function AboutHero() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const ctxRef = useRef<gsap.Context | null>(null);
 
+  // Header背景色を上マスク(gray-50)と同色に
+  useEffect(() => {
+    document.documentElement.style.setProperty("--header-top-bg", "oklch(97% 0 0deg)");
+    return () => {
+      document.documentElement.style.removeProperty("--header-top-bg");
+    };
+  }, []);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (ctxRef.current) return;
@@ -156,23 +164,42 @@ export function AboutHero() {
         style={{ top: "50%" }}
       />
 
-      {/* Layer 2: 右下テキストブロック */}
-      <div className="absolute bottom-16 right-6 z-10 text-right sm:bottom-20 sm:right-8 lg:bottom-24 lg:right-12">
-        <p ref={descRef} className="mb-2 text-xs tracking-widest text-gray-400 sm:text-sm">
+      {/* Layer 2: 右下テキストブロック — 「97」を主役にした縦積みレイアウト */}
+      <div className="absolute bottom-20 right-6 z-10 text-right sm:bottom-16 sm:right-8 lg:bottom-20 lg:right-12">
+        <p
+          ref={descRef}
+          className="mb-3 text-[10px] font-medium uppercase tracking-[0.3em] text-gray-400 sm:mb-4 sm:text-xs"
+        >
           {description}
         </p>
         <h1
           ref={titleRef}
-          className="text-5xl font-bold tracking-tight text-gray-900 sm:text-6xl lg:text-7xl xl:text-8xl"
+          className="flex flex-col items-end gap-0 leading-none"
+          style={{ fontFamily: "var(--font-noto-sans-jp), sans-serif" }}
         >
-          {title}
+          {/* 第 + 97 — 「97」が圧倒的に大きい */}
+          <span className="flex items-center gap-1">
+            <span className="text-lg font-bold tracking-tight text-gray-900 sm:text-xl lg:text-2xl">
+              第
+            </span>
+            <span className="text-7xl font-black text-primary-500 sm:text-8xl lg:text-9xl xl:text-[10rem]">
+              97
+            </span>
+            <span className="text-lg font-bold tracking-tight text-gray-900 sm:text-xl lg:text-2xl">
+              回
+            </span>
+          </span>
+          {/* 世田谷祭実行委員会 — 小さく上品に */}
+          <span className="mt-1 text-xl font-bold tracking-[0.15em] text-gray-900 sm:mt-2 sm:text-2xl lg:text-3xl xl:text-4xl">
+            世田谷祭実行委員会
+          </span>
         </h1>
       </div>
 
       {/* Layer 2: スクロールインジケーター */}
       <div
         ref={scrollRef}
-        className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2"
+        className="absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 sm:flex"
         role="presentation"
         aria-label={scrollIndicator}
       >

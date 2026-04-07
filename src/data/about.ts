@@ -4,8 +4,8 @@
 export const aboutConfig = {
   // Aboutページ ヒーロー（ミニマルデザイン）
   hero: {
-    title: "About Us",
-    description: "東京都市大学 世田谷祭実行委員会について",
+    title: "第97回世田谷祭実行委員会",
+    description: "東京都市大学",
     scrollIndicator: "( scroll down )",
   },
 

@@ -103,14 +103,14 @@ export function AboutSection() {
       {/* z-0: 背景グラデーションblob（ピンク系グロウ） */}
       <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
         <div
-          className="animate-blob absolute top-[10%] right-[0%] h-[50%] w-[45%] rounded-full"
+          className="animate-blob absolute top-[10%] right-[5%] md:right-[0%] h-[50%] w-[45%] rounded-full"
           style={{
             background: "radial-gradient(circle at center, rgba(255,140,200,0.4), transparent 70%)",
             animation: "blob-drift-2 20s ease-in-out infinite",
           }}
         />
         <div
-          className="animate-blob absolute top-[40%] -left-[5%] h-[45%] w-[40%] rounded-full"
+          className="animate-blob absolute top-[40%] left-[0%] md:-left-[5%] h-[45%] w-[40%] rounded-full"
           style={{
             background:
               "radial-gradient(circle at center, rgba(255,160,210,0.35), transparent 70%)",

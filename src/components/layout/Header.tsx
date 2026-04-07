@@ -55,11 +55,12 @@ export function Header() {
         className={`sticky top-0 z-40 transition-all duration-300 ${
           isAtTop ? "px-0 pt-0" : "px-4 pt-2"
         }`}
+        style={{ backgroundColor: isAtTop ? "var(--header-top-bg)" : "transparent" }}
       >
         <div
           className={`flex items-center justify-between px-6 py-3 transition-all duration-300 ${
             isAtTop
-              ? "bg-white rounded-none shadow-none"
+              ? "rounded-none shadow-none"
               : "bg-white container mx-auto rounded-full shadow-md"
           }`}
         >

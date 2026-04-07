@@ -45,6 +45,7 @@
 :root {
   /* レイアウト定数 */
   --header-height: 5.5rem; /* pt-2 + py-3×2 + ロゴ高さ約56px (ピル型ヘッダー) */
+  --header-top-bg: #ffffff; /* ページ別にオーバーライド可 */
 }
 
 body {
@@ -129,6 +130,17 @@ body {
   /* CircularText 回転アニメーション */
   .animate-spin-slow {
     animation: spin-slow 60s linear infinite;
+  }
+
+  /* Hero+About背景グラデーション（モバイル: 下30%で紫グラデ） */
+  .hero-about-bg {
+    background: linear-gradient(to bottom, #ffffff 0%, var(--color-secondary) 70%);
+  }
+
+  @media (min-width: 768px) {
+    .hero-about-bg {
+      background: linear-gradient(to bottom, #ffffff 35%, var(--color-secondary) 65%);
+    }
   }
 }
 

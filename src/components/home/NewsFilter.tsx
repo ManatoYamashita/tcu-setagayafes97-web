@@ -35,7 +35,7 @@ export function NewsFilter({ newsList, header }: NewsFilterProps) {
           {header}
 
           {/* フィルタータブ */}
-          <div className="mt-6 flex flex-wrap gap-2 lg:mt-8 lg:flex-col lg:gap-1">
+          <div className="news-tabs mt-6 flex flex-wrap gap-2 lg:mt-8 lg:flex-col lg:gap-1">
             {filterTabs.map((tab) => (
               <button
                 key={tab.value}
@@ -64,7 +64,9 @@ export function NewsFilter({ newsList, header }: NewsFilterProps) {
             {/* Featured: 上位2件を大きく */}
             <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
               {featured.map((news) => (
-                <NewsCard key={news.id} news={news} variant="large" />
+                <div key={news.id} className="news-card">
+                  <NewsCard news={news} variant="large" />
+                </div>
               ))}
             </div>
 
@@ -72,7 +74,9 @@ export function NewsFilter({ newsList, header }: NewsFilterProps) {
             {regular.length > 0 && (
               <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 lg:gap-6">
                 {regular.map((news) => (
-                  <NewsCard key={news.id} news={news} variant="default" />
+                  <div key={news.id} className="news-card">
+                    <NewsCard news={news} variant="default" />
+                  </div>
                 ))}
               </div>
             )}
