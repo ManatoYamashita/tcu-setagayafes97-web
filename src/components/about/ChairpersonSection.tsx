@@ -64,14 +64,14 @@ export function ChairpersonSection() {
           </div>
 
           {/* ── モバイル専用: 右端からはみ出す画像 ── */}
-          <div className="relative -mr-16 ml-auto w-3/4 sm:-mr-20 sm:w-2/3 lg:hidden">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-l-2xl shadow-lg">
+          <div className="relative lg:hidden" style={{ marginLeft: "20%", marginRight: "-2rem" }}>
+            <div className="relative aspect-[4/3] w-full max-h-64 sm:max-h-80 overflow-hidden rounded-l-2xl shadow-lg">
               <Image
                 src={image}
                 alt="委員長メイン写真"
                 fill
                 className="object-cover"
-                sizes="75vw"
+                sizes="90vw"
               />
             </div>
           </div>
