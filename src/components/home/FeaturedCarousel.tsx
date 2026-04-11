@@ -124,7 +124,7 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
                   className="group w-[260px] max-w-[70vw] shrink-0 sm:w-[300px] sm:max-w-[45vw] md:w-[340px] md:max-w-[340px]"
                   style={{ scrollSnapAlign: "start" }}
                 >
-                  <div className="relative aspect-[3/5] overflow-hidden rounded-3xl shadow-lg transition-shadow duration-300 group-hover:shadow-2xl">
+                  <div className="relative aspect-[3/5] overflow-hidden rounded-3xl">
                     {/* 全面画像 */}
                     <Image
                       src={imageUrl}
@@ -134,14 +134,19 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
                       sizes="340px"
                     />
 
-                    {/* グラデーション */}
+                    {/* ブラー境界のぼかし（グラデーションマスク） */}
                     <div
-                      className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"
+                      className="pointer-events-none absolute inset-x-0 bottom-0 z-[9] rounded-b-3xl backdrop-blur-md"
+                      style={{
+                        top: "40%",
+                        maskImage: "linear-gradient(to bottom, transparent 0%, black 35%)",
+                        WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 35%)",
+                      }}
                       aria-hidden="true"
                     />
 
                     {/* コンテンツ（下部） */}
-                    <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col p-5">
+                    <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col rounded-b-3xl p-5">
                       {/* ドットインジケーター */}
                       <div className="mb-4 flex justify-center gap-1.5" aria-hidden="true">
                         <span className="h-1.5 w-1.5 rounded-full bg-white/80" />
