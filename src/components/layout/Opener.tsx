@@ -136,13 +136,13 @@ export function Opener() {
           "-=0.2"
         );
 
-        // Heroアニメーション開始トリガー（完了0.4秒前）
+        // Heroアニメーション開始トリガー（スライドアウト開始直前）
         tl.call(
           () => {
             window.dispatchEvent(new CustomEvent("opener-done"));
           },
           [],
-          tl.duration() - 0.4
+          tl.duration() - 1.4
         );
       }, containerRef);
 

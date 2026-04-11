@@ -53,22 +53,8 @@ export const navigationConfig = {
       ],
     },
     {
-      label: "委員会・その他",
+      label: "委員会について",
       href: "/about",
-      children: [
-        {
-          label: "委員長挨拶・理念",
-          href: "/about",
-        },
-        {
-          label: "協賛企業一覧",
-          href: "/about/sponsors",
-        },
-        {
-          label: "プライバシーポリシー",
-          href: "/about/privacy",
-        },
-      ],
     },
   ],
 
@@ -125,12 +111,8 @@ export const navigationConfig = {
       title: "委員会について",
       links: [
         {
-          label: "委員長挨拶・理念",
+          label: "委員会について",
           href: "/about",
-        },
-        {
-          label: "協賛企業一覧",
-          href: "/about/sponsors",
         },
         {
           label: "プライバシーポリシー",
@@ -209,21 +191,11 @@ export const cardNavItems = [
     bgColor: "#3d1a6e",
     textColor: "#fff",
     links: [
-      { label: "委員長挨拶・理念", href: "/about", ariaLabel: "委員長挨拶" },
-      {
-        label: "協賛企業一覧",
-        href: "/about/sponsors",
-        ariaLabel: "協賛企業",
-      },
+      { label: "委員会について", href: "/about", ariaLabel: "委員会について" },
       {
         label: "お問い合わせ",
         href: "/info/contact",
         ariaLabel: "お問い合わせ",
-      },
-      {
-        label: "プライバシーポリシー",
-        href: "/about/privacy",
-        ariaLabel: "プライバシーポリシー",
       },
     ],
   },

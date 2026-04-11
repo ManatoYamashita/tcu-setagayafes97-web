@@ -45,6 +45,7 @@
 :root {
   /* レイアウト定数 */
   --header-height: 5.5rem; /* pt-2 + py-3×2 + ロゴ高さ約56px (ピル型ヘッダー) */
+  --header-top-bg: #ffffff; /* ページ別にオーバーライド可 */
 }
 
 body {
@@ -75,6 +76,24 @@ body {
 
 @utility font-dela-gothic {
   font-family: var(--font-dela-gothic-one, "Dela Gothic One"), sans-serif;
+}
+
+@utility animate-scroll-line {
+  animation: scroll-line 1.5s ease-in-out infinite;
+}
+
+@keyframes scroll-line {
+  0% {
+    top: 0;
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
 }
 
 @utility text-hero-title {
@@ -111,6 +130,27 @@ body {
   /* CircularText 回転アニメーション */
   .animate-spin-slow {
     animation: spin-slow 60s linear infinite;
+  }
+
+  /* Hero+About背景グラデーション（モバイル: 下30%で紫グラデ） */
+  .hero-about-bg {
+    background: linear-gradient(
+      to bottom,
+      #ffffff 20%,
+      var(--color-primary-200) 35%,
+      var(--color-secondary) 50%
+    );
+  }
+
+  @media (min-width: 768px) {
+    .hero-about-bg {
+      background: linear-gradient(
+        to bottom,
+        #ffffff 25%,
+        var(--color-primary-200) 40%,
+        var(--color-secondary) 55%
+      );
+    }
   }
 }
 
@@ -244,6 +284,9 @@ body {
     animation: none !important;
   }
   [class*="animate-blob"] {
+    animation: none !important;
+  }
+  .animate-scroll-line {
     animation: none !important;
   }
 }

@@ -147,12 +147,12 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
     <section
       ref={sectionRef}
       id="hero-section"
-      className="w-full min-h-[calc(100svh-var(--header-height))] relative z-10 overflow-hidden flex items-center justify-center"
+      className="w-full h-[calc(100svh-var(--header-height))] relative z-10 overflow-hidden flex items-center justify-center pb-16 md:pb-20 lg:pb-24"
     >
       {/* [z-20] ロゴ画像（中央配置） */}
       <div
         ref={gearRef}
-        className="relative z-20 flex items-center justify-center w-full max-w-[75vw] sm:max-w-[50vw] md:max-w-[40vw] will-change-transform opacity-0 -translate-y-10 sm:-translate-y-6 md:translate-y-0"
+        className="relative z-20 flex items-center justify-center w-full max-w-[75vw] sm:max-w-[50vw] md:max-w-[35vw] lg:max-w-[30vw] will-change-transform opacity-0 -translate-y-10 sm:-translate-y-6 md:translate-y-0"
       >
         <Image
           src="/images/brand/favicon-outline.webp"
@@ -193,7 +193,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
             className="font-dela-gothic"
             fontSize="56"
             letterSpacing="-1"
-            fill="#f5e6b8"
+            fill="#f7edd0"
             stroke="#1e3a5f"
             strokeWidth="4"
             paintOrder="stroke fill"
@@ -208,7 +208,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
             className="font-dela-gothic"
             fontSize="120"
             letterSpacing="-2"
-            fill="#f5e6b8"
+            fill="#f7edd0"
             stroke="#1e3a5f"
             strokeWidth="5.5"
             paintOrder="stroke fill"

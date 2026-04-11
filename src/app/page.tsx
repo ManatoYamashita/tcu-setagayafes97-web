@@ -3,23 +3,21 @@ import { AboutSection } from "@/components/home/AboutSection";
 import { NewsSection } from "@/components/home/NewsSection";
 import { FeaturedEvents } from "@/components/home/FeaturedEvents";
 import { SponsorBanner } from "@/components/home/SponsorBanner";
-import { getLatestHeroNews } from "@/lib/news";
+import { getLatestHeroNews, getNewsList } from "@/lib/news";
 /**
  * トップページ
  * 第97回世田谷祭の公式Webサイト
  */
 export default async function Home() {
-  const heroNews = await getLatestHeroNews();
+  const [heroNews, newsList] = await Promise.all([getLatestHeroNews(), getNewsList(8)]);
 
   return (
     <main className="overflow-x-clip">
-      <div
-        style={{ background: "linear-gradient(to top, var(--color-secondary) 40%, #ffffff 100%)" }}
-      >
+      <div className="hero-about-bg">
         <HeroSection latestNews={heroNews} />
         <AboutSection />
       </div>
-      <NewsSection />
+      <NewsSection newsList={newsList} />
       <FeaturedEvents />
       <SponsorBanner />
     </main>
