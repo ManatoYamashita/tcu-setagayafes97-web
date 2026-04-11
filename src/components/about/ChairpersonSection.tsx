@@ -63,6 +63,19 @@ export function ChairpersonSection() {
             </h2>
           </div>
 
+          {/* ── モバイル専用: 右端からはみ出す画像 ── */}
+          <div className="relative -mr-16 ml-auto w-3/4 sm:-mr-20 sm:w-2/3 lg:hidden">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-l-2xl shadow-lg">
+              <Image
+                src={image}
+                alt="委員長メイン写真"
+                fill
+                className="object-cover"
+                sizes="75vw"
+              />
+            </div>
+          </div>
+
           {/* ── briefDescription ── col 7-13, row 4 */}
           <div className="lg:col-start-7 lg:col-end-13 lg:row-start-4">
             <p className="text-base leading-[2] text-gray-600 whitespace-pre-line lg:text-lg">
