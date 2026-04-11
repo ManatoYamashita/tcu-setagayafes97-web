@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import Image from "next/image";
 import { Menu } from "lucide-react";
 import { siteConfig } from "@/data/site";
 import { DesktopNav } from "@/components/layout/DesktopNav";
@@ -24,6 +26,9 @@ import { LogoVideo } from "@/components/home/LogoVideo";
  * IMPORTANT: padding変更時は globals.css の --header-height も更新すること
  */
 export function Header() {
+  const pathname = usePathname();
+  const isAboutPage = pathname === "/about" || pathname.endsWith("/about");
+
   const [isAtTop, setIsAtTop] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openerDone, setOpenerDone] = useState(false);
@@ -66,9 +71,20 @@ export function Header() {
         >
           {/* 左: ロゴ */}
           <Link href="/" className="hover:opacity-80" aria-label={siteConfig.shortName}>
-            <LogoVideo
-              className={`transition-[width,opacity] duration-300 ${openerDone ? (isAtTop ? "w-52" : "w-28") : "w-0 opacity-0"}`}
-            />
+            {isAboutPage ? (
+              <Image
+                src="/images/brand/logo.webp"
+                alt="世田谷祭ロゴ"
+                width={208}
+                height={40}
+                className={`h-auto object-contain transition-[width,opacity] duration-300 ${isAtTop ? "w-52" : "w-28"}`}
+                priority
+              />
+            ) : (
+              <LogoVideo
+                className={`transition-[width,opacity] duration-300 ${openerDone ? (isAtTop ? "w-52" : "w-28") : "w-0 opacity-0"}`}
+              />
+            )}
           </Link>
 
           {/* 中央: デスクトップナビ */}

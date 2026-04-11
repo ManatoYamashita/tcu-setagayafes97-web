@@ -134,12 +134,22 @@ body {
 
   /* Hero+About背景グラデーション（モバイル: 下30%で紫グラデ） */
   .hero-about-bg {
-    background: linear-gradient(to bottom, #ffffff 0%, var(--color-secondary) 70%);
+    background: linear-gradient(
+      to bottom,
+      #ffffff 20%,
+      var(--color-primary-200) 35%,
+      var(--color-secondary) 50%
+    );
   }
 
   @media (min-width: 768px) {
     .hero-about-bg {
-      background: linear-gradient(to bottom, #ffffff 35%, var(--color-secondary) 65%);
+      background: linear-gradient(
+        to bottom,
+        #ffffff 25%,
+        var(--color-primary-200) 40%,
+        var(--color-secondary) 55%
+      );
     }
   }
 }

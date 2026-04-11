@@ -63,19 +63,20 @@ export function AboutHero() {
             const halfBand = isSmall ? 30 : isMedium ? 40 : 50;
 
             // 上下マスク: 最初は中央で密着（バンド見えない）→ 分離してバンド露出
+            // 45%: Headerの高さ分を考慮し、視覚的な画面中央に合わせる
             if (upperMaskRef.current) {
-              gsap.set(upperMaskRef.current, { bottom: "50%" });
+              gsap.set(upperMaskRef.current, { bottom: "55%" });
               gsap.to(upperMaskRef.current, {
-                bottom: `calc(50% + ${halfBand}px)`,
+                bottom: `calc(55% + ${halfBand}px)`,
                 duration: 0.8,
                 ease: "power3.inOut",
               });
             }
 
             if (lowerMaskRef.current) {
-              gsap.set(lowerMaskRef.current, { top: "50%" });
+              gsap.set(lowerMaskRef.current, { top: "45%" });
               gsap.to(lowerMaskRef.current, {
-                top: `calc(50% + ${halfBand}px)`,
+                top: `calc(45% + ${halfBand}px)`,
                 duration: 0.8,
                 ease: "power3.inOut",
               });
@@ -154,14 +155,14 @@ export function AboutHero() {
       <div
         ref={upperMaskRef}
         className="absolute inset-x-0 top-0 z-[1] bg-gray-50"
-        style={{ bottom: "50%" }}
+        style={{ bottom: "55%" }}
       />
 
       {/* Layer 1: 下マスク（gray-50で覆う） */}
       <div
         ref={lowerMaskRef}
         className="absolute inset-x-0 bottom-0 z-[1] bg-gray-50"
-        style={{ top: "50%" }}
+        style={{ top: "45%" }}
       />
 
       {/* Layer 2: 右下テキストブロック — 「97」を主役にした縦積みレイアウト */}
@@ -174,23 +175,20 @@ export function AboutHero() {
         </p>
         <h1
           ref={titleRef}
-          className="flex flex-col items-end gap-0 leading-none"
+          className="leading-tight"
           style={{ fontFamily: "var(--font-noto-sans-jp), sans-serif" }}
         >
-          {/* 第 + 97 — 「97」が圧倒的に大きい */}
-          <span className="flex items-center gap-1">
-            <span className="text-lg font-bold tracking-tight text-gray-900 sm:text-xl lg:text-2xl">
-              第
-            </span>
-            <span className="text-7xl font-black text-primary-500 sm:text-8xl lg:text-9xl xl:text-[10rem]">
+          <span className="block text-2xl font-semibold tracking-[0.08em] text-gray-900 sm:text-3xl lg:text-4xl">
+            第
+            <span
+              className="text-4xl font-bold bg-gradient-to-r from-purple-500 to-pink-400 bg-clip-text text-transparent tracking-tighter sm:text-5xl lg:text-6xl"
+              style={{ fontFamily: "var(--font-kaisei-opti), serif" }}
+            >
               97
             </span>
-            <span className="text-lg font-bold tracking-tight text-gray-900 sm:text-xl lg:text-2xl">
-              回
-            </span>
+            <span className="ml-1 sm:ml-2">回</span>
           </span>
-          {/* 世田谷祭実行委員会 — 小さく上品に */}
-          <span className="mt-1 text-xl font-bold tracking-[0.15em] text-gray-900 sm:mt-2 sm:text-2xl lg:text-3xl xl:text-4xl">
+          <span className="block text-2xl font-semibold tracking-[0.08em] text-gray-900 sm:text-3xl lg:text-4xl">
             世田谷祭実行委員会
           </span>
         </h1>
