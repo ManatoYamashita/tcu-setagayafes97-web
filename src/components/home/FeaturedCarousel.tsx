@@ -121,48 +121,63 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
                 <Link
                   key={event.id}
                   href={`/events/${event.id}`}
-                  className="group w-[260px] shrink-0 sm:w-[300px] md:w-[340px]"
+                  className="group w-[260px] max-w-[70vw] shrink-0 sm:w-[300px] sm:max-w-[45vw] md:w-[340px] md:max-w-[340px]"
                   style={{ scrollSnapAlign: "start" }}
                 >
-                  <div className="relative aspect-[3/5] overflow-hidden rounded-3xl transition-shadow duration-300 group-hover:shadow-xl">
-                    {/* 全面背景画像 */}
+                  <div className="relative aspect-[3/5] overflow-hidden rounded-3xl shadow-lg transition-shadow duration-300 group-hover:shadow-2xl">
+                    {/* 全面画像 */}
                     <Image
                       src={imageUrl}
                       alt={event.title}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      sizes="300px"
+                      sizes="340px"
                     />
 
-                    {/* グラデーションオーバーレイ */}
+                    {/* グラデーション */}
                     <div
-                      className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
+                      className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"
                       aria-hidden="true"
                     />
 
-                    {/* コンテンツ（下部に配置・背景ブラー） */}
-                    <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 rounded-b-3xl bg-black/30 p-5 backdrop-blur-md">
-                      {/* タイトル行 */}
-                      <div className="flex items-start justify-between gap-2">
+                    {/* コンテンツ（下部） */}
+                    <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col p-5">
+                      {/* ドットインジケーター */}
+                      <div className="mb-4 flex justify-center gap-1.5" aria-hidden="true">
+                        <span className="h-1.5 w-1.5 rounded-full bg-white/80" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-white/30" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-white/30" />
+                      </div>
+
+                      {/* タイトル + バッジ */}
+                      <div className="flex items-start justify-between gap-3">
                         <h3 className="text-base font-bold leading-snug text-white line-clamp-2 sm:text-lg">
                           {event.title}
                         </h3>
-                        <span className="shrink-0 rounded-full border border-white/40 bg-white/20 px-2.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+                        <span className="shrink-0 rounded-full border border-white/40 bg-white/15 px-2.5 py-1 text-[10px] font-medium text-white backdrop-blur-sm">
                           {typeLabels[event.type]}
                         </span>
                       </div>
 
                       {/* 説明文 */}
-                      <p className="text-xs leading-relaxed text-white/70 line-clamp-3">
+                      <p className="mt-2.5 text-xs leading-relaxed text-white/70 line-clamp-3">
                         {event.description}
                       </p>
 
                       {/* 分類タグ */}
-                      <div className="flex flex-wrap gap-1.5">
-                        <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-[10px] font-medium text-white">
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        <span className="rounded-full bg-white/15 px-3 py-1 text-[10px] font-medium text-white/80 backdrop-blur-sm">
                           {typeLabels[event.type]}
                         </span>
+                        <span className="rounded-full bg-white/15 px-3 py-1 text-[10px] font-medium text-white/80 backdrop-blur-sm">
+                          {event.building}
+                        </span>
                       </div>
+
+                      {/* 詳細ボタン */}
+                      <span className="mt-4 block w-full rounded-full bg-white py-2.5 text-center text-sm font-semibold text-gray-900 transition-opacity group-hover:opacity-90">
+                        詳細を見る
+                      </span>
                     </div>
                   </div>
                 </Link>
