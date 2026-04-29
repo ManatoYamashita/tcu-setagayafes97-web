@@ -136,9 +136,10 @@ body {
   .hero-about-bg {
     background: linear-gradient(
       to bottom,
-      #ffffff 20%,
-      var(--color-primary-200) 35%,
-      var(--color-secondary) 50%
+      #ffffff 0%,
+      var(--color-primary-50) 15%,
+      var(--color-primary-100) 50%,
+      var(--color-secondary) 80%
     );
   }
 
@@ -146,9 +147,10 @@ body {
     .hero-about-bg {
       background: linear-gradient(
         to bottom,
-        #ffffff 25%,
-        var(--color-primary-200) 40%,
-        var(--color-secondary) 55%
+        #ffffff 0%,
+        var(--color-primary-50) 20%,
+        var(--color-primary-100) 55%,
+        var(--color-secondary) 85%
       );
     }
   }

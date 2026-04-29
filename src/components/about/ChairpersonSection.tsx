@@ -64,14 +64,14 @@ export function ChairpersonSection() {
           </div>
 
           {/* ── モバイル専用: 右端からはみ出す画像 ── */}
-          <div className="relative -mr-16 ml-auto w-3/4 sm:-mr-20 sm:w-2/3 lg:hidden">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-l-2xl shadow-lg">
+          <div className="relative lg:hidden" style={{ marginLeft: "20%", marginRight: "-2rem" }}>
+            <div className="relative aspect-[4/3] w-full max-h-64 sm:max-h-80 overflow-hidden rounded-l-2xl shadow-lg">
               <Image
                 src={image}
                 alt="委員長メイン写真"
                 fill
                 className="object-cover"
-                sizes="75vw"
+                sizes="90vw"
               />
             </div>
           </div>
@@ -85,7 +85,7 @@ export function ChairpersonSection() {
 
           {/* ── メイン画像 ── col 2-6, row 2-4 (span 3) */}
           <div className="lg:col-start-2 lg:col-end-6 lg:row-start-2 lg:row-end-5 lg:pt-8">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-lg">
+            <div className="relative aspect-square w-full overflow-hidden rounded-full shadow-lg">
               <Image
                 src={image}
                 alt="委員長メイン写真"
@@ -105,7 +105,7 @@ export function ChairpersonSection() {
 
           {/* ── サブ画像 + 名前・役職 ── col 8-11, row 6（本文と並行） */}
           <div className="lg:col-start-8 lg:col-end-12 lg:row-start-6 lg:mt-36">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-lg">
+            <div className="relative aspect-square w-full overflow-hidden rounded-full shadow-lg">
               <Image
                 src={subImage}
                 alt="委員長サブ写真"

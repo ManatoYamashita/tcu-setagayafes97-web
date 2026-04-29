@@ -39,7 +39,7 @@ function ArrowIcon({ direction }: { direction: "left" | "right" }) {
 
 export function FeaturedCarousel({ events }: { events: Event[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const SCROLL_AMOUNT = 324; // card width(300) + gap(24)
+  const SCROLL_AMOUNT = 364; // card width(340) + gap(24)
 
   const scroll = (direction: 1 | -1) => {
     scrollRef.current?.scrollBy({
@@ -58,16 +58,9 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
 
   return (
     <div>
-      {/* モバイル用タイトル */}
-      <div className="mb-8 px-8 lg:hidden">
-        <p className="mb-1 text-xs uppercase tracking-widest text-primary-900">Pick Up</p>
-        <h2 className="text-3xl font-bold text-primary-900">おすすめ企画</h2>
-        <p className="mt-1 text-sm text-primary-700">実行委員会が選ぶ注目の企画</p>
-      </div>
-
       <div className="flex items-start">
         {/* 左サイド: 縦書きタイトル + ナビ */}
-        <div className="hidden w-44 shrink-0 flex-col items-center pt-4 lg:flex">
+        <div className="flex w-28 shrink-0 flex-col items-center pt-4 sm:w-36 lg:w-44">
           {/* 縦書きテキスト群 */}
           <div className="flex items-start gap-2">
             <p
@@ -77,7 +70,7 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
               おすすめ企画
             </p>
             <h2
-              className="text-5xl font-bold leading-none tracking-tight text-primary-900"
+              className="text-3xl font-bold leading-none tracking-tight text-primary-900 sm:text-4xl lg:text-5xl"
               style={{ writingMode: "vertical-rl" }}
             >
               PICK UP
@@ -95,7 +88,7 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
             <button
               type="button"
               onClick={() => scroll(-1)}
-              className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary-900 text-primary-900 transition-colors hover:bg-primary-900 hover:text-white"
+              className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary-900 text-primary-900 transition-colors hover:bg-primary-900 hover:text-white sm:h-10 sm:w-10 lg:h-11 lg:w-11"
               aria-label="前の企画を表示"
             >
               <ArrowIcon direction="left" />
@@ -103,7 +96,7 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
             <button
               type="button"
               onClick={() => scroll(1)}
-              className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary-900 text-primary-900 transition-colors hover:bg-primary-900 hover:text-white"
+              className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary-900 text-primary-900 transition-colors hover:bg-primary-900 hover:text-white sm:h-10 sm:w-10 lg:h-11 lg:w-11"
               aria-label="次の企画を表示"
             >
               <ArrowIcon direction="right" />
@@ -115,7 +108,7 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
         <div className="min-w-0 flex-1">
           <div
             ref={scrollRef}
-            className="flex gap-6 overflow-x-auto px-8 pb-4 lg:pl-6 lg:pr-0 [&::-webkit-scrollbar]:hidden"
+            className="flex gap-4 overflow-x-auto px-4 pb-4 sm:gap-6 sm:px-6 lg:pl-6 lg:pr-0 [&::-webkit-scrollbar]:hidden"
             style={{ scrollSnapType: "x mandatory", scrollbarWidth: "none" }}
             role="region"
             aria-label="おすすめ企画一覧"
@@ -128,34 +121,68 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
                 <Link
                   key={event.id}
                   href={`/events/${event.id}`}
-                  className="group w-[280px] shrink-0 md:w-[300px]"
+                  className="group w-[260px] max-w-[70vw] shrink-0 sm:w-[300px] sm:max-w-[45vw] md:w-[340px] md:max-w-[340px]"
                   style={{ scrollSnapAlign: "start" }}
                 >
-                  <div className="overflow-hidden rounded-2xl bg-white transition-shadow duration-300 group-hover:shadow-lg">
-                    {/* 画像 */}
-                    <div className="relative aspect-[4/5] overflow-hidden">
-                      <Image
-                        src={imageUrl}
-                        alt={event.title}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        sizes="300px"
-                      />
-                      {/* カテゴリバッジ */}
-                      <span className="absolute bottom-0 left-4 rounded-t-md bg-gray-900 px-4 py-1 text-xs font-medium text-white">
-                        {typeLabels[event.type]}
-                      </span>
-                    </div>
+                  <div className="relative aspect-[3/5] overflow-hidden rounded-3xl">
+                    {/* 全面画像 */}
+                    <Image
+                      src={imageUrl}
+                      alt={event.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="340px"
+                    />
 
-                    {/* テキスト */}
-                    <div className="p-4">
-                      <time className="text-xs text-gray-400">{formatDate(event.publishedAt)}</time>
-                      <h3 className="mt-1.5 text-sm font-bold leading-snug text-gray-900 line-clamp-2">
-                        {event.title}
-                      </h3>
-                      <p className="mt-2 text-xs leading-relaxed text-gray-400 line-clamp-3">
+                    {/* ブラー境界のぼかし（グラデーションマスク） */}
+                    <div
+                      className="pointer-events-none absolute inset-x-0 bottom-0 z-[9] rounded-b-3xl backdrop-blur-md"
+                      style={{
+                        top: "40%",
+                        maskImage: "linear-gradient(to bottom, transparent 0%, black 35%)",
+                        WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 35%)",
+                      }}
+                      aria-hidden="true"
+                    />
+
+                    {/* コンテンツ（下部） */}
+                    <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col rounded-b-3xl p-5">
+                      {/* ドットインジケーター */}
+                      <div className="mb-4 flex justify-center gap-1.5" aria-hidden="true">
+                        <span className="h-1.5 w-1.5 rounded-full bg-white/80" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-white/30" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-white/30" />
+                      </div>
+
+                      {/* タイトル + バッジ */}
+                      <div className="flex items-start justify-between gap-3">
+                        <h3 className="text-base font-bold leading-snug text-white line-clamp-2 sm:text-lg">
+                          {event.title}
+                        </h3>
+                        <span className="shrink-0 rounded-full border border-white/40 bg-white/15 px-2.5 py-1 text-[10px] font-medium text-white backdrop-blur-sm">
+                          {typeLabels[event.type]}
+                        </span>
+                      </div>
+
+                      {/* 説明文 */}
+                      <p className="mt-2.5 text-xs leading-relaxed text-white/70 line-clamp-3">
                         {event.description}
                       </p>
+
+                      {/* 分類タグ */}
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        <span className="rounded-full bg-white/15 px-3 py-1 text-[10px] font-medium text-white/80 backdrop-blur-sm">
+                          {typeLabels[event.type]}
+                        </span>
+                        <span className="rounded-full bg-white/15 px-3 py-1 text-[10px] font-medium text-white/80 backdrop-blur-sm">
+                          {event.building}
+                        </span>
+                      </div>
+
+                      {/* 詳細ボタン */}
+                      <span className="mt-4 block w-full rounded-full bg-white py-2.5 text-center text-sm font-semibold text-gray-900 transition-opacity group-hover:opacity-90">
+                        詳細を見る
+                      </span>
                     </div>
                   </div>
                 </Link>
@@ -172,22 +199,6 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
           className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-80"
         >
           企画一覧
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-            aria-hidden="true"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </Link>
-        <Link
-          href="/info"
-          className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-80"
-        >
-          お知らせ一覧
           <svg
             className="h-4 w-4"
             fill="none"
