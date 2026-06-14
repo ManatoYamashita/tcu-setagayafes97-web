@@ -39,10 +39,10 @@ export const pageHeroes: Record<string, PageHeroData> = {
     imageSrc: "/images/placeholder/pastel-castle.webp",
     imageAlt: "ステージ企画の様子",
   },
-  map: {
-    title: "キャンパスマップ",
-    subtitle: "Campus Map",
-    description: "建物をクリックすると、開催企画を検索できます",
+  access: {
+    title: "アクセス",
+    subtitle: "Access",
+    description: "キャンパスマップと交通アクセス情報",
     imageSrc: "/images/placeholder/pastel-castle.webp",
     imageAlt: "世田谷キャンパスの風景",
   },
