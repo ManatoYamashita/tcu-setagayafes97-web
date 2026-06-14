@@ -13,18 +13,8 @@ export const navigationConfig = {
       href: "/timetable",
     },
     {
-      label: "マップ・アクセス",
-      href: "/map",
-      children: [
-        {
-          label: "キャンパスマップ",
-          href: "/map",
-        },
-        {
-          label: "交通アクセス",
-          href: "/map/access",
-        },
-      ],
+      label: "アクセス",
+      href: "/access",
     },
     {
       label: "インフォメーション",
@@ -77,12 +67,8 @@ export const navigationConfig = {
       title: "会場案内",
       links: [
         {
-          label: "キャンパスマップ",
-          href: "/map",
-        },
-        {
-          label: "交通アクセス",
-          href: "/map/access",
+          label: "アクセス",
+          href: "/access",
         },
       ],
     },
@@ -179,11 +165,10 @@ export const cardNavItems = [
         ariaLabel: "タイムテーブル",
       },
       {
-        label: "キャンパスマップ",
-        href: "/map",
-        ariaLabel: "キャンパスマップ",
+        label: "アクセス",
+        href: "/access",
+        ariaLabel: "キャンパスマップ・交通アクセス",
       },
-      { label: "交通アクセス", href: "/map/access", ariaLabel: "交通アクセス" },
     ],
   },
   {
