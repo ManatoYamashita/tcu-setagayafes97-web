@@ -1,12 +1,19 @@
 import { getFeaturedEvents } from "@/lib/events";
+import { EVENTS_VISIBLE } from "@/data/site";
 import { FeaturedCarousel } from "./FeaturedCarousel";
 // import { FeaturedGearScene } from "./FeaturedGearScene";
 
 /**
  * おすすめ企画セクション
  * 左: 縦書きタイトル+ナビ / 右: 横スクロールカルーセル
+ * EVENTS_VISIBLE が false の間はセクションごと非表示
  */
 export async function FeaturedEvents() {
+  // 企画非公開期間はセクションごと非表示（フェッチも行わない）
+  if (!EVENTS_VISIBLE) {
+    return null;
+  }
+
   const events = await getFeaturedEvents();
   const featured = events.slice(0, 6);
 
