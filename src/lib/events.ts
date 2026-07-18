@@ -1,4 +1,5 @@
 import { client, isMicrocmsConfigured } from "./microcms";
+import { EVENTS_VISIBLE } from "@/data/site";
 import type {
   Event,
   EventListResponse,
@@ -124,6 +125,7 @@ const MICROCMS_MAX_LIMIT = 100;
 /**
  * 企画一覧を取得
  * limit が microCMS 上限(100)を超える場合は自動的にページネーションで全件取得
+ * EVENTS_VISIBLE が false の間は常に空配列を返す（microCMSへは問い合わせない）
  * @param limit 取得件数（デフォルト: 50）
  * @param filters フィルタオプション
  * @returns 企画の配列
@@ -132,6 +134,7 @@ export async function getEventsList(
   limit: number = 50,
   filters?: EventsFilterOptions
 ): Promise<Event[]> {
+  if (!EVENTS_VISIBLE) return [];
   if (!isMicrocmsConfigured) return [];
   try {
     // microCMS filters パラメータの構築
@@ -194,9 +197,11 @@ export async function getEventsList(
 /**
  * おすすめ企画を取得（全企画からランダムに最大6件）
  * ISR再検証のたびにランダムが更新される
+ * EVENTS_VISIBLE が false の間は常に空配列を返す（microCMSへは問い合わせない）
  * @returns おすすめ企画の配列
  */
 export async function getFeaturedEvents(): Promise<Event[]> {
+  if (!EVENTS_VISIBLE) return [];
   if (!isMicrocmsConfigured) return [];
   try {
     const allEvents = await getEventsList(100);
@@ -217,10 +222,12 @@ export async function getFeaturedEvents(): Promise<Event[]> {
 
 /**
  * 特定の企画を取得
+ * EVENTS_VISIBLE が false の間は常に null を返す（microCMSへは問い合わせない）
  * @param id 企画ID
  * @returns 企画情報、見つからない場合はnull
  */
 export async function getEventById(id: string): Promise<Event | null> {
+  if (!EVENTS_VISIBLE) return null;
   if (!isMicrocmsConfigured) return null;
   try {
     const response: RawEvent = await client.get({

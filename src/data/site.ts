@@ -56,3 +56,12 @@ export const siteConfig = {
  * サイト設定の型定義
  */
 export type SiteConfig = typeof siteConfig;
+
+/**
+ * 企画（イベント）情報の公開フラグ
+ * microCMS の企画データが出揃い公開可能になったら true に変更する（変更はこの1箇所のみ・要再デプロイ）。
+ * false の間は /events・/timetable・トップのおすすめ企画・企画詳細ページ・
+ * サイトマップの企画詳細URLがすべて非公開（準備中表示 / 404）になり、
+ * microCMS への企画系フェッチも行われない。
+ */
+export const EVENTS_VISIBLE: boolean = false;
