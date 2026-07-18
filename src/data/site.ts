@@ -65,3 +65,12 @@ export type SiteConfig = typeof siteConfig;
  * microCMS への企画系フェッチも行われない。
  */
 export const EVENTS_VISIBLE: boolean = false;
+
+/**
+ * お知らせ一覧ページ（/info）の公開フラグ
+ * 一覧UIを公開できる状態になったら true に変更する（変更はこの1箇所のみ・要再デプロイ）。
+ * false の間は /info 一覧のみ準備中表示になる。
+ * ※ トップの News セクション・お知らせ詳細（/info/[id]）・サイトマップの
+ *   お知らせURLは意図的な部分公開のため、このフラグの影響を受けない。
+ */
+export const NEWS_VISIBLE: boolean = false;
