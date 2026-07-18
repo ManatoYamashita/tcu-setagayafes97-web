@@ -72,7 +72,7 @@ export function NewsFilter({ newsList, header }: NewsFilterProps) {
 
             {/* Regular: 残りを小さく */}
             {regular.length > 0 && (
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 lg:gap-6">
+              <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4 lg:gap-6">
                 {regular.map((news) => (
                   <div key={news.id} className="news-card">
                     <NewsCard news={news} variant="default" />

@@ -17,12 +17,11 @@ export default createMiddleware(routing);
  * 多言語対応ページ:
  * - /about, /about/privacy
  * - /info/guide, /info/faq, /info/contact
- * - /map/access
+ * - /access
  *
  * 多言語非対応ページ（除外）:
  * - /events, /events/[id]
  * - /timetable
- * - /map (3Dマップ)
  * - /info, /info/[id], /info/pamphlet
  * - /about/sponsors
  * - /api, /_next, /favicon.ico など
@@ -35,12 +34,12 @@ export const config = {
     "/info/guide",
     "/info/faq",
     "/info/contact",
-    "/map/access",
+    "/access",
 
     // 他言語用のルート（プレフィックス付き）
     "/(en|zh|ko)/about/:path*",
     "/(en|zh|ko)/info/guide",
     "/(en|zh|ko)/info/faq",
-    "/(en|zh|ko)/map/access",
+    "/(en|zh|ko)/access",
   ],
 };
