@@ -53,6 +53,7 @@
 
 - `pastel-castle.webp` を使用していた仮画像箇所は、`setagayafe97-image.webp` に置き換えます。
 - 元画像 `setagayafe97-image.JPG` は WebP 形式として最適化し、Webサイトでは `/images/photos/setagayafe97-image.webp` を使用します。
+- Aboutページの「期待を超える瞬間へ、ともに進もう」左側画像も `/images/photos/setagayafe97-image.webp` を使用します。
 
 ---
 
