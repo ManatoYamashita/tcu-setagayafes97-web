@@ -9,8 +9,17 @@ import { aboutConfig } from "@/data/about";
  * モバイルは通常フローで縦積み。
  */
 export function ChairpersonSection() {
-  const { sectionLabel, heading, briefDescription, name, position, image, subImage, message } =
-    aboutConfig.chairpersonMessage;
+  const {
+    sectionLabel,
+    heading,
+    briefDescription,
+    name,
+    position,
+    image,
+    subImage,
+    imageAlt,
+    message,
+  } = aboutConfig.chairpersonMessage;
 
   return (
     <section className="relative overflow-hidden bg-gray-50 py-24 lg:py-32">
@@ -68,9 +77,9 @@ export function ChairpersonSection() {
             <div className="relative aspect-[4/3] w-full max-h-64 sm:max-h-80 overflow-hidden rounded-l-2xl shadow-lg">
               <Image
                 src={image}
-                alt="委員長メイン写真"
+                alt={imageAlt}
                 fill
-                className="object-cover"
+                className="object-cover object-[center_25%]"
                 sizes="90vw"
               />
             </div>
@@ -84,13 +93,13 @@ export function ChairpersonSection() {
           </div>
 
           {/* ── メイン画像 ── col 2-6, row 2-4 (span 3) */}
-          <div className="lg:col-start-2 lg:col-end-6 lg:row-start-2 lg:row-end-5 lg:pt-8">
+          <div className="hidden lg:col-start-2 lg:col-end-6 lg:row-start-2 lg:row-end-5 lg:block lg:pt-8">
             <div className="relative aspect-square w-full overflow-hidden rounded-full shadow-lg">
               <Image
                 src={image}
-                alt="委員長メイン写真"
+                alt={imageAlt}
                 fill
-                className="object-cover"
+                className="object-cover object-[center_25%]"
                 sizes="(max-width: 1024px) 100vw, 42vw"
               />
             </div>
@@ -108,9 +117,9 @@ export function ChairpersonSection() {
             <div className="relative aspect-square w-full overflow-hidden rounded-full shadow-lg">
               <Image
                 src={subImage}
-                alt="委員長サブ写真"
+                alt=""
                 fill
-                className="object-cover"
+                className="object-cover object-[center_25%]"
                 sizes="(max-width: 1024px) 100vw, 25vw"
               />
             </div>
