@@ -97,6 +97,7 @@ docs/
 - **[ci-env.md](./dev/ci-env.md)** - GitHub Actions 環境変数管理
   - Repository Secrets / Variables の使い分け基準
   - 本プロジェクトの登録一覧（MICROCMS*\*, NEXT_PUBLIC*\*）
+  - 企画・お知らせの公開フラグと非公開時の表示範囲
   - ワークフローでの参照方法（`secrets.` vs `vars.`）
   - ローカル開発（.env.local）との対応表
 
@@ -136,4 +137,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-03-22
+**最終更新日**: 2026-07-22

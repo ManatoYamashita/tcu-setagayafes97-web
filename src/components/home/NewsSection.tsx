@@ -13,6 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 interface NewsSectionProps {
   newsList: News[];
+  isVisible: boolean;
 }
 
 /**
@@ -20,7 +21,7 @@ interface NewsSectionProps {
  * 白シート + Type絞り込みタブ + 2段グリッド（Featured 2件 + Regular）+ 歯車装飾
  * ScrollTriggerによるエントランスアニメーション付き
  */
-export function NewsSection({ newsList }: NewsSectionProps) {
+export function NewsSection({ newsList, isVisible }: NewsSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const heroImageRef = useRef<HTMLDivElement>(null);
   const whiteSheetRef = useRef<HTMLDivElement>(null);
@@ -197,8 +198,8 @@ export function NewsSection({ newsList }: NewsSectionProps) {
     };
   }, []);
 
-  // データが取得できない場合の表示
-  if (newsList.length === 0) {
+  // 非公開期間またはデータが取得できない場合の表示
+  if (!isVisible || newsList.length === 0) {
     return (
       <section className="relative bg-secondary py-32">
         {/* CircularText装飾 */}
@@ -213,7 +214,11 @@ export function NewsSection({ newsList }: NewsSectionProps) {
               <div className="mb-12 flex items-center justify-between">
                 <h2 className="text-5xl font-bold md:text-6xl">NEWS</h2>
               </div>
-              <div className="text-center text-gray-900/60">現在、お知らせはありません。</div>
+              <div className="text-center text-gray-900/60">
+                {isVisible
+                  ? "現在、お知らせはありません。"
+                  : "現在、お知らせは準備中です。公開までもうしばらくお待ちください。"}
+              </div>
             </div>
           </div>
         </div>

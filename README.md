@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/ogp.webp" alt="東京都市大学 第97回 世田谷祭 - からくり KARAKURI" width="100%" />
+  <img src="public/ogp.webp" alt="東京都市大学 第97回 世田谷祭 - カラクリ KARAKURI" width="100%" />
 </div>
 
 # 東京都市大学 第97回 世田谷祭 公式Webサイト

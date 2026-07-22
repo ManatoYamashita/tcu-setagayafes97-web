@@ -54,7 +54,7 @@ export const pageHeroes: Record<string, PageHeroData> = {
     imageAlt: "お知らせイメージ",
   },
   about: {
-    title: ["世田谷祭", "こころを動かす", "からくり"],
+    title: ["世田谷祭", "こころを動かす", "カラクリ"],
     subtitle: "About Us",
     ctaHref: "/events",
     ctaLabel: "View More",
