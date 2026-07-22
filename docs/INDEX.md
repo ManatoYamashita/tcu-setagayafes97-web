@@ -75,6 +75,7 @@ docs/
   - 第97回 キャンパステーマ『カラクリ』本文
   - 2026年度 学園祭共通テーマ『期待を超える瞬間へ、ともに進もう』本文
   - 第97回 実行委員長 高野雄司 挨拶文
+  - 仮画像 `pastel-castle.webp` から実画像 `setagayafe97-image.webp` への置換指示
   - 公開時点で「準備中」表示とする項目の指示
 
 - **[contract-individual-v97.md](./requires/contract-individual-v97.md)** - 第97回業務委託 個別契約書ドラフト（乙側提示用 v1）
