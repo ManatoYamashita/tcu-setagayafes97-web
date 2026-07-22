@@ -49,6 +49,13 @@
 
 ---
 
+## 実画像素材
+
+- `pastel-castle.webp` を使用していた仮画像箇所は、`setagayafe97-image.webp` に置き換えます。
+- 元画像 `setagayafe97-image.JPG` は WebP 形式として最適化し、Webサイトでは `/images/photos/setagayafe97-image.webp` を使用します。
+
+---
+
 ## その他修正のお願い
 
 以下の箇所について、**公開時点では「準備中」として表示**をお願い致します。

@@ -116,7 +116,7 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
             tabIndex={0}
           >
             {events.map((event) => {
-              const imageUrl = event.thumbnail?.url || "/images/placeholder/pastel-castle.webp";
+              const imageUrl = event.thumbnail?.url || "/images/photos/setagayafe97-image.webp";
               return (
                 <Link
                   key={event.id}

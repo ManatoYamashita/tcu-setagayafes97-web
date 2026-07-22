@@ -21,7 +21,7 @@ export const aboutConfig = {
       "多くの人の力が重なり合い、知的好奇心と前向きなエネルギーが共鳴する特別な空間となることを願っています。",
     ],
     cta: { label: "委員会について", href: "/about" },
-    image: { src: "/images/placeholder/pastel-castle.webp", alt: "世田谷祭の様子" },
+    image: { src: "/images/photos/setagayafe97-image.webp", alt: "世田谷祭の様子" },
   },
 
   // 委員長挨拶
