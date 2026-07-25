@@ -111,13 +111,18 @@ export const aboutConfig = {
   social: [
     {
       name: "X (Twitter)",
-      url: "https://twitter.com/setagayafes_tcu",
+      url: "https://x.com/setagayafes_tcu?s=11",
       icon: "twitter",
     },
     {
       name: "Instagram",
-      url: "https://instagram.com/setagayafes_sfa",
+      url: "https://www.instagram.com/setagayafes_sfa?igsh=bWpzYWpqOGozZ3Nr&utm_source=qr",
       icon: "instagram",
+    },
+    {
+      name: "YouTube",
+      url: "https://youtube.com/@setagayafes?si=WvB8ya5RrqvHg0Vj",
+      icon: "youtube",
     },
   ],
 

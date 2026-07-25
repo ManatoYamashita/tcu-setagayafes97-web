@@ -1,4 +1,4 @@
-import { Facebook, Instagram } from "lucide-react";
+import { Instagram, Youtube } from "lucide-react";
 import { siteConfig } from "@/data/site";
 
 export interface SocialIconsProps {
@@ -52,9 +52,9 @@ export function SocialIcons({
       icon: <Instagram className={iconSizes[size]} />,
     },
     {
-      name: "Facebook",
-      url: siteConfig.sns.facebook,
-      icon: <Facebook className={iconSizes[size]} />,
+      name: "YouTube",
+      url: siteConfig.sns.youtube,
+      icon: <Youtube className={iconSizes[size]} />,
     },
   ];
 
