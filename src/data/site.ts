@@ -22,7 +22,7 @@ export const siteConfig = {
 
   // 開催時間
   openTime: "10:00",
-  closeTime: "18:00",
+  closeTime: "19:30",
 
   // 会場情報
   venue: "東京都市大学 世田谷キャンパス",
@@ -33,9 +33,9 @@ export const siteConfig = {
 
   // SNS
   sns: {
-    twitter: "https://twitter.com/tcu_setagayafes",
-    instagram: "https://instagram.com/tcu_setagayafes",
-    facebook: "https://facebook.com/tcu.setagayafes",
+    twitter: "https://x.com/setagayafes_tcu?s=11",
+    instagram: "https://www.instagram.com/setagayafes_sfa?igsh=bWpzYWpqOGozZ3Nr&utm_source=qr",
+    youtube: "https://youtube.com/@setagayafes?si=WvB8ya5RrqvHg0Vj",
   },
 
   // メタデータ

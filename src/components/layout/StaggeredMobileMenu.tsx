@@ -35,7 +35,7 @@ const menuItems: MenuItem[] = getFilteredHeaderNav().map((item) => ({
 const socialItems: SocialItem[] = [
   { label: "X (Twitter)", link: siteConfig.sns.twitter },
   { label: "Instagram", link: siteConfig.sns.instagram },
-  { label: "Facebook", link: siteConfig.sns.facebook },
+  { label: "YouTube", link: siteConfig.sns.youtube },
 ];
 
 const PRE_COLORS = ["#E1C0EE", "#CD79EE"];

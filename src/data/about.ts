@@ -30,7 +30,7 @@ export const aboutConfig = {
     heading: "期待を超える瞬間へ、\nともに進もう",
     briefDescription:
       "東京都市大学学園祭共通テーマには、これまで両キャンパスが積み上げてきた歴史や伝統を大切に受け継ぎながら、さらにその先へ挑戦し続けるという想いが込められています。\n「期待を超える瞬間へ」には、来場者の想像を超える感動や体験を届けるため、現状に満足することなく学園祭の可能性を追求し続けるという決意があります。これまでの成功にとどまることなく、新たな挑戦を重ねることで、学園祭だからこそ生み出せる特別な瞬間を目指します。\nまた、「ともに進もう」には、キャンパスや立場を越えて協力し合い、多くの人とのつながりを広げながら、学園祭を創り上げていくという意味があります。学生同士はもちろん、地域の皆様やご来場いただく方々とともに、誰にとっても心に残る学園祭を築いていきます。\n関わるすべての人にとって特別な瞬間となるように。東京都市大学の結束と熱量を体現する学園祭を目指します。",
-    name: "高野雄司",
+    name: "髙野雄司",
     position: "第97回東京都市大学世田谷祭実行委員会 実行委員長",
     image: "/images/photos/setagayafe97-image.webp",
     subImage: "/images/photos/setagayafes97-leader.webp",
@@ -101,13 +101,18 @@ export const aboutConfig = {
   social: [
     {
       name: "X (Twitter)",
-      url: "https://twitter.com/setagayafes_tcu",
+      url: "https://x.com/setagayafes_tcu?s=11",
       icon: "twitter",
     },
     {
       name: "Instagram",
-      url: "https://instagram.com/setagayafes_sfa",
+      url: "https://www.instagram.com/setagayafes_sfa?igsh=bWpzYWpqOGozZ3Nr&utm_source=qr",
       icon: "instagram",
+    },
+    {
+      name: "YouTube",
+      url: "https://youtube.com/@setagayafes?si=WvB8ya5RrqvHg0Vj",
+      icon: "youtube",
     },
   ],
 
