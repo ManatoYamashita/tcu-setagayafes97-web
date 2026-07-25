@@ -27,10 +27,12 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 
 ### Repository Variables
 
-| 変数名               | 内容                  | 値の例                          |
-| -------------------- | --------------------- | ------------------------------- |
-| `NEXT_PUBLIC_URL`    | 本番サイト URL        | `https://setagayafes.tcu.ac.jp` |
-| `NEXT_PUBLIC_GTM_ID` | Google Tag Manager ID | `GTM-XXXXXXX`                   |
+| 変数名                       | 内容                     | 値の例                          |
+| ---------------------------- | ------------------------ | ------------------------------- |
+| `NEXT_PUBLIC_URL`            | 本番サイト URL           | `https://setagayafes.tcu.ac.jp` |
+| `NEXT_PUBLIC_GTM_ID`         | Google Tag Manager ID    | `GTM-XXXXXXX`                   |
+| `NEXT_PUBLIC_EVENTS_VISIBLE` | 企画情報の公開フラグ     | `false`                         |
+| `NEXT_PUBLIC_NEWS_VISIBLE`   | お知らせ情報の公開フラグ | `false`                         |
 
 ## ワークフローでの参照例
 
@@ -42,6 +44,8 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
     MICROCMS_API_KEY: ${{ secrets.MICROCMS_API_KEY }}
     NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
     NEXT_PUBLIC_GTM_ID: ${{ vars.NEXT_PUBLIC_GTM_ID }}
+    NEXT_PUBLIC_EVENTS_VISIBLE: ${{ vars.NEXT_PUBLIC_EVENTS_VISIBLE }}
+    NEXT_PUBLIC_NEWS_VISIBLE: ${{ vars.NEXT_PUBLIC_NEWS_VISIBLE }}
 ```
 
 ## 登録手順
@@ -66,6 +70,15 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 | `secrets.MICROCMS_API_KEY`        | `MICROCMS_API_KEY=xxxxx`                |
 | `vars.NEXT_PUBLIC_URL`            | `NEXT_PUBLIC_URL=http://localhost:3000` |
 | `vars.NEXT_PUBLIC_GTM_ID`         | `NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX`        |
+| `vars.NEXT_PUBLIC_EVENTS_VISIBLE` | `NEXT_PUBLIC_EVENTS_VISIBLE=false`      |
+| `vars.NEXT_PUBLIC_NEWS_VISIBLE`   | `NEXT_PUBLIC_NEWS_VISIBLE=false`        |
+
+## コンテンツ公開フラグ
+
+- `NEXT_PUBLIC_EVENTS_VISIBLE=false`: 企画一覧・タイムテーブルは準備中表示にし、トップのおすすめ企画・企画詳細URL・サイトマップの企画詳細URLを非公開にする。microCMS の企画データは取得しない。
+- `NEXT_PUBLIC_NEWS_VISIBLE=false`: お知らせ一覧とトップの NEWS セクションは準備中表示にし、トップの最新ニュース・お知らせ詳細URL・サイトマップのお知らせ詳細URLを非公開にする。microCMS のお知らせデータは取得しない。
+- どちらも `true` の場合のみ公開する。未設定または `true` 以外は安全側として非公開になる。
+- ビルド時に評価されるため、値を変更した後は再ビルド・再デプロイが必要。
 
 ## 注意事項
 
@@ -81,4 +94,4 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 
 ---
 
-**最終更新日**: 2026-03-22
+**最終更新日**: 2026-07-22

@@ -74,6 +74,8 @@ docs/
 - **[website-content.md](./requires/website-content.md)** - クライアント提供のWebサイト掲載文
   - 第97回 キャンパステーマ『カラクリ』本文
   - 2026年度 学園祭共通テーマ『期待を超える瞬間へ、ともに進もう』本文
+  - 第97回 実行委員長 髙野雄司 挨拶文
+  - 仮画像 `pastel-castle.webp` から実画像 `setagayafe97-image.webp` への置換指示
   - 公開時点で「準備中」表示とする項目の指示
 
 - **[contract-individual-v97.md](./requires/contract-individual-v97.md)** - 第97回業務委託 個別契約書ドラフト（乙側提示用 v1）
@@ -97,6 +99,7 @@ docs/
 - **[ci-env.md](./dev/ci-env.md)** - GitHub Actions 環境変数管理
   - Repository Secrets / Variables の使い分け基準
   - 本プロジェクトの登録一覧（MICROCMS*\*, NEXT_PUBLIC*\*）
+  - 企画・お知らせの公開フラグと非公開時の表示範囲
   - ワークフローでの参照方法（`secrets.` vs `vars.`）
   - ローカル開発（.env.local）との対応表
 
@@ -136,4 +139,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-03-22
+**最終更新日**: 2026-07-22

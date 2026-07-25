@@ -4,12 +4,15 @@ import { NewsSection } from "@/components/home/NewsSection";
 import { FeaturedEvents } from "@/components/home/FeaturedEvents";
 import { SponsorBanner } from "@/components/home/SponsorBanner";
 import { getLatestHeroNews, getNewsList } from "@/lib/news";
+import { NEWS_VISIBLE } from "@/data/site";
 /**
  * トップページ
  * 第97回世田谷祭の公式Webサイト
  */
 export default async function Home() {
-  const [heroNews, newsList] = await Promise.all([getLatestHeroNews(), getNewsList(8)]);
+  const [heroNews, newsList] = NEWS_VISIBLE
+    ? await Promise.all([getLatestHeroNews(), getNewsList(8)])
+    : [null, []];
 
   return (
     <main className="overflow-x-clip">
@@ -17,7 +20,7 @@ export default async function Home() {
         <HeroSection latestNews={heroNews} />
         <AboutSection />
       </div>
-      <NewsSection newsList={newsList} />
+      <NewsSection newsList={newsList} isVisible={NEWS_VISIBLE} />
       <FeaturedEvents />
       <SponsorBanner />
     </main>

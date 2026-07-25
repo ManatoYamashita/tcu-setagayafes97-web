@@ -56,3 +56,25 @@ export const siteConfig = {
  * サイト設定の型定義
  */
 export type SiteConfig = typeof siteConfig;
+
+/**
+ * 企画（イベント）情報の公開フラグ
+ * 環境変数 NEXT_PUBLIC_EVENTS_VISIBLE を "true" に設定して再デプロイすると公開される
+ * （Vercel の環境変数 or .env.local。ビルド時に評価されるため変更には再ビルドが必要）。
+ * 未設定・"true" 以外はすべて非公開（安全側デフォルト）。
+ * false の間は /events・/timetable・トップのおすすめ企画・企画詳細ページ・
+ * サイトマップの企画詳細URLがすべて非公開（準備中表示 / 404）になり、
+ * microCMS への企画系フェッチも行われない。
+ */
+export const EVENTS_VISIBLE: boolean = process.env.NEXT_PUBLIC_EVENTS_VISIBLE === "true";
+
+/**
+ * お知らせ情報の公開フラグ
+ * 環境変数 NEXT_PUBLIC_NEWS_VISIBLE を "true" に設定して再デプロイすると公開される
+ * （Vercel の環境変数 or .env.local。ビルド時に評価されるため変更には再ビルドが必要）。
+ * 未設定・"true" 以外はすべて非公開（安全側デフォルト）。
+ * false の間は /info・トップの News セクション・お知らせ詳細ページ・
+ * サイトマップのお知らせ詳細URLがすべて非公開（準備中表示 / 404）になり、
+ * microCMS へのお知らせ系フェッチも行われない。
+ */
+export const NEWS_VISIBLE: boolean = process.env.NEXT_PUBLIC_NEWS_VISIBLE === "true";

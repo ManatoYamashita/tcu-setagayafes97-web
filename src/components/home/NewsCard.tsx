@@ -100,7 +100,7 @@ function CategoryIcon({ type, size = 16 }: { type: NewsType; size?: number }) {
 }
 
 export function NewsCard({ news, variant = "default", className }: NewsCardProps) {
-  const imageUrl = news.thumbnail?.url || "/images/placeholder/pastel-castle.webp";
+  const imageUrl = news.thumbnail?.url || "/images/photos/setagayafe97-image.webp";
   const dateStr = formatDate(news.publishedAt || news.createdAt);
   const isLarge = variant === "large";
 
