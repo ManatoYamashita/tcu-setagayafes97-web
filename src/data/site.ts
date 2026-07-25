@@ -22,7 +22,7 @@ export const siteConfig = {
 
   // 開催時間
   openTime: "10:00",
-  closeTime: "18:00",
+  closeTime: "19:30",
 
   // 会場情報
   venue: "東京都市大学 世田谷キャンパス",
