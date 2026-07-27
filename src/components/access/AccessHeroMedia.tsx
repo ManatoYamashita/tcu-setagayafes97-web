@@ -42,6 +42,7 @@ export function AccessHeroMedia() {
           className="absolute inset-0 h-full w-full object-cover"
         >
           <source src="/videos/access-tcu-setagaya.webm" type="video/webm" />
+          <source src="/videos/access-tcu-setagaya.mp4" type="video/mp4" />
         </video>
       )}
       <div
