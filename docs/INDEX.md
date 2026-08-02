@@ -21,7 +21,8 @@ docs/
 │   ├── design.md                  # デザインシステム（カラー・タイポグラフィトークン）
 │   ├── access-page-design.md      # Accessページの情報設計・UI実装方針
 │   ├── agent-browser-workflow.md  # agent-browserを使用したデザイン再現とデバッグフロー
-│   └── layout-patterns.md         # レイアウトパターンと設計原則
+│   ├── layout-patterns.md         # レイアウトパターンと設計原則
+│   └── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
 └── requires/         # 要件定義・仕様関連
     ├── require.md           # プロジェクト要件定義書
     ├── todo.md                    # プロジェクト開発タスクリスト
@@ -135,6 +136,15 @@ docs/
   - z-index管理とレイヤー構造（標準スケール: 10/20/30/40/60）
   - absolute/fixed/sticky使い分けガイド
   - レスポンシブ高さ計算（100vh vs 100svh、モバイルSafari対策）
+  - 部分幅ヒーロー画像の境界処理（mask-image とオーバーレイの分担）
+
+- **[i18n-page-structure.md](./frontend/i18n-page-structure.md)** - 多言語ページの構成パターン
+  - ページビューの置き場所（同名ルートの二重実装がデッドコード化する罠）
+  - `pageHeroes` のロケール上書き（日本語ハードコードの共有データ）
+  - リンクの扱い（`@/i18n/navigation` を使う場所・使えない場所）
+  - 翻訳しないもの（コンテンツに対する照合ロジック）
+  - 言語宣言（`lang` 属性の二段構え、`headers()` を使えない理由）
+  - 多言語ページを追加する手順と `proxy.ts` 編集時の禁止事項
 
 ## 更新手順（PDCA）
 
