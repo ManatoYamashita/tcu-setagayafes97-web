@@ -19,6 +19,7 @@ docs/
 │   └── microcms.md   # microCMS API 制約と実装パターン
 ├── frontend/         # フロントエンド関連ドキュメント
 │   ├── design.md                  # デザインシステム（カラー・タイポグラフィトークン）
+│   ├── access-page-design.md      # Accessページの情報設計・UI実装方針
 │   ├── agent-browser-workflow.md  # agent-browserを使用したデザイン再現とデバッグフロー
 │   └── layout-patterns.md         # レイアウトパターンと設計原則
 └── requires/         # 要件定義・仕様関連
@@ -110,6 +111,11 @@ docs/
 
 ### フロントエンド関連（frontend/）
 
+- **[access-page-design.md](./frontend/access-page-design.md)** - Accessページの情報設計・UI実装方針
+  - 会場所在地・推奨経路・注意事項の情報優先順位
+  - 地図iframe、外部リンク、経路リストのアクセシビリティ要件
+  - 交通情報の管理場所と公式情報の参照基準
+
 - **[design.md](./frontend/design.md)** - デザインシステム（カラー・タイポグラフィトークン）
   - ブランドカラー `#CD79EE` の HLC 定義（H319 / L64 / C70）と oklch CSS 実装
   - Primary スケール・Neutral スケール・Semantic カラートークン
@@ -139,4 +145,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-07-22
+**最終更新日**: 2026-07-26

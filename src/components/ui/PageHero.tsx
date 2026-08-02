@@ -37,7 +37,7 @@ export function PageHero({
     <section className="relative h-[70svh] min-h-[400px] w-full overflow-hidden bg-secondary">
       {/* 画像レイヤー */}
       {hasImage && (
-        <div className="absolute inset-0 lg:inset-auto lg:right-0 lg:top-0 lg:h-full lg:w-[70vw]">
+        <div className="page-hero-image-fade absolute inset-0 lg:inset-auto lg:right-0 lg:top-0 lg:h-full lg:w-[70vw]">
           <Image
             src={imageSrc}
             alt={imageAlt ?? ""}
@@ -49,28 +49,13 @@ export function PageHero({
         </div>
       )}
 
-      {/* グラデーションオーバーレイ（テキスト可読性確保） */}
+      {/* グラデーションオーバーレイ（テキスト可読性確保）
+          モバイルは下→上、lg以上は左→右。方向の切り替えは page-hero-overlay 側のメディアクエリで完結する */}
       {hasImage && (
-        <>
-          {/* モバイル: 下→上 */}
-          <div
-            className="pointer-events-none absolute inset-0 z-10 lg:hidden"
-            style={{
-              background:
-                "linear-gradient(to top, oklch(79.5% 0.108 314deg) 15%, oklch(79.5% 0.108 314deg / 0.7) 45%, transparent 75%)",
-            }}
-            aria-hidden="true"
-          />
-          {/* デスクトップ: 左→右 */}
-          <div
-            className="pointer-events-none absolute inset-0 z-10 hidden lg:block"
-            style={{
-              background:
-                "linear-gradient(to right, oklch(79.5% 0.108 314deg) 20%, oklch(79.5% 0.108 314deg / 0.85) 35%, transparent 65%)",
-            }}
-            aria-hidden="true"
-          />
-        </>
+        <div
+          className="page-hero-overlay pointer-events-none absolute inset-0 z-10"
+          aria-hidden="true"
+        />
       )}
 
       {/* テキストレイヤー */}

@@ -4,6 +4,7 @@ import React, { useCallback, useLayoutEffect, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 import { X } from "lucide-react";
+import { LanguageSwitcherInline } from "@/components/layout/LanguageSwitcher";
 import { getFilteredHeaderNav } from "@/data/navigation";
 import { siteConfig } from "@/data/site";
 
@@ -371,6 +372,12 @@ export function StaggeredMobileMenu({ isOpen, onClose }: StaggeredMobileMenuProp
                 </li>
               ))}
             </ul>
+
+            {/*
+              言語切替。GSAPタイムラインが参照する sm-socials-* 系のクラスは
+              付けないこと（SNSブロックのフェードイン対象を奪うため）。
+            */}
+            <LanguageSwitcherInline className="pt-2" onNavigate={onClose} />
 
             {/* SNSリンク */}
             <div className="sm-socials mt-auto flex flex-col gap-3 pt-8" aria-label="SNSリンク">

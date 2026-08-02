@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Menu } from "lucide-react";
 import { siteConfig } from "@/data/site";
 import { DesktopNav } from "@/components/layout/DesktopNav";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import dynamic from "next/dynamic";
 const StaggeredMobileMenu = dynamic(
   () => import("@/components/layout/StaggeredMobileMenu").then((m) => m.StaggeredMobileMenu),
@@ -19,7 +20,7 @@ import { LogoVideo } from "@/components/home/LogoVideo";
  *
  * - 全ページで常時表示される共通ヘッダー
  * - デスクトップ (>=lg): ロゴ + ナビゲーション + 言語切り替え
- * - モバイル (<lg): ロゴ + 言語切り替え + ハンバーガーボタン
+ * - モバイル (<lg): ロゴ + ハンバーガーボタン（言語切り替えはメニューパネル内）
  * - 画面最上部: フラット（幅いっぱい・角丸なし・影なし）
  * - スクロール時: ピル型（container幅・rounded-full・shadow-md）
  *
@@ -90,8 +91,9 @@ export function Header() {
           {/* 中央: デスクトップナビ */}
           <DesktopNav />
 
-          {/* 右: ハンバーガー */}
+          {/* 右: 言語切り替え + ハンバーガー */}
           <div className="flex items-center gap-3">
+            <LanguageSwitcher className="hidden lg:block" />
             <button
               className="inline-flex items-center justify-center rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900 lg:hidden"
               aria-label="メニューを開く"
