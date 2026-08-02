@@ -464,7 +464,7 @@ VT 非対応ブラウザは `dreamy-fallback-in`（0.55s）で代替。
 
 ### モーション軽減対応
 
-CSS 側（`globals.css`）で `animation: none !important` にする対象は以下の**4つに限定**されている。
+CSS 側（`globals.css`）で `animation: none !important` にする対象は以下の**5つに限定**されている。
 `[class*="animate-"]` のような包括ルールは存在しないため、**常時ループする装飾クラスを新設したら
 このブロックへの追記が必須**。
 
