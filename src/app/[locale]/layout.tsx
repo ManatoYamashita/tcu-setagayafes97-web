@@ -38,5 +38,15 @@ export default async function LocaleLayout({
   // 翻訳メッセージを取得
   const messages = await getMessages();
 
-  return <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>;
+  return (
+    <NextIntlClientProvider messages={messages}>
+      {/*
+        言語範囲の宣言。ルートレイアウトの <html lang> はロケールを知らないため
+        既定の "ja" 固定であり、支援技術が英語の本文を日本語の音声エンジンで
+        読み上げてしまう。要素レベルの lang でこの範囲だけを上書きする。
+        JavaScript を実行しない環境でも効くのはこちら。
+      */}
+      <div lang={locale}>{children}</div>
+    </NextIntlClientProvider>
+  );
 }
