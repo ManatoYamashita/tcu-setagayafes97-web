@@ -3,6 +3,7 @@ import { Noto_Sans_JP, Kaisei_Opti, Shippori_Mincho, Dela_Gothic_One } from "nex
 import "./globals.css";
 import { siteConfig } from "@/data/site";
 import { Header } from "@/components/layout/Header";
+import { HtmlLangSync } from "@/components/layout/HtmlLangSync";
 import { Footer } from "@/components/layout/Footer";
 import { Opener } from "@/components/layout/Opener";
 import { AgentationDevTool } from "@/components/dev/AgentationDevTool";
@@ -79,10 +80,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    // 初期値は既定ロケール。実際のロケールへは HtmlLangSync が同期する
     <html lang="ja">
       <body
         className={`${notoSansJP.variable} ${kaiseiOpti.variable} ${shipporiMincho.variable} ${delaGothicOne.variable} font-sans antialiased text-gray-900`}
       >
+        <HtmlLangSync />
         <Opener />
         <Header />
         {children}
