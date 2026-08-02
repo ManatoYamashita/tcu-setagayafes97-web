@@ -173,6 +173,22 @@
       "lostFoundHours": "Hours",
       "medicalRoom": "First Aid Room",
       "emergencyContact": "Emergency Contact"
+    },
+    "nav": {
+      "label": "On this page",
+      "admission": "Admission",
+      "precautions": "Guidelines",
+      "accessibility": "Accessibility",
+      "weather": "Weather",
+      "lostFound": "Lost & Found",
+      "families": "Families",
+      "emergency": "Emergency"
+    },
+    "relatedPages": {
+      "title": "Related Pages",
+      "accessDescription": "View directions to the venue",
+      "contactDescription": "Questions and inquiries",
+      "faqDescription": "Browse the FAQ"
     }
   },
   "faq": {
@@ -182,12 +198,31 @@
       "title": "FAQ",
       "description": "Frequently asked questions and answers about the 97th Setagaya Festival at Tokyo City University."
     },
-    "count": "{count} questions",
+    "count": "{count, plural, =0 {No questions} one {# question} other {# questions}}",
     "empty": {
       "title": "FAQ is currently being prepared.",
       "prefix": "If you have any questions, please contact us via",
       "contactLink": "contact form",
       "suffix": "."
+    },
+    "search": {
+      "label": "Search questions",
+      "placeholder": "Search questions by keyword..."
+    },
+    "filters": {
+      "all": "All",
+      "visit": "Visiting",
+      "event": "Events",
+      "facility": "Venue & Facilities",
+      "other": "Other"
+    },
+    "noResults": {
+      "title": "No matching questions found",
+      "description": "Try a different keyword or filter"
+    },
+    "cta": {
+      "title": "Can't find what you're looking for?",
+      "description": "Send us your question through the contact form and our team will get back to you."
     }
   },
   "access": {
