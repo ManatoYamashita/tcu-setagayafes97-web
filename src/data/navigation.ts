@@ -1,3 +1,27 @@
+import type { Locale } from "@/i18n/routing";
+
+/**
+ * 言語切替の選択肢
+ *
+ * label は各言語の母語表記（autonym）。国旗絵文字は使用しない。
+ * 🇺🇸=English は英語圏を米国に限定してしまい、Windows ではフォント欠落で
+ * 表示されず、スクリーンリーダーの読み上げも不正確になるため。
+ *
+ * fallbackLabel は多言語未対応ページから切り替えた際の着地先ページ名。
+ * `src/messages/<code>.json` の `guide.title` と同一文字列にすること。
+ * 日本語は未対応ページでも常に現在ロケールになるため不要。
+ */
+export const languageOptions: ReadonlyArray<{
+  code: Locale;
+  label: string;
+  fallbackLabel?: string;
+}> = [
+  { code: "ja", label: "日本語" },
+  { code: "en", label: "English", fallbackLabel: "Visitor Guide" },
+  { code: "zh", label: "简体中文", fallbackLabel: "参观指南" },
+  { code: "ko", label: "한국어", fallbackLabel: "방문 안내" },
+];
+
 /**
  * ナビゲーション構成
  */
@@ -105,30 +129,6 @@ export const navigationConfig = {
           href: "/about/privacy",
         },
       ],
-    },
-  ],
-
-  // 言語切り替え
-  languages: [
-    {
-      code: "ja",
-      label: "日本語",
-      flag: "🇯🇵",
-    },
-    {
-      code: "en",
-      label: "English",
-      flag: "🇺🇸",
-    },
-    {
-      code: "zh",
-      label: "简体中文",
-      flag: "🇨🇳",
-    },
-    {
-      code: "ko",
-      label: "한국어",
-      flag: "🇰🇷",
     },
   ],
 } as const;
