@@ -402,23 +402,56 @@ Line Height:  1.75
 
 プロジェクトでは GSAP を高度なアニメーションに使用。
 
-| コンポーネント      | 手法                  | 効果                                          |
-| ------------------- | --------------------- | --------------------------------------------- |
-| HeroSection         | `stagger(0.12s)`      | 4要素の順次フェードイン + スライドアップ      |
-| Opener              | 6フェーズタイムライン | 薄紫 → 濃紫フェード → スライドアウト          |
-| AboutSection        | ScrollTrigger         | スクロール時の画像スケール + テキスト stagger |
-| StaggeredMobileMenu | タイムライン          | 背景スライドイン + メニュー項目 stagger       |
+| コンポーネント      | 手法                      | 効果                                             |
+| ------------------- | ------------------------- | ------------------------------------------------ |
+| HeroSection         | `stagger(0.12s)`          | 4要素の順次フェードイン + スライドアップ         |
+| Opener              | 6フェーズタイムライン     | 薄紫 → 濃紫フェード → スライドアウト             |
+| AboutSection        | ScrollTrigger             | スクロール時の画像スケール + テキスト stagger    |
+| ChairpersonSection  | ScrollTrigger + SplitText | 行単位リヴィール + 画像二層ズーム + 段落 stagger |
+| StaggeredMobileMenu | タイムライン              | 背景スライドイン + メニュー項目 stagger          |
 
 GSAP 使用時は `force3D: true` を設定し GPU 加速を有効にする。
 
+ScrollTrigger の入場は `{ start: "top 80%", once: true }` を共通の基準とし、各 tween には
+スプレッドしたコピー `{ ...scrollTriggerBase }` を渡す。入場は `gsap.set` + `gsap.to` ではなく
+`gsap.from()` で書くと、モーション軽減時に「何もしない」だけで完成形が表示される。
+
+#### SplitText と日本語（重要）
+
+SplitText は既定で**空白を単語区切りとする**ため、空白のない日本語では段落全体が 1 単語
+= 1 行と判定され、行分割が機能しない。`wordDelimiter: ""` を指定して 1 文字を最小単位にする。
+
+```ts
+SplitText.create(elements, {
+  type: "lines",        // chars は type に含めない（行へまとめた後、文字要素は解除される）
+  wordDelimiter: "",    // 日本語には必須
+  autoSplit: true,      // フォント読み込み完了とリサイズを監視して自動で再分割
+  onSplit: (self) => gsap.from(self.lines, { ... }), // return すると再分割時に破棄される
+});
+```
+
+- `type` に `chars` を含めないこと。行へグループ化したあと文字要素が解除され、行 `<div>` には
+  素のテキストが残るため、禁則処理（行頭の句読点回避）が保たれる
+- `white-space: pre-line` / `pre-wrap` と併用しない。`reduceWhiteSpace`（既定 `true`）が
+  空白を畳んで改行が失われる。改行は `<br />` と個別の `<p>` で表現する
+- `aria` の既定は `"auto"` で元要素に `aria-label` が付くため、`aria-labelledby` の参照は保たれる
+
 ### Tailwind / CSS アニメーション
 
-| 名前                  | キーフレーム                   | 用途                          |
-| --------------------- | ------------------------------ | ----------------------------- |
-| `animate-spin-slow`   | `spin-slow` — 60s 回転         | CircularText 回転（ヒーロー） |
-| `animate-scroll-line` | `scroll-line` — 1.5s フェード  | スクロール促進矢印            |
-| `animate-blob`        | `blob-drift-1/2` — 20-24s      | 背景 Blob 浮遊                |
-| `dialog-fade-in`      | scale(0.95→1) + opacity — 0.2s | モーダル表示                  |
+| 名前                     | キーフレーム                   | 用途                           |
+| ------------------------ | ------------------------------ | ------------------------------ |
+| `animate-spin-slow`      | `spin-slow` — 60s 回転         | CircularText 回転（ヒーロー）  |
+| `animate-scroll-line`    | `scroll-line` — 1.5s フェード  | スクロール促進矢印             |
+| `animate-blob`           | `blob-drift-1/2` — 20-24s      | 背景 Blob 浮遊                 |
+| `animate-triangle-drift` | `triangle-drift-1/2` — 20-24s  | About 装飾三角形の常時ドリフト |
+| `dialog-fade-in`         | scale(0.95→1) + opacity — 0.2s | モーダル表示                   |
+
+常時ループする装飾は、keyframes を `globals.css` に置き、要素側の inline `style` で
+duration と**負の `animationDelay`** を与えて個体ごとに位相をずらす。
+
+`triangle-drift-*` は `transform` ではなく**個別プロパティ `translate`** を動かす。装飾三角形は
+Tailwind の `rotate-[Ndeg]` で角度を持ち、v4 はこれを個別プロパティ `rotate` として出力するため
+（`.rotate-\[15deg\]{rotate:15deg}`）、`translate` なら確実に合成されて回転角が保たれる。
 
 ### View Transitions（ページ遷移）
 
@@ -431,14 +464,21 @@ VT 非対応ブラウザは `dreamy-fallback-in`（0.55s）で代替。
 
 ### モーション軽減対応
 
-```css
-@media (prefers-reduced-motion: reduce) {
-  /* すべてのアニメーションを無効化 */
-  animation: none !important;
-}
-```
+CSS 側（`globals.css`）で `animation: none !important` にする対象は以下の**4つに限定**されている。
+`[class*="animate-"]` のような包括ルールは存在しないため、**常時ループする装飾クラスを新設したら
+このブロックへの追記が必須**。
 
-対象: View Transitions、Blob、スクロールライン、その他 `[class*="animate-"]`
+| セレクタ                      | 対象                        |
+| ----------------------------- | --------------------------- |
+| `::view-transition-old/new`   | ページ遷移                  |
+| `.page-transition-wrapper`    | VT 非対応時のフォールバック |
+| `[class*="animate-blob"]`     | 背景 Blob                   |
+| `[class*="animate-triangle"]` | About 装飾三角形            |
+| `.animate-scroll-line`        | スクロール促進矢印          |
+
+JS 側は各コンポーネントで `window.matchMedia("(prefers-reduced-motion: reduce)").matches` を
+判定し、アニメーションを生成せずに早期 return する（`NewsSection` / `ChairpersonSection`）。
+`ChairpersonSection` では SplitText の分割自体もスキップし、DOM を一切変更しない。
 
 ---
 
