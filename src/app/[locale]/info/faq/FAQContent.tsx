@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Link from "next/link";
 import { Search, MessageCircleQuestion, ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Accordion } from "@/components/ui/Accordion";
+import { Link } from "@/i18n/navigation";
 import type { Information } from "@/types/informations";
 import type { AccordionItem } from "@/types/accordion";
 
@@ -14,29 +15,29 @@ interface FAQContentProps {
 type FAQFilter = "all" | "visit" | "event" | "facility" | "other";
 
 interface FAQFilterDef {
-  key: FAQFilter;
-  label: string;
+  key: Exclude<FAQFilter, "all" | "other">;
   keywords: string[];
 }
 
 /**
  * FAQのサブカテゴリ分類定義
  * タイトル・descriptionのキーワードで自動分類
+ *
+ * IMPORTANT: keywords は microCMS の日本語コンテンツに対する照合ロジックであり、
+ * UI 文言ではない。翻訳すると全ロケールで分類が「その他」に倒れるため、
+ * 表示ロケールに関わらず日本語のまま維持すること。
  */
 const FAQ_FILTERS: FAQFilterDef[] = [
   {
     key: "visit",
-    label: "来場",
     keywords: ["入場", "アクセス", "駅", "車", "駐車", "雨天", "ペット", "開催日", "開催"],
   },
   {
     key: "event",
-    label: "企画",
     keywords: ["企画", "ステージ", "タイムテーブル", "出展", "参加", "申し込み"],
   },
   {
     key: "facility",
-    label: "会場・施設",
     keywords: ["トイレ", "授乳", "キャンパス", "建物", "落とし物", "忘れ物", "本部"],
   },
 ];
@@ -59,6 +60,8 @@ function classifyFAQ(faq: Information): FAQFilter {
  * キーワード検索 + カテゴリフィルター + アコーディオン表示
  */
 export function FAQContent({ initialFAQ }: FAQContentProps) {
+  const t = useTranslations("faq");
+  const tNav = useTranslations("navigation");
   const [activeFilter, setActiveFilter] = useState<FAQFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -112,14 +115,43 @@ export function FAQContent({ initialFAQ }: FAQContentProps) {
     defaultOpen: false,
   }));
 
+  /**
+   * CMS にFAQが1件も登録されていない場合。
+   * 検索・フィルターを出しても操作対象が無いため、案内のみを表示する。
+   */
+  if (initialFAQ.length === 0) {
+    return (
+      <div className="mx-auto max-w-4xl">
+        <div className="rounded-xl border border-gray-200 bg-gray-50 p-8 text-center">
+          <MessageCircleQuestion
+            aria-hidden="true"
+            className="mx-auto mb-4 h-12 w-12 text-gray-300"
+          />
+          <p className="text-gray-500">{t("empty.title")}</p>
+          <p className="mt-2 text-sm text-gray-400">
+            {t("empty.prefix")}{" "}
+            <Link href="/info/contact" className="text-primary hover:underline">
+              {t("empty.contactLink")}
+            </Link>{" "}
+            {t("empty.suffix")}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-4xl">
       {/* 検索バー */}
       <div className="relative mb-6">
-        <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+        <Search
+          aria-hidden="true"
+          className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+        />
         <input
           type="text"
-          placeholder="キーワードで質問を検索..."
+          aria-label={t("search.label")}
+          placeholder={t("search.placeholder")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-12 pr-4 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-purple-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-100"
@@ -129,22 +161,31 @@ export function FAQContent({ initialFAQ }: FAQContentProps) {
       {/* フィルターボタン群 */}
       <div className="mb-6 flex flex-wrap gap-3">
         <FilterButton
-          label="すべて"
+          label={t("filters.all")}
           isActive={activeFilter === "all"}
           onClick={() => setActiveFilter("all")}
           count={categoryCounts.all}
         />
-        {FAQ_FILTERS.map((filter) => (
-          <FilterButton
-            key={filter.key}
-            label={filter.label}
-            isActive={activeFilter === filter.key}
-            onClick={() => setActiveFilter(filter.key)}
-            count={categoryCounts[filter.key]}
-          />
-        ))}
         <FilterButton
-          label="その他"
+          label={t("filters.visit")}
+          isActive={activeFilter === "visit"}
+          onClick={() => setActiveFilter("visit")}
+          count={categoryCounts.visit}
+        />
+        <FilterButton
+          label={t("filters.event")}
+          isActive={activeFilter === "event"}
+          onClick={() => setActiveFilter("event")}
+          count={categoryCounts.event}
+        />
+        <FilterButton
+          label={t("filters.facility")}
+          isActive={activeFilter === "facility"}
+          onClick={() => setActiveFilter("facility")}
+          count={categoryCounts.facility}
+        />
+        <FilterButton
+          label={t("filters.other")}
           isActive={activeFilter === "other"}
           onClick={() => setActiveFilter("other")}
           count={categoryCounts.other}
@@ -153,10 +194,7 @@ export function FAQContent({ initialFAQ }: FAQContentProps) {
 
       {/* 件数表示 */}
       <div className="mb-6">
-        <p className="text-sm text-gray-900/80">
-          <span className="font-semibold text-gray-900">{filteredFAQ.length}</span>{" "}
-          件の質問があります
-        </p>
+        <p className="text-sm text-gray-600">{t("count", { count: filteredFAQ.length })}</p>
       </div>
 
       {/* FAQ一覧（アコーディオン） */}
@@ -164,9 +202,12 @@ export function FAQContent({ initialFAQ }: FAQContentProps) {
         <Accordion items={accordionItems} />
       ) : (
         <div className="rounded-xl border border-gray-200 bg-gray-50 py-16 text-center">
-          <MessageCircleQuestion className="mx-auto mb-4 h-12 w-12 text-gray-300" />
-          <p className="text-gray-500">該当する質問が見つかりませんでした</p>
-          <p className="mt-2 text-sm text-gray-400">別のキーワードやフィルターをお試しください</p>
+          <MessageCircleQuestion
+            aria-hidden="true"
+            className="mx-auto mb-4 h-12 w-12 text-gray-300"
+          />
+          <p className="text-gray-500">{t("noResults.title")}</p>
+          <p className="mt-2 text-sm text-gray-400">{t("noResults.description")}</p>
         </div>
       )}
 
@@ -174,17 +215,15 @@ export function FAQContent({ initialFAQ }: FAQContentProps) {
       <div className="mt-10 rounded-xl border border-blue-200 bg-blue-50 p-6 md:p-8">
         <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h3 className="text-lg font-bold text-gray-900">お探しの質問が見つかりませんか？</h3>
-            <p className="mt-1 text-sm text-gray-600">
-              お気軽にお問い合わせフォームからご質問ください。担当者が回答いたします。
-            </p>
+            <h2 className="text-lg font-bold text-gray-900">{t("cta.title")}</h2>
+            <p className="mt-1 text-sm text-gray-600">{t("cta.description")}</p>
           </div>
           <Link
             href="/info/contact"
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
+            className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-500"
           >
-            お問い合わせ
-            <ArrowRight className="h-4 w-4" />
+            {tNav("contact")}
+            <ArrowRight aria-hidden="true" className="h-4 w-4" />
           </Link>
         </div>
       </div>
@@ -205,11 +244,13 @@ interface FilterButtonProps {
 function FilterButton({ label, isActive, onClick, count }: FilterButtonProps) {
   return (
     <button
+      type="button"
       onClick={onClick}
+      aria-pressed={isActive}
       className={`rounded-full border px-5 py-2 text-sm font-semibold transition-all ${
         isActive
-          ? "border-gray-200 bg-white text-primary shadow-md"
-          : "border-gray-200/30 bg-white/10 text-gray-900/90 hover:border-gray-200 hover:bg-white/10"
+          ? "border-primary-300 bg-white text-primary shadow-md"
+          : "border-gray-200 bg-gray-50 text-gray-700 hover:border-primary-200 hover:bg-white"
       }`}
     >
       {label} <span className="ml-1 opacity-75">({count})</span>
