@@ -39,7 +39,13 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <NextIntlClientProvider messages={messages}>
+    /*
+      messages は全名前空間をそのまま渡している。pick() 等で絞り込むと、
+      クライアントコンポーネントから useTranslations を呼んでいる
+      info/faq/FAQContent.tsx（faq / navigation）が実行時に落ちる。
+      絞る場合は各クライアントコンポーネントが参照する名前空間を必ず含めること。
+    */
+    <NextIntlClientProvider locale={locale} messages={messages}>
       {/*
         言語範囲の宣言。ルートレイアウトの <html lang> はロケールを知らないため
         既定の "ja" 固定であり、支援技術が英語の本文を日本語の音声エンジンで

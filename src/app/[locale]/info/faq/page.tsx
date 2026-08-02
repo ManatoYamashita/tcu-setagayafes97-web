@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { HelpCircle } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { getFAQList } from "@/lib/informations";
-import { Accordion } from "@/components/ui/Accordion";
+import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
+import { pageHeroes, type PageHeroData } from "@/data/page-heroes";
 import { routing } from "@/i18n/routing";
-import type { AccordionItem } from "@/types/accordion";
+import { getFAQList } from "@/lib/informations";
+import { FAQContent } from "./FAQContent";
 
 /**
  * 静的パラメータ生成
@@ -54,50 +54,19 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: st
   // FAQ一覧を取得
   const faqList = await getFAQList();
 
-  // AccordionItem形式に変換
-  const accordionItems: AccordionItem[] = faqList.map((faq) => ({
-    title: faq.title,
-    content: faq.description || "",
-    defaultOpen: false,
-  }));
+  /**
+   * ヒーローは他セクションページと共通の PageHero を使用する。
+   * 画像と英字サブラベルは pageHeroes を継承し、見出し・説明のみロケール別文言で上書きする。
+   */
+  const hero: PageHeroData = {
+    ...pageHeroes.faq,
+    title: t("title"),
+    description: t("subtitle"),
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary">
-      {/* ページヘッダー */}
-      <div className="bg-secondary py-16 text-gray-900">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center gap-3">
-            <HelpCircle className="h-10 w-10 md:h-12 md:w-12" />
-            <h1 className="text-4xl font-bold md:text-5xl">{t("title")}</h1>
-          </div>
-          <p className="mt-4 text-center text-lg opacity-90">{t("subtitle")}</p>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-12">
-        <div className="mx-auto max-w-4xl">
-          {/* FAQ件数表示 */}
-          <div className="mb-6">
-            <p className="text-sm text-gray-900/80">{t("count", { count: faqList.length })}</p>
-          </div>
-
-          {/* FAQ一覧 */}
-          {faqList.length > 0 ? (
-            <Accordion items={accordionItems} />
-          ) : (
-            <div className="rounded-lg border border-gray-200/20 bg-white/10 p-8 text-center shadow-sm">
-              <p className="text-gray-900/60">{t("empty.title")}</p>
-              <p className="mt-2 text-sm text-gray-900/50">
-                {t("empty.prefix")}{" "}
-                <a href="/info/contact" className="text-primary-light hover:underline">
-                  {t("empty.contactLink")}
-                </a>{" "}
-                {t("empty.suffix")}
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+    <PageSheetLayout hero={hero}>
+      <FAQContent initialFAQ={faqList} />
+    </PageSheetLayout>
   );
 }

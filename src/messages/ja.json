@@ -173,6 +173,22 @@
       "lostFoundHours": "受付時間",
       "medicalRoom": "救護室",
       "emergencyContact": "緊急連絡先"
+    },
+    "nav": {
+      "label": "ページ内ナビゲーション",
+      "admission": "入場案内",
+      "precautions": "注意事項",
+      "accessibility": "バリアフリー",
+      "weather": "天候",
+      "lostFound": "落とし物",
+      "families": "お子様連れ",
+      "emergency": "緊急時"
+    },
+    "relatedPages": {
+      "title": "関連ページ",
+      "accessDescription": "会場案内を見る",
+      "contactDescription": "ご質問・ご相談はこちら",
+      "faqDescription": "FAQを確認する"
     }
   },
   "faq": {
@@ -188,6 +204,25 @@
       "prefix": "ご不明な点がございましたら、",
       "contactLink": "お問い合わせフォーム",
       "suffix": "よりお問い合わせください。"
+    },
+    "search": {
+      "label": "質問を検索",
+      "placeholder": "キーワードで質問を検索..."
+    },
+    "filters": {
+      "all": "すべて",
+      "visit": "来場",
+      "event": "企画",
+      "facility": "会場・施設",
+      "other": "その他"
+    },
+    "noResults": {
+      "title": "該当する質問が見つかりませんでした",
+      "description": "別のキーワードやフィルターをお試しください"
+    },
+    "cta": {
+      "title": "お探しの質問が見つかりませんか？",
+      "description": "お気軽にお問い合わせフォームからご質問ください。担当者が回答いたします。"
     }
   },
   "access": {
