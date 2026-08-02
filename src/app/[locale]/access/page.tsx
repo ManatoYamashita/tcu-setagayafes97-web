@@ -36,5 +36,5 @@ export default async function AccessPage({ params }: { params: Promise<{ locale:
 
   const content = accessPageContents[locale] ?? accessPageContents.ja;
 
-  return <AccessPageView content={content} />;
+  return <AccessPageView content={content} locale={locale} />;
 }

@@ -5,7 +5,12 @@ import { useEffect, useState } from "react";
 
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
-export function AccessHeroMedia() {
+/**
+ * 会場までの経路を示す路線図イラストの動画
+ *
+ * 装飾目的のため無音・1回再生とし、動きを減らす設定ではポスター画像のみを表示する。
+ */
+export function AccessRouteMedia() {
   const [shouldPlayVideo, setShouldPlayVideo] = useState(false);
 
   useEffect(() => {
@@ -24,8 +29,7 @@ export function AccessHeroMedia() {
         src="/images/video-posters/access-tcu-setagaya.webp"
         alt=""
         fill
-        priority
-        sizes="(min-width: 1440px) 1376px, (min-width: 1024px) calc(100vw - 128px), calc(100vw - 48px)"
+        sizes="(min-width: 864px) 768px, (min-width: 640px) calc(100vw - 96px), calc(100vw - 64px)"
         className="object-cover"
       />
       {shouldPlayVideo && (
@@ -45,14 +49,6 @@ export function AccessHeroMedia() {
           <source src="/videos/access-tcu-setagaya.mp4" type="video/mp4" />
         </video>
       )}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-1/5 bg-gradient-to-b from-white via-white/70 to-transparent"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/5 bg-gradient-to-t from-white via-white/70 to-transparent"
-      />
     </div>
   );
 }
