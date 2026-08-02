@@ -227,6 +227,43 @@ body {
   }
 }
 
+/*
+ * 装飾三角形の常時ドリフト（About 委員長挨拶セクション）
+ *
+ * transform ではなく個別プロパティ translate を動かすこと。
+ * 三角形は Tailwind の rotate-[Ndeg] で角度を持ち、v4 はこれを個別プロパティ
+ * rotate として出力する（.rotate-\[15deg\]{rotate:15deg}）。translate と rotate は
+ * 個別プロパティ同士なので確実に合成され、回転角が保たれる。
+ *
+ * 振れ幅は親セクションの overflow-hidden で端が欠けないよう ±20px 以内に収める。
+ * 位相は要素側の負の animationDelay でずらす。
+ */
+@keyframes triangle-drift-1 {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  33% {
+    translate: 14px -12px;
+  }
+  66% {
+    translate: -10px 10px;
+  }
+}
+
+@keyframes triangle-drift-2 {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  33% {
+    translate: -16px 10px;
+  }
+  66% {
+    translate: 12px -14px;
+  }
+}
+
 /* Dialog モーダルアニメーション */
 @keyframes dialog-fade-in {
   from {
@@ -321,6 +358,9 @@ body {
     animation: none !important;
   }
   [class*="animate-blob"] {
+    animation: none !important;
+  }
+  [class*="animate-triangle"] {
     animation: none !important;
   }
   .animate-scroll-line {

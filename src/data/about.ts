@@ -24,12 +24,16 @@ export const aboutConfig = {
     image: { src: "/images/photos/setagayafe97-image.webp", alt: "世田谷祭の様子" },
   },
 
-  // 委員長挨拶
+  // 共通テーマの解説 + 委員長挨拶（同一セクション内の2ブロック構成）
   chairpersonMessage: {
-    sectionLabel: "MESSAGE",
+    // テーマブロック（themeLabel + heading + briefDescription）
+    themeLabel: "THEME",
     heading: "期待を超える瞬間へ、\nともに進もう",
     briefDescription:
       "東京都市大学学園祭共通テーマには、これまで両キャンパスが積み上げてきた歴史や伝統を大切に受け継ぎながら、さらにその先へ挑戦し続けるという想いが込められています。\n「期待を超える瞬間へ」には、来場者の想像を超える感動や体験を届けるため、現状に満足することなく学園祭の可能性を追求し続けるという決意があります。これまでの成功にとどまることなく、新たな挑戦を重ねることで、学園祭だからこそ生み出せる特別な瞬間を目指します。\nまた、「ともに進もう」には、キャンパスや立場を越えて協力し合い、多くの人とのつながりを広げながら、学園祭を創り上げていくという意味があります。学生同士はもちろん、地域の皆様やご来場いただく方々とともに、誰にとっても心に残る学園祭を築いていきます。\n関わるすべての人にとって特別な瞬間となるように。東京都市大学の結束と熱量を体現する学園祭を目指します。",
+    // 挨拶ブロック（messageLabel + messageHeading + 署名 + message）
+    messageLabel: "MESSAGE",
+    messageHeading: "委員長挨拶",
     name: "髙野雄司",
     position: "第97回東京都市大学世田谷祭実行委員会 実行委員長",
     image: "/images/photos/setagayafe97-image.webp",

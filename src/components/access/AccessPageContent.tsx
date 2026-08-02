@@ -15,7 +15,6 @@ import { AccessRouteMedia } from "@/components/access/AccessRouteMedia";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
 import {
   accessConfig,
-  accessPageContent,
   type AccessPageContent,
   resolveBusRoutes,
   resolveTrainRoutes,
@@ -27,14 +26,11 @@ const linkClassName =
   "inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 py-3 text-sm font-bold transition-colors focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600";
 
 interface AccessPageContentProps {
-  content?: AccessPageContent;
-  locale?: Locale;
+  content: AccessPageContent;
+  locale: Locale;
 }
 
-export function AccessPageView({
-  content = accessPageContent,
-  locale = "ja",
-}: AccessPageContentProps) {
+export function AccessPageView({ content, locale }: AccessPageContentProps) {
   /**
    * ヒーローは他セクションページと共通の PageHero を使用する。
    * 画像とサブラベルは pageHeroes を継承し、見出し・説明のみロケール別文言で上書きする。

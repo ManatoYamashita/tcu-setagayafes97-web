@@ -173,6 +173,22 @@
       "lostFoundHours": "服务时间",
       "medicalRoom": "医务室",
       "emergencyContact": "紧急联系方式"
+    },
+    "nav": {
+      "label": "本页导航",
+      "admission": "入场",
+      "precautions": "须知",
+      "accessibility": "无障碍",
+      "weather": "天气",
+      "lostFound": "失物",
+      "families": "亲子",
+      "emergency": "紧急"
+    },
+    "relatedPages": {
+      "title": "相关页面",
+      "accessDescription": "查看会场交通指引",
+      "contactDescription": "咨询与提问",
+      "faqDescription": "查看常见问题"
     }
   },
   "faq": {
@@ -188,6 +204,25 @@
       "prefix": "如有疑问，请通过",
       "contactLink": "咨询表格",
       "suffix": "联系我们。"
+    },
+    "search": {
+      "label": "搜索问题",
+      "placeholder": "输入关键词搜索问题..."
+    },
+    "filters": {
+      "all": "全部",
+      "visit": "参观",
+      "event": "活动",
+      "facility": "会场与设施",
+      "other": "其他"
+    },
+    "noResults": {
+      "title": "未找到相关问题",
+      "description": "请尝试其他关键词或筛选条件"
+    },
+    "cta": {
+      "title": "没有找到您想了解的问题？",
+      "description": "欢迎通过咨询表格向我们提问，工作人员将为您解答。"
     }
   },
   "access": {

@@ -14,33 +14,41 @@ export const guideConfig = {
   },
 
   // 来場時の注意事項
+  // id は表示に使わない安定識別子。UI 側のカラーマッピングがこの id をキーに
+  // 網羅性を検査するため、項目を増減した場合はページ側のスタイル定義も更新が必要になる。
   precautions: [
     {
+      id: "parking",
       category: "駐車場",
       content: "当日は駐車場のご利用ができません。公共交通機関をご利用ください。",
       icon: "🚗",
     },
     {
+      id: "smoking",
       category: "喫煙",
       content: "キャンパス内は原則禁煙です。喫煙は指定場所でお願いします。",
       icon: "🚭",
     },
     {
+      id: "trash",
       category: "ゴミ",
       content: "ゴミは各自お持ち帰りください。分別にご協力をお願いします。",
       icon: "♻️",
     },
     {
+      id: "pets",
       category: "ペット",
       content: "ペット同伴でのご来場はご遠慮ください（盲導犬・介助犬を除く）。",
       icon: "🐕",
     },
     {
+      id: "hazardous",
       category: "危険物",
       content: "刃物類、花火、爆竹などの危険物の持ち込みは固く禁止します。",
       icon: "⚠️",
     },
     {
+      id: "photos",
       category: "撮影",
       content: "無断での企画内容の撮影・録音はお控えください。",
       icon: "📷",
@@ -105,3 +113,10 @@ export const guideConfig = {
  * ガイド情報の型定義
  */
 export type GuideConfig = typeof guideConfig;
+
+/**
+ * 注意事項の識別子
+ * UI 側のカラーマッピングを `satisfies Record<PrecautionId, ...>` で受けることにより、
+ * 項目の増減時にスタイル定義の追従漏れをコンパイルエラーとして検出できる。
+ */
+export type PrecautionId = (typeof guideConfig.precautions)[number]["id"];
