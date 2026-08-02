@@ -154,6 +154,41 @@ body {
       );
     }
   }
+
+  /* PageHero: 画像の左端を背景の紫へ溶かし、矩形の境界を見せない。
+     画像が右70vwへ寄る lg 以上でのみ適用する（lg未満は画像が全面のため境界が存在しない） */
+  @media (min-width: 64rem) {
+    .page-hero-image-fade {
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 22%);
+      mask-image: linear-gradient(to right, transparent 0%, #000 22%);
+    }
+  }
+
+  /* PageHero: テキスト可読性を確保するオーバーレイ。
+     alpha付きの値は変数化できないため、--color-secondary と同一の oklch 値をリテラルで持つ。
+     終端は transparent ではなく同色の alpha 0 とし、補間経路を紫に留める */
+  .page-hero-overlay {
+    background: linear-gradient(
+      to top,
+      var(--color-secondary) 15%,
+      oklch(79.5% 0.108 314deg / 0.7) 45%,
+      oklch(79.5% 0.108 314deg / 0) 75%
+    );
+  }
+
+  /* lg以上では画像が右70vwに寄るため、画像左端(30%)より右まで不透明を延ばして境界を覆う */
+  @media (min-width: 64rem) {
+    .page-hero-overlay {
+      background: linear-gradient(
+        to right,
+        var(--color-secondary) 0%,
+        var(--color-secondary) 33%,
+        oklch(79.5% 0.108 314deg / 0.75) 48%,
+        oklch(79.5% 0.108 314deg / 0.35) 62%,
+        oklch(79.5% 0.108 314deg / 0) 80%
+      );
+    }
+  }
 }
 
 @keyframes spin-slow {

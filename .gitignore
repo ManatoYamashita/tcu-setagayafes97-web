@@ -53,6 +53,7 @@ next-env.d.ts
 
 # Claude/Serena temporary files
 .claude/skills/
+.claude/worktrees/
 .serena/
 stagewise.json
 .grepai/
