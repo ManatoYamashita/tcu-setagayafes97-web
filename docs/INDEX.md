@@ -22,7 +22,8 @@ docs/
 │   ├── access-page-design.md      # Accessページの情報設計・UI実装方針
 │   ├── agent-browser-workflow.md  # agent-browserを使用したデザイン再現とデバッグフロー
 │   ├── layout-patterns.md         # レイアウトパターンと設計原則
-│   └── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
+│   ├── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
+│   └── page-transition.md         # ページ遷移アニメーションとView Transitions API
 └── requires/         # 要件定義・仕様関連
     ├── require.md           # プロジェクト要件定義書
     ├── todo.md                    # プロジェクト開発タスクリスト
@@ -131,6 +132,7 @@ docs/
   - 数値測定手法とコマンド集（Header高さ、z-index階層、viewport占有率）
   - レスポンシブテスト標準手順（375px/768px/1920px）
   - デバッグワークフロー（Layout Shift検出、z-index競合確認）
+  - 誤診の実例は [page-transition.md](./frontend/page-transition.md) も参照
 
 - **[layout-patterns.md](./frontend/layout-patterns.md)** - レイアウトパターンと設計原則
   - Header/Hero統合パターン（calc()による実効100vh、CSS変数化）
@@ -148,6 +150,14 @@ docs/
   - 言語宣言（`lang` 属性の二段構え、`headers()` を使えない理由）
   - 多言語ページを追加する手順と `proxy.ts` 編集時の禁止事項
 
+- **[page-transition.md](./frontend/page-transition.md)** - ページ遷移アニメーションと View Transitions API
+  - `template.tsx` + `.page-transition-wrapper` による CSS アニメーション実装
+  - `::view-transition-*` は React の `<ViewTransition>` が無いと発火しない
+  - `@supports not (view-transition-name: a)` はモダンブラウザで逆効果になるアンチパターン
+  - `experimental.viewTransition` は next@16.1.0 では読まれていない死に設定（警告も出ない）
+  - **Issue #39 の誤診** — `<div hidden id="S:0">` は rAF 停止時の Suspense 差し込み待ち
+  - 可視性の計測は要素単体ではなく祖先すべてを見る（`display: none` は子孫の computed 値を変えない）
+
 ## 更新手順（PDCA）
 
 1. PLAN: 既存の配置と命名を本索引で確認し、追加箇所を決める。
@@ -157,4 +167,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-07-26
+**最終更新日**: 2026-08-09
