@@ -73,3 +73,36 @@ export function buildLocaleHref(pathname: string, locale: Locale): string {
 
   return pathname === "/" ? `/${locale}` : `/${locale}${pathname}`;
 }
+
+export interface LocalizedNavHref {
+  readonly href: string;
+  /** 多言語版が無い＝遷移先が日本語固定のページであることを宣言する */
+  readonly hrefLang?: "ja";
+}
+
+/**
+ * ヘッダー・フッター等のナビゲーションリンク用に href を組み立てる。
+ *
+ * 接頭辞を付けてよいのは `LOCALIZED_PATHNAMES` の6つだけ。`/` や `/events` に
+ * 付けると `src/proxy.ts` の matcher 外なので即 404 になる。この判定を通すことで
+ * 呼び出し側の注意力に依存せず 404 を防ぐ。
+ *
+ * `hrefLang` を付ける条件は接頭辞を付けない条件と完全に同一なので、両者を組で
+ * 返す。描画側で別々に判定すると、片方だけ直して不整合になる余地が生まれる。
+ *
+ * @example localizeNavHref("/access", "en")  // { href: "/en/access" }
+ * @example localizeNavHref("/events", "en")  // { href: "/events", hrefLang: "ja" }
+ * @example localizeNavHref("/events", "ja")  // { href: "/events" }
+ */
+export function localizeNavHref(pathname: string, locale: Locale): LocalizedNavHref {
+  if (isLocalizedPathname(pathname)) {
+    return { href: buildLocaleHref(pathname, locale) };
+  }
+
+  // 日本語で閲覧中に日本語ページへのリンクへ hreflang を付けるのは冗長
+  if (locale === routing.defaultLocale) {
+    return { href: pathname };
+  }
+
+  return { href: pathname, hrefLang: "ja" };
+}
