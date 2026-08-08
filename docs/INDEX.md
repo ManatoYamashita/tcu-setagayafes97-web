@@ -126,6 +126,7 @@ docs/
   - CSS 変数まとめ
 
 - **[agent-browser-workflow.md](./frontend/agent-browser-workflow.md)** - agent-browserを使用したデザイン再現とデバッグの標準フロー
+  - **検証できないもの（先に読むこと）** — 自動化タブは rAF が停止するためアニメーションの再生は検証不可
   - デザイン再現3ステップ（分析→実装→検証）
   - 数値測定手法とコマンド集（Header高さ、z-index階層、viewport占有率）
   - レスポンシブテスト標準手順（375px/768px/1920px）
