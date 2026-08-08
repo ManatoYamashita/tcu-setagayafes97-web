@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useLayoutEffect, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { gsap } from "gsap";
 import { X } from "lucide-react";
 import { LanguageSwitcherInline } from "@/components/layout/LanguageSwitcher";
@@ -46,7 +46,6 @@ export function StaggeredMobileMenu({
   items,
   closeLabel,
 }: StaggeredMobileMenuProps) {
-  const router = useRouter();
   const prevOpenRef = useRef(false);
 
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -263,16 +262,6 @@ export function StaggeredMobileMenu({
     }
   }, [isOpen, playOpen, playClose]);
 
-  // メニューアイテムクリック → ナビゲーション＋メニュー閉じ
-  const handleItemClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>, link: string) => {
-      e.preventDefault();
-      onClose();
-      router.push(link);
-    },
-    [onClose, router]
-  );
-
   // パネル外クリックで閉じる
   useEffect(() => {
     if (!isOpen) return;
@@ -359,17 +348,22 @@ export function StaggeredMobileMenu({
                   className="sm-panel-itemWrap relative overflow-hidden leading-none"
                   key={item.id}
                 >
-                  <a
+                  {/*
+                    className と <span className="sm-panel-itemLabel"> の入れ子は
+                    GSAP のセレクタが依存しているため変更しないこと。Link は
+                    className / data-* をそのまま下の <a> へ渡すので一致し続ける。
+                  */}
+                  <Link
                     className="sm-panel-item relative inline-block cursor-pointer pr-[1.4em] text-[1.8rem] font-normal leading-none tracking-[-1px] text-black no-underline transition-[background,color] duration-150 ease-linear"
                     href={item.href}
                     hrefLang={item.hrefLang}
                     data-index={idx + 1}
-                    onClick={(e) => handleItemClick(e, item.href)}
+                    onClick={onClose}
                   >
                     <span className="sm-panel-itemLabel inline-block origin-[50%_100%] will-change-transform">
                       {item.label}
                     </span>
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
