@@ -139,9 +139,10 @@ docs/
   - 部分幅ヒーロー画像の境界処理（mask-image とオーバーレイの分担）
 
 - **[i18n-page-structure.md](./frontend/i18n-page-structure.md)** - 多言語ページの構成パターン
+  - メッセージの二分割（ページ本文 `messages/` と ヘッダー・フッター `messages/chrome/`）
   - ページビューの置き場所（同名ルートの二重実装がデッドコード化する罠）
   - `pageHeroes` のロケール上書き（日本語ハードコードの共有データ）
-  - リンクの扱い（`@/i18n/navigation` を使う場所・使えない場所）
+  - リンクの扱い（Provider の内は `@/i18n/navigation`、外は `localizeNavHref()`）
   - 翻訳しないもの（コンテンツに対する照合ロジック）
   - 言語宣言（`lang` 属性の二段構え、`headers()` を使えない理由）
   - 多言語ページを追加する手順と `proxy.ts` 編集時の禁止事項

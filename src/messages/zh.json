@@ -9,34 +9,6 @@
     "share": "分享",
     "language": "语言"
   },
-  "navigation": {
-    "events": "活动查询",
-    "timetable": "时间表",
-    "map": "地图与交通",
-    "campusMap": "校园地图",
-    "access": "交通指南",
-    "info": "信息中心",
-    "news": "新闻公告",
-    "guide": "参观指南",
-    "faq": "常见问题",
-    "pamphlet": "宣传册",
-    "about": "关于我们",
-    "aboutUs": "委员长致辞",
-    "sponsors": "赞助企业",
-    "contact": "联系我们",
-    "privacy": "隐私政策"
-  },
-  "header": {
-    "menu": "菜单",
-    "close": "关闭"
-  },
-  "footer": {
-    "eventInfo": "活动信息",
-    "venueInfo": "场馆信息",
-    "information": "信息中心",
-    "aboutCommittee": "关于委员会",
-    "copyright": "© 2026 第97届世田谷祭执行委员会"
-  },
   "languageSwitcher": {
     "label": "选择语言",
     "ja": "日语",

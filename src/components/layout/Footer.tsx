@@ -1,8 +1,14 @@
-import Link from "next/link";
 import { siteConfig } from "@/data/site";
-import { getFilteredFooterNav } from "@/data/navigation";
+import { FooterNav } from "@/components/layout/FooterNav";
 import { SocialIcons } from "@/components/ui/SocialIcons";
 
+/**
+ * 共通フッター
+ *
+ * サーバーコンポーネントのまま保つこと。`new Date().getFullYear()` を
+ * クライアントで再評価させると、ビルド時と閲覧時で年をまたいだ場合に
+ * ハイドレーション不一致になる。ロケール解決が要る部分は FooterNav が担う。
+ */
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -16,20 +22,7 @@ export function Footer() {
           </div>
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
-            {getFilteredFooterNav().map((section) => (
-              <div key={section.title}>
-                <h3 className="mb-4 font-bold text-white">{section.title}</h3>
-                <ul className="space-y-2">
-                  {section.links.map((link) => (
-                    <li key={link.href}>
-                      <Link href={link.href} className="text-white/70 hover:text-white">
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            <FooterNav />
 
             {/* SNSセクション */}
             <div>

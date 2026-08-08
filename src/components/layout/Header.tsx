@@ -8,6 +8,7 @@ import { Menu } from "lucide-react";
 import { siteConfig } from "@/data/site";
 import { DesktopNav } from "@/components/layout/DesktopNav";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { useChromeNav } from "@/components/layout/useChromeNav";
 import dynamic from "next/dynamic";
 const StaggeredMobileMenu = dynamic(
   () => import("@/components/layout/StaggeredMobileMenu").then((m) => m.StaggeredMobileMenu),
@@ -29,6 +30,11 @@ import { LogoVideo } from "@/components/home/LogoVideo";
 export function Header() {
   const pathname = usePathname();
   const isAboutPage = pathname === "/about" || pathname.endsWith("/about");
+
+  // ロケール解決はここで1回だけ行い、子へは props で流す。
+  // 子でも呼ぶと usePathname() の購読と useMemo が二重になるうえ、
+  // デスクトップナビとモバイルメニューが同じ結果を共有することが読み取れなくなる。
+  const { home, headerItems, messages } = useChromeNav();
 
   const [isAtTop, setIsAtTop] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -71,7 +77,12 @@ export function Header() {
           }`}
         >
           {/* 左: ロゴ */}
-          <Link href="/" className="hover:opacity-80" aria-label={siteConfig.shortName}>
+          <Link
+            href={home.href}
+            hrefLang={home.hrefLang}
+            className="hover:opacity-80"
+            aria-label={siteConfig.shortName}
+          >
             {isAboutPage ? (
               <Image
                 src="/images/brand/logo.webp"
@@ -89,14 +100,14 @@ export function Header() {
           </Link>
 
           {/* 中央: デスクトップナビ */}
-          <DesktopNav />
+          <DesktopNav items={headerItems} />
 
           {/* 右: 言語切り替え + ハンバーガー */}
           <div className="flex items-center gap-3">
             <LanguageSwitcher className="hidden lg:block" />
             <button
               className="inline-flex items-center justify-center rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900 lg:hidden"
-              aria-label="メニューを開く"
+              aria-label={messages.header.openMenu}
               aria-expanded={isMobileMenuOpen}
               aria-controls="staggered-menu-panel"
               onClick={() => setIsMobileMenuOpen(true)}
@@ -109,7 +120,12 @@ export function Header() {
       </header>
 
       {/* モバイルメニュー（StaggeredMenu: 外部制御） */}
-      <StaggeredMobileMenu isOpen={isMobileMenuOpen} onClose={handleCloseMobileMenu} />
+      <StaggeredMobileMenu
+        isOpen={isMobileMenuOpen}
+        onClose={handleCloseMobileMenu}
+        items={headerItems}
+        closeLabel={messages.header.closeMenu}
+      />
     </>
   );
 }

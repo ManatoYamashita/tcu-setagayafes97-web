@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useCallback, useLayoutEffect, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { gsap } from "gsap";
 import { X } from "lucide-react";
 import { LanguageSwitcherInline } from "@/components/layout/LanguageSwitcher";
-import { getFilteredHeaderNav } from "@/data/navigation";
+import type { ChromeNavItem } from "@/components/layout/useChromeNav";
 import { siteConfig } from "@/data/site";
 
 /**
@@ -16,23 +16,13 @@ import { siteConfig } from "@/data/site";
  * lg (1024px) 以上では非表示。
  */
 
-interface MenuItem {
-  label: string;
-  ariaLabel: string;
-  link: string;
-}
-
 interface SocialItem {
   label: string;
   link: string;
 }
 
-const menuItems: MenuItem[] = getFilteredHeaderNav().map((item) => ({
-  label: item.label,
-  ariaLabel: `${item.label}ページへ`,
-  link: item.href,
-}));
-
+// SNS リンクはロケール非依存なのでモジュールスコープのままでよい。
+// ナビ項目はロケールで変わるため props で受け取る。
 const socialItems: SocialItem[] = [
   { label: "X (Twitter)", link: siteConfig.sns.twitter },
   { label: "Instagram", link: siteConfig.sns.instagram },
@@ -45,10 +35,17 @@ const ACCENT_COLOR = "#CD79EE";
 interface StaggeredMobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  /** ロケール解決済みのナビ項目。Header の useChromeNav() から受け取る */
+  items: readonly ChromeNavItem[];
+  closeLabel: string;
 }
 
-export function StaggeredMobileMenu({ isOpen, onClose }: StaggeredMobileMenuProps) {
-  const router = useRouter();
+export function StaggeredMobileMenu({
+  isOpen,
+  onClose,
+  items,
+  closeLabel,
+}: StaggeredMobileMenuProps) {
   const prevOpenRef = useRef(false);
 
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -265,16 +262,6 @@ export function StaggeredMobileMenu({ isOpen, onClose }: StaggeredMobileMenuProp
     }
   }, [isOpen, playOpen, playClose]);
 
-  // メニューアイテムクリック → ナビゲーション＋メニュー閉じ
-  const handleItemClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>, link: string) => {
-      e.preventDefault();
-      onClose();
-      router.push(link);
-    },
-    [onClose, router]
-  );
-
   // パネル外クリックで閉じる
   useEffect(() => {
     if (!isOpen) return;
@@ -340,7 +327,7 @@ export function StaggeredMobileMenu({ isOpen, onClose }: StaggeredMobileMenuProp
           {/* 閉じるボタン */}
           <button
             className="absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900"
-            aria-label="メニューを閉じる"
+            aria-label={closeLabel}
             onClick={onClose}
             type="button"
           >
@@ -353,22 +340,30 @@ export function StaggeredMobileMenu({ isOpen, onClose }: StaggeredMobileMenuProp
               role="list"
               data-numbering=""
             >
-              {menuItems.map((it, idx) => (
+              {items.map((item, idx) => (
+                // key は href ではなく id。href はロケールで変わるため、href を
+                // key にすると閉じアニメーション中に GSAP が掴んだ DOM が
+                // unmount されうる。
                 <li
                   className="sm-panel-itemWrap relative overflow-hidden leading-none"
-                  key={it.link}
+                  key={item.id}
                 >
-                  <a
+                  {/*
+                    className と <span className="sm-panel-itemLabel"> の入れ子は
+                    GSAP のセレクタが依存しているため変更しないこと。Link は
+                    className / data-* をそのまま下の <a> へ渡すので一致し続ける。
+                  */}
+                  <Link
                     className="sm-panel-item relative inline-block cursor-pointer pr-[1.4em] text-[1.8rem] font-normal leading-none tracking-[-1px] text-black no-underline transition-[background,color] duration-150 ease-linear"
-                    href={it.link}
-                    aria-label={it.ariaLabel}
+                    href={item.href}
+                    hrefLang={item.hrefLang}
                     data-index={idx + 1}
-                    onClick={(e) => handleItemClick(e, it.link)}
+                    onClick={onClose}
                   >
                     <span className="sm-panel-itemLabel inline-block origin-[50%_100%] will-change-transform">
-                      {it.label}
+                      {item.label}
                     </span>
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

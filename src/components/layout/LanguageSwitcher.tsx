@@ -2,16 +2,15 @@
 
 import { Globe } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { languageOptions } from "@/data/navigation";
 import {
   buildLocaleHref,
   isLocalizedPathname,
   LOCALE_FALLBACK_PATHNAME,
-  splitLocalePrefix,
 } from "@/i18n/localized-pathnames";
 import type { Locale } from "@/i18n/routing";
+import { useCurrentLocale } from "@/i18n/use-current-locale";
 
 const focusRing =
   "focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600";
@@ -28,16 +27,15 @@ interface LanguageLink {
 /**
  * 現在のパスを起点に、各言語版のリンクを組み立てる。
  *
- * next-intl の `Link` / `usePathname` は使えない。Header はルートレイアウト直下に
- * あり、NextIntlClientProvider（[locale]/layout.tsx）の子孫ではないため、
- * 内部で useLocale() を呼ぶそれらの API は実行時に例外を投げる。
+ * ロケール解決は `useCurrentLocale()` に委ねる（Provider 外でロケールを得られない
+ * 理由と、静的生成時とハイドレーション後でパスが食い違う話はそちらのコメント参照）。
+ *
+ * href の組み立ては `localizeNavHref()` を使わない。ナビゲーションは多言語版が
+ * 無いページへ実在パスで直リンクするが、言語切替は着地先が無いと切替自体が
+ * 成立しないため `LOCALE_FALLBACK_PATHNAME` へ倒す。この差は意図的なもの。
  */
 function useLanguageLinks(): { current: LanguageLink; items: LanguageLink[] } {
-  const pathname = usePathname();
-
-  // 静的生成時は "/ja/about"、ハイドレーション後は "/about" が渡るため、
-  // 必ず接頭辞を剥がして正規化してから組み立て直す。
-  const { locale: currentLocale, pathname: basePathname } = splitLocalePrefix(pathname);
+  const { locale: currentLocale, pathname: basePathname } = useCurrentLocale();
   const isFallbackMode = !isLocalizedPathname(basePathname);
   const targetPathname = isFallbackMode ? LOCALE_FALLBACK_PATHNAME : basePathname;
 
