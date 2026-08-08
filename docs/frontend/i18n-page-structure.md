@@ -12,10 +12,22 @@
 | --------------------------------- | ------------------------------------------------------------------------------------ |
 | `src/i18n/routing.ts`             | `locales: ["ja","en","zh","ko"]`、`defaultLocale: "ja"`、`localePrefix: "as-needed"` |
 | `src/proxy.ts`                    | 多言語対応ページのみをマッチングするミドルウェア。matcher は静的リテラルの列挙       |
-| `src/i18n/localized-pathnames.ts` | `LOCALIZED_PATHNAMES`。matcher とのドリフトを開発時に検知する                        |
+| `src/i18n/localized-pathnames.ts` | `LOCALIZED_PATHNAMES` と `localizeNavHref()`。matcher とのドリフトを開発時に検知する |
 | `src/i18n/navigation.ts`          | `createNavigation(routing)` による `Link` / `redirect` / `usePathname` 等            |
+| `src/i18n/use-current-locale.ts`  | Provider 外でロケールを解決するフック（ヘッダー・フッター用）                        |
+| `src/i18n/chrome-messages.ts`     | ヘッダー・フッター文言の辞書。`src/messages/chrome/*.json` を静的 import             |
+| `src/i18n/request.ts`             | 本文と chrome のメッセージをマージして Provider へ渡す                               |
 
 `localePrefix: "as-needed"` のため、**デフォルトロケール（ja）の正規URLは接頭辞なし**です。`/about` へのリクエストは proxy が内部で `/ja/about` へ rewrite し、`/ja/about` へ直接来たリクエストは 307 で `/about` へリダイレクトされます。
+
+翻訳メッセージは2つに分かれています。
+
+| ファイル                            | 内容                               | 読み方                                                 |
+| ----------------------------------- | ---------------------------------- | ------------------------------------------------------ |
+| `src/messages/<locale>.json`        | ページ本文                         | Provider 経由（`getTranslations` / `useTranslations`） |
+| `src/messages/chrome/<locale>.json` | `navigation` / `header` / `footer` | クライアントから静的 import（`getChromeMessages`）     |
+
+chrome 側を分けているのは、ヘッダー・フッターが Provider の外にあり静的 import で読む必要があるためです。ページ本文（約29KB）まで載せると全ページのバンドルが膨らみます。`request.ts` が両者をマージして Provider へ渡すので、`getTranslations("navigation")` は従来どおり動きます。
 
 ---
 
@@ -69,17 +81,49 @@ return <PageSheetLayout hero={hero}>{/* ... */}</PageSheetLayout>;
 
 ## リンクの扱い
 
-`[locale]` 配下では `next/link` ではなく `@/i18n/navigation` の `Link` を使います。素の `Link` だと `/en/info/guide` から `/info/faq` へ遷移した瞬間に日本語ページへ落ちます。
+リンクの書き方は **Provider の内か外か**で2通りに分かれます。
 
-### 使ってはいけない場所
+| 場所                                           | 使うもの                                     |
+| ---------------------------------------------- | -------------------------------------------- |
+| `src/app/[locale]/` 配下（Provider の子孫）    | `@/i18n/navigation` の `Link`                |
+| ルートレイアウト直下の共通 UI（Provider の外） | `next/link` の `Link` ＋ `localizeNavHref()` |
 
-| 対象                                                                       | 理由                                                                                                                                                         |
-| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `Header` / `Footer` / `DesktopNav` / `NavDropdown` / `StaggeredMobileMenu` | ルートレイアウト直下にあり `NextIntlClientProvider` の子孫ではない。内部で `useLocale()` を呼ぶため実行時例外になる（`LanguageSwitcher.tsx` のコメント参照） |
-| `src/components/ui/PageHero.tsx`                                           | `/events` `/timetable` `/info` など Provider 外のページからも描画される共有コンポーネント。CTA の遷移先 `/events` は多言語版が存在しないルートでもある       |
-| `fetch("/api/contact")` 等のAPI呼び出し                                    | API ルートは proxy の matcher 対象外。絶対パスのままが正しい                                                                                                 |
+`[locale]` 配下で素の `next/link` を使うと、`/en/info/guide` から `/info/faq` へ遷移した瞬間に日本語ページへ落ちます。
 
-Header/Footer がロケール非対応である点は構造的な制約として現在も残っています（`navigation.*` / `footer.*` の翻訳キーは4言語揃っているが未使用）。対応するなら `LanguageSwitcher` と同じく `usePathname` + `buildLocaleHref` で href を自前組み立てします。
+### Provider の外（ヘッダー・フッター）
+
+`Header` / `Footer` / `DesktopNav` / `NavDropdown` / `StaggeredMobileMenu` は `src/app/layout.tsx` 直下にあり、`NextIntlClientProvider` を提供する `[locale]/layout.tsx` の子孫ではありません。`@/i18n/navigation` の `Link` も `useTranslations` も内部で `useLocale()` を呼ぶため**実行時に例外を投げます**。
+
+代わりに次の組み合わせを使います。
+
+```tsx
+const { locale } = useCurrentLocale(); // src/i18n/use-current-locale.ts
+const { href, hrefLang } = localizeNavHref("/access", locale);
+<Link href={href} hrefLang={hrefLang}>
+  …
+</Link>; // next/link
+```
+
+- **`localizeNavHref()`（`src/i18n/localized-pathnames.ts`）が接頭辞の要否を判定する。** 接頭辞を付けてよいのは `LOCALIZED_PATHNAMES` の6つだけで、`/` や `/events` に付けると proxy の matcher 外なので即404になります。呼び出し側で `isLocalizedPathname()` を書かないこと
+- **多言語版が無いページへのリンクには `hrefLang="ja"` が付く。** 遷移先が日本語であることの宣言で、判定条件が接頭辞の要否と同一なため `{ href, hrefLang }` を組で返しています
+- 文言は `getChromeMessages(locale)`（`src/i18n/chrome-messages.ts`）から引く。`src/messages/chrome/*.json` を素の TS として静的 import しており、`useTranslations` は使いません
+
+ヘッダー・フッターは `src/components/layout/useChromeNav.ts` がこれらを合成しています。**Header が1回だけフックを呼び、子へは props で流す**構造なので、新しいナビ項目を足すときは `src/data/navigation.ts` に `labelKey` と `href` を書くだけで済みます。
+
+### それでも `next/link` のまま残すもの
+
+| 対象                                    | 理由                                                                                                                                                   |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/components/ui/PageHero.tsx`        | `/events` `/timetable` `/info` など Provider 外のページからも描画される共有コンポーネント。CTA の遷移先 `/events` は多言語版が存在しないルートでもある |
+| `fetch("/api/contact")` 等のAPI呼び出し | API ルートは proxy の matcher 対象外。絶対パスのままが正しい                                                                                           |
+
+### 言語切替だけは扱いが違う
+
+`LanguageSwitcher` は `useCurrentLocale()` を共有しますが、href の組み立てに `localizeNavHref()` は**使いません**。ナビゲーションは多言語版が無いページへ実在パスで直リンクするのに対し、言語切替は着地先が無いと切替自体が成立しないため `LOCALE_FALLBACK_PATHNAME`（`/info/guide`）へ倒します。**この差は意図的なので統一しないこと。**
+
+### 期待される挙動: `/events` へ移ると UI が日本語に戻る
+
+`/en/info/guide` からヘッダーの `Events` を押すと、遷移先の `/events` には多言語版が無いためヘッダー・フッターを含む UI 全体が日本語になります。これはバグではなく、多言語版が6パスしか存在しないことの帰結です。リンクには `hrefLang="ja"` が付いており、支援技術と検索エンジンには遷移先の言語が正しく伝わります。
 
 ---
 
@@ -129,6 +173,9 @@ Vercel Free Plan の帯域（100GB/月）とサーバーレス関数の制約、
 5. `src/i18n/localized-pathnames.ts` の `LOCALIZED_PATHNAMES` に追加する
 6. `src/proxy.ts` の matcher に**2行**追加する（`"/<path>"` と `"/(en|zh|ko)/<path>"`）
 7. `src/app/sitemap.ts` に非接頭辞URLを追加する
+8. ヘッダー・フッターに載せるなら `src/messages/chrome/*.json` の `navigation` にラベルを足し、`src/data/navigation.ts` に `labelKey` と `href` を追加する
+
+`LOCALIZED_PATHNAMES` に追加した時点で、ヘッダー・フッターの該当リンクには自動でロケール接頭辞が付き `hrefLang="ja"` が外れます（`localizeNavHref()` が判定するため）。逆に**手順5を忘れるとナビだけ日本語ページへ飛び続けます**。
 
 ### proxy.ts を編集するときの禁止事項
 
@@ -143,19 +190,47 @@ matcher と `LOCALIZED_PATHNAMES` のドリフトは `proxy.ts` 末尾の検知�
 ## 検証
 
 ```bash
-# メッセージファイルのキー集合が4言語で一致しているか
+# メッセージファイルのキー集合が4言語で一致し、本文と chrome が互いに素であること
 python3 -c "
 import json
 def flat(d,p=''):
     for k,v in d.items():
         n=f'{p}.{k}' if p else k
-        if isinstance(v,dict): yield from flat(v,n)
-        else: yield n
-ks={l:set(flat(json.load(open(f'src/messages/{l}.json')))) for l in ('ja','en','zh','ko')}
-base=ks['ja']
-for l,s in ks.items(): print(l, len(s), 'missing:', sorted(base-s), 'extra:', sorted(s-base))
+        yield from (flat(v,n) if isinstance(v,dict) else [n])
+L=('ja','en','zh','ko')
+for d in ('src/messages','src/messages/chrome'):
+    ks={l:set(flat(json.load(open(f'{d}/{l}.json')))) for l in L}
+    print(d)
+    for l in L: print(' ',l,len(ks[l]),'missing:',sorted(ks['ja']-ks[l]),'extra:',sorted(ks[l]-ks['ja']))
+for l in L:
+    a=set(json.load(open(f'src/messages/{l}.json'))); b=set(json.load(open(f'src/messages/chrome/{l}.json')))
+    if a&b: print('COLLISION',l,sorted(a&b))
 "
 ```
+
+`chrome/` 側のキー欠落は `src/i18n/chrome-messages.ts` の `Record<Locale, ChromeMessages>` が `pnpm build` で落とします。上のスクリプトは本文側の検証と、余剰キー・名前空間衝突の検出が主目的です。名前空間が衝突すると浅いマージで片方が丸ごと消えるため、開発時は `request.ts` が `console.error` でも知らせます。
+
+ヘッダー・フッターのロケール対応は静的HTMLへの grep で検証できます。
+
+```bash
+rm -rf .next && pnpm build && cd .next/server/app
+
+# 接頭辞が付くのは LOCALIZED_PATHNAMES の6つだけ
+grep -oE 'href="/(en/)?(events|timetable|access|info|info/guide|info/faq|info/contact|about|about/privacy)"' en/access.html | sort -u
+
+# 禁止パターン（1件でも出れば 404 になる）— 出力ゼロが正
+grep -oE 'href="/(en|zh|ko)/(events|timetable|info|info/pamphlet)"|href="/(en|zh|ko)"' en/access.html
+
+# ハイドレーション不一致のカナリア — 出力ゼロが正
+# splitLocalePrefix による正規化を忘れると href が "/ja/..." で焼き付く
+grep -rl 'href="/ja/' . 2>/dev/null | grep '\.html$'
+
+# ナビラベルのロケール
+grep -c '企画を探す' en/access.html   # 0
+grep -c '企画を探す' ja/access.html   # >= 2
+```
+
+**モバイルメニューは curl で検証できません。** `next/dynamic({ ssr: false })` のため SSG HTML に含まれず（`grep -c 'sm-panel-item' en/access.html` は 0）、ドロップダウンの子リンクも閉じた状態では描画されません。ブラウザで開いて確認してください。
 
 ルーティングの検証は**本番ビルドで行うこと**（`pnpm dev` では rewrite/redirect の挙動が本番と異なる場合がある）。ルートファイルを削除した後は `.next` を消してからビルドします。
 
@@ -184,4 +259,4 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3000/en/about/sponsors
 ---
 
 **作成日:** 2026-08-03
-**最終更新:** 2026-08-03
+**最終更新:** 2026-08-08
