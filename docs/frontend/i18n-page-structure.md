@@ -73,11 +73,11 @@ return <PageSheetLayout hero={hero}>{/* ... */}</PageSheetLayout>;
 
 ### 使ってはいけない場所
 
-| 対象                                                                                   | 理由                                                                                                                                                         |
-| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `Header` / `Footer` / `DesktopNav` / `NavDropdown` / `CardNav` / `StaggeredMobileMenu` | ルートレイアウト直下にあり `NextIntlClientProvider` の子孫ではない。内部で `useLocale()` を呼ぶため実行時例外になる（`LanguageSwitcher.tsx` のコメント参照） |
-| `src/components/ui/PageHero.tsx`                                                       | `/events` `/timetable` `/info` など Provider 外のページからも描画される共有コンポーネント。CTA の遷移先 `/events` は多言語版が存在しないルートでもある       |
-| `fetch("/api/contact")` 等のAPI呼び出し                                                | API ルートは proxy の matcher 対象外。絶対パスのままが正しい                                                                                                 |
+| 対象                                                                       | 理由                                                                                                                                                         |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Header` / `Footer` / `DesktopNav` / `NavDropdown` / `StaggeredMobileMenu` | ルートレイアウト直下にあり `NextIntlClientProvider` の子孫ではない。内部で `useLocale()` を呼ぶため実行時例外になる（`LanguageSwitcher.tsx` のコメント参照） |
+| `src/components/ui/PageHero.tsx`                                           | `/events` `/timetable` `/info` など Provider 外のページからも描画される共有コンポーネント。CTA の遷移先 `/events` は多言語版が存在しないルートでもある       |
+| `fetch("/api/contact")` 等のAPI呼び出し                                    | API ルートは proxy の matcher 対象外。絶対パスのままが正しい                                                                                                 |
 
 Header/Footer がロケール非対応である点は構造的な制約として現在も残っています（`navigation.*` / `footer.*` の翻訳キーは4言語揃っているが未使用）。対応するなら `LanguageSwitcher` と同じく `usePathname` + `buildLocaleHref` で href を自前組み立てします。
 

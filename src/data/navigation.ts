@@ -134,64 +134,6 @@ export const navigationConfig = {
 } as const;
 
 /**
- * CardNav 用カード構成データ
- * About（インフォメーション）/ Event（企画）/ Other（委員会・その他）の3カード
- */
-export const cardNavItems = [
-  {
-    label: "About",
-    bgColor: "#1a0a2e",
-    textColor: "#fff",
-    links: [
-      { label: "お知らせ", href: "/info", ariaLabel: "お知らせ一覧" },
-      { label: "ご来場の方へ", href: "/info/guide", ariaLabel: "ご来場案内" },
-      { label: "よくある質問", href: "/info/faq", ariaLabel: "FAQ" },
-      {
-        label: "パンフレットDL",
-        href: "/info/pamphlet",
-        ariaLabel: "パンフレットダウンロード",
-      },
-    ],
-  },
-  {
-    label: "Event",
-    bgColor: "#2d1052",
-    textColor: "#fff",
-    links: [
-      { label: "企画を探す", href: "/events", ariaLabel: "企画検索" },
-      {
-        label: "タイムテーブル",
-        href: "/timetable",
-        ariaLabel: "タイムテーブル",
-      },
-      {
-        label: "アクセス",
-        href: "/access",
-        ariaLabel: "キャンパスマップ・交通アクセス",
-      },
-    ],
-  },
-  {
-    label: "Other",
-    bgColor: "#3d1a6e",
-    textColor: "#fff",
-    links: [
-      { label: "委員会について", href: "/about", ariaLabel: "委員会について" },
-      {
-        label: "お問い合わせ",
-        href: "/info/contact",
-        ariaLabel: "お問い合わせ",
-      },
-    ],
-  },
-] as const;
-
-/**
- * ナビゲーション設定の型定義
- */
-export type NavigationConfig = typeof navigationConfig;
-
-/**
  * ヘッダーナビを取得
  */
 export function getFilteredHeaderNav() {

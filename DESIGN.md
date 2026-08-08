@@ -486,15 +486,15 @@ JS 側は各コンポーネントで `window.matchMedia("(prefers-reduced-motion
 
 10 刻みの固定スケール。アドホック値（`z-[45]` 等）は禁止。
 
-| レイヤー      | z-index | Tailwind | 用途                         |
-| ------------- | ------- | -------- | ---------------------------- |
-| Modal/Overlay | 60      | `z-60`   | モーダル、トースト           |
-| CardNav       | 50      | `z-50`   | CardNav コンテナ             |
-| Sticky Header | **40**  | `z-40`   | 固定ヘッダー、グローバルナビ |
-| Floating UI   | 30      | `z-30`   | Hero 内最上位要素            |
-| Content Upper | 20      | `z-20`   | テキストエリア、カード上位   |
-| Content Base  | 10      | `z-10`   | 画像、背景、カードベース     |
-| Default       | auto    | —        | 通常コンテンツ               |
+| レイヤー      | z-index | Tailwind | 用途                           |
+| ------------- | ------- | -------- | ------------------------------ |
+| Modal/Overlay | 60      | `z-60`   | モーダル、トースト             |
+| Mobile Menu   | 50      | `z-50`   | モバイルメニューのオーバーレイ |
+| Sticky Header | **40**  | `z-40`   | 固定ヘッダー、グローバルナビ   |
+| Floating UI   | 30      | `z-30`   | Hero 内最上位要素              |
+| Content Upper | 20      | `z-20`   | テキストエリア、カード上位     |
+| Content Base  | 10      | `z-10`   | 画像、背景、カードベース       |
+| Default       | auto    | —        | 通常コンテンツ                 |
 
 ---
 
