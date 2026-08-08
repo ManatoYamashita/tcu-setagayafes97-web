@@ -61,12 +61,6 @@ const lineNames = {
     zh: "东急大井町线",
     ko: "도큐 오이마치선",
   },
-  tamagawaHub: {
-    ja: "東急東横線・目黒線・多摩川線",
-    en: "Tokyu Toyoko, Meguro & Tamagawa Lines",
-    zh: "东急东横线・目黑线・多摩川线",
-    ko: "도큐 도요코선・메구로선・다마가와선",
-  },
 } as const satisfies Record<string, LocalizedText>;
 
 const tokyuBus = {
@@ -116,44 +110,31 @@ export type BusRoute = {
 };
 
 /**
- * 尾山台駅・等々力駅の徒歩時間は、ヒーローの路線図イラスト（access ヒーロー素材）の表記に合わせている。
- * 大学公式案内は尾山台駅を「徒歩12分」としているが、実際の所要時間に近い15分を採用する。
- * 多摩川駅の徒歩時間は地図上の距離からの概算のため、確定情報が出次第更新する。
+ * 尾山台駅・等々力駅の徒歩時間は、大学公式案内の表記に合わせている。
+ * 多摩川駅からの徒歩ルートは案内しない（バス経路のみ掲載）。
  */
 const trainRoutes = [
   {
     line: lineNames.oimachi,
     station: stationNames.oyamadai,
-    walkTime: 15,
+    walkTime: 12,
     description: {
-      ja: "「東京都市大学 世田谷キャンパス前」尾山台駅から徒歩約15分です。",
-      en: "The station is subtitled “Tokyo City University Setagaya Campus”. The campus is about a 15-minute walk away.",
-      zh: "车站副名为“东京都市大学世田谷校区”。从车站步行约15分钟即可抵达。",
-      ko: "역 부역명이 ‘도쿄도시대학 세타가야 캠퍼스’입니다. 역에서 도보 약 15분 거리입니다.",
+      ja: "「東京都市大学 世田谷キャンパス前」尾山台駅から徒歩約12分です。",
+      en: "The station is subtitled “Tokyo City University Setagaya Campus”. The campus is about a 12-minute walk away.",
+      zh: "车站副名为“东京都市大学世田谷校区”。从车站步行约12分钟即可抵达。",
+      ko: "역 부역명이 ‘도쿄도시대학 세타가야 캠퍼스’입니다. 역에서 도보 약 12분 거리입니다.",
     },
     recommended: true,
   },
   {
     line: lineNames.oimachi,
     station: stationNames.todoroki,
-    walkTime: 20,
+    walkTime: 15,
     description: {
       ja: "尾山台駅の隣駅です。環八通りを渡り、多摩川方面へ向かうと到着します。",
       en: "The next station from Oyamadai. Cross Kanpachi-dori and head toward the Tama River.",
       zh: "尾山台站的邻站。穿过环八通，朝多摩川方向步行即可抵达。",
       ko: "오야마다이역의 옆 역입니다. 간파치도리를 건너 다마가와 방면으로 향하면 도착합니다.",
-    },
-    recommended: false,
-  },
-  {
-    line: lineNames.tamagawaHub,
-    station: stationNames.tamagawa,
-    walkTime: 20,
-    description: {
-      ja: "3路線が乗り入れています。徒歩のほか、東急バス玉11系統もご利用いただけます。",
-      en: "Three lines serve this station. You can also take the Tokyu Bus Tama 11 route instead of walking.",
-      zh: "有3条线路在此交汇。除步行外，也可搭乘东急巴士玉11路。",
-      ko: "3개 노선이 지나갑니다. 도보 외에 도큐 버스 다마11 계통도 이용할 수 있습니다.",
     },
     recommended: false,
   },
@@ -296,7 +277,7 @@ export const accessPageContent = {
     label: "Setagaya Campus",
     title: "世田谷祭への行き方",
     description:
-      "会場は東京都市大学 世田谷キャンパスです。最寄りの尾山台駅からは徒歩約15分。時間に余裕を持ってお越しください。",
+      "会場は東京都市大学 世田谷キャンパスです。最寄りの尾山台駅からは徒歩約12分。時間に余裕を持ってお越しください。",
     mapLinkLabel: "Google マップで開く",
     officialLinkLabel: "大学公式の交通案内",
   },
@@ -353,7 +334,7 @@ export const accessPageContents = {
       label: "Setagaya Campus",
       title: "Your way to Setagaya Festival.",
       description:
-        "The venue is Tokyo City University Setagaya Campus. It is about a 15-minute walk from the nearest station, Oyamadai. Please allow extra travel time.",
+        "The venue is Tokyo City University Setagaya Campus. It is about a 12-minute walk from the nearest station, Oyamadai. Please allow extra travel time.",
       mapLinkLabel: "Open in Google Maps",
       officialLinkLabel: "Official campus directions",
     },
@@ -407,7 +388,7 @@ export const accessPageContents = {
       label: "Setagaya Campus",
       title: "轻松抵达世田谷祭。",
       description:
-        "会场位于东京都市大学世田谷校区。从最近的尾山台站步行约15分钟，请预留充足的出行时间。",
+        "会场位于东京都市大学世田谷校区。从最近的尾山台站步行约12分钟，请预留充足的出行时间。",
       mapLinkLabel: "在 Google 地图中打开",
       officialLinkLabel: "大学官方交通指南",
     },
@@ -460,7 +441,7 @@ export const accessPageContents = {
       label: "Setagaya Campus",
       title: "헤매지 않고 세타가야 축제로.",
       description:
-        "행사장은 도쿄도시대학 세타가야 캠퍼스입니다. 가장 가까운 오야마다이역에서 도보 약 15분이므로 여유 있게 방문해 주세요.",
+        "행사장은 도쿄도시대학 세타가야 캠퍼스입니다. 가장 가까운 오야마다이역에서 도보 약 12분이므로 여유 있게 방문해 주세요.",
       mapLinkLabel: "Google 지도에서 열기",
       officialLinkLabel: "대학 공식 교통 안내",
     },
