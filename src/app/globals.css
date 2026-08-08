@@ -295,65 +295,41 @@ body {
 
 /* ===== Dreamy Fade — Page Transition ===== */
 
-/* View Transitions API (対応ブラウザ) */
-::view-transition-old(root) {
-  animation: dreamy-fade-out 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-::view-transition-new(root) {
-  animation: dreamy-fade-in 0.5s cubic-bezier(0, 0, 0.2, 1) forwards;
+/*
+ * ページ遷移アニメーション。
+ *
+ * `src/app/template.tsx` はナビゲーションのたびに再マウントされるため、
+ * このラッパーに付けた CSS アニメーションは遷移ごとに再生される。
+ *
+ * View Transitions API (`::view-transition-*`) は使用しない。ブラウザの
+ * view transition は React の <ViewTransition> がツリーに存在するときしか
+ * 発火せず、擬似要素へ書いたルールは一度も適用されないため。
+ * 経緯と根拠は docs/frontend/page-transition.md を参照。
+ *
+ * fill-mode に forwards / both を使わないのは、`transform` が終了後も
+ * 残ると position: fixed の子孫に対する包含ブロックを作り続けるため。
+ * `to` の値は要素の既定状態と同一なので、backwards でも見た目は変わらない。
+ *
+ * filter: blur() は入れていない。ビューポート全域の blur はフレームごとの
+ * 再描画コストが大きく、モバイル中心の想定来場者に対して割に合わない。
+ */
+.page-transition-wrapper {
+  animation: dreamy-fade-in 0.4s cubic-bezier(0, 0, 0.2, 1) backwards;
 }
 
-@keyframes dreamy-fade-out {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(8px);
-    filter: blur(4px);
-  }
-}
 @keyframes dreamy-fade-in {
   from {
     opacity: 0;
-    transform: translateY(16px);
-    filter: blur(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-}
-
-/* フォールバック (VT非対応ブラウザ) */
-@supports not (view-transition-name: a) {
-  .page-transition-wrapper {
-    animation: dreamy-fallback-in 0.55s cubic-bezier(0, 0, 0.2, 1) both;
-  }
-}
-
-@keyframes dreamy-fallback-in {
-  from {
-    opacity: 0;
     transform: translateY(14px);
-    filter: blur(4px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
-    filter: blur(0);
   }
 }
 
 /* アクセシビリティ: モーション軽減設定 */
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none !important;
-  }
   .page-transition-wrapper {
     animation: none !important;
   }
