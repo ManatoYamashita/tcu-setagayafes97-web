@@ -3,15 +3,10 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-
-interface NavItem {
-  readonly label: string;
-  readonly href: string;
-  readonly children?: readonly { readonly label: string; readonly href: string }[];
-}
+import type { ChromeNavItem } from "@/components/layout/useChromeNav";
 
 interface NavDropdownProps {
-  item: NavItem;
+  item: ChromeNavItem;
 }
 
 /**
@@ -107,9 +102,11 @@ export function NavDropdown({ item }: NavDropdownProps) {
       {isOpen && (
         <div className="absolute left-0 top-full z-60 mt-2 min-w-[200px] rounded-lg border border-gray-200/20 bg-secondary py-2">
           {item.children?.map((child) => (
+            // key は href ではなく id。href はロケールで変わるため
             <Link
-              key={child.href}
+              key={child.id}
               href={child.href}
+              hrefLang={child.hrefLang}
               className="block px-4 py-2 text-sm text-gray-900/80 transition-colors hover:bg-white/10 hover:text-gray-900"
               onClick={() => setIsOpen(false)}
             >
