@@ -9,34 +9,6 @@
     "share": "Share",
     "language": "Language"
   },
-  "navigation": {
-    "events": "Events",
-    "timetable": "Timetable",
-    "map": "Map & Access",
-    "campusMap": "Campus Map",
-    "access": "Access",
-    "info": "Information",
-    "news": "News",
-    "guide": "Visitor Guide",
-    "faq": "FAQ",
-    "pamphlet": "Pamphlet",
-    "about": "About Us",
-    "aboutUs": "Chairperson Message",
-    "sponsors": "Sponsors",
-    "contact": "Contact",
-    "privacy": "Privacy Policy"
-  },
-  "header": {
-    "menu": "Menu",
-    "close": "Close"
-  },
-  "footer": {
-    "eventInfo": "Event Info",
-    "venueInfo": "Venue Info",
-    "information": "Information",
-    "aboutCommittee": "About Committee",
-    "copyright": "© 2026 97th Setagaya Festival Executive Committee"
-  },
   "languageSwitcher": {
     "label": "Select Language",
     "ja": "Japanese",

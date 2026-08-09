@@ -1,3 +1,4 @@
+import type { FooterSectionKey, NavigationLabelKey } from "@/i18n/chrome-messages";
 import type { Locale } from "@/i18n/routing";
 
 /**
@@ -6,6 +7,9 @@ import type { Locale } from "@/i18n/routing";
  * label は各言語の母語表記（autonym）。国旗絵文字は使用しない。
  * 🇺🇸=English は英語圏を米国に限定してしまい、Windows ではフォント欠落で
  * 表示されず、スクリーンリーダーの読み上げも不正確になるため。
+ *
+ * autonym は翻訳対象ではない（どの言語で閲覧していても「日本語」は「日本語」）
+ * ため、messages ではなくここに置く。
  *
  * fallbackLabel は多言語未対応ページから切り替えた際の着地先ページ名。
  * `src/messages/<code>.json` の `guide.title` と同一文字列にすること。
@@ -22,189 +26,86 @@ export const languageOptions: ReadonlyArray<{
   { code: "ko", label: "한국어", fallbackLabel: "방문 안내" },
 ];
 
+interface NavLinkConfig {
+  /** `messages/chrome/<locale>.json` の `navigation.*` を指すキー */
+  readonly labelKey: NavigationLabelKey;
+  readonly href: string;
+}
+
+interface NavItemConfig extends NavLinkConfig {
+  readonly children?: readonly NavLinkConfig[];
+}
+
+interface FooterSectionConfig {
+  /** `messages/chrome/<locale>.json` の `footer.*` を指すキー */
+  readonly titleKey: FooterSectionKey;
+  readonly links: readonly NavLinkConfig[];
+}
+
 /**
  * ナビゲーション構成
+ *
+ * ラベルは翻訳キーで持つ。実際の文言解決とロケール別 href の組み立ては
+ * `src/components/layout/useChromeNav.ts` が行う。
+ *
+ * `as const satisfies` はリテラル型を保ったままキーの実在を検証するための
+ * 組み合わせ。`labelKey: "eventss"` のようなタイポはビルドで落ちる。
+ *
+ * IMPORTANT: href にロケール接頭辞を書かないこと。多言語版が存在するのは
+ * `LOCALIZED_PATHNAMES` の6パスだけで、接頭辞の要否は `localizeNavHref()` が
+ * 判定する。
  */
 export const navigationConfig = {
   // ヘッダーナビゲーション
   header: [
+    { labelKey: "events", href: "/events" },
+    { labelKey: "timetable", href: "/timetable" },
+    { labelKey: "access", href: "/access" },
     {
-      label: "企画を探す",
-      href: "/events",
-    },
-    {
-      label: "タイムテーブル",
-      href: "/timetable",
-    },
-    {
-      label: "アクセス",
-      href: "/access",
-    },
-    {
-      label: "インフォメーション",
+      labelKey: "info",
       href: "/info",
       children: [
-        {
-          label: "お知らせ",
-          href: "/info",
-        },
-        {
-          label: "ご来場の方へ",
-          href: "/info/guide",
-        },
-        {
-          label: "よくある質問",
-          href: "/info/faq",
-        },
-        {
-          label: "パンフレットDL",
-          href: "/info/pamphlet",
-        },
-        {
-          label: "お問い合わせ",
-          href: "/info/contact",
-        },
+        { labelKey: "news", href: "/info" },
+        { labelKey: "guide", href: "/info/guide" },
+        { labelKey: "faq", href: "/info/faq" },
+        { labelKey: "pamphlet", href: "/info/pamphlet" },
+        { labelKey: "contact", href: "/info/contact" },
       ],
     },
-    {
-      label: "委員会について",
-      href: "/about",
-    },
+    { labelKey: "about", href: "/about" },
   ],
 
   // フッターナビゲーション
   footer: [
     {
-      title: "企画情報",
+      titleKey: "eventInfo",
       links: [
-        {
-          label: "企画を探す",
-          href: "/events",
-        },
-        {
-          label: "タイムテーブル",
-          href: "/timetable",
-        },
+        { labelKey: "events", href: "/events" },
+        { labelKey: "timetable", href: "/timetable" },
       ],
     },
     {
-      title: "会場案内",
+      titleKey: "venueInfo",
+      links: [{ labelKey: "access", href: "/access" }],
+    },
+    {
+      titleKey: "information",
       links: [
-        {
-          label: "アクセス",
-          href: "/access",
-        },
+        { labelKey: "news", href: "/info" },
+        { labelKey: "guide", href: "/info/guide" },
+        { labelKey: "faq", href: "/info/faq" },
+        { labelKey: "contact", href: "/info/contact" },
       ],
     },
     {
-      title: "インフォメーション",
+      titleKey: "aboutCommittee",
       links: [
-        {
-          label: "お知らせ",
-          href: "/info",
-        },
-        {
-          label: "ご来場の方へ",
-          href: "/info/guide",
-        },
-        {
-          label: "よくある質問",
-          href: "/info/faq",
-        },
-        {
-          label: "お問い合わせ",
-          href: "/info/contact",
-        },
-      ],
-    },
-    {
-      title: "委員会について",
-      links: [
-        {
-          label: "委員会について",
-          href: "/about",
-        },
-        {
-          label: "プライバシーポリシー",
-          href: "/about/privacy",
-        },
+        { labelKey: "about", href: "/about" },
+        { labelKey: "privacy", href: "/about/privacy" },
       ],
     },
   ],
-} as const;
-
-/**
- * CardNav 用カード構成データ
- * About（インフォメーション）/ Event（企画）/ Other（委員会・その他）の3カード
- */
-export const cardNavItems = [
-  {
-    label: "About",
-    bgColor: "#1a0a2e",
-    textColor: "#fff",
-    links: [
-      { label: "お知らせ", href: "/info", ariaLabel: "お知らせ一覧" },
-      { label: "ご来場の方へ", href: "/info/guide", ariaLabel: "ご来場案内" },
-      { label: "よくある質問", href: "/info/faq", ariaLabel: "FAQ" },
-      {
-        label: "パンフレットDL",
-        href: "/info/pamphlet",
-        ariaLabel: "パンフレットダウンロード",
-      },
-    ],
-  },
-  {
-    label: "Event",
-    bgColor: "#2d1052",
-    textColor: "#fff",
-    links: [
-      { label: "企画を探す", href: "/events", ariaLabel: "企画検索" },
-      {
-        label: "タイムテーブル",
-        href: "/timetable",
-        ariaLabel: "タイムテーブル",
-      },
-      {
-        label: "アクセス",
-        href: "/access",
-        ariaLabel: "キャンパスマップ・交通アクセス",
-      },
-    ],
-  },
-  {
-    label: "Other",
-    bgColor: "#3d1a6e",
-    textColor: "#fff",
-    links: [
-      { label: "委員会について", href: "/about", ariaLabel: "委員会について" },
-      {
-        label: "お問い合わせ",
-        href: "/info/contact",
-        ariaLabel: "お問い合わせ",
-      },
-    ],
-  },
-] as const;
-
-/**
- * ナビゲーション設定の型定義
- */
-export type NavigationConfig = typeof navigationConfig;
-
-/**
- * ヘッダーナビを取得
- */
-export function getFilteredHeaderNav() {
-  return navigationConfig.header.map((item) => ({ ...item })) as Array<{
-    label: string;
-    href: string;
-    children?: Array<{ label: string; href: string }>;
-  }>;
-}
-
-/**
- * フッターナビを取得
- */
-export function getFilteredFooterNav() {
-  return navigationConfig.footer.map((section) => ({ ...section }));
-}
+} as const satisfies {
+  readonly header: readonly NavItemConfig[];
+  readonly footer: readonly FooterSectionConfig[];
+};

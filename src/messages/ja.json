@@ -9,34 +9,6 @@
     "share": "シェア",
     "language": "言語"
   },
-  "navigation": {
-    "events": "企画を探す",
-    "timetable": "タイムテーブル",
-    "map": "マップ・アクセス",
-    "campusMap": "キャンパスマップ",
-    "access": "交通アクセス",
-    "info": "インフォメーション",
-    "news": "お知らせ",
-    "guide": "ご来場の方へ",
-    "faq": "よくある質問",
-    "pamphlet": "パンフレットDL",
-    "about": "委員会・その他",
-    "aboutUs": "委員長挨拶・理念",
-    "sponsors": "協賛企業一覧",
-    "contact": "お問い合わせ",
-    "privacy": "プライバシーポリシー"
-  },
-  "header": {
-    "menu": "メニュー",
-    "close": "閉じる"
-  },
-  "footer": {
-    "eventInfo": "企画情報",
-    "venueInfo": "会場案内",
-    "information": "インフォメーション",
-    "aboutCommittee": "委員会について",
-    "copyright": "© 2026 第97回 世田谷祭実行委員会"
-  },
   "languageSwitcher": {
     "label": "言語を選択",
     "ja": "日本語",

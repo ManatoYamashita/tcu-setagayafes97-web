@@ -9,34 +9,6 @@
     "share": "공유",
     "language": "언어"
   },
-  "navigation": {
-    "events": "행사 검색",
-    "timetable": "시간표",
-    "map": "지도 & 교통",
-    "campusMap": "캠퍼스 지도",
-    "access": "교통 안내",
-    "info": "안내",
-    "news": "공지사항",
-    "guide": "방문 안내",
-    "faq": "자주 묻는 질문",
-    "pamphlet": "팸플릿",
-    "about": "소개",
-    "aboutUs": "위원장 인사",
-    "sponsors": "후원사",
-    "contact": "문의",
-    "privacy": "개인정보 처리방침"
-  },
-  "header": {
-    "menu": "메뉴",
-    "close": "닫기"
-  },
-  "footer": {
-    "eventInfo": "행사 정보",
-    "venueInfo": "장소 안내",
-    "information": "안내",
-    "aboutCommittee": "위원회 소개",
-    "copyright": "© 2026 제97회 세타가야 축제 실행위원회"
-  },
   "languageSwitcher": {
     "label": "언어 선택",
     "ja": "일본어",
