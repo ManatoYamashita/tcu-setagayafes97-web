@@ -7,7 +7,7 @@
 - **開催日程**: 2026年10月31日（土）〜11月1日（日）
 - **公開予定**: 2026年2月28日
 - **開発期間**: 約3ヶ月（2025年12月〜2026年2月）
-- **技術スタック**: Next.js 16.1 (App Router), TypeScript, TailwindCSS, GSAP, microCMS, next-intl, Vercel（Three.js は 3Dマップ見送りにより不使用）
+- **技術スタック**: Next.js 16.1 (App Router), TypeScript, TailwindCSS, GSAP, Three.js / React Three Fiber, microCMS, next-intl, Vercel（Three.js は 3Dマップでは不採用。カラクリの歯車演出 `src/components/three/` で稼働中 — Phase 3 の見送り節を参照）
 
 ## 進捗状況
 
