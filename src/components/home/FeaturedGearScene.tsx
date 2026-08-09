@@ -2,13 +2,20 @@
 
 import dynamic from "next/dynamic";
 
+/*
+ * loading fallback は置かない。
+ *
+ * この歯車は `aria-hidden` の背景装飾であり、読み込み中であることを利用者へ伝える必要がない。
+ * 以前はスピナー（`animate-spin`）を出していたが、globals.css のモーション軽減ブロックが
+ * `animate-spin` を対象にしていないため、モーション軽減設定でも装飾のために回り続けていた。
+ * `GearScene` 側の `frameloop="demand"` はチャンクのロード後にしか効かず、その手前を守れない。
+ *
+ * クライアントチャンクは 860K（brotli 185K）で全チャンク中最大のため、低速回線では
+ * fallback が数秒表示される。何も出さないのが装飾として正しい。
+ */
 const GearScene = dynamic(() => import("@/components/three/GearScene"), {
   ssr: false,
-  loading: () => (
-    <div className="w-full h-full flex items-center justify-center">
-      <div className="w-12 h-12 border-4 border-primary-400 border-t-transparent rounded-full animate-spin" />
-    </div>
-  ),
+  loading: () => null,
 });
 
 export function FeaturedGearScene() {

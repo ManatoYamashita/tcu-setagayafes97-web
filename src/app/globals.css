@@ -303,11 +303,12 @@ body {
  * enter として別々のグループになる。`.page-exit` / `.page-enter` は
  * React が `exit` / `enter` prop から付与する view-transition-class。
  *
- * 対応範囲は `<Link>` / `router.push()` によるクライアント遷移のみ。ブラウザの
- * 戻る・進む（popstate）では startViewTransition が呼ばれず、アニメーションなしで
- * 即座に切り替わる。非対応ブラウザでも同様（いずれも機能は損なわれない）。
+ * View Transition が走るのは `<Link>` / `router.push()` によるクライアント遷移のみ。
+ * ブラウザの戻る・進む（popstate）では startViewTransition が呼ばれないため、
+ * 代わりに実 DOM のラッパーへ `.page-enter-history` を付けて enter だけ再生する
+ * （後述）。非対応ブラウザでは両方とも無演出になる（機能は損なわれない）。
  *
- * 遷移中（合計 0.3 秒）はページ全体が操作を受け付けない。View Transitions API は
+ * View Transition 中（合計 0.3 秒）はページ全体が操作を受け付けない。View Transitions API は
  * キャプチャした要素の描画を抑止し、抑止された要素は hit-test の対象から外れるため、
  * これは CSS では回避できない。`::view-transition` へ pointer-events: none を掛けても、
  * 当たる要素が <html> から <body> へ変わるだけでリンクは復活しない（実測済み）。
@@ -361,6 +362,31 @@ body {
   animation: dreamy-fade-in 0.18s cubic-bezier(0, 0, 0.2, 1) 0.12s both;
 }
 
+/*
+ * 履歴遷移（戻る・進む）専用の enter。
+ *
+ * popstate 由来の更新では React が View Transition を必ずスキップするため
+ * `::view-transition-new(.page-enter)` は一度も生成されない。そこで実 DOM の
+ * ラッパーへ同じ dreamy-fade-in を掛け、enter だけを再現する。
+ * 付与元は src/components/layout/PageTransitionWrapper.tsx。
+ *
+ * old 側のスナップショットが存在しないので、上の VT 用ルールと違って 0.12s の
+ * delay は入れない。View Transition の overlay も作られないため、こちらは
+ * 再生中もページをクリックできる。
+ *
+ * fill-mode を付けないのは意図的。`both` を足すと終了後も transform: translateY(0)
+ * が計算値として残り、この要素が position: fixed の包含ブロック兼スタッキング
+ * コンテキストになる。しかも履歴遷移をしたセッションでだけそうなるため、将来
+ * ページ本文へ position: fixed を足したときに再現困難な不具合の温床になる。
+ *
+ * クラスはアニメーション終了後も DOM に残るが、同じ要素で再発火することはない
+ * （再生されるのはマウント直後の1回だけ）。DOM に残っていることを「まだ再生中」
+ * と読まないこと。
+ */
+.page-transition-wrapper.page-enter-history {
+  animation: dreamy-fade-in 0.18s cubic-bezier(0, 0, 0.2, 1);
+}
+
 @keyframes dreamy-fade-out {
   from {
     opacity: 1;
@@ -393,6 +419,9 @@ body {
   ::view-transition-new(.page-enter) {
     animation: none !important;
   }
+  .page-transition-wrapper.page-enter-history {
+    animation: none !important;
+  }
   [class*="animate-blob"] {
     animation: none !important;
   }
@@ -400,6 +429,19 @@ body {
     animation: none !important;
   }
   .animate-scroll-line {
+    animation: none !important;
+  }
+  /*
+   * ヒーローのロゴ（HeroSection）と CircularText の無限回転。どちらも装飾で、
+   * 止めても情報は失われない。CircularText はインライン style で
+   * animation-duration を上書きするが、!important 付きの animation ショート
+   * ハンドは通常のインラインスタイルより強いため、これで確実に止まる。
+   *
+   * 素の `animate-spin` は対象にしないこと。ContactForm の送信中スピナーが
+   * 静止し、フォーム唯一の進捗フィードバックが失われる。装飾のスピナーは
+   * そもそも出さない方針（FeaturedGearScene の loading: () => null）で対応する。
+   */
+  .animate-spin-slow {
     animation: none !important;
   }
 }
