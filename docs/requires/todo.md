@@ -11,13 +11,29 @@
 
 ## 進捗状況
 
-- **全タスク数**: 152
-- **完了**: 110
+- **全タスク数**: 156
+- **完了**: 137
 - **進行中**: 0
-- **未着手**: 42
-- **進捗率**: 72.4%
+- **未着手**: 19
+- **進捗率**: 87.8%
 
-最終更新日: 2026-01-26
+最終更新日: 2026-08-09
+
+> [!NOTE]
+> 前回更新（2026-01-26）時点のサマリは実際のチェックボックス数と食い違っていました（記載 110/152 に対し実際は 115/152）。今回、全項目を実装と照合したうえで数え直しています。以降は本文のチェックボックスを唯一の根拠とし、サマリはそこから機械的に算出してください。
+>
+> 全タスク数が 152 から 156 へ増えたのは、要件定義には無かった「14. ページ遷移・モーション」を 4 項目追加したためです。
+
+### 残り 19 項目の内訳
+
+| 区分                     | 件数 | 内容                                                                    |
+| ------------------------ | ---- | ----------------------------------------------------------------------- |
+| 3Dマップ（Phase 3）      | 12   | Three.js 本体は導入済み。ページ・モデル・インタラクションが未着手       |
+| テスト・最終調整         | 5    | クロスブラウザ、レスポンシブ、多言語表示確認、Lighthouse 改善、本番確認 |
+| 未実装コンポーネント     | 1    | Breadcrumb                                                              |
+| 履歴遷移のアニメーション | 1    | popstate 対応（#51）                                                    |
+
+**残タスクの過半数が 3D マップです。** 要件定義書のリスク管理でも「実装難易度が高い場合は 2D マップをフォールバック」とされています。公開予定（2026-02-28）から逆算した判断が必要です。
 
 ---
 
@@ -34,19 +50,20 @@
 - [x] Prettierを設定（`.prettierrc`、`.prettierignore`）
 - [x] プロジェクトディレクトリ構造を構築（`/src/app`, `/src/components`, `/src/data`, `/src/lib`, `/src/messages`, `/src/assets`）
 - [x] `.gitignore`を設定（node_modules, .next, .env.local等）
-- [ ] `.env.local.example`を作成（環境変数のテンプレート）
+- [x] `.env.local.example`を作成（環境変数のテンプレート）
+  - 実体: `.env.example` として存在（`cp .env.example .env.local` の手順つき）
 - [x] GitHub Actionsワークフローファイルを作成（`.github/workflows/feature-ci.yml`）
 - [x] Git hooksを設定（husky + lint-staged）
 - [x] VSCode設定ファイルを作成（`.vscode/settings.json`, `.vscode/extensions.json`）
-- [ ] README.mdを更新（セットアップ手順、開発コマンド等）
+- [x] README.mdを更新（セットアップ手順、開発コマンド等）
 
 ### 2. microCMS設定
 
-- [ ] microCMSアカウントを作成
-- [ ] 新規サービスを作成（サービス名: `setagayafes97`等）
-- [ ] News APIを設計・作成（フィールド: type, title, thumbnail, description, content）
-- [ ] Events APIを設計・作成（フィールド: date, type, place, building, title, organizer, thumbnail, description, content, startTime, endTime, sns）
-- [ ] Informations APIを設計・作成（フィールド: category, title, sponsorName, sponsorDescription, logo, url, priority）
+- [x] microCMSアカウントを作成
+- [x] 新規サービスを作成（サービス名: `setagayafes97`等）
+- [x] News APIを設計・作成（フィールド: type, title, thumbnail, description, content）
+- [x] Events APIを設計・作成（フィールド: date, type, place, building, title, organizer, thumbnail, description, content, startTime, endTime, sns）
+- [x] Informations APIを設計・作成（フィールド: category, title, sponsorName, sponsorDescription, logo, url, priority）
 - [x] microCMS APIキーを取得（`.env.local`に設定）
 - [x] microCMS SDK（`microcms-js-sdk`）をインストール
 - [x] microCMSクライアントを実装（`/src/lib/microcms.ts`）
@@ -59,17 +76,21 @@
 
 - [x] Headerコンポーネントを作成（`/src/components/layout/Header.tsx`）
 - [x] Footerコンポーネントを作成（`/src/components/layout/Footer.tsx`）
-- [ ] Navigationコンポーネントを作成（`/src/components/layout/Navigation.tsx`）
-- [ ] モバイルメニューコンポーネントを作成（ハンバーガーメニュー）
+- [x] Navigationコンポーネントを作成（`/src/components/layout/Navigation.tsx`）
+  - 実体: `DesktopNav.tsx` / `NavDropdown.tsx` / `FooterNav.tsx` / `useChromeNav.ts` に分割して実装
+- [x] モバイルメニューコンポーネントを作成（ハンバーガーメニュー）
+  - 実体: `layout/StaggeredMobileMenu.tsx`
 - [x] Loadingコンポーネントを作成（`/src/components/ui/Loading.tsx`）
 - [x] Errorコンポーネントを作成（`/src/components/ui/Error.tsx`）
 - [x] Buttonコンポーネントを作成（再利用可能な汎用ボタン）
 - [x] Cardコンポーネントを作成（企画カード等で使用）
-- [ ] Modalコンポーネントを作成（汎用モーダル）
+- [x] Modalコンポーネントを作成（汎用モーダル）
+  - 実体: `ui/Modal.tsx`
 - [x] Badgeコンポーネントを作成（カテゴリバッジ等）
 - [x] SEO用Metadataコンポーネントを作成（`/src/components/seo/Metadata.tsx`）
 - [x] 構造化データ（JSON-LD）コンポーネントを作成（イベント情報マークアップ）
-- [ ] 多言語切替UIコンポーネントを作成（`/src/components/ui/LanguageSwitcher.tsx`）
+- [x] 多言語切替UIコンポーネントを作成（`/src/components/ui/LanguageSwitcher.tsx`）
+  - 実体: `layout/LanguageSwitcher.tsx`（`ui/` ではなく `layout/` 配下）
 - [ ] Breadcrumbコンポーネントを作成（パンくずリスト）
 - [x] ルートレイアウト（`/src/app/layout.tsx`）を実装（Header, Footer配置）
 - [x] error.tsxを実装（エラーバウンダリ）
@@ -143,7 +164,8 @@
 
 #### 3Dマップ実装（優先度: 中）
 
-- [ ] Three.js / React Three Fiberをインストール
+- [x] Three.js / React Three Fiberをインストール
+  - 実体: `three` / `@react-three/fiber` / `@react-three/drei` 導入済み。3Dマップ本体は未着手
 - [ ] 3Dマップページルート（`/src/app/map/page.tsx`）を作成
 - [ ] Three.jsキャンバスコンポーネントを作成
 - [ ] 3DモデルをBlenderで作成（建物10棟程度）
@@ -207,10 +229,12 @@
 - [x] next-intl（またはnext-i18next）をインストール
 - [x] i18n設定ファイルを作成（サポート言語: ja, en, zh, ko）
 - [x] 翻訳ファイルを作成（`/src/messages/ja.json`, `en.json`, `zh.json`, `ko.json`）
-- [ ] 固定ページの翻訳キーを定義（Header, Footer, Navigation等）
-- [ ] 多言語ルーティングを設定（`/[locale]`）
-- [ ] 言語切替UIを実装（LanguageSwitcherコンポーネント）
-- [ ] 翻訳内容を入力（英語、中国語、韓国語）
+- [x] 固定ページの翻訳キーを定義（Header, Footer, Navigation等）
+  - 実体: ページ本文は `messages/*.json`、ヘッダー・フッターは `messages/chrome/*.json` に分離
+- [x] 多言語ルーティングを設定（`/[locale]`）
+  - 実体: `src/app/[locale]/` + `localePrefix: "as-needed"`
+- [x] 言語切替UIを実装（LanguageSwitcherコンポーネント）
+- [x] 翻訳内容を入力（英語、中国語、韓国語）
 - [ ] 多言語対応のテストを実施（各言語での表示確認）
 
 ### 12. パフォーマンス最適化
@@ -229,10 +253,22 @@
 - [ ] レスポンシブ調整（モバイル、タブレット、デスクトップ）
 - [x] メタタグ設定（title, description, OGP）を全ページに実装
 - [x] 構造化データ（JSON-LD）を実装（イベント情報、組織情報）
-- [ ] sitemap.xmlを自動生成（next-sitemap使用）
-- [ ] robots.txtを設置
-- [ ] Vercel本番環境へデプロイ
+- [x] sitemap.xmlを自動生成（next-sitemap使用）
+  - 実体: next-sitemap ではなく Next.js 標準の `src/app/sitemap.ts` を使用
+- [x] robots.txtを設置
+  - 実体: `src/app/robots.ts`
+- [x] Vercel本番環境へデプロイ
+  - 実体: Production デプロイ 8 件を確認
 - [ ] 本番環境での動作確認・最終調整
+
+### 14. ページ遷移・モーション
+
+要件定義には無く、Issue #39 の調査から派生して追加したタスクです。詳細は [page-transition.md](../frontend/page-transition.md) を参照。
+
+- [x] React `<ViewTransition>` によるページ遷移を実装（`src/app/template.tsx` 1箇所で全ページに適用）
+- [x] 読まれていない `experimental.viewTransition` を `next.config.ts` から削除
+- [x] `prefers-reduced-motion` で遷移アニメーションを打ち消し
+- [ ] 履歴遷移（popstate）での遷移アニメーション対応（#51）— `<Link>` / `router.push()` のみ対応済み
 
 ---
 
