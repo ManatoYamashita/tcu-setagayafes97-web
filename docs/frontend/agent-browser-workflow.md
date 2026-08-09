@@ -83,11 +83,21 @@ DOM の件数を数えるだけの計測であっても安全とは限りませ�
 
 `framesIn1s: 0` の環境で「消えるはずのDOMが残っている」を観測したら、まず計測アーティファクトを疑ってください。詳細と実証手順は [page-transition.md](./page-transition.md) の「Issue #39 の誤診」を参照。
 
-### 例外: `next/dynamic` の `ssr: false` はマウントしないことがある
+### 例外: `next/dynamic` の `ssr: false` は描画を検証できない
 
-`framesIn1s: 0` の環境では、**`ssr: false` の dynamic import が読み込まれないまま fallback で固まる**ことを実測しました（おすすめ企画セクションの 3D 歯車 `FeaturedGearScene`）。
+`framesIn1s: 0` の環境では、`ssr: false` の dynamic import の**描画**を検証できません（おすすめ企画セクションの 3D 歯車 `FeaturedGearScene` で実測）。
 
-観測された状態は次のとおりです。React 自体はハイドレート済み（`Object.keys(el).some(k => k.startsWith("__react"))` が true）にもかかわらず、11 秒待っても `<canvas>` はマウントされませんでした。
+> [!WARNING]
+> **症状は自動化ツールによって異なり、片方は「成功しているように見えます。」** `canvas` の存在確認だけで合格判定を出すと誤判定します。
+
+| ツール                                         | `<canvas>` 要素    | drawing buffer                 | 見え方                                  |
+| ---------------------------------------------- | ------------------ | ------------------------------ | --------------------------------------- |
+| agent-browser（Playwright/Chromium）           | **マウントしない** | —                              | loading fallback が残る（明らかに失敗） |
+| Claude in Chrome（実 Chrome の `hidden` タブ） | **マウントする**   | `300×150` のまま・全ピクセル 0 | **要素はあるので成功に見える**（罠）    |
+
+#### agent-browser の症状: fallback で固まる
+
+React 自体はハイドレート済み（`Object.keys(el).some(k => k.startsWith("__react"))` が true）にもかかわらず、11 秒待っても `<canvas>` はマウントされませんでした。
 
 ```html
 <!--$!--><template data-dgst="BAILOUT_TO_CLIENT_SIDE_RENDERING"></template>
@@ -96,7 +106,25 @@ DOM の件数を数えるだけの計測であっても安全とは限りませ�
 
 `$!` は「クライアント側で描き直すべき境界」を示すマーカーですが、その再描画が走りません。Issue #39 の `$RV` と同種の rAF 依存が疑われるものの、境界のコメントノードに `_reactRetry` は生えておらず、**手動で発火させる手段は見つかっていません。**
 
-**結論として、`framesIn1s: 0` の環境では `ssr: false` コンポーネントの描画は検証できません。** ラッパー要素の位置・サイズ・z-index・`aria-hidden` といった外側のレイアウトは検証できるので、そこまでを自動で確認し、中身の描画は実機確認に回してください。
+#### Claude in Chrome の症状: マウントするが1フレームも描かれない
+
+実 Chrome では dynamic import が解決し、`<canvas>` が DOM に現れます。**しかし R3F は初期化されていません。** `Canvas` はコンテナサイズへのリサイズと描画をどちらも rAF 上で行うため、`hidden` タブでは HTML の既定サイズ `300×150` のまま、描画も 1 回も走りません。
+
+```js
+const c = wrapper.querySelector("canvas");
+const gl = c.getContext("webgl2") || c.getContext("webgl");
+const px = new Uint8Array(4);
+gl.readPixels(c.width >> 1, c.height >> 1, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+
+// R3F 未初期化のサイン（ラッパーが 470×470 なのに canvas が既定サイズ）
+c.width === 300 && c.height === 150;
+// 未描画のサイン
+[...px].every((v) => v === 0);
+```
+
+`canvas` の存在は「マウントされた」ことしか意味しません。**`width`/`height` がコンテナ寸法へ追随しているか、`readPixels` が非ゼロを返すかまで見てください。**
+
+**結論として、`framesIn1s: 0` の環境では `ssr: false` コンポーネントの描画は検証できません。** ラッパー要素の位置・サイズ・z-index・`aria-hidden`、`animate-*` の有無、横スクロールの発生といった**描画に依存しない指標**は検証できるので、そこまでを自動で確認し、回転・チルト・モーション軽減時の静止は実機確認に回してください。
 
 ### BFCache の観測
 
@@ -147,6 +175,16 @@ document.querySelector(".page-transition-wrapper").dataset.probeNode = "NODE-A";
 #### 落とし穴3: rAF を await するとタブごと死ぬ
 
 `framesIn1s` を測るコードを `hidden` なタブで実行すると `requestAnimationFrame` が二度と発火せず、`await` が永久に解決しません。CDP がタイムアウトし、**レンダラが凍結してタブが落ちます**（実際に落としました）。バックグラウンドタブでは rAF を待つ計測を実行しないこと。`setTimeout` はスロットリングされつつも解決します。
+
+**これは agent-browser 固有ではありません。** Claude in Chrome（実 Chrome を CDP で駆動）でも同じで、`hidden` タブで rAF を `await` したところ `Runtime.evaluate` が 45 秒でタイムアウトしました。
+
+**順序を守ってください。** `visibilityState` を**同期評価**で先に読み、`"visible"` を確認できてから `framesIn1s` を測ります。逆にすると測定そのものでタブを失います。
+
+```js
+// 1. まずこれだけを同期で読む（rAF に触らない）
+({ visibilityState: document.visibilityState, hasFocus: document.hasFocus() });
+// 2. "visible" だったときだけ framesIn1s を測る
+```
 
 ### View Transitions API の観測
 
