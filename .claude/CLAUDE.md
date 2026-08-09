@@ -99,6 +99,17 @@ refactor/<refactor-target> # リファクタリング
 - `feature/3d-campus-map`
 - `bugfix/countdown-timer-fix`
 
+**CI のカバー範囲:**
+
+`.github/workflows/feature-ci.yml`（Lint & Format Check / Build Check）は次の場合に走る。**上記5つの命名規則から外れたブランチ名を使うと、push 時のチェックが一切走らない。**
+
+| イベント       | 対象                                                             |
+| -------------- | ---------------------------------------------------------------- |
+| `push`         | `feature/**`, `bugfix/**`, `hotfix/**`, `docs/**`, `refactor/**` |
+| `pull_request` | base が `main` または `dev`                                      |
+
+push 時は head をそのまま、PR 時は head を base へマージした結果を検証する。**両方走る場合、それは重複ではなく別種の検証である。**
+
 ### コミットメッセージ規約
 
 **基本フォーマット:**

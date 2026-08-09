@@ -1,14 +1,21 @@
 name: Feature Branch CI
 
+# トリガは .claude/CLAUDE.md のブランチ命名規則とマージ経路（作業ブランチ → dev → main）に対応させる。
+# push は作業ブランチへの直接の変更を、pull_request は base へマージした結果を検証する。
+# 両方が走るケースでは検証対象が異なる（前者は head、後者は head を base へマージしたもの）ため、
+# 重複ではなく別種の検証として扱う。
 on:
   push:
     branches:
       - "feature/**"
       - "bugfix/**"
       - "hotfix/**"
+      - "docs/**"
+      - "refactor/**"
   pull_request:
     branches:
       - main
+      - dev
 
 jobs:
   lint-and-format:
