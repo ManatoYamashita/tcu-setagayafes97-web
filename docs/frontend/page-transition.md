@@ -10,10 +10,11 @@
 
 1. **`::view-transition-*` の CSS は、React の `<ViewTransition>` がツリーに無ければ一度も適用されない。** 擬似要素にルールを書いただけでは何も起きません。
 2. **`<ViewTransition>` は `src/app/template.tsx` に 1 箇所置けば全ページに効く。** `page.tsx` を個別に包む必要はありません。
-3. **効くのは `<Link>` / `router.push()` によるクライアント遷移だけ。** ブラウザの戻る・進む（popstate）ではアニメーションなしで即時切り替わります。
-4. **遷移中（合計 0.3 秒）はページ全体がクリックを受け付けない。** 仕様上の制約で、`pointer-events` では回避できません。演出を伸ばすことは、そのまま無反応時間を伸ばすことです。
-5. **`next.config.ts` の `experimental.viewTransition` は next@16.1.0 では読まれていない死に設定。** 付けても外しても挙動は変わりません。
-6. **`<div hidden id="S:n">` の中に前ページの内容が残っているのは、rAF が止まった環境でだけ起きる計測アーティファクト。** 実ブラウザでは発生しません。
+3. **View Transition が走るのは `<Link>` / `router.push()` によるクライアント遷移だけ。** ブラウザの戻る・進む（popstate）では React が仕様上必ずスキップします。代わりに実 DOM のラッパーへ `.page-enter-history` を付け、同じ CSS アニメーションを enter だけ再現しています。
+4. **発火するのは template が再マウントされたときだけ。** ルート直下セグメントの stateKey が変わらない遷移（`src/app/[locale]/` 配下どうしの `/about` → `/access` など）は、**リンクでも戻るでも無演出**です。
+5. **遷移中（合計 0.3 秒）はページ全体がクリックを受け付けない。** 仕様上の制約で、`pointer-events` では回避できません。演出を伸ばすことは、そのまま無反応時間を伸ばすことです。ただしこれは View Transition 経路だけの話で、履歴遷移の CSS アニメーションでは操作できます。
+6. **`next.config.ts` の `experimental.viewTransition` は next@16.1.0 では読まれていない死に設定。** 付けても外しても挙動は変わりません。
+7. **`<div hidden id="S:n">` の中に前ページの内容が残っているのは、rAF が止まった環境でだけ起きる計測アーティファクト。** 実ブラウザでは発生しません。
 
 ---
 
@@ -23,15 +24,18 @@
 
 ```tsx
 import { ViewTransition } from "react";
+import { PageTransitionWrapper } from "@/components/layout/PageTransitionWrapper";
 
 export default function Template({ children }: { children: React.ReactNode }) {
   return (
     <ViewTransition enter="page-enter" exit="page-exit" default="none">
-      <div className="page-transition-wrapper">{children}</div>
+      <PageTransitionWrapper>{children}</PageTransitionWrapper>
     </ViewTransition>
   );
 }
 ```
+
+`PageTransitionWrapper` は `.page-transition-wrapper` を持つ `<div>` を描画するだけのクライアントコンポーネントです。履歴遷移のときだけ `.page-enter-history` を足します（[履歴遷移（戻る・進む）](#履歴遷移戻る進む)）。`<ViewTransition>` の直下にクライアントコンポーネントを挟んでも配線は壊れません。React は host fiber まで再帰で降りて `view-transition-class` を付けるためです。
 
 Next.js の `template.tsx` は `layout.tsx` と異なり**クライアント遷移のたびに再マウントされます。** そのため旧ページの `<ViewTransition>` は unmount（exit）、新ページのそれは mount（enter）として扱われ、React が `document.startViewTransition()` を起動します。
 
@@ -45,20 +49,40 @@ Next.js の `template.tsx` は `layout.tsx` と異なり**クライアント遷�
 
 `<ViewTransition>` は Server Component 内で使えます（`template.tsx` に `"use client"` は不要）。
 
-### 対応範囲: クライアント遷移のみ
+### 対応範囲: 経路で演出が2系統に分かれる
 
-**アニメーションが再生されるのは `<Link>` / `router.push()` によるクライアント遷移だけです。** ブラウザの戻る・進む（popstate）では `startViewTransition()` が呼ばれず、アニメーションなしで即時切り替わります。
+**View Transition が走るのは `<Link>` / `router.push()` によるクライアント遷移だけです。** ブラウザの戻る・進む（popstate）では `startViewTransition()` が呼ばれません。これは React の仕様であって不具合ではありません（理由は[履歴遷移（戻る・進む）](#履歴遷移戻る進む)）。
 
-可視タブでの実測値（`document.startViewTransition` にフックを刺し、呼び出し回数を数えたもの）:
+そのままでは「リンクだけアニメーションし、戻るとしない」という非対称になるため、[#51](https://github.com/ManatoYamashita/tcu-setagayafes97-web/issues/51) で**履歴遷移のときだけ実 DOM のラッパーへ CSS アニメーションを掛ける**代替を入れました。
 
-| 操作                     | `location.pathname` | `startViewTransition` の累計呼び出し |
-| ------------------------ | ------------------- | ------------------------------------ |
-| 初期状態                 | `/timetable`        | 0                                    |
-| ヘッダーのリンクを click | `/events`           | **1**                                |
-| `history.back()`         | `/timetable`        | 1（増えない）                        |
-| `history.forward()`      | `/events`           | 1（増えない）                        |
+可視タブでの実測値（`document.startViewTransition` にフックを刺して呼び出し回数を数え、あわせて `animationstart` で `dreamy-fade-in` の発火を数えたもの。`framesIn1s: 60` / `visibilityState: "visible"` / ローカル本番ビルド）:
 
-URL とページ内容は正しく切り替わるため、**機能上の欠落ではありません。** 「戻るとアニメーションしない」を不具合として起票しないでください。対応は [#51](https://github.com/ManatoYamashita/tcu-setagayafes97-web/issues/51) で扱います。
+| 操作                     | `location.pathname` | `startViewTransition` の累計 | `dreamy-fade-in` の累計 | ラッパーの class          |
+| ------------------------ | ------------------- | ---------------------------- | ----------------------- | ------------------------- |
+| 初期状態                 | `/timetable`        | 0                            | 0                       | —                         |
+| ヘッダーのリンクを click | `/events`           | **+1**                       | ±0                      | —                         |
+| `history.back()`         | `/timetable`        | ±0                           | **+1**                  | `page-enter-history` あり |
+| `history.forward()`      | `/events`           | ±0                           | **+1**                  | `page-enter-history` あり |
+| 戻る・進むを5往復        | `/events`           | ±0                           | **+10**                 | 毎回付与                  |
+
+**この2系統が同時に走ることはありません。** リンク遷移では View Transition だけ、履歴遷移では CSS アニメーションだけです。最後の行が回帰検出用で、ここが `+1` で止まったら popstate リスナの登録順が壊れています（理由は後述）。
+
+### 発火範囲はセグメント単位
+
+**どちらの系統も「`template.tsx` が再マウントされたとき」だけ発火します。** `OuterLayoutRouter` は template を `key={stateKey}` で描画し、`stateKey` は `createRouterCacheKey(activeSegment, true)`＝**ルート直下セグメント**しか見ません。本プロジェクトのルーティングは次のようにグルーピングされます。
+
+| ルート直下 stateKey | 該当 URL                                                                                                       |
+| ------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `__PAGE__`          | `/`                                                                                                            |
+| `timetable`         | `/timetable`                                                                                                   |
+| `events`            | `/events`, `/events/[id]`                                                                                      |
+| `info`              | `/info`, `/info/[id]`, `/info/pamphlet`                                                                        |
+| `about`             | `/about/sponsors`                                                                                              |
+| `locale\|ja\|d`     | `/about`, `/about/privacy`, `/access`, `/info/guide`, `/info/faq`, `/info/contact`（`src/app/[locale]/` 配下） |
+
+**同じ行の中の遷移は無演出です。** `/about` → `/access` をリンクでクリックしても再マウントは起きず（実測 `remountedOnLink: false`）、View Transition も発火しません。戻る・進むでも同じく無演出なので、**リンクと履歴で非対称にはなりません。**
+
+検証でここを踏むと「#51 が効いていない」と誤判定します。動作確認には `/timetable` ↔ `/events` のようにグループをまたぐ組み合わせを使ってください。この穴を塞ぐ（`src/app/[locale]/template.tsx` の追加など）のは別 Issue です。
 
 ### ヘッダーの固定
 
@@ -157,12 +181,109 @@ React が `startViewTransition` の有無を見て分岐するため、非対応
 
 公式ガイド [Designing view transitions](https://nextjs.org/docs/app/guides/view-transitions) には、本実装で採用していないパターンがあります。着手するなら独立 Issue として扱ってください。
 
-| パターン                                                                                      | 概要                                                                     | 追加コスト                                          |
-| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------- |
-| 履歴遷移への対応（[#51](https://github.com/ManatoYamashita/tcu-setagayafes97-web/issues/51)） | ブラウザの戻る・進む（popstate）でもアニメーションを再生する             | Next.js router の popstate 経路の調査、BFCache 検証 |
-| 共有要素モーフ                                                                                | 企画一覧のサムネイルを詳細ページのヒーローへ変形させる                   | 一覧・詳細の両方に同名 `<ViewTransition>`           |
-| 方向付き遷移                                                                                  | 進む / 戻るで横スライドの向きを変える                                    | 全 `<Link>` への `transitionTypes` 設計             |
-| Suspense リビール                                                                             | ローディングスケルトンから実コンテンツへの受け渡しをアニメーションさせる | 各 `Suspense` の fallback を包む                    |
+| パターン                          | 概要                                                                     | 追加コスト                                                             |
+| --------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| 履歴遷移で真の old→new を走らせる | 戻る・進むでも旧ページの exit を含む View Transition を再生する          | Next.js の Navigation API 採用待ち（upstream ブロック。下記参照）      |
+| 発火範囲の穴を塞ぐ                | `src/app/[locale]/` 配下どうしの遷移にも演出を効かせる                   | `src/app/[locale]/template.tsx` の追加と二重発火の検証                 |
+| 共有要素モーフ                    | 企画一覧のサムネイルを詳細ページのヒーローへ変形させる                   | 一覧・詳細の両方に同名 `<ViewTransition>`                              |
+| 方向付き遷移                      | 進む / 戻るで横スライドの向きを変える                                    | 全 `<Link>` への `transitionTypes` 設計（popstate は type を運べない） |
+| Suspense リビール                 | ローディングスケルトンから実コンテンツへの受け渡しをアニメーションさせる | 各 `Suspense` の fallback を包む                                       |
+
+---
+
+## 履歴遷移（戻る・進む）
+
+[#51](https://github.com/ManatoYamashita/tcu-setagayafes97-web/issues/51) の対応。**popstate で View Transition を走らせることは、アプリ側からは実現できません。** 上流に2層のブロックがあり、どちらも解除できないためです。
+
+### なぜ View Transition が走らないか
+
+**1. React が意図的にスキップしている。**
+
+[react.dev の ViewTransition リファレンス](https://react.dev/reference/react/ViewTransition#building-view-transition-enabled-routers)が明言しています。
+
+> If a `startTransition` is started from the legacy popstate event, such as during a "back"-navigation then it must finish synchronously to ensure scroll and form restoration works correctly. This is in conflict with running a View Transition animation. Therefore, React will skip animations from popstate and animations won't run for the back button. You can fix this by upgrading your router to use the Navigation API.
+
+実装は `react-dom` の `shouldAttemptEagerTransition()` です。`window.event.type === "popstate"` のときだけ真を返し、呼び出し元の `processRootScheduleInMicrotask` が `syncTransitionLanes = currentEventTransitionLane` として**transition レーンを同期フラッシュ**します。同期フラッシュと非同期の View Transition は両立しません。
+
+**2. Next.js 側ではそもそも transition レーンに乗っていない。**
+
+`next/dist/client/components/app-router-instance.js` の `dispatchAction` は、`ACTION_RESTORE`（popstate 由来）のときだけ `startTransition(() => setState(deferredPromise))` をスキップします。
+
+```js
+// most of the action types are async with the exception of restore
+// it's important that restore is handled quickly since it's fired on the popstate event
+if (payload.type !== ACTION_RESTORE) {
+  /* ... startTransition(() => setState(deferredPromise)) ... */
+}
+```
+
+実際の `setState` は非同期の `runAction` の `.then()` から呼ばれるため、`app-router.js` の `onPopState` が張った `startTransition` のスコープを跨いでしまい、DefaultLane になります。**canary でも同じ実装です。**
+
+Next.js Issue [#94369](https://github.com/vercel/next.js/issues/94369) でメンテナが回答済みです。
+
+> This is expected behavior currently ... Next.js does not yet use the browser Navigation API because it doesn't have broad enough support across browser users yet. We're planning to adopt the Navigation API in the future.
+
+**したがって、この節の内容は Next.js が Navigation API を採用した時点で見直しが必要になります。**
+
+### 採用した代替: enter だけを CSS で再現する
+
+`src/components/layout/PageTransitionWrapper.tsx` が、履歴遷移のときだけ実 DOM のラッパーへ `.page-enter-history` を付けます。CSS 側（`globals.css`）は既存の `@keyframes dreamy-fade-in` をそのまま再利用します。
+
+```css
+.page-transition-wrapper.page-enter-history {
+  animation: dreamy-fade-in 0.18s cubic-bezier(0, 0, 0.2, 1);
+}
+```
+
+- **旧ページの exit は再現できません。** popstate の時点で旧 DOM を保持する手段がないためです。enter のみの片側演出になります。
+- **View Transition の overlay を作らないので、再生中もページをクリックできます。** リンク遷移の 0.3 秒ロックはここには存在しません。
+- 追加のネットワークアクセスはありません。#94369 で提示されている `router.refresh()` を使う回避策は、履歴遷移のたびに RSC を再フェッチするため Vercel Free Plan の制約と衝突します。**採用しないでください。**
+
+### popstate リスナはモジュール評価時に登録すること（最重要）
+
+`src/lib/history-navigation.ts` は `useEffect` ではなく**モジュール評価時**に `window.addEventListener("popstate", ...)` を実行します。これは好みではなく必須です。
+
+popstate のリスナは window への**登録順**に呼ばれ、1つ返るたびにマイクロタスクチェックポイントが走ります。Next.js の `onPopState` が先に走ると、そのチェックポイントで `ACTION_RESTORE` の `setState` と React の同期フラッシュまで到達し、**新しいラッパーの render（＝判定の読み取り）が終わってしまいます。**
+
+`useEffect` で登録すると、再マウントのたびに登録が末尾へ移動します。初回だけ Next.js より前に載るため、**「1回目の戻るだけ動いて2回目以降は動かない」**という発見しにくい壊れ方をします。モジュール評価はハイドレーション前なので、登録順がツリー構造の変更から独立します。
+
+回帰検出は「戻る・進むを5往復して毎回発火するか」です。1回で止まったらここを疑ってください。
+
+### 判定キーは「URL 一致 + 200ms」
+
+タイムスタンプだけで判定してはいけません。**再マウントを伴わない popstate**（ハッシュのみの変更、`src/app/[locale]/` 配下どうしの遷移）では記録が消費されずに残り、直後のリンク遷移がそれを食べて View Transition と CSS アニメーションが二重に走ります。
+
+popstate 時点の `location.href` を一緒に記録し、消費側で現在の URL と一致することを要求すれば、間にリンク遷移が挟まった瞬間に無効化されます。200ms は保険であって遅延の吸収ではありません（popstate → mount は実測 1ms 未満）。伸ばすと誤検知の窓が広がります。
+
+### fill-mode を付けない
+
+`animation` に `both` を足してはいけません。終了後も `transform: translateY(0)` が計算値として残り、このラッパーが `position: fixed` の**包含ブロック**兼**スタッキングコンテキスト**になります。しかも**履歴遷移をしたセッションでだけ**そうなるため、将来ページ本文へ `position: fixed` を足したときに「戻るボタンを押したあとだけ壊れる」という再現困難な不具合になります。
+
+delay が 0 なので fill-mode 無しでも最初のフレームから 0% キーフレームが当たります。実測（`framesIn1s: 60`）:
+
+| 経過時間 | `opacity` | `transform`            |
+| -------- | --------- | ---------------------- |
+| 3ms      | 0.00      | `translateY(14px)`     |
+| 37ms     | 0.48      | `translateY(7.27px)`   |
+| 104ms    | 0.88      | `translateY(1.70px)`   |
+| 170ms    | 1.00      | `translateY(0.04px)`   |
+| 204ms    | 1.00      | **`none`**（残留なし） |
+
+`class` はアニメーション終了後も DOM に残りますが、同じ要素で再発火することはありません（再生されるのはマウント直後の1回だけ）。**DOM に `page-enter-history` があることを「まだ再生中」と読まないでください。**
+
+### BFCache
+
+二重の防御が入っています。
+
+1. `pageshow` の `event.persisted` が真なら記録を破棄する。
+2. そもそも BFCache 復帰では React ツリーが再マウントされない（ドキュメントごと保持されるため、`useState` の初期化が走らない）。Next.js の `app-router.js` も同一 tree で `ACTION_RESTORE` を投げるだけ。
+
+> [!NOTE]
+> BFCache 復帰そのものは**自動化環境で実測できていません。** agent-browser（Playwright / Chromium）では BFCache が無効化されており、クロスドキュメントの戻るでは常にドキュメントが再作成されました。再作成された場合にクラスが付かないこと（`navType: "back_forward"` かつ `.page-enter-history` なし）は2回確認済みですが、**BFCache が実際に効く実機での確認は残っています。**
+
+### hydration 安全性
+
+`PageTransitionWrapper` はモジュールスコープの `hasMountedOnce` で「初回レンダー＝ハイドレーション」を保証し、初回は必ずクラス無しにします。ハイドレーション直前に戻るボタンが押されてもサーバーの HTML と一致するため、`className` の mismatch は起きません（実測: コンソール警告 0 件）。
 
 ---
 
@@ -316,7 +437,30 @@ document.startViewTransition = (arg) => {
 // name に自動生成名（_t_4_ 等）、cls に page-exit が入ることを確認する
 ```
 
-この配線チェックは**対応範囲の確認にも使えます。** リンククリックで `calls` が増え、`history.back()` で増えないことが、popstate では発火しないという上記の「対応範囲」節の根拠です。
+この配線チェックは**対応範囲の確認にも使えます。** リンククリックで `calls` が増え、`history.back()` で増えないことが、popstate では View Transition が発火しないという上記「対応範囲」節の根拠です。
+
+履歴遷移側（`.page-enter-history` の CSS アニメーション）は View Transition ではないので、同じフックでは数えられません。`animationstart` を併用してください。両方を仕込めば、「リンクでは VT だけ、戻るでは CSS だけ」という排他が1回の操作列で確認できます。
+
+```javascript
+window.__pt = [];
+document.addEventListener(
+  "animationstart",
+  (e) => {
+    if (
+      e.animationName === "dreamy-fade-in" &&
+      e.target instanceof HTMLElement &&
+      e.target.classList.contains("page-transition-wrapper")
+    ) {
+      window.__pt.push({ cls: e.target.className, vtCalls: window.__vt.calls });
+    }
+  },
+  true
+);
+// 戻る・進むを5往復し、__pt.length が +10、__vt.calls が ±0 であることを確認する。
+// +1 で止まったら popstate リスナの登録順が壊れている。
+```
+
+検証には `/timetable` ↔ `/events` のようにルート直下セグメントをまたぐ組み合わせを使ってください。`/about` ↔ `/access` は再マウントが起きないため、リンクでも戻るでも両方 0 のままです（「発火範囲はセグメント単位」を参照）。
 
 **アニメーションの見た目そのものは、`framesIn1s: 0` の環境ではこの方法でも検証できません。** その場合は実機で目視するしかありません。
 
