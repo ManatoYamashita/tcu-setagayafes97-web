@@ -127,7 +127,7 @@ docs/
   - CSS 変数まとめ
 
 - **[agent-browser-workflow.md](./frontend/agent-browser-workflow.md)** - agent-browserを使用したデザイン再現とデバッグの標準フロー
-  - **検証できないもの（先に読むこと）** — 自動化タブは rAF が停止するためアニメーションの再生は検証不可
+  - **観測の前提を測る（先に読むこと）** — 実行環境は一定でない。`framesIn1s` を測ってから検証可否を分岐する
   - デザイン再現3ステップ（分析→実装→検証）
   - 数値測定手法とコマンド集（Header高さ、z-index階層、viewport占有率）
   - レスポンシブテスト標準手順（375px/768px/1920px）
@@ -160,7 +160,7 @@ docs/
   - `experimental.viewTransition` は next@16.1.0 では読まれていない死に設定（警告も出ない）
   - **Issue #39 の誤診** — `<div hidden id="S:0">` は rAF 停止時の Suspense 差し込み待ち
   - 可視性の計測は要素単体ではなく祖先すべてを見る（`display: none` は子孫の computed 値を変えない）
-  - 自動化タブでは view transition がスキップされ `ready` が InvalidStateError で reject する
+  - 自動化環境での view transition は `visibilityState` で挙動が割れる（`hidden` のみスキップされ `ready` が reject）
 
 ## 更新手順（PDCA）
 

@@ -2,7 +2,7 @@
 
 本ドキュメントでは、React の `<ViewTransition>` によるページ遷移の実装方針と、その過程で判明した Next.js / React 側の落とし穴を記録します。あわせて、Issue #39 で「前ページのDOMが残留する」という**存在しないバグを起票してしまった事故**の原因と、同じ誤診を繰り返さないための計測ルールを定義します。
 
-計測環境そのものの前提は [agent-browser-workflow.md](./agent-browser-workflow.md) の「検証できないもの」節を先に読んでください。
+計測環境そのものの前提は [agent-browser-workflow.md](./agent-browser-workflow.md#観測の前提を測る先に読むこと) の「観測の前提を測る」節を先に読んでください。**自動化環境で観測値を取る前に、必ず `framesIn1s` を測ってください。**
 
 ---
 
@@ -216,7 +216,7 @@ $RC = function (a, b) {
 };
 ```
 
-**実際に DOM へ差し込む `$RV` の実行が `requestAnimationFrame` に積まれます。** 自動化タブは `visibilityState: "hidden"` で rAF が停止しているため `$RV` は永久に呼ばれず、
+**実際に DOM へ差し込む `$RV` の実行が `requestAnimationFrame` に積まれます。** このときの計測セッションは `visibilityState: "hidden"` / `framesIn1s: 0` で rAF が停止していたため `$RV` は永久に呼ばれず、
 
 - Suspense 境界のマーカーは `$~`（差し込み待ち）のまま
 - 中身は `<div hidden id="S:0">` に取り残される
@@ -278,22 +278,25 @@ rAF が止まった同じタブで `$RV($RB)` を手動実行したところ、�
 
 ### DOM 構造の観測でも rAF 生存確認は必要
 
-[agent-browser-workflow.md](./agent-browser-workflow.md) の切り分け表では DOM 構造の確認を「検証できる」側に分類していますが、**Suspense のストリーミング差し込みのように DOM 操作そのものが rAF に依存しているケースがあります。** DOM 件数を数えるだけの計測でも、`framesIn1s` を記録に残してください。
+[agent-browser-workflow.md](./agent-browser-workflow.md#観測の前提を測る先に読むこと) の切り分け表では DOM 構造の確認を「条件付きで検証できる」側に分類していますが、**Suspense のストリーミング差し込みのように DOM 操作そのものが rAF に依存しているケースがあります。** DOM 件数を数えるだけの計測でも、`framesIn1s` を記録に残してください。
 
 `framesIn1s: 0` の環境で `<div hidden id="S:n">` を見つけたら、バグではなく計測アーティファクトです。`$RV($RB)` を手動実行して消えるなら確定です。
 
-### 自動化タブでの view transition の挙動
+### 自動化環境での view transition の挙動
 
-自動化タブは `visibilityState: "hidden"` です。仕様上、非表示ドキュメントの view transition は**スキップ**されます。そのため:
+**自動化環境が `visibilityState: "hidden"` とは限りません。** ツールによって異なり、実測すると次のように割れます。まず [agent-browser-workflow.md](./agent-browser-workflow.md#観測の前提を測る先に読むこと) の手順1 で `visibilityState` と `framesIn1s` を測り、どちらの列にいるかを確定させてください。
 
-- `document.startViewTransition()` は**呼ばれる**（React 側の配線は動いている）
-- `transition.ready` は `InvalidStateError: Transition was aborted because of invalid state` で reject する
-- `transition.updateCallbackDone` は resolve し、**DOM 更新自体は正常に適用される**
-- アニメーションは 1 フレームも描画されない
+| 観測項目                         | `visible` / `framesIn1s > 0` | `hidden` / `framesIn1s: 0`           |
+| -------------------------------- | ---------------------------- | ------------------------------------ |
+| `document.startViewTransition()` | 呼ばれる                     | 呼ばれる                             |
+| `transition.ready`               | **resolve**（実測 約 43ms）  | `InvalidStateError` で **reject**    |
+| `transition.updateCallbackDone`  | resolve                      | resolve（DOM 更新は正常）            |
+| `transition.finished`            | resolve（実測 約 348ms）     | 即座に解決。1 フレームも描画されない |
+| アニメーションの検証             | **可能**                     | 不可（実機で目視するしかない）       |
 
-`ready` の reject は非表示ドキュメント固有の挙動で、実ブラウザでは起きません（[facebook/react#34098](https://github.com/facebook/react/issues/34098)）。**これをバグとして起票しないでください。**
+`hidden` 側の `ready` reject は、仕様上**非表示ドキュメントの view transition がスキップされる**ことによるものです（[facebook/react#34098](https://github.com/facebook/react/issues/34098)）。**これをバグとして起票しないでください。**
 
-配線が生きているかどうかだけは、rAF に依存せず確認できます。
+配線が生きているかどうかだけは、どちらの環境でも rAF に依存せず確認できます。
 
 ```javascript
 window.__vt = { calls: 0 };
@@ -311,16 +314,20 @@ document.startViewTransition = (arg) => {
 // name に自動生成名（_t_4_ 等）、cls に page-exit が入ることを確認する
 ```
 
-**アニメーションの見た目そのものは、この方法でも検証できません。** 実機で目視するしかありません。
+この配線チェックは**対応範囲の確認にも使えます。** リンククリックで `calls` が増え、`history.back()` で増えないことが、popstate では発火しないという上記の「対応範囲」節の根拠です。
 
-### 起票前に実機で確認する
+**アニメーションの見た目そのものは、`framesIn1s: 0` の環境ではこの方法でも検証できません。** その場合は実機で目視するしかありません。
 
-Issue #47 に続き Issue #39 も、自動化タブの観測値だけで起票された誤報でした。**「前ページが残る」「アニメーションが動かない」「要素が見えない」という症状は、実ブラウザで再現するまで起票しないでください。** 依頼の書き方は agent-browser-workflow.md の「代替手段: 実機確認を依頼する」を参照。
+### 起票前に、測定系の生存を確認する
+
+Issue #47 に続き Issue #39 も、**`framesIn1s: 0` の環境で得た観測値だけで**起票された誤報でした。問題は「自動化を使ったこと」ではなく、**測定系が死んでいることを確認せずに結論を出したこと**です。
+
+「前ページが残る」「アニメーションが動かない」「要素が見えない」という症状を見つけたら、まず `framesIn1s` を測ってください。`0` なら計測アーティファクトを疑い、実機で再現するまで起票しない。`60` 前後なら、その環境で正当に切り分けられます。依頼の書き方は agent-browser-workflow.md の「代替手段: `framesIn1s: 0` なら実機確認を依頼する」を参照。
 
 ---
 
 ## 関連ドキュメント
 
-- [agent-browser-workflow.md](./agent-browser-workflow.md) - 自動化タブで検証できないものと、実機確認の依頼方法
+- [agent-browser-workflow.md](./agent-browser-workflow.md) - 観測の前提（rAF 生存）の測り方と、実機確認の依頼方法
 - [layout-patterns.md](./layout-patterns.md) - z-index・position の使い分け
 - [design.md](./design.md) - デザインシステム（カラー・タイポグラフィトークン）
