@@ -83,6 +83,21 @@ DOM の件数を数えるだけの計測であっても安全とは限りませ�
 
 `framesIn1s: 0` の環境で「消えるはずのDOMが残っている」を観測したら、まず計測アーティファクトを疑ってください。詳細と実証手順は [page-transition.md](./page-transition.md) の「Issue #39 の誤診」を参照。
 
+### 例外: `next/dynamic` の `ssr: false` はマウントしないことがある
+
+`framesIn1s: 0` の環境では、**`ssr: false` の dynamic import が読み込まれないまま fallback で固まる**ことを実測しました（おすすめ企画セクションの 3D 歯車 `FeaturedGearScene`）。
+
+観測された状態は次のとおりです。React 自体はハイドレート済み（`Object.keys(el).some(k => k.startsWith("__react"))` が true）にもかかわらず、11 秒待っても `<canvas>` はマウントされませんでした。
+
+```html
+<!--$!--><template data-dgst="BAILOUT_TO_CLIENT_SIDE_RENDERING"></template>
+<!-- ここに loading fallback が出たまま -->
+```
+
+`$!` は「クライアント側で描き直すべき境界」を示すマーカーですが、その再描画が走りません。Issue #39 の `$RV` と同種の rAF 依存が疑われるものの、境界のコメントノードに `_reactRetry` は生えておらず、**手動で発火させる手段は見つかっていません。**
+
+**結論として、`framesIn1s: 0` の環境では `ssr: false` コンポーネントの描画は検証できません。** ラッパー要素の位置・サイズ・z-index・`aria-hidden` といった外側のレイアウトは検証できるので、そこまでを自動で確認し、中身の描画は実機確認に回してください。
+
 ### View Transitions API の観測
 
 本サイトのページ遷移は React の `<ViewTransition>`（`src/app/template.tsx`）で実装されています。挙動は `visibilityState` で真っ二つに分かれます。

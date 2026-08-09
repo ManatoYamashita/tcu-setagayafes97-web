@@ -224,7 +224,12 @@ push 時は head をそのまま、PR 時は head を base へマージした結
 
 **新規に 3D 関連のコードを追加しないでください。** 第98回以降で再検討する場合は、上記のチェックリストを復活させたうえで判断してください。
 
-`three` / `@react-three/fiber` は依存に残っていますが、これはカラクリのギア演出（`src/components/three/`）用です。3Dマップとは無関係で、現状その呼び出し元（`FeaturedEvents.tsx` の `FeaturedGearScene` import）はコメントアウトされています。
+`three` / `@react-three/fiber` はカラクリのギア演出（`src/components/three/`）用です。3Dマップとは無関係で、おすすめ企画セクションの背景装飾として稼働しています（2026-08-10 復活）。
+
+- 読み込みは `next/dynamic` の `ssr: false`。クライアントチャンクは 860K（brotli 185K）で全チャンク中最大
+- `EVENTS_VISIBLE=false` の間はセクションごと非表示のため、チャンクも読み込まれない
+- モーション軽減設定時は `frameloop="demand"` でレンダーループごと停止する
+- `@react-three/drei` は依存にあるが未使用
 
 ## ページ構成
 

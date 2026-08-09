@@ -188,7 +188,7 @@
 >
 > - `src/data/buildings.ts` / `src/data/facilities.ts` — 3D マップ用に作成されたが、どこからもインポートされていない
 > - `@react-three/drei` — 依存にあるが未使用
-> - `three` / `@react-three/fiber` — `src/components/three/`（カラクリのギア演出）が使用しているが、その `FeaturedGearScene` の import は `FeaturedEvents.tsx` でコメントアウトされており、**ビルド成果物のクライアントチャンクに three は含まれていない**
+> - `three` / `@react-three/fiber` — `src/components/three/`（カラクリのギア演出）が使用。**2026-08-10 に復活させたため、現在はクライアントチャンクに含まれる**（860K / brotli 185K）。3Dマップとは無関係なので削除しないこと
 >
 > 第98回以降で再検討する場合は、以下のチェックリストをそのまま復活させてください。
 
