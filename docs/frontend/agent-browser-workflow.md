@@ -87,13 +87,13 @@ DOM の件数を数えるだけの計測であっても安全とは限りませ�
 
 本サイトのページ遷移は React の `<ViewTransition>`（`src/app/template.tsx`）で実装されています。挙動は `visibilityState` で真っ二つに分かれます。
 
-| 観測項目                         | `visible`（rAF 生存）       | `hidden`（rAF 停止）                            |
-| -------------------------------- | --------------------------- | ----------------------------------------------- |
-| `document.startViewTransition()` | 呼ばれる                    | 呼ばれる                                        |
-| `transition.ready`               | **resolve**（実測 約 43ms） | `InvalidStateError` で **reject**               |
-| `transition.updateCallbackDone`  | resolve                     | resolve（DOM 更新は正常に適用される）           |
-| `transition.finished`            | resolve（実測 約 348ms）    | 即座に解決。アニメーションは 1 フレームも出ない |
-| アニメーションの検証             | **可能**                    | 不可                                            |
+| 観測項目                         | `visible`（rAF 生存）        | `hidden`（rAF 停止）                            |
+| -------------------------------- | ---------------------------- | ----------------------------------------------- |
+| `document.startViewTransition()` | 呼ばれる                     | 呼ばれる                                        |
+| `transition.ready`               | **resolve**（実測 43〜55ms） | `InvalidStateError` で **reject**               |
+| `transition.updateCallbackDone`  | resolve                      | resolve（DOM 更新は正常に適用される）           |
+| `transition.finished`            | resolve（実測 約 370ms）     | 即座に解決。アニメーションは 1 フレームも出ない |
+| アニメーションの検証             | **可能**                     | 不可                                            |
 
 `hidden` での `ready` reject は、仕様上**非表示ドキュメントの view transition がスキップされる**ことによるものです。**これをバグとして起票しないでください。** 配線と対応範囲の確認手順は [page-transition.md](./page-transition.md) の「自動化環境での view transition の挙動」にあります。
 

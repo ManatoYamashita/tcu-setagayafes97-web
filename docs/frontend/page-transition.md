@@ -135,10 +135,12 @@ document.startViewTransition = (arg) => {
 
 **合計時間はそのまま操作ロック時間です。** 上記のとおり遷移中はクリックが一切通らないため、伸ばすほど「反応しないサイト」になります。可視タブでの実測値は次のとおりで、`transition.finished` の発火まで一切操作できません。
 
-| 構成                                 | `transition.finished` |
-| ------------------------------------ | --------------------- |
-| 0.2s + 0.3s@0.2s（旧・合計 0.5s）    | 約 548ms              |
-| 0.12s + 0.18s@0.12s（現・合計 0.3s） | 約 348ms              |
+| 構成                                 | `transition.finished` | 操作が戻るまで |
+| ------------------------------------ | --------------------- | -------------- |
+| 0.2s + 0.3s@0.2s（旧・合計 0.5s）    | 約 550ms              | 約 0.55 秒     |
+| 0.12s + 0.18s@0.12s（現・合計 0.3s） | 約 370ms              | 約 0.37 秒     |
+
+CSS の合計値より 50〜70ms 長いのは、スナップショットの取得とフレームのスケジューリングが乗るためです。**この上乗せ分も無反応時間に含まれます。**
 
 演出を伸ばしたくなったら、まずこの表を見てください。0.3s を超える構成は採用しません。
 
@@ -289,9 +291,9 @@ rAF が止まった同じタブで `$RV($RB)` を手動実行したところ、�
 | 観測項目                         | `visible` / `framesIn1s > 0` | `hidden` / `framesIn1s: 0`           |
 | -------------------------------- | ---------------------------- | ------------------------------------ |
 | `document.startViewTransition()` | 呼ばれる                     | 呼ばれる                             |
-| `transition.ready`               | **resolve**（実測 約 43ms）  | `InvalidStateError` で **reject**    |
+| `transition.ready`               | **resolve**（実測 43〜55ms） | `InvalidStateError` で **reject**    |
 | `transition.updateCallbackDone`  | resolve                      | resolve（DOM 更新は正常）            |
-| `transition.finished`            | resolve（実測 約 348ms）     | 即座に解決。1 フレームも描画されない |
+| `transition.finished`            | resolve（実測 約 370ms）     | 即座に解決。1 フレームも描画されない |
 | アニメーションの検証             | **可能**                     | 不可（実機で目視するしかない）       |
 
 `hidden` 側の `ready` reject は、仕様上**非表示ドキュメントの view transition がスキップされる**ことによるものです（[facebook/react#34098](https://github.com/facebook/react/issues/34098)）。**これをバグとして起票しないでください。**
