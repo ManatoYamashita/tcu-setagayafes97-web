@@ -431,4 +431,17 @@ body {
   .animate-scroll-line {
     animation: none !important;
   }
+  /*
+   * ヒーローのロゴ（HeroSection）と CircularText の無限回転。どちらも装飾で、
+   * 止めても情報は失われない。CircularText はインライン style で
+   * animation-duration を上書きするが、!important 付きの animation ショート
+   * ハンドは通常のインラインスタイルより強いため、これで確実に止まる。
+   *
+   * 素の `animate-spin` は対象にしないこと。ContactForm の送信中スピナーが
+   * 静止し、フォーム唯一の進捗フィードバックが失われる。装飾のスピナーは
+   * そもそも出さない方針（FeaturedGearScene の loading: () => null）で対応する。
+   */
+  .animate-spin-slow {
+    animation: none !important;
+  }
 }

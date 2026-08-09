@@ -20,7 +20,15 @@ export default function GearScene() {
       dpr={[1, 1.5]}
       camera={{ position: [0, 0, 8.0], fov: 45 }}
       frameloop={prefersReducedMotion ? "demand" : "always"}
-      style={{ width: "100%", height: "100%" }}
+      /*
+       * pointerEvents: "inherit" が必須。R3F の Canvas はルート div へ
+       * インラインで pointer-events: auto を書く（eventSource 未指定時の既定）。
+       * CSS 仕様上、祖先の pointer-events: none は子孫の auto で復活するため、
+       * これを放置すると呼び出し側の Tailwind 指定（FeaturedEvents の
+       * pointer-events-none / md:pointer-events-auto）が全ブレークポイントで
+       * 無効になる。style は R3F 側の既定より後に spread されるので上書きできる。
+       */
+      style={{ width: "100%", height: "100%", pointerEvents: "inherit" }}
     >
       {/* メインライト（やや上方、強度下げ） */}
       <directionalLight position={[3, 5, 6]} intensity={0.95} color="#ffffff" />

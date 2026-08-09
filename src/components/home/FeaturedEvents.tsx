@@ -27,13 +27,19 @@ export async function FeaturedEvents() {
         3D歯車（装飾）。セクション左下から画面外へはみ出させ、本文の背面に敷く。
         セクションの overflow-hidden で切り取られるため、はみ出し量は自由に取れる。
 
-        pointer-events は lg 以上でのみ有効にする。歯車のマウス追従チルトは
+        pointer-events は md 以上でのみ有効にする。歯車のマウス追従チルトは
         Canvas 要素のポインタイベントを R3F が拾って動くため、none のままだと
-        チルトしない。一方モバイルではチルト自体を無効化しており、有効にすると
-        スクロールを奪うだけなので none で固定する。
+        チルトしない。一方モバイルではチルト自体を無効化しており、有効にしても
+        ポインタ座標を拾うだけ無駄なので none で固定する。
+
+        しきい値は Gear.tsx の isMobile（max-width: 768px）と対にすること。
+        ずらすと「チルトは有効なのにポインタ座標が来ない」帯域ができる。
+
+        この指定が効くのは GearScene が Canvas へ pointerEvents: "inherit" を
+        渡しているからで、外すと R3F 既定の auto が復活して none が無効になる。
       */}
       <div
-        className="pointer-events-none absolute -left-[32%] bottom-[-12%] z-0 aspect-square w-[78%] opacity-70 sm:-left-[24%] sm:w-[62%] lg:pointer-events-auto lg:-left-[10%] lg:bottom-[-18%] lg:w-[42%] lg:opacity-100"
+        className="pointer-events-none absolute -left-[32%] bottom-[-12%] z-0 aspect-square w-[78%] opacity-70 sm:-left-[24%] sm:w-[62%] md:pointer-events-auto lg:-left-[10%] lg:bottom-[-18%] lg:w-[42%] lg:opacity-100"
         aria-hidden="true"
       >
         <FeaturedGearScene />

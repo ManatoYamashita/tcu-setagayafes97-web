@@ -98,6 +98,56 @@ DOM の件数を数えるだけの計測であっても安全とは限りませ�
 
 **結論として、`framesIn1s: 0` の環境では `ssr: false` コンポーネントの描画は検証できません。** ラッパー要素の位置・サイズ・z-index・`aria-hidden` といった外側のレイアウトは検証できるので、そこまでを自動で確認し、中身の描画は実機確認に回してください。
 
+### BFCache の観測
+
+戻る・進むの挙動を検証するとき、BFCache（bfcache）が効いた復帰と、ドキュメントが再作成された復帰は**まったく別の経路**です。取り違えると「防御が効いた」と「そもそも BFCache が起きていない」を区別できません。
+
+#### 落とし穴1: Vercel preview では測れない
+
+プレビューデプロイは `vercel.live` のフィードバック iframe を注入します。これがクロスオリジンで BFCache を阻害するため、**preview URL では BFCache が絶対に効きません。**
+
+```js
+performance.getEntriesByType("navigation")[0].notRestoredReasons;
+// => { reasons: [{ reason: "masked" }],
+//      children: [{ src: "https://vercel.live/_next-live/feedback/feedback.html" }] }
+```
+
+`reason: "masked"` はクロスオリジンフレームが理由を隠しているサインです。`children` に犯人が出ます。**BFCache の検証はローカル本番ビルド（`pnpm build && pnpm start`）で行ってください。** レスポンスヘッダに `Cache-Control: no-store` が付いていないことも先に確認します（付いていると Chrome は BFCache を使いません）。
+
+#### 落とし穴2: `navigation.type` は判定に使えない
+
+BFCache 復帰後の `PerformanceNavigationTiming.type` は **`"back_forward"` ではなく元の `"navigate"` のまま**です（復帰したエントリは元の navigation そのものだから）。`"back_forward"` が返るのは**ドキュメントが再作成された**ときです。逆に読むと判定が反転します。
+
+#### 判定の3点セット
+
+描画に依存しない指標だけで判定します（`framesIn1s: 0` の環境でも使えます）。
+
+```js
+// 離脱前に仕込む
+window.__probe = "ALIVE";
+addEventListener("pageshow", (e) => (window.__persisted = e.persisted));
+document.querySelector(".page-transition-wrapper").dataset.probeNode = "NODE-A";
+```
+
+```js
+// 戻ったあとに読む
+({
+  bfcacheHit: window.__probe, // "ALIVE" なら JS コンテキストが生存＝BFCache
+  persisted: window.__persisted, // true なら pageshow が persisted で発火
+  sameNode: document.querySelector(".page-transition-wrapper").dataset.probeNode, // 同一なら再マウントなし
+});
+```
+
+1. **プローブ生存** — `window` 上の値が残っていれば BFCache ヒット。
+2. **`pageshow.persisted`** — アプリ側の防御が見ている当の値。
+3. **DOM ノード同一性** — `dataset` のマーカーが残っていれば再マウントされていない。
+
+必ず**対照**を先に取ってください。「同一ドキュメント内の戻るで期待どおり変化する」ことを示してから「BFCache 復帰では変化しない」を主張しないと、単に検証コードが壊れているだけかもしれません。
+
+#### 落とし穴3: rAF を await するとタブごと死ぬ
+
+`framesIn1s` を測るコードを `hidden` なタブで実行すると `requestAnimationFrame` が二度と発火せず、`await` が永久に解決しません。CDP がタイムアウトし、**レンダラが凍結してタブが落ちます**（実際に落としました）。バックグラウンドタブでは rAF を待つ計測を実行しないこと。`setTimeout` はスロットリングされつつも解決します。
+
 ### View Transitions API の観測
 
 本サイトのページ遷移は React の `<ViewTransition>`（`src/app/template.tsx`）で実装されています。挙動は `visibilityState` で真っ二つに分かれます。
