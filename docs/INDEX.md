@@ -158,6 +158,7 @@ docs/
   - View Transition が走るのは `<Link>` / `router.push()` のみ。戻る・進む（popstate）は React が仕様上必ずスキップする
   - 履歴遷移は `.page-enter-history` の CSS アニメーションで enter だけ再現。**popstate リスナはモジュール評価時登録が必須**（`useEffect` だと2回目以降動かない）
   - **`next` のアップグレード時は履歴遷移の再検証が必須。** 登録順は Next.js 内部の挙動依存で、崩れると無演出に戻るだけなので CI では検出できない（`next` は `16.1.0` 固定）
+  - **リスナの多重登録を `window` フラグで抑止してはいけない。** ハンドラは冪等で重複は無害。抑止すると HMR 後に新インスタンスの `record` が孤立し、開発時だけ無演出になる（静的解析ツールが繰り返し指摘してくる）
   - **発火範囲はルート直下セグメントの stateKey 単位。** `/about` ↔ `/access` はリンクでも無演出（検証で踏むと誤判定する）
   - **BFCache 復帰は実機 Chrome で検証済み（2026-08-10）。** `pageshow.persisted: true` / 同一 DOM ノード / `.page-enter-history` なしを実測
   - **View Transition 中（合計 0.3 秒）はページ全体がクリックを受け付けない** — `pointer-events` では回避できない仕様
