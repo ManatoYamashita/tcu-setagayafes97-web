@@ -134,7 +134,8 @@ docs/
   - デバッグワークフロー（Layout Shift検出、z-index競合確認）
   - **BFCache の観測** — Vercel preview は `vercel.live` の iframe が阻害するため測れない。ローカル本番ビルドで、プローブ生存 / `pageshow.persisted` / DOM ノード同一性の3点で判定する
   - `navigation.type` は BFCache 復帰でも `"navigate"` のまま。`"back_forward"` はドキュメント再作成のサイン（逆に読むと判定が反転する）
-  - **`hidden` なタブで rAF を await するとレンダラが凍結してタブが落ちる**
+  - **`hidden` なタブで rAF を await するとレンダラが凍結してタブが落ちる**（agent-browser / Claude in Chrome 共通。`visibilityState` を同期評価で先に読む）
+  - **`ssr: false` の描画検証の症状はツールで異なる。** agent-browser は canvas がマウントせず、実 Chrome の `hidden` タブは**マウントするが `300×150` のまま未描画**（要素の存在だけで合格判定すると誤判定する）
   - 誤診の実例は [page-transition.md](./frontend/page-transition.md) も参照
 
 - **[layout-patterns.md](./frontend/layout-patterns.md)** - レイアウトパターンと設計原則
