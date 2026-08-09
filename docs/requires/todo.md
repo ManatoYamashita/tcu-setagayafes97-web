@@ -12,12 +12,12 @@
 ## 進捗状況
 
 - **全タスク数**: 143（見送り 12 件を除く）
-- **完了**: 136
+- **完了**: 137
 - **進行中**: 0
-- **未着手**: 7
-- **進捗率**: 95.1%
+- **未着手**: 6
+- **進捗率**: 95.8%
 
-最終更新日: 2026-08-09
+最終更新日: 2026-08-10
 
 > [!NOTE]
 > **集計ルール**: 本文のチェックボックス（`- [x]` / `- [ ]`）を唯一の根拠とし、サマリはそこから機械的に算出します。手書きで数字を更新しないでください。前回更新（2026-01-26）時点ではサマリが 110/152 とされていましたが、実際のチェックボックスは 115/152 で乖離していました。
@@ -34,15 +34,14 @@
 | 3D 前提の「Three.js インストール」項目を削除                 | -1   |
 | **現在**                                                     | 143  |
 
-### 残り 7 項目
+### 残り 6 項目
 
-| 区分                     | 件数 | 内容                                                                    |
-| ------------------------ | ---- | ----------------------------------------------------------------------- |
-| テスト・最終調整         | 5    | クロスブラウザ、レスポンシブ、多言語表示確認、Lighthouse 改善、本番確認 |
-| 未実装コンポーネント     | 1    | Breadcrumb                                                              |
-| 履歴遷移のアニメーション | 1    | popstate 対応（#51）                                                    |
+| 区分                 | 件数 | 内容                                                                    |
+| -------------------- | ---- | ----------------------------------------------------------------------- |
+| テスト・最終調整     | 5    | クロスブラウザ、レスポンシブ、多言語表示確認、Lighthouse 改善、本番確認 |
+| 未実装コンポーネント | 1    | Breadcrumb                                                              |
 
-**機能実装は実質完了しています。** 3D マップの見送り（2026-08-09 決定、Phase 3 の該当節を参照）により、残るのはテストと最終調整が中心です。
+**機能実装は完了しています。** 3D マップの見送り（2026-08-09 決定、Phase 3 の該当節を参照）と履歴遷移対応（2026-08-10 完了、#51）により、残るのはテストと最終調整のみです。
 
 ---
 
@@ -72,7 +71,8 @@
 - [x] 新規サービスを作成（サービス名: `setagayafes97`等）
 - [x] News APIを設計・作成（フィールド: type, title, thumbnail, description, content）
 - [x] Events APIを設計・作成（フィールド: date, type, place, building, title, organizer, thumbnail, description, content, startTime, endTime, sns）
-- [x] Informations APIを設計・作成（フィールド: category, title, sponsorName, sponsorDescription, logo, url, priority）
+- [x] Informations APIを設計・作成（フィールド: category, title, description, image, url, priority）
+  - 実体: 要件定義時の想定名 `sponsorName` / `sponsorDescription` / `logo` は採用せず、協賛とFAQで使い回せる汎用フィールド `description` / `image` に統一。正準は `src/types/informations.ts` の `Information`、消費側は `src/app/about/sponsors/page.tsx`
 - [x] microCMS APIキーを取得（`.env.local`に設定）
 - [x] microCMS SDK（`microcms-js-sdk`）をインストール
 - [x] microCMSクライアントを実装（`/src/lib/microcms.ts`）
@@ -295,7 +295,8 @@
 - [x] React `<ViewTransition>` によるページ遷移を実装（`src/app/template.tsx` 1箇所で全ページに適用）
 - [x] 読まれていない `experimental.viewTransition` を `next.config.ts` から削除
 - [x] `prefers-reduced-motion` で遷移アニメーションを打ち消し
-- [ ] 履歴遷移（popstate）での遷移アニメーション対応（#51）— `<Link>` / `router.push()` のみ対応済み
+- [x] 履歴遷移（popstate）での遷移アニメーション対応（#51）
+  - 実体: `src/lib/history-navigation.ts` + `src/components/layout/PageTransitionWrapper.tsx`。React は popstate 由来の遷移で View Transition を必ずスキップするため、実 DOM のラッパーへ `.page-enter-history` を付けて enter のみ CSS で再現。発火範囲はルート直下セグメントの stateKey 単位
 
 ---
 
@@ -410,4 +411,4 @@
 
 ---
 
-**最終更新日**: 2026-01-26
+**最終更新日**: 2026-08-10
