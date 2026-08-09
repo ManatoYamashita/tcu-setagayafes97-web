@@ -232,6 +232,8 @@ grep -c '企画を探す' ja/access.html   # >= 2
 
 **モバイルメニューは curl で検証できません。** `next/dynamic({ ssr: false })` のため SSG HTML に含まれず（`grep -c 'sm-panel-item' en/access.html` は 0）、ドロップダウンの子リンクも閉じた状態では描画されません。ブラウザで開いて確認してください。
 
+このとき、**リンクの href やラベルはブラウザ自動化で確認できますが、開閉アニメーションの再生を検証できるかどうかは実行環境によります。** `requestAnimationFrame` が停止しているセッションでは 1 フレームも進まないため、観測値が無効になります。測る前に `framesIn1s` を確認し、`0` なら実機で目視してください。手順は [agent-browser-workflow.md の「観測の前提を測る」](./agent-browser-workflow.md#観測の前提を測る先に読むこと) を参照。
+
 ルーティングの検証は**本番ビルドで行うこと**（`pnpm dev` では rewrite/redirect の挙動が本番と異なる場合がある）。ルートファイルを削除した後は `.next` を消してからビルドします。
 
 ```bash
