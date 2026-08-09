@@ -295,8 +295,19 @@ delay が 0 なので fill-mode 無しでも最初のフレームから 0% キ�
 1. `pageshow` の `event.persisted` が真なら記録を破棄する。
 2. そもそも BFCache 復帰では React ツリーが再マウントされない（ドキュメントごと保持されるため、`useState` の初期化が走らない）。Next.js の `app-router.js` も同一 tree で `ACTION_RESTORE` を投げるだけ。
 
-> [!NOTE]
-> BFCache 復帰そのものは**自動化環境で実測できていません。** agent-browser（Playwright / Chromium）では BFCache が無効化されており、クロスドキュメントの戻るでは常にドキュメントが再作成されました。再作成された場合にクラスが付かないこと（`navType: "back_forward"` かつ `.page-enter-history` なし）は2回確認済みですが、**BFCache が実際に効く実機での確認は残っています。**
+**実機の Chrome で検証済みです（2026-08-10）。** ローカル本番ビルド（`pnpm build && pnpm start`）を開き、外部サイトへ移動してから戻るボタンで復帰させた実測値:
+
+| 測定項目                     | 結果                      | 意味                                         |
+| ---------------------------- | ------------------------- | -------------------------------------------- |
+| `window` 上に置いたプローブ  | 生存                      | JS コンテキストごと復帰＝**BFCache ヒット**  |
+| `pageshow` の `persisted`    | **`true`**                | 防御1が見ている当の値が真                    |
+| ラッパーの `data-*` マーカー | 離脱前と同一              | **同一 DOM ノード＝再マウントなし**（防御2） |
+| ラッパーの `className`       | `page-transition-wrapper` | `.page-enter-history` は付かない             |
+| `popstate`                   | 発火なし                  | Chrome はこの復帰で popstate を撃たなかった  |
+
+対照として、同一コミットの Vercel preview で「リンク遷移ではクラスなし → `history.back()` で `page-enter-history` が付く」ことを確認済みです。**プローブに検出能力があることを示したうえでの「付かない」**なので、偽陰性ではありません。
+
+観測手順の詳細と落とし穴は [agent-browser-workflow.md](./agent-browser-workflow.md) の「BFCache の観測」を参照してください。
 
 ### hydration 安全性
 
