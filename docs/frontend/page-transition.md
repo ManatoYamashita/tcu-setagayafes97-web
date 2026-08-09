@@ -10,8 +10,10 @@
 
 1. **`::view-transition-*` の CSS は、React の `<ViewTransition>` がツリーに無ければ一度も適用されない。** 擬似要素にルールを書いただけでは何も起きません。
 2. **`<ViewTransition>` は `src/app/template.tsx` に 1 箇所置けば全ページに効く。** `page.tsx` を個別に包む必要はありません。
-3. **`next.config.ts` の `experimental.viewTransition` は next@16.1.0 では読まれていない死に設定。** 付けても外しても挙動は変わりません。
-4. **`<div hidden id="S:n">` の中に前ページの内容が残っているのは、自動化タブで rAF が止まっているときだけ起きる計測アーティファクト。** 実ブラウザでは発生しません。
+3. **効くのは `<Link>` / `router.push()` によるクライアント遷移だけ。** ブラウザの戻る・進む（popstate）ではアニメーションなしで即時切り替わります。
+4. **遷移中（合計 0.3 秒）はページ全体がクリックを受け付けない。** 仕様上の制約で、`pointer-events` では回避できません。演出を伸ばすことは、そのまま無反応時間を伸ばすことです。
+5. **`next.config.ts` の `experimental.viewTransition` は next@16.1.0 では読まれていない死に設定。** 付けても外しても挙動は変わりません。
+6. **`<div hidden id="S:n">` の中に前ページの内容が残っているのは、rAF が止まった環境でだけ起きる計測アーティファクト。** 実ブラウザでは発生しません。
 
 ---
 
@@ -31,7 +33,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Next.js の `template.tsx` は `layout.tsx` と異なり**ナビゲーションのたびに再マウントされます。** そのため旧ページの `<ViewTransition>` は unmount（exit）、新ページのそれは mount（enter）として扱われ、React が `document.startViewTransition()` を起動します。
+Next.js の `template.tsx` は `layout.tsx` と異なり**クライアント遷移のたびに再マウントされます。** そのため旧ページの `<ViewTransition>` は unmount（exit）、新ページのそれは mount（enter）として扱われ、React が `document.startViewTransition()` を起動します。
 
 公式ガイドは「`layout.tsx` ではなく各 `page.tsx` を包め」と書いていますが、これは**レイアウトがナビゲーション間で永続するため enter / exit が発火しない**という理由です。`template.tsx` は永続しないので、この制約は当てはまりません。16 ページすべてを個別に包む必要はありません。
 
@@ -43,13 +45,28 @@ Next.js の `template.tsx` は `layout.tsx` と異なり**ナビゲーション�
 
 `<ViewTransition>` は Server Component 内で使えます（`template.tsx` に `"use client"` は不要）。
 
+### 対応範囲: クライアント遷移のみ
+
+**アニメーションが再生されるのは `<Link>` / `router.push()` によるクライアント遷移だけです。** ブラウザの戻る・進む（popstate）では `startViewTransition()` が呼ばれず、アニメーションなしで即時切り替わります。
+
+可視タブでの実測値（`document.startViewTransition` にフックを刺し、呼び出し回数を数えたもの）:
+
+| 操作                     | `location.pathname` | `startViewTransition` の累計呼び出し |
+| ------------------------ | ------------------- | ------------------------------------ |
+| 初期状態                 | `/timetable`        | 0                                    |
+| ヘッダーのリンクを click | `/events`           | **1**                                |
+| `history.back()`         | `/timetable`        | 1（増えない）                        |
+| `history.forward()`      | `/events`           | 1（増えない）                        |
+
+URL とページ内容は正しく切り替わるため、**機能上の欠落ではありません。** 「戻るとアニメーションしない」を不具合として起票せず、対応するなら「今後の拡張」の独立 Issue として扱ってください。
+
 ### ヘッダーの固定
 
 `src/components/layout/Header.tsx` の `<header>` に `viewTransitionName: "site-header"` を付け、CSS 側でアニメーションを止めています。これをしないと、遷移中にヘッダーが root スナップショットの一部としてクロスフェードし、ユーザーが空間的な基準点を失います。
 
 ### CSS の落とし穴
 
-`src/app/globals.css` の該当ブロックには、経験的に踏み抜きやすい点が 3 つ入っています。
+`src/app/globals.css` の該当ブロックで、経験的に踏み抜きやすい点が 3 つあります。1 と 2 は対策が入っており、3 は**そもそも対策できない**という結論です。
 
 **1. root のクロスフェードを止めるときは `mix-blend-mode` も戻す**
 
@@ -80,19 +97,50 @@ UA 既定では `::view-transition-image-pair` が `isolation: isolate`、old / 
 }
 ```
 
-**3. 遷移中のクリックを通す**
+**3. 遷移中はページを操作できない。これは CSS で回避できない**
 
-```css
-::view-transition {
-  pointer-events: none;
-}
+View Transitions API はキャプチャした要素の描画を抑止します。**描画を抑止された要素は hit-test の対象からも外れます。** `<html>` 全体が root として捕捉される以上、遷移が終わるまでページ上のどの要素もクリックできません。
+
+`::view-transition { pointer-events: none; }` は**この問題を解決しません。** 以前の実装は「オーバーレイがクリックを握り潰さないように」という意図でこれを入れていましたが、実測すると当たる要素が変わるだけでした。
+
+| `::view-transition` の `pointer-events` | 遷移中に `elementFromPoint` が返す要素 |
+| --------------------------------------- | -------------------------------------- |
+| `none`                                  | `<body>`（オーバーレイを素通りする）   |
+| `auto`（UA 既定）                       | `<html>`（オーバーレイに当たる）       |
+
+どちらの場合も、狙ったヘッダーのリンク（`<a>`）には**一度も当たりません。** 目的を達していないため、この規則は削除しました。同じ意図で再追加しないでください。
+
+```javascript
+// 実測手順。ヘッダーのリンク中心を遷移中に繰り返し叩く
+const a = document.querySelector('header a[href="/access"]');
+const orig = document.startViewTransition.bind(document);
+const hits = [];
+document.startViewTransition = (arg) => {
+  const t = orig(arg);
+  [0, 100, 300, 500, 600].forEach((ms) =>
+    setTimeout(() => {
+      const r = a.getBoundingClientRect();
+      const h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      hits.push({ ms, tag: h?.tagName });
+    }, ms)
+  );
+  return t;
+};
+// この後リンクをクリックし、hits を読む
 ```
-
-`::view-transition` オーバーレイは既定でポインタイベントを受け取るため、アニメーション中のクリックが失われます。
 
 ### タイミング
 
-旧ページ 0.2s で沈んで消える → 0.2s 待ってから新ページ 0.3s で持ち上がって現れる、の非対称構成（合計 0.5s）。exit と enter は**別グループ**なので同時に描画されます。enter に delay を入れないと新旧が重なって二重に見えます。
+旧ページ 0.12s で沈んで消える → 0.12s 待ってから新ページ 0.18s で持ち上がって現れる、の非対称構成（合計 0.3s）。exit と enter は**別グループ**なので同時に描画されます。enter の delay を old の duration より短くすると、新旧が重なって二重に見えます。
+
+**合計時間はそのまま操作ロック時間です。** 上記のとおり遷移中はクリックが一切通らないため、伸ばすほど「反応しないサイト」になります。可視タブでの実測値は次のとおりで、`transition.finished` の発火まで一切操作できません。
+
+| 構成                                 | `transition.finished` |
+| ------------------------------------ | --------------------- |
+| 0.2s + 0.3s@0.2s（旧・合計 0.5s）    | 約 548ms              |
+| 0.12s + 0.18s@0.12s（現・合計 0.3s） | 約 348ms              |
+
+演出を伸ばしたくなったら、まずこの表を見てください。0.3s を超える構成は採用しません。
 
 `filter: blur()` は使っていません。ビューポート全域の blur はフレームごとの再描画コストが大きく、`Performance 90 以上` / `FCP 1.5s 以下` の目標に対して割に合いません。
 
@@ -107,11 +155,12 @@ React が `startViewTransition` の有無を見て分岐するため、非対応
 
 公式ガイド [Designing view transitions](https://nextjs.org/docs/app/guides/view-transitions) には、本実装で採用していないパターンがあります。着手するなら独立 Issue として扱ってください。
 
-| パターン          | 概要                                                                     | 追加コスト                                |
-| ----------------- | ------------------------------------------------------------------------ | ----------------------------------------- |
-| 共有要素モーフ    | 企画一覧のサムネイルを詳細ページのヒーローへ変形させる                   | 一覧・詳細の両方に同名 `<ViewTransition>` |
-| 方向付き遷移      | 進む / 戻るで横スライドの向きを変える                                    | 全 `<Link>` への `transitionTypes` 設計   |
-| Suspense リビール | ローディングスケルトンから実コンテンツへの受け渡しをアニメーションさせる | 各 `Suspense` の fallback を包む          |
+| パターン          | 概要                                                                     | 追加コスト                                          |
+| ----------------- | ------------------------------------------------------------------------ | --------------------------------------------------- |
+| 履歴遷移への対応  | ブラウザの戻る・進む（popstate）でもアニメーションを再生する             | Next.js router の popstate 経路の調査、BFCache 検証 |
+| 共有要素モーフ    | 企画一覧のサムネイルを詳細ページのヒーローへ変形させる                   | 一覧・詳細の両方に同名 `<ViewTransition>`           |
+| 方向付き遷移      | 進む / 戻るで横スライドの向きを変える                                    | 全 `<Link>` への `transitionTypes` 設計             |
+| Suspense リビール | ローディングスケルトンから実コンテンツへの受け渡しをアニメーションさせる | 各 `Suspense` の fallback を包む                    |
 
 ---
 

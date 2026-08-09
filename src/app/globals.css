@@ -299,20 +299,22 @@ body {
  * View Transitions API によるページ遷移。
  *
  * 起点は `src/app/template.tsx` の React `<ViewTransition>`。template は
- * ナビゲーションのたびに再マウントされるため、旧ページが exit、新ページが
+ * クライアント遷移のたびに再マウントされるため、旧ページが exit、新ページが
  * enter として別々のグループになる。`.page-exit` / `.page-enter` は
  * React が `exit` / `enter` prop から付与する view-transition-class。
  *
- * 非対応ブラウザでは React が startViewTransition を呼ばないため、
- * アニメーションなしで即座に切り替わる（機能は損なわれない）。
+ * 対応範囲は `<Link>` / `router.push()` によるクライアント遷移のみ。ブラウザの
+ * 戻る・進む（popstate）では startViewTransition が呼ばれず、アニメーションなしで
+ * 即座に切り替わる。非対応ブラウザでも同様（いずれも機能は損なわれない）。
+ *
+ * 遷移中（合計 0.3 秒）はページ全体が操作を受け付けない。View Transitions API は
+ * キャプチャした要素の描画を抑止し、抑止された要素は hit-test の対象から外れるため、
+ * これは CSS では回避できない。`::view-transition` へ pointer-events: none を掛けても、
+ * 当たる要素が <html> から <body> へ変わるだけでリンクは復活しない（実測済み）。
+ * 回避できない以上、合計時間を短く保つことが唯一の対策になる。
  *
  * 設計判断の経緯は docs/frontend/page-transition.md を参照。
  */
-
-/* 遷移中のオーバーレイがクリックを握り潰さないようにする */
-::view-transition {
-  pointer-events: none;
-}
 
 /*
  * root グループ（ヘッダー・フッター・背景）の既定クロスフェードを止める。
@@ -346,12 +348,17 @@ body {
 
 /* 旧ページ: 短く沈んで消える */
 ::view-transition-old(.page-exit) {
-  animation: dreamy-fade-out 0.2s cubic-bezier(0.4, 0, 1, 1) both;
+  animation: dreamy-fade-out 0.12s cubic-bezier(0.4, 0, 1, 1) both;
 }
 
-/* 新ページ: 旧ページが消えてから持ち上がって現れる */
+/*
+ * 新ページ: 旧ページが消えてから持ち上がって現れる。
+ * delay は old の duration と一致させること。exit と enter は別グループで同時に
+ * 描画されるため、delay を縮めると新旧が重なって二重に見える。
+ * 合計 0.3 秒 = 操作ロック時間なので、これ以上伸ばさない。
+ */
 ::view-transition-new(.page-enter) {
-  animation: dreamy-fade-in 0.3s cubic-bezier(0, 0, 0.2, 1) 0.2s both;
+  animation: dreamy-fade-in 0.18s cubic-bezier(0, 0, 0.2, 1) 0.12s both;
 }
 
 @keyframes dreamy-fade-out {
