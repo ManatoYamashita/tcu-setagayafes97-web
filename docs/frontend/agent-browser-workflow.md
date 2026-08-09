@@ -66,11 +66,18 @@ DOM の件数を数えるだけの計測であっても安全とは限りませ�
 
 `framesIn1s: 0` の環境で「消えるはずのDOMが残っている」を観測したら、まず計測アーティファクトを疑ってください。詳細と実証手順は [page-transition.md](./page-transition.md) の「Issue #39 の誤診」を参照。
 
-### 撮る前に有限長アニメーションを強制終了させる
+### ページ遷移は View Transitions API なのでスキップされる
 
-本サイトはページ遷移ごとに `.page-transition-wrapper` を `opacity: 0` からフェードインさせます。rAF が止まった自動化タブではこれが開始状態のまま固まるため、**何もせずに撮ったスクリーンショットはページ本体が真っ白になります。**
+本サイトのページ遷移は React の `<ViewTransition>`（`src/app/template.tsx`）で実装されています。仕様上、**非表示ドキュメントの view transition はスキップされる**ため、自動化タブでは次のようになります。
 
-計測・撮影の直前に、有限長のアニメーションだけを終了させてください。無限ループのアニメーション（スピナー、blob）に `finish()` を呼ぶと `InvalidStateError` になります。
+- `document.startViewTransition()` は**呼ばれる**（配線が生きていることはここで確認できる）
+- `transition.ready` は `InvalidStateError: Transition was aborted because of invalid state` で reject する
+- `transition.updateCallbackDone` は resolve し、**DOM 更新は正常に適用される**
+- アニメーションは 1 フレームも描画されない
+
+`ready` の reject は非表示ドキュメント固有の挙動で、実ブラウザでは起きません。**これをバグとして起票しないでください。** 配線の確認手順は [page-transition.md](./page-transition.md) の「自動化タブでの view transition の挙動」にあります。
+
+なお、ページ本体に CSS アニメーションは掛かっていないため、スクリーンショットが真っ白になることはありません。ただし GSAP やスピナーなど他の rAF 駆動アニメーションは依然として止まります。有限長のものだけ強制終了させたい場合はこれを使ってください（無限ループに `finish()` を呼ぶと `InvalidStateError` になります）。
 
 ```javascript
 document.getAnimations().forEach((a) => {

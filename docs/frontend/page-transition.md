@@ -1,6 +1,6 @@
 # ページ遷移アニメーションと View Transitions API
 
-本ドキュメントでは、ページ遷移アニメーションの実装方針と、View Transitions API を採用しなかった理由を記録します。あわせて、Issue #39 で「前ページのDOMが残留する」という**存在しないバグを起票してしまった事故**の原因と、同じ誤診を繰り返さないための計測ルールを定義します。
+本ドキュメントでは、React の `<ViewTransition>` によるページ遷移の実装方針と、その過程で判明した Next.js / React 側の落とし穴を記録します。あわせて、Issue #39 で「前ページのDOMが残留する」という**存在しないバグを起票してしまった事故**の原因と、同じ誤診を繰り返さないための計測ルールを定義します。
 
 計測環境そのものの前提は [agent-browser-workflow.md](./agent-browser-workflow.md) の「検証できないもの」節を先に読んでください。
 
@@ -9,64 +9,113 @@
 ## 結論（先に読むこと）
 
 1. **`::view-transition-*` の CSS は、React の `<ViewTransition>` がツリーに無ければ一度も適用されない。** 擬似要素にルールを書いただけでは何も起きません。
-2. **`next.config.ts` の `experimental.viewTransition` は next@16.1.0 では読まれていない死に設定。** 付けても外しても挙動は変わりません。
-3. **ページ遷移アニメーションは `src/app/template.tsx` + `.page-transition-wrapper` の CSS アニメーションで実装する。** View Transitions API は使いません。
+2. **`<ViewTransition>` は `src/app/template.tsx` に 1 箇所置けば全ページに効く。** `page.tsx` を個別に包む必要はありません。
+3. **`next.config.ts` の `experimental.viewTransition` は next@16.1.0 では読まれていない死に設定。** 付けても外しても挙動は変わりません。
 4. **`<div hidden id="S:n">` の中に前ページの内容が残っているのは、自動化タブで rAF が止まっているときだけ起きる計測アーティファクト。** 実ブラウザでは発生しません。
 
 ---
 
 ## 実装方針
 
-`src/app/template.tsx` は `.page-transition-wrapper` の `<div>` を置くだけです。
+### 起点: `src/app/template.tsx`
 
 ```tsx
+import { ViewTransition } from "react";
+
 export default function Template({ children }: { children: React.ReactNode }) {
-  return <div className="page-transition-wrapper">{children}</div>;
+  return (
+    <ViewTransition enter="page-enter" exit="page-exit" default="none">
+      <div className="page-transition-wrapper">{children}</div>
+    </ViewTransition>
+  );
 }
 ```
 
-Next.js の `template.tsx` は `layout.tsx` と異なり**ナビゲーションのたびに再マウントされる**ため、このラッパーに付けた CSS アニメーションは遷移ごとに再生されます。JS を一切増やさずに enter アニメーションが得られる、`template.tsx` 本来の用途です。
+Next.js の `template.tsx` は `layout.tsx` と異なり**ナビゲーションのたびに再マウントされます。** そのため旧ページの `<ViewTransition>` は unmount（exit）、新ページのそれは mount（enter）として扱われ、React が `document.startViewTransition()` を起動します。
 
-`src/app/globals.css` 側は次の 3 点を守ります。
+公式ガイドは「`layout.tsx` ではなく各 `page.tsx` を包め」と書いていますが、これは**レイアウトがナビゲーション間で永続するため enter / exit が発火しない**という理由です。`template.tsx` は永続しないので、この制約は当てはまりません。16 ページすべてを個別に包む必要はありません。
 
-| 項目                     | 決定                                    | 理由                                                                                                                                                                              |
-| ------------------------ | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `animation-fill-mode`    | `backwards`（`forwards` / `both` 禁止） | `forwards` / `both` だと終了後も `transform` が残り、`position: fixed` の子孫に対する包含ブロックを作り続ける。`to` の値は既定状態と同一なので `backwards` でも見た目は変わらない |
-| `filter: blur()`         | 使わない                                | ビューポート全域の blur はフレームごとの再描画コストが大きい。`Performance 90 以上` / `FCP 1.5s 以下` の目標に対して割に合わない                                                  |
-| `prefers-reduced-motion` | `animation: none !important` で打ち消す | ページ全体が動くため、モーション過敏の影響が最も大きい部類                                                                                                                        |
+| prop             | 値                         | 意味                                                                                                                                         |
+| ---------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `enter` / `exit` | `page-enter` / `page-exit` | `view-transition-class` として DOM に付与される。CSS 側は `::view-transition-new(.page-enter)` のようにクラスセレクタで受ける                |
+| `default`        | `"none"`                   | 「更新」ケースの view-transition-name を無効化する。外すと、ページ内の `startTransition` を伴う状態更新のたびに全体がクロスフェードする      |
+| `name`           | 省略（`"auto"`）           | React が自動生成した一意名（`_t_4_` 等）を付ける。明示的な `name` を与えると旧新がペア（share）扱いになり、exit / enter ではなくモーフになる |
 
-初回ロードでもアニメーションが走ります。`opacity: 0` 始まりなので LCP に影響しうるため、duration は 0.4s 程度に抑えています。
+`<ViewTransition>` は Server Component 内で使えます（`template.tsx` に `"use client"` は不要）。
 
----
+### ヘッダーの固定
 
-## View Transitions API を使わない理由
+`src/components/layout/Header.tsx` の `<header>` に `viewTransitionName: "site-header"` を付け、CSS 側でアニメーションを止めています。これをしないと、遷移中にヘッダーが root スナップショットの一部としてクロスフェードし、ユーザーが空間的な基準点を失います。
 
-### `::view-transition-*` の発火条件
+### CSS の落とし穴
 
-`react-dom` が `document.startViewTransition()` を呼ぶのは、内部フラグ `shouldStartViewTransition` が真のときだけです。このフラグを立てるのは以下の 2 箇所のみで、**どちらも `<ViewTransition>` コンポーネント（fiber tag 30）が対象ツリーに存在する場合にしか通りません。**
+`src/app/globals.css` の該当ブロックには、経験的に踏み抜きやすい点が 3 つ入っています。
 
-- `trackEnterViewTransitions()`
-- `applyViewTransitionToHostInstances()`
-
-つまり `<ViewTransition>` を書かずに `::view-transition-old(root)` / `::view-transition-new(root)` へルールを足しても、擬似要素そのものが生成されないため**完全な死にコード**になります。以前の実装がこの状態でした。
-
-### `@supports not (view-transition-name: a)` は逆効果になる
-
-VT 非対応ブラウザ向けのフォールバックとして
+**1. root のクロスフェードを止めるときは `mix-blend-mode` も戻す**
 
 ```css
-@supports not (view-transition-name: a) {
-  .page-transition-wrapper {
-    animation: ...;
+::view-transition-image-pair(root) {
+  isolation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  display: block;
+}
+```
+
+UA 既定では `::view-transition-image-pair` が `isolation: isolate`、old / new が `mix-blend-mode: plus-lighter` です。**アニメーションだけ止めて blend mode を放置すると、新旧スナップショットが加算合成されて白飛びします。**
+
+**2. `prefers-reduced-motion` でワイルドカードを使わない**
+
+`::view-transition-old(*)` は比較的新しい構文です。未対応ブラウザはセレクタリストごとルールを破棄するため、モーション軽減が効かなくなります。クラス指定で確実に打ち消します。
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(.page-exit),
+  ::view-transition-new(.page-enter) {
+    animation: none !important;
   }
 }
 ```
 
-と書くのはアンチパターンです。Chrome / Safari / Firefox 144+ は `view-transition-name` を**サポートしている**ため条件が偽になり、フォールバックが適用されません。結果として「モダンブラウザはアニメーションなし、古いブラウザだけフェードインする」という倒錯した状態になります。
+**3. 遷移中のクリックを通す**
 
-上の 2 点が重なると、**遷移アニメーションが全ブラウザで消えているのに CSS 上は実装されているように見える**状態が生まれます。CSS の存在をもって「実装済み」と判断しないでください。
+```css
+::view-transition {
+  pointer-events: none;
+}
+```
 
-### `experimental.viewTransition` は死に設定
+`::view-transition` オーバーレイは既定でポインタイベントを受け取るため、アニメーション中のクリックが失われます。
+
+### タイミング
+
+旧ページ 0.2s で沈んで消える → 0.2s 待ってから新ページ 0.3s で持ち上がって現れる、の非対称構成（合計 0.5s）。exit と enter は**別グループ**なので同時に描画されます。enter に delay を入れないと新旧が重なって二重に見えます。
+
+`filter: blur()` は使っていません。ビューポート全域の blur はフレームごとの再描画コストが大きく、`Performance 90 以上` / `FCP 1.5s 以下` の目標に対して割に合いません。
+
+### 非対応ブラウザ
+
+React が `startViewTransition` の有無を見て分岐するため、非対応ブラウザではアニメーションなしで即座に切り替わります。CSS フォールバックは用意していません。
+
+> [!WARNING]
+> `@supports not (view-transition-name: a)` によるフォールバックは**アンチパターン**です。Chrome / Safari / Firefox 144+ は `view-transition-name` をサポートしているため条件が偽になり、フォールバックが適用されません。結果は「モダンブラウザはアニメーションなし、古いブラウザだけアニメーションする」という倒錯した状態です。以前の実装がこれでした。
+
+### 今後の拡張
+
+公式ガイド [Designing view transitions](https://nextjs.org/docs/app/guides/view-transitions) には、本実装で採用していないパターンがあります。着手するなら独立 Issue として扱ってください。
+
+| パターン          | 概要                                                                     | 追加コスト                                |
+| ----------------- | ------------------------------------------------------------------------ | ----------------------------------------- |
+| 共有要素モーフ    | 企画一覧のサムネイルを詳細ページのヒーローへ変形させる                   | 一覧・詳細の両方に同名 `<ViewTransition>` |
+| 方向付き遷移      | 進む / 戻るで横スライドの向きを変える                                    | 全 `<Link>` への `transitionTypes` 設計   |
+| Suspense リビール | ローディングスケルトンから実コンテンツへの受け渡しをアニメーションさせる | 各 `Suspense` の fallback を包む          |
+
+---
+
+## `experimental.viewTransition` は死に設定
 
 `next@16.1.0` において、この設定キーはどこからも読まれていません。
 
@@ -79,9 +128,18 @@ VT 非対応ブラウザ向けのフォールバックとして
 
 **zod スキーマが受理するため警告が一切出ません。** 「設定したのだから効いているはず」と考えないでください。Next.js 16.3 の公式ガイドも "View transitions work in the App Router with no configuration" と明記しており、この設定は役目を終えています。
 
-### 将来 View Transitions を正式導入する場合
+なお `import { ViewTransition } from "react"` は動きます。アプリの `react` は Next.js が `next/dist/compiled/react`（19.3.0-canary）へエイリアスするためで、`node_modules/react`（19.2.3 stable）には `ViewTransition` の export はありません。型は `@types/react/canary.d.ts` から供給されます。
 
-公式ガイド [Designing view transitions](https://nextjs.org/docs/app/guides/view-transitions) の手順に従い、`react` から `ViewTransition` を import して**各 `page.tsx` を包む**必要があります（`layout.tsx` では enter / exit が発火しません）。方向付き遷移を行う場合は `<Link transitionTypes={[...]}>` の設計もセットで必要です。対象ページ数が多いため、着手するなら独立した Issue として扱ってください。
+---
+
+## `::view-transition-*` の発火条件
+
+`react-dom` が `document.startViewTransition()` を呼ぶのは、内部フラグ `shouldStartViewTransition` が真のときだけです。このフラグを立てるのは以下の 2 箇所のみで、**どちらも `<ViewTransition>` コンポーネント（fiber tag 30）が対象ツリーに存在する場合にしか通りません。**
+
+- `trackEnterViewTransitions()`
+- `applyViewTransitionToHostInstances()`
+
+つまり `<ViewTransition>` を書かずに `::view-transition-old(root)` へルールを足しても、擬似要素そのものが生成されないため**完全な死にコード**になります。CSS の存在をもって「実装済み」と判断しないでください。
 
 ---
 
@@ -175,23 +233,36 @@ rAF が止まった同じタブで `$RV($RB)` を手動実行したところ、�
 
 `framesIn1s: 0` の環境で `<div hidden id="S:n">` を見つけたら、バグではなく計測アーティファクトです。`$RV($RB)` を手動実行して消えるなら確定です。
 
-### 自動化タブではページ本体が opacity: 0 のまま止まる
+### 自動化タブでの view transition の挙動
 
-`.page-transition-wrapper` に enter アニメーションが付いた副作用として、**rAF が止まった自動化タブではページ本体が `opacity: 0`・`translateY(14px)` の開始状態で固まります。** CSS アニメーションのタイムラインも非表示タブでは進まないためで、これ自体は不具合ではありません。
+自動化タブは `visibilityState: "hidden"` です。仕様上、非表示ドキュメントの view transition は**スキップ**されます。そのため:
 
-スクリーンショットやレイアウト計測の前に、有限長のアニメーションだけを強制終了させてください。無限ループのアニメーション（スピナー、blob）に `finish()` を呼ぶと `InvalidStateError` になるため、必ず絞り込みます。
+- `document.startViewTransition()` は**呼ばれる**（React 側の配線は動いている）
+- `transition.ready` は `InvalidStateError: Transition was aborted because of invalid state` で reject する
+- `transition.updateCallbackDone` は resolve し、**DOM 更新自体は正常に適用される**
+- アニメーションは 1 フレームも描画されない
+
+`ready` の reject は非表示ドキュメント固有の挙動で、実ブラウザでは起きません（[facebook/react#34098](https://github.com/facebook/react/issues/34098)）。**これをバグとして起票しないでください。**
+
+配線が生きているかどうかだけは、rAF に依存せず確認できます。
 
 ```javascript
-document.getAnimations().forEach((a) => {
-  if (Number.isFinite(a.effect?.getComputedTiming?.().endTime)) {
-    try {
-      a.finish();
-    } catch {}
-  }
-});
+window.__vt = { calls: 0 };
+const orig = document.startViewTransition.bind(document);
+document.startViewTransition = (arg) => {
+  window.__vt.calls++;
+  const w = document.querySelector(".page-transition-wrapper");
+  window.__vt.name = w ? getComputedStyle(w).viewTransitionName : null;
+  window.__vt.cls = w ? getComputedStyle(w).viewTransitionClass : null;
+  const t = orig(arg);
+  t.ready?.catch(() => {});
+  return t;
+};
+// この後リンクをクリックし、__vt.calls が増えること、
+// name に自動生成名（_t_4_ 等）、cls に page-exit が入ることを確認する
 ```
 
-これを踏まずに撮ったスクリーンショットは「ページが真っ白」に見えます。**それをバグとして起票しないでください。**
+**アニメーションの見た目そのものは、この方法でも検証できません。** 実機で目視するしかありません。
 
 ### 起票前に実機で確認する
 
@@ -202,5 +273,5 @@ Issue #47 に続き Issue #39 も、自動化タブの観測値だけで起票�
 ## 関連ドキュメント
 
 - [agent-browser-workflow.md](./agent-browser-workflow.md) - 自動化タブで検証できないものと、実機確認の依頼方法
-- [layout-patterns.md](./layout-patterns.md) - z-index・position の使い分け（`transform` が包含ブロックを作る話の背景）
+- [layout-patterns.md](./layout-patterns.md) - z-index・position の使い分け
 - [design.md](./design.md) - デザインシステム（カラー・タイポグラフィトークン）

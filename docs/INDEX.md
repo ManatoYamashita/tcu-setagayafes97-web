@@ -151,12 +151,14 @@ docs/
   - 多言語ページを追加する手順と `proxy.ts` 編集時の禁止事項
 
 - **[page-transition.md](./frontend/page-transition.md)** - ページ遷移アニメーションと View Transitions API
-  - `template.tsx` + `.page-transition-wrapper` による CSS アニメーション実装
+  - `template.tsx` に `<ViewTransition>` を 1 箇所置けば全ページに効く（`page.tsx` 個別対応は不要）
   - `::view-transition-*` は React の `<ViewTransition>` が無いと発火しない
+  - CSS の落とし穴（root 停止時の `mix-blend-mode`、ワイルドカードセレクタ、`pointer-events`）
   - `@supports not (view-transition-name: a)` はモダンブラウザで逆効果になるアンチパターン
   - `experimental.viewTransition` は next@16.1.0 では読まれていない死に設定（警告も出ない）
   - **Issue #39 の誤診** — `<div hidden id="S:0">` は rAF 停止時の Suspense 差し込み待ち
   - 可視性の計測は要素単体ではなく祖先すべてを見る（`display: none` は子孫の computed 値を変えない）
+  - 自動化タブでは view transition がスキップされ `ready` が InvalidStateError で reject する
 
 ## 更新手順（PDCA）
 

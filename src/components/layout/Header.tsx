@@ -67,7 +67,12 @@ export function Header() {
         className={`sticky top-0 z-40 transition-all duration-300 ${
           isAtTop ? "px-0 pt-0" : "px-4 pt-2"
         }`}
-        style={{ backgroundColor: isAtTop ? "var(--header-top-bg)" : "transparent" }}
+        // viewTransitionName はページ遷移中にヘッダーを固定するための識別子。
+        // globals.css の ::view-transition-group(site-header) と対になっている。
+        style={{
+          backgroundColor: isAtTop ? "var(--header-top-bg)" : "transparent",
+          viewTransitionName: "site-header",
+        }}
       >
         <div
           className={`flex items-center justify-between px-6 py-3 transition-all duration-300 ${

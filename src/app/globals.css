@@ -296,25 +296,73 @@ body {
 /* ===== Dreamy Fade — Page Transition ===== */
 
 /*
- * ページ遷移アニメーション。
+ * View Transitions API によるページ遷移。
  *
- * `src/app/template.tsx` はナビゲーションのたびに再マウントされるため、
- * このラッパーに付けた CSS アニメーションは遷移ごとに再生される。
+ * 起点は `src/app/template.tsx` の React `<ViewTransition>`。template は
+ * ナビゲーションのたびに再マウントされるため、旧ページが exit、新ページが
+ * enter として別々のグループになる。`.page-exit` / `.page-enter` は
+ * React が `exit` / `enter` prop から付与する view-transition-class。
  *
- * View Transitions API (`::view-transition-*`) は使用しない。ブラウザの
- * view transition は React の <ViewTransition> がツリーに存在するときしか
- * 発火せず、擬似要素へ書いたルールは一度も適用されないため。
- * 経緯と根拠は docs/frontend/page-transition.md を参照。
+ * 非対応ブラウザでは React が startViewTransition を呼ばないため、
+ * アニメーションなしで即座に切り替わる（機能は損なわれない）。
  *
- * fill-mode に forwards / both を使わないのは、`transform` が終了後も
- * 残ると position: fixed の子孫に対する包含ブロックを作り続けるため。
- * `to` の値は要素の既定状態と同一なので、backwards でも見た目は変わらない。
- *
- * filter: blur() は入れていない。ビューポート全域の blur はフレームごとの
- * 再描画コストが大きく、モバイル中心の想定来場者に対して割に合わない。
+ * 設計判断の経緯は docs/frontend/page-transition.md を参照。
  */
-.page-transition-wrapper {
-  animation: dreamy-fade-in 0.4s cubic-bezier(0, 0, 0.2, 1) backwards;
+
+/* 遷移中のオーバーレイがクリックを握り潰さないようにする */
+::view-transition {
+  pointer-events: none;
+}
+
+/*
+ * root グループ（ヘッダー・フッター・背景）の既定クロスフェードを止める。
+ * `mix-blend-mode` を normal へ戻すのが必須。UA 既定の plus-lighter のまま
+ * アニメーションだけ止めると、新旧スナップショットが加算合成されて白飛びする。
+ */
+::view-transition-image-pair(root) {
+  isolation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  display: block;
+}
+
+/*
+ * ヘッダーは遷移中も動かさない。ページ本文のスナップショットより前面へ置く。
+ * 名前は `src/components/layout/Header.tsx` の viewTransitionName と対。
+ */
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+/* 旧ページ: 短く沈んで消える */
+::view-transition-old(.page-exit) {
+  animation: dreamy-fade-out 0.2s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+/* 新ページ: 旧ページが消えてから持ち上がって現れる */
+::view-transition-new(.page-enter) {
+  animation: dreamy-fade-in 0.3s cubic-bezier(0, 0, 0.2, 1) 0.2s both;
+}
+
+@keyframes dreamy-fade-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 }
 
 @keyframes dreamy-fade-in {
@@ -330,7 +378,12 @@ body {
 
 /* アクセシビリティ: モーション軽減設定 */
 @media (prefers-reduced-motion: reduce) {
-  .page-transition-wrapper {
+  /*
+   * ワイルドカード `::view-transition-old(*)` は使わない。未対応ブラウザが
+   * セレクタリストごとルールを破棄するため、クラス指定で確実に打ち消す。
+   */
+  ::view-transition-old(.page-exit),
+  ::view-transition-new(.page-enter) {
     animation: none !important;
   }
   [class*="animate-blob"] {
