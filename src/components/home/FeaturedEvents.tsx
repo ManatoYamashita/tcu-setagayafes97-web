@@ -32,8 +32,10 @@ export async function FeaturedEvents() {
         チルトしない。一方モバイルではチルト自体を無効化しており、有効にしても
         ポインタ座標を拾うだけ無駄なので none で固定する。
 
-        しきい値は Gear.tsx の isMobile（max-width: 768px）と対にすること。
-        ずらすと「チルトは有効なのにポインタ座標が来ない」帯域ができる。
+        しきい値は Gear.tsx の isMobile（max-width: 767.98px）と対にすること。
+        md は min-width: 768px なので、isMobile 側を 768px にすると 768px ちょうど
+        （iPad ポートレート）で両方成立し、pointer-events だけ有効な帯域ができる。
+        逆にずらすと「チルトは有効なのにポインタ座標が来ない」帯域ができる。
 
         この指定が効くのは GearScene が Canvas へ pointerEvents: "inherit" を
         渡しているからで、外すと R3F 既定の auto が復活して none が無効になる。

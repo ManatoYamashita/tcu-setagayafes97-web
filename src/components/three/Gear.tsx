@@ -20,7 +20,10 @@ export function Gear(props: ThreeElements["group"]) {
   const groupRef = useRef<Group>(null);
   const gearGeometry = useMemo(() => createGearGeometry(), []);
   const hubGeometry = useMemo(() => createHubRingGeometry(), []);
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  // Tailwind の md（min-width: 768px）と相補にする。768px ちょうどで両方成立させないため
+  // 上限を 767.98px にしている。ここをずらすと FeaturedEvents の md:pointer-events-auto と
+  // 食い違い、「チルトは有効なのにポインタ座標が来ない」帯域ができる。
+  const isMobile = useMediaQuery("(max-width: 767.98px)");
   const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
   useFrame((state, delta) => {
