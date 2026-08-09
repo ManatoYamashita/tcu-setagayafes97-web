@@ -7,17 +7,41 @@
 - **開催日程**: 2026年10月31日（土）〜11月1日（日）
 - **公開予定**: 2026年2月28日
 - **開発期間**: 約3ヶ月（2025年12月〜2026年2月）
-- **技術スタック**: Next.js 16.1 (App Router), TypeScript, TailwindCSS, GSAP, Three.js, microCMS, next-intl, Vercel
+- **技術スタック**: Next.js 16.1 (App Router), TypeScript, TailwindCSS, GSAP, microCMS, next-intl, Vercel（Three.js は 3Dマップ見送りにより不使用）
 
 ## 進捗状況
 
-- **全タスク数**: 152
-- **完了**: 110
+- **全タスク数**: 143（見送り 12 件を除く）
+- **完了**: 137
 - **進行中**: 0
-- **未着手**: 42
-- **進捗率**: 72.4%
+- **未着手**: 6
+- **進捗率**: 95.8%
 
-最終更新日: 2026-01-26
+最終更新日: 2026-08-10
+
+> [!NOTE]
+> **集計ルール**: 本文のチェックボックス（`- [x]` / `- [ ]`）を唯一の根拠とし、サマリはそこから機械的に算出します。手書きで数字を更新しないでください。前回更新（2026-01-26）時点ではサマリが 110/152 とされていましたが、実際のチェックボックスは 115/152 で乖離していました。
+>
+> **見送り項目はチェックボックスを外して打ち消し線で残しています。** 未着手件数に混ざらず、かつ判断の履歴が追えるようにするためです。
+
+### 母数の変遷
+
+| 変更                                                         | 増減 |
+| ------------------------------------------------------------ | ---- |
+| 前回時点                                                     | 152  |
+| 「14. ページ遷移・モーション」を追加（要件定義に無い実作業） | +4   |
+| 3Dマップ関連を見送り（11 項目 + 「マップで見る」ボタン）     | -12  |
+| 3D 前提の「Three.js インストール」項目を削除                 | -1   |
+| **現在**                                                     | 143  |
+
+### 残り 6 項目
+
+| 区分                 | 件数 | 内容                                                                    |
+| -------------------- | ---- | ----------------------------------------------------------------------- |
+| テスト・最終調整     | 5    | クロスブラウザ、レスポンシブ、多言語表示確認、Lighthouse 改善、本番確認 |
+| 未実装コンポーネント | 1    | Breadcrumb                                                              |
+
+**機能実装は完了しています。** 3D マップの見送り（2026-08-09 決定、Phase 3 の該当節を参照）と履歴遷移対応（2026-08-10 完了、#51）により、残るのはテストと最終調整のみです。
 
 ---
 
@@ -34,19 +58,21 @@
 - [x] Prettierを設定（`.prettierrc`、`.prettierignore`）
 - [x] プロジェクトディレクトリ構造を構築（`/src/app`, `/src/components`, `/src/data`, `/src/lib`, `/src/messages`, `/src/assets`）
 - [x] `.gitignore`を設定（node_modules, .next, .env.local等）
-- [ ] `.env.local.example`を作成（環境変数のテンプレート）
+- [x] `.env.local.example`を作成（環境変数のテンプレート）
+  - 実体: `.env.example` として存在（`cp .env.example .env.local` の手順つき）
 - [x] GitHub Actionsワークフローファイルを作成（`.github/workflows/feature-ci.yml`）
 - [x] Git hooksを設定（husky + lint-staged）
 - [x] VSCode設定ファイルを作成（`.vscode/settings.json`, `.vscode/extensions.json`）
-- [ ] README.mdを更新（セットアップ手順、開発コマンド等）
+- [x] README.mdを更新（セットアップ手順、開発コマンド等）
 
 ### 2. microCMS設定
 
-- [ ] microCMSアカウントを作成
-- [ ] 新規サービスを作成（サービス名: `setagayafes97`等）
-- [ ] News APIを設計・作成（フィールド: type, title, thumbnail, description, content）
-- [ ] Events APIを設計・作成（フィールド: date, type, place, building, title, organizer, thumbnail, description, content, startTime, endTime, sns）
-- [ ] Informations APIを設計・作成（フィールド: category, title, sponsorName, sponsorDescription, logo, url, priority）
+- [x] microCMSアカウントを作成
+- [x] 新規サービスを作成（サービス名: `setagayafes97`等）
+- [x] News APIを設計・作成（フィールド: type, title, thumbnail, description, content）
+- [x] Events APIを設計・作成（フィールド: date, type, place, building, title, organizer, thumbnail, description, content, startTime, endTime, sns）
+- [x] Informations APIを設計・作成（フィールド: category, title, description, image, url, priority）
+  - 実体: 要件定義時の想定名 `sponsorName` / `sponsorDescription` / `logo` は採用せず、協賛とFAQで使い回せる汎用フィールド `description` / `image` に統一。正準は `src/types/informations.ts` の `Information`、消費側は `src/app/about/sponsors/page.tsx`
 - [x] microCMS APIキーを取得（`.env.local`に設定）
 - [x] microCMS SDK（`microcms-js-sdk`）をインストール
 - [x] microCMSクライアントを実装（`/src/lib/microcms.ts`）
@@ -59,17 +85,21 @@
 
 - [x] Headerコンポーネントを作成（`/src/components/layout/Header.tsx`）
 - [x] Footerコンポーネントを作成（`/src/components/layout/Footer.tsx`）
-- [ ] Navigationコンポーネントを作成（`/src/components/layout/Navigation.tsx`）
-- [ ] モバイルメニューコンポーネントを作成（ハンバーガーメニュー）
+- [x] Navigationコンポーネントを作成（`/src/components/layout/Navigation.tsx`）
+  - 実体: `DesktopNav.tsx` / `NavDropdown.tsx` / `FooterNav.tsx` / `useChromeNav.ts` に分割して実装
+- [x] モバイルメニューコンポーネントを作成（ハンバーガーメニュー）
+  - 実体: `layout/StaggeredMobileMenu.tsx`
 - [x] Loadingコンポーネントを作成（`/src/components/ui/Loading.tsx`）
 - [x] Errorコンポーネントを作成（`/src/components/ui/Error.tsx`）
 - [x] Buttonコンポーネントを作成（再利用可能な汎用ボタン）
 - [x] Cardコンポーネントを作成（企画カード等で使用）
-- [ ] Modalコンポーネントを作成（汎用モーダル）
+- [x] Modalコンポーネントを作成（汎用モーダル）
+  - 実体: `ui/Modal.tsx`
 - [x] Badgeコンポーネントを作成（カテゴリバッジ等）
 - [x] SEO用Metadataコンポーネントを作成（`/src/components/seo/Metadata.tsx`）
 - [x] 構造化データ（JSON-LD）コンポーネントを作成（イベント情報マークアップ）
-- [ ] 多言語切替UIコンポーネントを作成（`/src/components/ui/LanguageSwitcher.tsx`）
+- [x] 多言語切替UIコンポーネントを作成（`/src/components/ui/LanguageSwitcher.tsx`）
+  - 実体: `layout/LanguageSwitcher.tsx`（`ui/` ではなく `layout/` 配下）
 - [ ] Breadcrumbコンポーネントを作成（パンくずリスト）
 - [x] ルートレイアウト（`/src/app/layout.tsx`）を実装（Header, Footer配置）
 - [x] error.tsxを実装（エラーバウンダリ）
@@ -81,6 +111,7 @@
 - [x] サイト基本情報ファイルを作成（`/src/data/site.ts` - サイト名、開催日、会場、テーマカラー、SNSリンク等）
 - [x] ナビゲーション構成ファイルを作成（`/src/data/navigation.ts` - メニュー項目、パス）
 - [x] 建物情報ファイルを作成（`/src/data/buildings.ts` - 3Dマップ用、建物番号、名称、座標等）
+  - 注意: 3Dマップ見送りにより、`buildings.ts` / `facilities.ts` はどこからもインポートされていない未使用ファイル
 - [x] 施設情報ファイルを作成（`/src/data/facilities.ts` - トイレ、案内所、休憩所等の位置情報）
 - [x] アクセス情報ファイルを作成（`/src/data/access.ts` - 最寄り駅、ルート、駐車場情報）
 - [x] ご来場の方へファイルを作成（`/src/data/guide.ts` - 注意事項、バリアフリー情報）
@@ -116,7 +147,7 @@
 - [x] フィルター機能のロジックを実装（クライアントサイドフィルタリング）
 - [x] ページネーションコンポーネントを実装（または無限スクロール）
 - [x] 企画詳細ページのレイアウトを実装（画像、説明、SNSリンク等）
-- [ ] 「マップで見る」ボタンを実装（3Dマップへの遷移）
+- ~~「マップで見る」ボタンを実装（3Dマップへの遷移）~~ — 3Dマップ見送りに伴い不要（アクセスページのキャンパスマップで代替）
 - [x] 企画データのISR設定を実装（revalidate設定）
 - [x] 企画一覧のソート機能を実装（日程順、人気順等）
 - [x] 企画検索結果の「該当なし」表示を実装
@@ -141,25 +172,43 @@
 
 ### 8. マップ・アクセス実装
 
-#### 3Dマップ実装（優先度: 中）
+#### 3Dマップ実装 — 見送り（2026-08-09 決定）
 
-- [ ] Three.js / React Three Fiberをインストール
-- [ ] 3Dマップページルート（`/src/app/map/page.tsx`）を作成
-- [ ] Three.jsキャンバスコンポーネントを作成
-- [ ] 3DモデルをBlenderで作成（建物10棟程度）
-- [ ] 3DモデルをGLTF/GLB形式でエクスポート
-- [ ] 3Dモデルをプロジェクトに配置（`/public/models/`）
-- [ ] 3Dモデルを読み込み・表示するロジックを実装
-- [ ] 建物クリックインタラクションを実装（raycasting使用）
-- [ ] 建物クリック時に企画一覧オーバーレイを表示
-- [ ] 企画ピンを3Dマップ上に配置（Events APIのbuildingフィールド参照）
-- [ ] カメラコントロールを実装（OrbitControls）
-- [ ] 3Dマップのパフォーマンス最適化（LOD、テクスチャ圧縮等）
+> [!IMPORTANT]
+> **第97回では 3D マップを実装しません。** 要件定義書のリスク管理にある「実装難易度が高い場合は 2D マップをフォールバックとして用意」を発動し、2D で確定します。
+>
+> **決定理由**
+>
+> - 残作業が 11 項目と大きい。Blender での建物 10 棟モデリング、GLTF 化、raycasting、OrbitControls、LOD・テクスチャ圧縮まで必要
+> - 公開予定 2026-02-28 に対し、他の残タスク（テスト・最終調整）を圧迫する
+> - **代替となる 2D マップは既に完成している**（下記）。来場者への会場案内という目的は達成済み
+> - Vercel Free Plan のビルド時間・帯域の制約に対し、3D アセットは割に合わない
+>
+> **この決定に伴う未使用資産**（別途整理の判断が必要）
+>
+> - `src/data/buildings.ts` / `src/data/facilities.ts` — 3D マップ用に作成されたが、どこからもインポートされていない
+> - `@react-three/drei` — 依存にあるが未使用
+> - `three` / `@react-three/fiber` — `src/components/three/`（カラクリのギア演出）が使用。**2026-08-10 に復活させたため、現在はクライアントチャンクに含まれる**（860K / brotli 185K）。3Dマップとは無関係なので削除しないこと
+>
+> 第98回以降で再検討する場合は、以下のチェックリストをそのまま復活させてください。
 
-#### 2Dマップフォールバック
+- ~~3Dマップページルート（`/src/app/map/page.tsx`）を作成~~ — 見送り
+- ~~Three.jsキャンバスコンポーネントを作成~~ — 見送り
+- ~~3DモデルをBlenderで作成（建物10棟程度）~~ — 見送り
+- ~~3DモデルをGLTF/GLB形式でエクスポート~~ — 見送り
+- ~~3Dモデルをプロジェクトに配置（`/public/models/`）~~ — 見送り
+- ~~3Dモデルを読み込み・表示するロジックを実装~~ — 見送り
+- ~~建物クリックインタラクションを実装（raycasting使用）~~ — 見送り
+- ~~建物クリック時に企画一覧オーバーレイを表示~~ — 見送り
+- ~~企画ピンを3Dマップ上に配置（Events APIのbuildingフィールド参照）~~ — 見送り
+- ~~カメラコントロールを実装（OrbitControls）~~ — 見送り
+- ~~3Dマップのパフォーマンス最適化（LOD、テクスチャ圧縮等）~~ — 見送り
+
+#### 2Dマップ（採用）
 
 - [x] 2Dマップ画像を準備（キャンパスマップ）
 - [x] 2Dマップ表示コンポーネントを作成（画像 + クリッカブルエリア）
+  - 実体: `src/components/access/AccessPageContent.tsx` のキャンパスマップセクション
 - [x] 2Dマップの建物クリックインタラクションを実装（image mapまたはSVG）
 
 #### 交通アクセスページ
@@ -207,10 +256,12 @@
 - [x] next-intl（またはnext-i18next）をインストール
 - [x] i18n設定ファイルを作成（サポート言語: ja, en, zh, ko）
 - [x] 翻訳ファイルを作成（`/src/messages/ja.json`, `en.json`, `zh.json`, `ko.json`）
-- [ ] 固定ページの翻訳キーを定義（Header, Footer, Navigation等）
-- [ ] 多言語ルーティングを設定（`/[locale]`）
-- [ ] 言語切替UIを実装（LanguageSwitcherコンポーネント）
-- [ ] 翻訳内容を入力（英語、中国語、韓国語）
+- [x] 固定ページの翻訳キーを定義（Header, Footer, Navigation等）
+  - 実体: ページ本文は `messages/*.json`、ヘッダー・フッターは `messages/chrome/*.json` に分離
+- [x] 多言語ルーティングを設定（`/[locale]`）
+  - 実体: `src/app/[locale]/` + `localePrefix: "as-needed"`
+- [x] 言語切替UIを実装（LanguageSwitcherコンポーネント）
+- [x] 翻訳内容を入力（英語、中国語、韓国語）
 - [ ] 多言語対応のテストを実施（各言語での表示確認）
 
 ### 12. パフォーマンス最適化
@@ -229,22 +280,35 @@
 - [ ] レスポンシブ調整（モバイル、タブレット、デスクトップ）
 - [x] メタタグ設定（title, description, OGP）を全ページに実装
 - [x] 構造化データ（JSON-LD）を実装（イベント情報、組織情報）
-- [ ] sitemap.xmlを自動生成（next-sitemap使用）
-- [ ] robots.txtを設置
-- [ ] Vercel本番環境へデプロイ
+- [x] sitemap.xmlを自動生成（next-sitemap使用）
+  - 実体: next-sitemap ではなく Next.js 標準の `src/app/sitemap.ts` を使用
+- [x] robots.txtを設置
+  - 実体: `src/app/robots.ts`
+- [x] Vercel本番環境へデプロイ
+  - 実体: Production デプロイ 8 件を確認
 - [ ] 本番環境での動作確認・最終調整
+
+### 14. ページ遷移・モーション
+
+要件定義には無く、Issue #39 の調査から派生して追加したタスクです。詳細は [page-transition.md](../frontend/page-transition.md) を参照。
+
+- [x] React `<ViewTransition>` によるページ遷移を実装（`src/app/template.tsx` 1箇所で全ページに適用）
+- [x] 読まれていない `experimental.viewTransition` を `next.config.ts` から削除
+- [x] `prefers-reduced-motion` で遷移アニメーションを打ち消し
+- [x] 履歴遷移（popstate）での遷移アニメーション対応（#51）
+  - 実体: `src/lib/history-navigation.ts` + `src/components/layout/PageTransitionWrapper.tsx`。React は popstate 由来の遷移で View Transition を必ずスキップするため、実 DOM のラッパーへ `.page-enter-history` を付けて enter のみ CSS で再現。発火範囲はルート直下セグメントの stateKey 単位
 
 ---
 
 ## リスク管理
 
-### 3Dマップ実装の難易度
+### 3Dマップ実装の難易度 — 顕在化し、対策を発動済み（2026-08-09 クローズ）
 
 - **リスク**: Three.js/React Three Fiberの学習コスト、3Dモデル作成の工数が想定以上
-- **対策**:
-  - 3Dマップの優先度を「中」に設定
-  - 2Dマップをフォールバックとして準備
-  - Phase 3で2Dマップを先に実装し、3Dマップは余裕があれば追加
+- **結果**: リスクが顕在化。公開予定 2026-02-28 に対して残作業 11 項目は過大と判断
+- **発動した対策**: **2Dマップフォールバックを本採用**し、3Dマップは第97回では実装しない
+- **代替の実体**: アクセスページ（`src/components/access/AccessPageContent.tsx`）の Google Maps 埋め込み + キャンパスマップセクション
+- **再検討**: 第98回以降。Phase 3 の見送り節にチェックリストをそのまま残してある
 
 ### Vercel Free Plan制約
 
@@ -280,7 +344,7 @@
 
 1. **Phase 1（基盤構築）**: 最優先。すべての開発の前提条件
 2. **Phase 2（主要機能実装）**: 高優先度。サイトのコア機能
-3. **Phase 3（マップ・その他）**: 中優先度。3Dマップはフォールバック準備
+3. **Phase 3（マップ・その他）**: 中優先度。3Dマップは見送り、2Dマップで確定（2026-08-09）
 4. **Phase 4（仕上げ・テスト）**: 最終調整とリリース準備
 
 ### 進捗管理
@@ -347,4 +411,4 @@
 
 ---
 
-**最終更新日**: 2026-01-26
+**最終更新日**: 2026-08-10

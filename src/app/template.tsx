@@ -1,4 +1,5 @@
 import { ViewTransition } from "react";
+import { PageTransitionWrapper } from "@/components/layout/PageTransitionWrapper";
 
 /**
  * ページ遷移アニメーションの境界。
@@ -8,10 +9,17 @@ import { ViewTransition } from "react";
  * mount（enter）として扱われ、React が `document.startViewTransition()` を
  * 起動する。ページごとに `page.tsx` を包む必要はない。
  *
- * 対応範囲は `<Link>` / `router.push()` によるクライアント遷移のみ。ブラウザの
- * 戻る・進む（popstate）では `startViewTransition()` が呼ばれず、アニメーションなしで
- * 即座に切り替わる（実測で確認済み。URL は変わるが発火回数は増えない）。
- * 履歴遷移への対応は本実装のスコープ外で、独立 Issue として扱う。
+ * 演出は経路によって2系統に分かれる。
+ * - `<Link>` / `router.push()`: React が `document.startViewTransition()` を起動し、
+ *   `::view-transition-old(.page-exit)` → `::view-transition-new(.page-enter)` が走る。
+ * - ブラウザの戻る・進む（popstate）: React は View Transition を必ずスキップする
+ *   （同期フラッシュとの両立が仕様上できないため）。代わりに `PageTransitionWrapper`
+ *   が実 DOM へ `page-enter-history` を付け、同じ `dreamy-fade-in` を enter だけ再生する。
+ *   旧ページの exit は、popstate 時点で旧 DOM を保持する手段がないため再現できない。
+ *
+ * どちらも「template が再マウントされたとき」だけ発火する。ルート直下セグメントの
+ * stateKey が変わらない遷移（`/about` → `/access` など `src/app/[locale]/` 配下どうし）は
+ * リンクでも戻るでも無演出になる。詳細は docs/frontend/page-transition.md を参照。
  *
  * 遷移中（合計 0.3 秒）はページ全体がクリックを受け付けない。キャプチャされた要素は
  * hit-test の対象から外れるという View Transitions API の仕様によるもので、CSS では
@@ -29,7 +37,7 @@ import { ViewTransition } from "react";
 export default function Template({ children }: { children: React.ReactNode }) {
   return (
     <ViewTransition enter="page-enter" exit="page-exit" default="none">
-      <div className="page-transition-wrapper">{children}</div>
+      <PageTransitionWrapper>{children}</PageTransitionWrapper>
     </ViewTransition>
   );
 }

@@ -1,32 +1,32 @@
 "use client";
 
-import { useRef, useMemo, useState, useEffect } from "react";
+import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import type { Group } from "three";
 import type { ThreeElements } from "@react-three/fiber";
 import { GEAR_DEFAULTS, createGearGeometry, createHubRingGeometry } from "./gear-geometry";
+import { useMediaQuery } from "./use-media-query";
 
 /**
  * ピンク紫クレイ風歯車メッシュ（ハブリング付き）
  * Z軸回転 + マウス追従チルトアニメーション
+ *
+ * モーション軽減設定時は回転もチルトも行わず、静止した歯車として描画する。
+ * `GearScene` 側で `frameloop="demand"` に切り替わるため通常はこのガードまで
+ * 到達しないが、設定が実行中に変更された場合の取りこぼしを防ぐ。
  */
 export function Gear(props: ThreeElements["group"]) {
   const groupRef = useRef<Group>(null);
   const gearGeometry = useMemo(() => createGearGeometry(), []);
   const hubGeometry = useMemo(() => createHubRingGeometry(), []);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.matchMedia("(max-width: 768px)").matches);
-    check();
-    const mql = window.matchMedia("(max-width: 768px)");
-    mql.addEventListener("change", check);
-    return () => mql.removeEventListener("change", check);
-  }, []);
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
   useFrame((state, delta) => {
     if (!groupRef.current) return;
+    if (prefersReducedMotion) return;
+
     // Z軸回転（0.15 rad/s）
     groupRef.current.rotation.z += 0.15 * delta;
 

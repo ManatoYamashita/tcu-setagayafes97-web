@@ -67,7 +67,7 @@ docs/
   - リスク・課題
 
 - **[todo.md](./requires/todo.md)** - プロジェクト開発タスクリスト
-  - Phase 1-4の全152タスク
+  - Phase 1-4 の全タスク（件数と進捗率は todo.md 冒頭の進捗状況が正。本索引では持たない）
   - セットアップから本番デプロイまでの詳細ステップ
   - 進捗状況の可視化
   - リスク管理とフォールバック戦略
@@ -152,8 +152,10 @@ docs/
 
 - **[page-transition.md](./frontend/page-transition.md)** - ページ遷移アニメーションと View Transitions API
   - `template.tsx` に `<ViewTransition>` を 1 箇所置けば全ページに効く（`page.tsx` 個別対応は不要）
-  - 対応範囲は `<Link>` / `router.push()` のみ。戻る・進む（popstate）は即時切り替え
-  - **遷移中（合計 0.3 秒）はページ全体がクリックを受け付けない** — `pointer-events` では回避できない仕様
+  - View Transition が走るのは `<Link>` / `router.push()` のみ。戻る・進む（popstate）は React が仕様上必ずスキップする
+  - 履歴遷移は `.page-enter-history` の CSS アニメーションで enter だけ再現。**popstate リスナはモジュール評価時登録が必須**（`useEffect` だと2回目以降動かない）
+  - **発火範囲はルート直下セグメントの stateKey 単位。** `/about` ↔ `/access` はリンクでも無演出（検証で踏むと誤判定する）
+  - **View Transition 中（合計 0.3 秒）はページ全体がクリックを受け付けない** — `pointer-events` では回避できない仕様
   - `::view-transition-*` は React の `<ViewTransition>` が無いと発火しない
   - CSS の落とし穴（root 停止時の `mix-blend-mode`、ワイルドカードセレクタ）
   - `@supports not (view-transition-name: a)` はモダンブラウザで逆効果になるアンチパターン
@@ -171,4 +173,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-08-09
+**最終更新日**: 2026-08-10

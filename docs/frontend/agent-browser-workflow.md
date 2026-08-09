@@ -83,6 +83,21 @@ DOM の件数を数えるだけの計測であっても安全とは限りませ�
 
 `framesIn1s: 0` の環境で「消えるはずのDOMが残っている」を観測したら、まず計測アーティファクトを疑ってください。詳細と実証手順は [page-transition.md](./page-transition.md) の「Issue #39 の誤診」を参照。
 
+### 例外: `next/dynamic` の `ssr: false` はマウントしないことがある
+
+`framesIn1s: 0` の環境では、**`ssr: false` の dynamic import が読み込まれないまま fallback で固まる**ことを実測しました（おすすめ企画セクションの 3D 歯車 `FeaturedGearScene`）。
+
+観測された状態は次のとおりです。React 自体はハイドレート済み（`Object.keys(el).some(k => k.startsWith("__react"))` が true）にもかかわらず、11 秒待っても `<canvas>` はマウントされませんでした。
+
+```html
+<!--$!--><template data-dgst="BAILOUT_TO_CLIENT_SIDE_RENDERING"></template>
+<!-- ここに loading fallback が出たまま -->
+```
+
+`$!` は「クライアント側で描き直すべき境界」を示すマーカーですが、その再描画が走りません。Issue #39 の `$RV` と同種の rAF 依存が疑われるものの、境界のコメントノードに `_reactRetry` は生えておらず、**手動で発火させる手段は見つかっていません。**
+
+**結論として、`framesIn1s: 0` の環境では `ssr: false` コンポーネントの描画は検証できません。** ラッパー要素の位置・サイズ・z-index・`aria-hidden` といった外側のレイアウトは検証できるので、そこまでを自動で確認し、中身の描画は実機確認に回してください。
+
 ### View Transitions API の観測
 
 本サイトのページ遷移は React の `<ViewTransition>`（`src/app/template.tsx`）で実装されています。挙動は `visibilityState` で真っ二つに分かれます。
@@ -99,7 +114,9 @@ DOM の件数を数えるだけの計測であっても安全とは限りませ�
 
 **遷移中はクリックが一切通りません。** キャプチャされた要素は hit-test の対象から外れるため、`visible` な環境であっても `transition.finished` まで待たずにクリックすると空振りします。連続遷移を自動化するときは `finished` を待つか、合計時間（現在 0.3 秒）以上のウェイトを入れてください。
 
-なお、ページ本体に CSS アニメーションは掛かっていないため、スクリーンショットが真っ白になることはありません。ただし `hidden` では GSAP やスピナーなど他の rAF 駆動アニメーションが止まります。有限長のものだけ強制終了させたい場合はこれを使ってください（無限ループに `finish()` を呼ぶと `InvalidStateError` になります）。
+なお、リンク遷移ではページ本体に CSS アニメーションが掛からないため、スクリーンショットが真っ白になることはありません。**ただし戻る・進む（履歴遷移）の直後 0.18 秒だけは例外です。** `.page-transition-wrapper` に `.page-enter-history` が付いて `opacity: 0` から立ち上がるため、このタイミングで撮ると本文が薄く写ります。履歴遷移の直後にスクリーンショットを撮るときは 200ms 以上待ってください（理由は [page-transition.md](./page-transition.md) の「履歴遷移（戻る・進む）」）。
+
+`hidden` では GSAP やスピナーなど他の rAF 駆動アニメーションが止まります。有限長のものだけ強制終了させたい場合はこれを使ってください（無限ループに `finish()` を呼ぶと `InvalidStateError` になります）。
 
 ```javascript
 document.getAnimations().forEach((a) => {
@@ -458,4 +475,4 @@ agent-browser screenshot /tmp/localhost.png --viewport 1920x1080
 ---
 
 **作成日:** 2026-02-07
-**最終更新:** 2026-08-09
+**最終更新:** 2026-08-10
