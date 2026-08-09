@@ -154,6 +154,7 @@ docs/
   - `template.tsx` に `<ViewTransition>` を 1 箇所置けば全ページに効く（`page.tsx` 個別対応は不要）
   - View Transition が走るのは `<Link>` / `router.push()` のみ。戻る・進む（popstate）は React が仕様上必ずスキップする
   - 履歴遷移は `.page-enter-history` の CSS アニメーションで enter だけ再現。**popstate リスナはモジュール評価時登録が必須**（`useEffect` だと2回目以降動かない）
+  - **`next` のアップグレード時は履歴遷移の再検証が必須。** 登録順は Next.js 内部の挙動依存で、崩れると無演出に戻るだけなので CI では検出できない（`next` は `16.1.0` 固定）
   - **発火範囲はルート直下セグメントの stateKey 単位。** `/about` ↔ `/access` はリンクでも無演出（検証で踏むと誤判定する）
   - **View Transition 中（合計 0.3 秒）はページ全体がクリックを受け付けない** — `pointer-events` では回避できない仕様
   - `::view-transition-*` は React の `<ViewTransition>` が無いと発火しない
