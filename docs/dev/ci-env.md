@@ -80,10 +80,12 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 - どちらも `true` の場合のみ公開する。未設定または `true` 以外は安全側として非公開になる。
 - ビルド時に評価されるため、値を変更した後は再ビルド・再デプロイが必要。
 
-## Vercel の本番反映は手動 Promote
+## Vercel の本番反映は手動
 
 > [!IMPORTANT]
-> **`main` へ merge しても Production デプロイは作られません。** 作られるのは Preview だけで、Production は人手で Promote する運用です。**「merge したから本番に出ている」と思い込まないでください。**
+> **`main` へ merge しても Production デプロイは作られません。** 作られるのは Preview だけで、Production は人手で作る運用です。**「merge したから本番に出ている」と思い込まないでください。**
+>
+> 操作は `vercel promote` **ではなく** `vercel redeploy --target production` です（理由は後述）。
 
 実測した挙動です。
 
@@ -94,7 +96,7 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 | `c90f980` | 2026-08-09 21:53 | （作られないまま次の merge へ） | —        |
 | `3f9f0fb` | 2026-08-09 22:12 | 2026-08-09 22:30                | 18分後   |
 
-**すべてのコミットがまず Preview になり、Production は後から別途作られています。** 遅延が push と無相関で、`c90f980` のように Promote されないまま次のリリースに追い越される場合もあります。
+**すべてのコミットがまず Preview になり、Production は後から別途作られています。** 遅延が push と無相関で、`c90f980` のように本番反映されないまま次のリリースに追い越される場合もあります。
 
 ### 完了判定
 
@@ -108,12 +110,67 @@ git ls-remote origin refs/heads/main | cut -f1
 
 `vercel ls <project> --prod` でも Production デプロイの履歴を確認できます。`vercel inspect <url>` の `target` が `production` かどうかが正準です。
 
+### `vercel promote` は使わない
+
+> [!CAUTION]
+> **`vercel promote` を本番反映に使ってはいけません。** `promote` は**再ビルドせず**エイリアスを張り替えるだけなので、**Preview 環境変数でビルドされた成果物が本番に出ます。**
+
+本プロジェクトは同名の環境変数を環境ごとに別値で登録しています。`vercel env ls` の `environments` 列で確認できます。
+
+| 変数                         | 登録状況                                     |
+| ---------------------------- | -------------------------------------------- |
+| `MICROCMS_SERVICE_DOMAIN`    | **Production と Preview で別行＝別値**       |
+| `MICROCMS_API_KEY`           | Production, Preview で共有／Development は別 |
+| `NEXT_PUBLIC_EVENTS_VISIBLE` | Production, Preview で共有                   |
+
+`MICROCMS_SERVICE_DOMAIN` が環境別なので、`promote` すると **Preview の microCMS サービスから取得したコンテンツが本番に出ます。** 正しい操作は Production 環境変数での再ビルドです。
+
+```bash
+# main のマージコミットに対応する deployment URL を GitHub Deployments API から引く
+DID=$(gh api "repos/<owner>/<repo>/deployments?per_page=5" --jq '.[] | select(.sha=="<main の sha>") | .id' | head -1)
+gh api "repos/<owner>/<repo>/deployments/$DID/statuses" --jq '.[0].target_url'
+
+# その deployment を Production 環境変数で再ビルドする
+vercel redeploy <上で得た URL> --target production
+```
+
+過去の Production デプロイが「Preview の十数分後に別レコードとして現れる」のは、この再ビルドが行われているためです。
+
+### 公開ドメインの確認
+
+> [!IMPORTANT]
+> **`vercel redeploy` の出力に出る `Aliased: https://...` は、そのドメインが実際にこのデプロイを指していることを保証しません。** DNS が Vercel を向いていなければエイリアスは実効しません。
+
+Vercel の表示を信じず、実際の応答で確認してください。
+
+```bash
+# リダイレクトを追跡して最終的な到達先を見る
+curl -s -o /dev/null -L -w "%{http_code} %{url_effective} (ip=%{remote_ip})\n" https://<公開ドメイン>
+
+# server ヘッダが Vercel でなければ、DNS は別のホストを向いている
+curl -sI https://<公開ドメイン> | grep -iE "^(server|location):"
+```
+
+`NEXT_PUBLIC_URL` に設定したホストが**そもそも名前解決できるか**も確認します。解決できないと `robots.txt` の `Sitemap:` 行、`sitemap.xml`、OGP・canonical のすべてが存在しないホストを指します。
+
+```bash
+# 環境が dig / host を禁止している場合は公開 DoH で引く（Status=3 は NXDOMAIN）
+curl -s "https://dns.google/resolve?name=<host>&type=A" | python3 -m json.tool
+```
+
+`NEXT_PUBLIC_URL` の値そのものは、本番デプロイの `robots.txt` から読み取れます。
+
+```bash
+curl -s https://<production deployment url>/robots.txt | grep Sitemap
+```
+
 ### RELEASE PR のチェックリスト
 
 `dev` → `main` の PR には次を含めてください。
 
-1. merge 後に Promote が必要である旨（**変動する sha は書かない。すぐ陳腐化する**）
+1. merge 後に本番反映（`vercel redeploy --target production`）が必要である旨（**変動する sha は書かない。すぐ陳腐化する**）
 2. 上記の完了判定コマンド
+3. 公開ドメインが当該デプロイを指しているかの確認
 
 ## 注意事項
 
