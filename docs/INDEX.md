@@ -105,6 +105,7 @@ docs/
   - 企画・お知らせの公開フラグと非公開時の表示範囲
   - ワークフローでの参照方法（`secrets.` vs `vars.`）
   - ローカル開発（.env.local）との対応表
+  - **Vercel の本番反映は手動 Promote。** main へ merge しても Production は作られない（Preview のみ）。完了は Production デプロイの sha と main 先端の一致で判定する
 
 - **[microcms.md](./dev/microcms.md)** - microCMS API 制約と実装パターン
   - limit 上限100件の制約と offset ページネーション実装
