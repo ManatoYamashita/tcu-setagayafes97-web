@@ -55,7 +55,10 @@ export function TicketTable({ tickets, note }: TicketTableProps) {
           <tbody className="divide-y divide-gray-200">
             {hasPrice && (
               <tr>
-                <th scope="row" className="px-4 py-3 text-left font-medium text-gray-900/70">
+                <th
+                  scope="row"
+                  className="whitespace-nowrap px-4 py-3 text-left font-medium text-gray-900/70"
+                >
                   料金
                 </th>
                 {tickets.map((ticket, index) => (
@@ -71,7 +74,10 @@ export function TicketTable({ tickets, note }: TicketTableProps) {
 
             {hasSalesPeriod && (
               <tr>
-                <th scope="row" className="px-4 py-3 text-left font-medium text-gray-900/70">
+                <th
+                  scope="row"
+                  className="whitespace-nowrap px-4 py-3 text-left font-medium text-gray-900/70"
+                >
                   発売日・販売期間
                 </th>
                 {tickets.map((ticket, index) => (
@@ -84,7 +90,10 @@ export function TicketTable({ tickets, note }: TicketTableProps) {
 
             {hasMethod && (
               <tr>
-                <th scope="row" className="px-4 py-3 text-left font-medium text-gray-900/70">
+                <th
+                  scope="row"
+                  className="whitespace-nowrap px-4 py-3 text-left font-medium text-gray-900/70"
+                >
                   販売方法・販売場所
                 </th>
                 {tickets.map((ticket, index) => (
@@ -102,7 +111,10 @@ export function TicketTable({ tickets, note }: TicketTableProps) {
 
             {hasNote && (
               <tr>
-                <th scope="row" className="px-4 py-3 text-left font-medium text-gray-900/70">
+                <th
+                  scope="row"
+                  className="whitespace-nowrap px-4 py-3 text-left font-medium text-gray-900/70"
+                >
                   注意事項
                 </th>
                 {tickets.map((ticket, index) => (
@@ -118,7 +130,10 @@ export function TicketTable({ tickets, note }: TicketTableProps) {
 
             {hasButton && (
               <tr>
-                <th scope="row" className="px-4 py-3 text-left font-medium text-gray-900/70">
+                <th
+                  scope="row"
+                  className="whitespace-nowrap px-4 py-3 text-left font-medium text-gray-900/70"
+                >
                   <span className="sr-only">購入</span>
                 </th>
                 {tickets.map((ticket, index) => (
