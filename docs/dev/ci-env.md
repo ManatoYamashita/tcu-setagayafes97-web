@@ -66,14 +66,15 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 
 ## ローカル開発との対応
 
-| CI 環境変数                       | ローカル (.env.local)                   |
-| --------------------------------- | --------------------------------------- |
-| `secrets.MICROCMS_SERVICE_DOMAIN` | `MICROCMS_SERVICE_DOMAIN=setagayafes97` |
-| `secrets.MICROCMS_API_KEY`        | `MICROCMS_API_KEY=xxxxx`                |
-| `vars.NEXT_PUBLIC_URL`            | `NEXT_PUBLIC_URL=http://localhost:3000` |
-| `vars.NEXT_PUBLIC_GTM_ID`         | `NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX`        |
-| `vars.NEXT_PUBLIC_EVENTS_VISIBLE` | `NEXT_PUBLIC_EVENTS_VISIBLE=false`      |
-| `vars.NEXT_PUBLIC_NEWS_VISIBLE`   | `NEXT_PUBLIC_NEWS_VISIBLE=false`        |
+| CI 環境変数                        | ローカル (.env.local)                   |
+| ---------------------------------- | --------------------------------------- |
+| `secrets.MICROCMS_SERVICE_DOMAIN`  | `MICROCMS_SERVICE_DOMAIN=setagayafes97` |
+| `secrets.MICROCMS_API_KEY`         | `MICROCMS_API_KEY=xxxxx`                |
+| `vars.NEXT_PUBLIC_URL`             | `NEXT_PUBLIC_URL=http://localhost:3000` |
+| `vars.NEXT_PUBLIC_GTM_ID`          | `NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX`        |
+| `vars.NEXT_PUBLIC_EVENTS_VISIBLE`  | `NEXT_PUBLIC_EVENTS_VISIBLE=false`      |
+| `vars.NEXT_PUBLIC_NEWS_VISIBLE`    | `NEXT_PUBLIC_NEWS_VISIBLE=false`        |
+| `vars.NEXT_PUBLIC_SPECIAL_VISIBLE` | `NEXT_PUBLIC_SPECIAL_VISIBLE=false`     |
 
 ## コンテンツ公開フラグ
 
@@ -152,4 +153,4 @@ git ls-remote origin refs/heads/main | cut -f1
 
 ---
 
-**最終更新日**: 2026-08-12
+**最終更新日**: 2026-08-16
