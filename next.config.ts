@@ -39,7 +39,13 @@ const nextConfig: NextConfig = {
       {
         source: "/96th/:path*",
         destination: `${ARCHIVE_96TH_ORIGIN}/:path*`,
-        permanent: true,
+        /*
+         * `permanent: true` ではなく `statusCode: 301` を指定する。
+         * `permanent: true` は 308 を返す。308 は method を保持する仕様で、
+         * 検索エンジンの扱いは 301 と同等だが、古いクローラやリンクチェッカには
+         * 301 のほうが確実に伝わる。アーカイブへの GET 導線に method 保持は不要。
+         */
+        statusCode: 301,
       },
     ];
   },

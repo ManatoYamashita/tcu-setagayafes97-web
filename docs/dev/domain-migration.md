@@ -43,6 +43,26 @@ Next.js の trailing-slash リダイレクトは **rewrite より先**に走る�
 
 WordPress の全アセット（画像・CSS・JS）が Vercel を経由する。Free Plan の帯域は 100GB/月で、アーカイブのために払うコストではない。
 
+## 301 の実測挙動
+
+Preview デプロイで確認した結果（`96th.setagayafes.org` はまだ存在しないため、最終ホップは名前解決に失敗する）。
+
+| リクエスト      | ホップ | 最終到達先                            |
+| --------------- | ------ | ------------------------------------- |
+| `/96th`         | 1      | `https://96th.setagayafes.org/`       |
+| `/96th/`        | **2**  | `https://96th.setagayafes.org/`       |
+| `/96th/access/` | **2**  | `https://96th.setagayafes.org/access` |
+| `/96th/?q=1`    | **2**  | `https://96th.setagayafes.org/?q=1`   |
+
+パスもクエリも正しく引き継がれる。
+
+**末尾スラッシュつきのURLは 2 ホップになる。** `trailingSlash: false`（既定）のため Next.js がまず `/96th/` → `/96th` へ正規化し、そのあと 301 が走るためである。1 ホップにするにはサイト全体の `trailingSlash` 方針を変える必要があり、割に合わない。
+
+また `/96th/access/` は `/access`（末尾スラッシュなし）へ引き継がれるため、移行先の WordPress が `/access` → `/access/` へ 301 する場合は合計 3 ホップになる。実用上の問題はない。
+
+> [!NOTE]
+> `permanent: true` は **308** を返す。本プロジェクトは `statusCode: 301` を明示している。308 の検索エンジンでの扱いは 301 と同等だが、古いクローラやリンクチェッカには 301 のほうが確実に伝わるためである。アーカイブへの GET 導線に method 保持（308 の利点）は不要。
+
 ## 実測した現状（2026-08-15 時点）
 
 ```
