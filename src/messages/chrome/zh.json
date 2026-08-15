@@ -1,6 +1,7 @@
 {
   "navigation": {
     "events": "活动查询",
+    "special": "特别嘉宾",
     "timetable": "时间表",
     "map": "地图与交通",
     "campusMap": "校园地图",
