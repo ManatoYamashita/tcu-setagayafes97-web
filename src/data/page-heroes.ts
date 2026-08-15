@@ -32,6 +32,13 @@ export const pageHeroes: Record<string, PageHeroData> = {
     imageSrc: "/images/photos/setagayafe97-image.webp",
     imageAlt: "世田谷祭の企画風景",
   },
+  special: {
+    title: "著名人企画",
+    subtitle: "Special",
+    description: "第97回 世田谷祭にお招きするゲストのご紹介",
+    imageSrc: "/images/photos/setagayafe97-image.webp",
+    imageAlt: "ステージ企画の様子",
+  },
   timetable: {
     title: "タイムテーブル",
     subtitle: "Timetable",

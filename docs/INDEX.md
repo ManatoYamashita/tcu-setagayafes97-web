@@ -107,6 +107,7 @@ docs/
   - ワークフローでの参照方法（`secrets.` vs `vars.`）
   - ローカル開発（.env.local）との対応表
   - **Vercel の本番反映は手動 Promote。** main へ merge しても Production は作られない（Preview のみ）。完了は Production デプロイの sha と main 先端の一致で判定する
+  - **`NEXT_PUBLIC_SPECIAL_VISIBLE` は `EVENTS_VISIBLE` と独立。** 4通りの組み合わせ表あり。著名人ページの先行公開には `getSpecialEvents()` を使う（`getEventsList()` は EVENTS_VISIBLE=false で常に空）
 
 - **[domain-migration.md](./dev/domain-migration.md)** - `setagayafes.org` を第97回の正規ドメインにする手順
   - 第96回（WordPress）は `96th.setagayafes.org` へ退避し、`/96th/*` は 301 で引き継ぐ

@@ -1,5 +1,5 @@
 import { client, isMicrocmsConfigured } from "./microcms";
-import { EVENTS_VISIBLE } from "@/data/site";
+import { EVENTS_VISIBLE, SPECIAL_VISIBLE } from "@/data/site";
 import type {
   Event,
   EventListResponse,
@@ -123,6 +123,20 @@ function normalizeEvent(rawEvent: RawEvent): Event {
 const MICROCMS_MAX_LIMIT = 100;
 
 /**
+ * 未解禁の著名人企画を一覧から除外する
+ *
+ * SPECIAL_VISIBLE が false の間、type = special の企画は
+ * 企画一覧・タイムテーブル・おすすめ企画のどこにも出してはいけない。
+ * 解禁前の出演者名が露出すると契約上の事故になる。
+ * @param events 正規化済みの企画配列
+ * @returns SPECIAL_VISIBLE が false の場合、type = special を除いた配列
+ */
+function excludeUnreleasedSpecial(events: Event[]): Event[] {
+  if (SPECIAL_VISIBLE) return events;
+  return events.filter((event) => event.type !== "special");
+}
+
+/**
  * 企画一覧を取得
  * limit が microCMS 上限(100)を超える場合は自動的にページネーションで全件取得
  * EVENTS_VISIBLE が false の間は常に空配列を返す（microCMSへは問い合わせない）
@@ -161,7 +175,7 @@ export async function getEventsList(
           ...filterParam,
         },
       });
-      return response.contents.map(normalizeEvent);
+      return excludeUnreleasedSpecial(response.contents.map(normalizeEvent));
     }
 
     // 100件超: ページネーションで全件取得
@@ -187,10 +201,62 @@ export async function getEventsList(
       offset += perPage;
     }
 
-    return allContents.map(normalizeEvent);
+    return excludeUnreleasedSpecial(allContents.map(normalizeEvent));
   } catch (error) {
     console.error("[getEventsList] Error:", error);
     return [];
+  }
+}
+
+/**
+ * 著名人企画（type = special）の一覧を取得
+ *
+ * IMPORTANT: 判定に使うのは SPECIAL_VISIBLE のみで、EVENTS_VISIBLE には依存しない。
+ * 著名人ページは一般企画一覧より先に公開されることがあり、`getEventsList()` を
+ * 流用すると EVENTS_VISIBLE が false の間は常に空になって先行公開が成立しない。
+ * @returns 著名人企画の配列（公開日の新しい順）
+ */
+export async function getSpecialEvents(): Promise<Event[]> {
+  if (!SPECIAL_VISIBLE) return [];
+  if (!isMicrocmsConfigured) return [];
+  try {
+    const response: RawEventListResponse = await client.get({
+      endpoint: "events",
+      queries: {
+        limit: MICROCMS_MAX_LIMIT,
+        orders: "-publishedAt",
+        filters: "type[contains]special",
+      },
+    });
+    // filters は部分一致のため、正規化後の値で再度絞り込む
+    return response.contents.map(normalizeEvent).filter((event) => event.type === "special");
+  } catch (error) {
+    console.error("[getSpecialEvents] Error:", error);
+    return [];
+  }
+}
+
+/**
+ * 著名人企画を1件取得
+ *
+ * `getEventById()` と違い EVENTS_VISIBLE には依存しない（`getSpecialEvents()` と同じ理由）。
+ * type が special でないコンテンツを指定した場合は null を返す。
+ * @param id 企画ID
+ * @returns 著名人企画、該当しない場合は null
+ */
+export async function getSpecialEventById(id: string): Promise<Event | null> {
+  if (!SPECIAL_VISIBLE) return null;
+  if (!isMicrocmsConfigured) return null;
+  try {
+    const response: RawEvent = await client.get({
+      endpoint: "events",
+      contentId: id,
+    });
+    const event = normalizeEvent(response);
+    return event.type === "special" ? event : null;
+  } catch (error) {
+    console.error("[getSpecialEventById] Error:", error);
+    return null;
   }
 }
 

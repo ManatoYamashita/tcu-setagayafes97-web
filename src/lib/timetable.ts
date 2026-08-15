@@ -2,11 +2,19 @@ import type { Event, EventDate } from "@/types/events";
 import { extractStageId } from "@/data/stages";
 
 /**
- * ステージ企画のみを抽出
- * type === "stage" かつ startTime と endTime が存在する企画のみ
+ * タイムテーブルに載せる企画を抽出
+ *
+ * type === "stage" または "special" で、かつ startTime と endTime が存在する企画のみ。
+ *
+ * 著名人企画（special）を含めるのは、それが開場・開演のあるステージイベントであり、
+ * 来場者が「何時から」をタイムテーブルで探すためです。未解禁の著名人企画は
+ * `getEventsList()` の時点で除外されるため、ここでの追加判定は不要です。
  */
 export function filterStageEvents(events: Event[]): Event[] {
-  return events.filter((event) => event.type === "stage" && event.startTime && event.endTime);
+  return events.filter(
+    (event) =>
+      (event.type === "stage" || event.type === "special") && event.startTime && event.endTime
+  );
 }
 
 /**

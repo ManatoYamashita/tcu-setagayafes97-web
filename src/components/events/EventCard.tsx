@@ -14,8 +14,11 @@ interface EventCardProps {
  * 企画一覧・おすすめ企画で使用
  */
 export function EventCard({ event, variant = "default" }: EventCardProps) {
+  // 著名人企画は専用LP（/special/[id]）が正規URL。/events/[id] は生成されない
+  const href = event.type === "special" ? `/special/${event.id}` : `/events/${event.id}`;
+
   return (
-    <Link href={`/events/${event.id}`} className="group block h-full">
+    <Link href={href} className="group block h-full">
       <article className="h-full overflow-hidden rounded-2xl border border-gray-200/20 bg-white/10 transition-colors hover:border-gray-200/40">
         {/* 円形サムネイル */}
         {event.thumbnail && (

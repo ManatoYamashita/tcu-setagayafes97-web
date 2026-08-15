@@ -27,12 +27,13 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 
 ### Repository Variables
 
-| 変数名                       | 内容                     | 値の例                          |
-| ---------------------------- | ------------------------ | ------------------------------- |
-| `NEXT_PUBLIC_URL`            | 本番サイト URL           | `https://setagayafes.tcu.ac.jp` |
-| `NEXT_PUBLIC_GTM_ID`         | Google Tag Manager ID    | `GTM-XXXXXXX`                   |
-| `NEXT_PUBLIC_EVENTS_VISIBLE` | 企画情報の公開フラグ     | `false`                         |
-| `NEXT_PUBLIC_NEWS_VISIBLE`   | お知らせ情報の公開フラグ | `false`                         |
+| 変数名                        | 内容                     | 値の例                          |
+| ----------------------------- | ------------------------ | ------------------------------- |
+| `NEXT_PUBLIC_URL`             | 本番サイト URL           | `https://setagayafes.tcu.ac.jp` |
+| `NEXT_PUBLIC_GTM_ID`          | Google Tag Manager ID    | `GTM-XXXXXXX`                   |
+| `NEXT_PUBLIC_EVENTS_VISIBLE`  | 企画情報の公開フラグ     | `false`                         |
+| `NEXT_PUBLIC_NEWS_VISIBLE`    | お知らせ情報の公開フラグ | `false`                         |
+| `NEXT_PUBLIC_SPECIAL_VISIBLE` | 著名人企画の公開フラグ   | `false`                         |
 
 ## ワークフローでの参照例
 
@@ -46,6 +47,7 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
     NEXT_PUBLIC_GTM_ID: ${{ vars.NEXT_PUBLIC_GTM_ID }}
     NEXT_PUBLIC_EVENTS_VISIBLE: ${{ vars.NEXT_PUBLIC_EVENTS_VISIBLE }}
     NEXT_PUBLIC_NEWS_VISIBLE: ${{ vars.NEXT_PUBLIC_NEWS_VISIBLE }}
+    NEXT_PUBLIC_SPECIAL_VISIBLE: ${{ vars.NEXT_PUBLIC_SPECIAL_VISIBLE }}
 ```
 
 ## 登録手順
@@ -77,8 +79,29 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 
 - `NEXT_PUBLIC_EVENTS_VISIBLE=false`: 企画一覧・タイムテーブルは準備中表示にし、トップのおすすめ企画・企画詳細URL・サイトマップの企画詳細URLを非公開にする。microCMS の企画データは取得しない。
 - `NEXT_PUBLIC_NEWS_VISIBLE=false`: お知らせ一覧とトップの NEWS セクションは準備中表示にし、トップの最新ニュース・お知らせ詳細URL・サイトマップのお知らせ詳細URLを非公開にする。microCMS のお知らせデータは取得しない。
-- どちらも `true` の場合のみ公開する。未設定または `true` 以外は安全側として非公開になる。
+- `NEXT_PUBLIC_SPECIAL_VISIBLE=false`: 著名人企画（`type = special`）を全面的に非公開にする。`/special` は準備中表示になり、`/special/[id]` は生成されず 404。企画一覧・タイムテーブル・おすすめ企画・サイトマップからも `type = special` を除外する。
+- いずれも `true` の場合のみ公開する。未設定または `true` 以外は安全側として非公開になる。
 - ビルド時に評価されるため、値を変更した後は再ビルド・再デプロイが必要。
+
+### EVENTS_VISIBLE と SPECIAL_VISIBLE の組み合わせ
+
+**この2つは独立している。** 著名人の発表はチケット販売と紐づき、一般企画一覧の公開より先行することがあるため、別のフラグに分けている。
+
+| `EVENTS_VISIBLE` | `SPECIAL_VISIBLE` | 挙動                                                              |
+| ---------------- | ----------------- | ----------------------------------------------------------------- |
+| `false`          | `false`           | すべて準備中                                                      |
+| `false`          | **`true`**        | **`/special` のみ公開。`/events` `/timetable` は準備中**          |
+| `true`           | `false`           | `/events` `/timetable` は公開。**ただし `type = special` は除外** |
+| `true`           | `true`            | すべて公開                                                        |
+
+> [!WARNING]
+> **著名人ページを先行公開するときは `getSpecialEvents()` / `getSpecialEventById()` を使うこと。**
+> `getEventsList()` は `EVENTS_VISIBLE` が false の間 microCMS へ問い合わせず常に空を返すため、
+> これを流用すると先行公開が成立しない。
+
+> [!CAUTION]
+> **著名人は解禁日が契約で決まっていることが多く、URL の先行露出が事故になる。**
+> microCMS 側を下書きにするだけで済ませず、必ず `NEXT_PUBLIC_SPECIAL_VISIBLE` でも塞ぐこと。
 
 ## Vercel の本番反映は手動 Promote
 

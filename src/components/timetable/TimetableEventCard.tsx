@@ -10,9 +10,12 @@ interface TimetableEventCardProps {
  * タイムテーブルに表示されるイベントカード
  */
 export function TimetableEventCard({ event }: TimetableEventCardProps) {
+  // 著名人企画は専用LP（/special/[id]）が正規URL
+  const href = event.type === "special" ? `/special/${event.id}` : `/events/${event.id}`;
+
   return (
     <Link
-      href={`/events/${event.id}`}
+      href={href}
       className="block h-full rounded-lg bg-white/10 p-3 border border-gray-200/20 transition-colors hover:border-gray-200 border-l-4 border-l-primary-light"
     >
       {/* タイトル */}
