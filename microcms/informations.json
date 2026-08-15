@@ -6,20 +6,11 @@
       "kind": "select",
       "required": true,
       "multipleSelect": false,
-      "selectInitialValue": null,
+      "initialValue": ["DEFAULT"],
       "selectItems": [
-        {
-          "id": "sponsor_001",
-          "value": "sponsor"
-        },
-        {
-          "id": "faq_002",
-          "value": "faq"
-        },
-        {
-          "id": "other_003",
-          "value": "other"
-        }
+        { "id": "JTUkzbRFIv", "value": "sponsor : 協賛企業" },
+        { "id": "vVfH91UxAq", "value": "faq : FAQ" },
+        { "id": "mCFnoWmiXG", "value": "other : その他" }
       ]
     },
     {
@@ -31,7 +22,7 @@
     {
       "fieldId": "description",
       "name": "概要",
-      "kind": "textArea",
+      "kind": "text",
       "required": false
     },
     {
@@ -48,7 +39,7 @@
     },
     {
       "fieldId": "priority",
-      "name": "表示優先度",
+      "name": "表示順",
       "kind": "number",
       "required": false
     }

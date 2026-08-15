@@ -13,9 +13,13 @@
 
 | ファイル            | 対象API                       | 実機との照合           |
 | ------------------- | ----------------------------- | ---------------------- |
-| `news.json`         | News API（お知らせ）          | 未検証                 |
+| `news.json`         | News API（お知らせ）          | ✅ 2026-08-16 照合済み |
 | `events.json`       | Events API（企画）            | ✅ 2026-08-16 照合済み |
-| `informations.json` | Informations API（協賛・FAQ） | 未検証                 |
+| `informations.json` | Informations API（協賛・FAQ） | ✅ 2026-08-16 照合済み |
+
+> [!NOTE]
+> **`select` の値はいずれの API も `値 : ラベル` 形式**（例: `urgent : 緊急`）で登録されています。
+> コード側は `split(":")` で先頭を取り出すため、ラベルだけの変更はコードに影響しません。
 
 ## インポート手順
 
@@ -69,16 +73,15 @@ else links.website = sns;
 
 ### News API (news.json)
 
-> [!NOTE]
-> 実機との照合は未実施。以下はJSONファイルの内容です。
+**実機と照合済み（2026-08-16）**
 
-| フィールドID | 表示名         | 型           | 必須 | 備考              |
-| ------------ | -------------- | ------------ | ---- | ----------------- |
-| type         | お知らせ種別   | select       | ✓    | urgent/news/other |
-| title        | タイトル       | text         | ✓    |                   |
-| thumbnail    | サムネイル画像 | media        |      |                   |
-| description  | 概要           | textArea     | ✓    |                   |
-| content      | 本文           | richEditorV2 | ✓    |                   |
+| フィールドID | 表示名         | 型           | 必須 | 備考                                                   |
+| ------------ | -------------- | ------------ | ---- | ------------------------------------------------------ |
+| type         | タイプ         | select       | ✓    | `urgent : 緊急` / `news : お知らせ` / `other : その他` |
+| title        | タイトル       | text         | ✓    |                                                        |
+| thumbnail    | サムネイル画像 | media        |      |                                                        |
+| description  | 概要           | textArea     | ✓    |                                                        |
+| content      | 本文           | richEditorV2 | ✓    |                                                        |
 
 ### Events API (events.json)
 
@@ -156,17 +159,20 @@ else links.website = sns;
 
 ### Informations API (informations.json)
 
-> [!NOTE]
-> 実機との照合は未実施。以下はJSONファイルの内容です。
+**実機と照合済み（2026-08-16）**
 
-| フィールドID | 表示名     | 型       | 必須 | 備考              |
-| ------------ | ---------- | -------- | ---- | ----------------- |
-| category     | カテゴリ   | select   | ✓    | sponsor/faq/other |
-| title        | タイトル   | text     | ✓    |                   |
-| description  | 概要       | textArea |      |                   |
-| image        | 画像       | media    |      |                   |
-| url          | URL        | text     |      |                   |
-| priority     | 表示優先度 | number   |      |                   |
+| フィールドID | 表示名   | 型     | 必須 | 備考                                                  |
+| ------------ | -------- | ------ | ---- | ----------------------------------------------------- |
+| category     | カテゴリ | select | ✓    | `sponsor : 協賛企業` / `faq : FAQ` / `other : その他` |
+| title        | タイトル | text   | ✓    |                                                       |
+| description  | 概要     | text   |      | **1行テキスト。** textArea ではない                   |
+| image        | 画像     | media  |      |                                                       |
+| url          | URL      | text   |      |                                                       |
+| priority     | 表示順   | number |      |                                                       |
+
+> [!NOTE]
+> **`description` は1行テキストです。** 協賛企業の紹介文を複数行で入稿したい場合は、
+> 管理画面で textArea へ変更したうえで本ファイルも同期してください（型定義への影響はありません）。
 
 ## JSON の書き方
 
