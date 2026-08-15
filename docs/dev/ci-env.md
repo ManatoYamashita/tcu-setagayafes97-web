@@ -130,11 +130,28 @@ git ls-remote origin refs/heads/main | cut -f1
 DID=$(gh api "repos/<owner>/<repo>/deployments?per_page=5" --jq '.[] | select(.sha=="<main の sha>") | .id' | head -1)
 gh api "repos/<owner>/<repo>/deployments/$DID/statuses" --jq '.[0].target_url'
 
-# その deployment を Production 環境変数で再ビルドする
+# その deployment を Production ターゲットで再ビルドする
 vercel redeploy <上で得た URL> --target production
 ```
 
 過去の Production デプロイが「Preview の十数分後に別レコードとして現れる」のは、この再ビルドが行われているためです。
+
+#### `redeploy` は環境変数を「元デプロイの値」で再現する
+
+> [!CAUTION]
+> **`vercel redeploy` は元デプロイの環境変数スナップショットを再利用します。** 再ビルドはしますが、**再ビルド後に変更した環境変数は反映されません。** `redeploy` は「過去のデプロイを再現する」ためのコマンドだからです。
+
+実測です。`NEXT_PUBLIC_URL` を Production で更新したあと、更新前に作られた deployment を `redeploy --target production` したところ、ビルドは走ったのに `robots.txt` の `Sitemap:` 行は**古い値のまま**でした。`vercel env pull --environment=production` で確認すると、変数自体は新しい値になっていました。
+
+`NEXT_PUBLIC_*` はビルド時にバンドルへ埋め込まれるため、この差は静的な出力にそのまま残ります。
+
+**環境変数を変えたときは、変更後に作られた deployment を対象にしてください。**
+
+| 状況                       | 正しい手順                                                           |
+| -------------------------- | -------------------------------------------------------------------- |
+| コードだけ変わった         | main のマージコミットの deployment を `redeploy --target production` |
+| **環境変数を変えた**       | **変更後に新しい commit を push し、その deployment を redeploy**    |
+| 変更を反映したか確かめたい | `curl -s <deployment url>/robots.txt \| grep Sitemap` で実出力を見る |
 
 ### 公開ドメインの確認
 
