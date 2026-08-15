@@ -118,6 +118,9 @@ docs/
   - limit 上限100件の制約と offset ページネーション実装
   - 適用済み関数（getEventsList）と未適用関数の一覧
   - 使用 API エンドポイント一覧
+  - **select の選択肢を増やしたら正規化関数も直す。** ホワイトリスト方式のため、直さないと新しい値が黙って `other` に落ちる（エラーは出ない）
+  - カスタムフィールドのネスト制約と作成順序（子から親へ）。API をまたいだ参照は不可
+  - **管理画面はブラウザ自動操作で編集できない。** 種類選択が実マウスイベントに依存し、スクリプトでは別の行へ適用される
 
 ### フロントエンド関連（frontend/）
 
@@ -144,6 +147,7 @@ docs/
   - `navigation.type` は BFCache 復帰でも `"navigate"` のまま。`"back_forward"` はドキュメント再作成のサイン（逆に読むと判定が反転する）
   - **`hidden` なタブで rAF を await するとレンダラが凍結してタブが落ちる**（agent-browser / Claude in Chrome 共通。`visibilityState` を同期評価で先に読む）
   - **`ssr: false` の描画検証の症状はツールで異なる。** agent-browser は canvas がマウントせず、実 Chrome の `hidden` タブは**マウントするが `300×150` のまま未描画**（要素の存在だけで合格判定すると誤判定する）
+  - **外部SPAの管理画面は「操作」に使わない。** 本ワークフローは観測用。設定投入の自動化は失敗が本番に残る（[../dev/microcms.md](./dev/microcms.md) に実例）
   - 誤診の実例は [page-transition.md](./frontend/page-transition.md) も参照
 
 - **[layout-patterns.md](./frontend/layout-patterns.md)** - レイアウトパターンと設計原則
@@ -188,4 +192,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-08-10
+**最終更新日**: 2026-08-16
