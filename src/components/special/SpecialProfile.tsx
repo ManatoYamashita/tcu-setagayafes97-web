@@ -1,0 +1,54 @@
+import Image from "next/image";
+import type { MicroCMSImage } from "microcms-js-sdk";
+
+interface SpecialProfileProps {
+  /** 紹介文（Event.content のリッチエディタHTML） */
+  content?: string;
+  /** 追加のアーティスト写真 */
+  photos?: MicroCMSImage[];
+}
+
+/**
+ * アーティスト紹介文と追加写真
+ *
+ * HTML は microCMS のリッチエディタ出力をそのまま描画します。
+ * 入稿者が実行委員会に限られる前提の既存方針（EventDetail と同様）に揃えています。
+ *
+ * 紹介文も写真も無い場合はセクションごと出力しません。
+ */
+export function SpecialProfile({ content, photos }: SpecialProfileProps) {
+  const hasPhotos = Boolean(photos && photos.length > 0);
+  if (!content && !hasPhotos) return null;
+
+  return (
+    <section aria-labelledby="special-profile" className="py-8">
+      <h2 id="special-profile" className="mb-4 text-xl font-bold text-gray-900 md:text-2xl">
+        出演者情報
+      </h2>
+
+      {content && (
+        <div
+          className="prose max-w-none prose-headings:text-gray-900 prose-p:text-gray-900/80 prose-a:text-primary"
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+      )}
+
+      {hasPhotos && (
+        <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {photos?.map((photo) => (
+            <li key={photo.url} className="overflow-hidden rounded-xl border border-gray-200">
+              <Image
+                src={photo.url}
+                alt=""
+                width={photo.width ?? 800}
+                height={photo.height ?? 600}
+                sizes="(min-width: 640px) 50vw, 100vw"
+                className="h-auto w-full object-cover"
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}

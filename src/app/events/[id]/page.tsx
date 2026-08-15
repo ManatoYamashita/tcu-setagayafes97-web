@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { getEventById, getEventsList } from "@/lib/events";
+import { SPECIAL_VISIBLE } from "@/data/site";
 import { EventDetail } from "@/components/events/EventDetail";
 import { RelatedEvents } from "@/components/events/RelatedEvents";
 interface EventPageProps {
@@ -19,9 +20,12 @@ export const revalidate = 3600;
  */
 export async function generateStaticParams() {
   const events = await getEventsList(200);
-  return events.map((event) => ({
-    id: event.id,
-  }));
+  // 著名人企画の正規URLは /special/[id]。ここでは生成しない（重複URLを作らない）
+  return events
+    .filter((event) => event.type !== "special")
+    .map((event) => ({
+      id: event.id,
+    }));
 }
 
 /**
@@ -73,6 +77,14 @@ export default async function EventPage({ params }: EventPageProps) {
 
   if (!event) {
     notFound();
+  }
+
+  // 著名人企画は /special/[id] が正規URL。既出のURLから来た場合に備えて誘導する
+  if (event.type === "special") {
+    if (!SPECIAL_VISIBLE) {
+      notFound();
+    }
+    redirect(`/special/${event.id}`);
   }
 
   // 構造化データ（JSON-LD）
