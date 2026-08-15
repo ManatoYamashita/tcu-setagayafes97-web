@@ -16,6 +16,7 @@ docs/
 ├── dev/              # 開発関連ドキュメント
 │   ├── git.md        # ブランチ戦略とCI/CDワークフロー
 │   ├── ci-env.md     # GitHub Actions 環境変数管理（Secrets/Variables）
+│   ├── domain-migration.md # setagayafes.org を第97回の正規ドメインにする手順
 │   └── microcms.md   # microCMS API 制約と実装パターン
 ├── frontend/         # フロントエンド関連ドキュメント
 │   ├── design.md                  # デザインシステム（カラー・タイポグラフィトークン）
@@ -106,6 +107,12 @@ docs/
   - ワークフローでの参照方法（`secrets.` vs `vars.`）
   - ローカル開発（.env.local）との対応表
   - **Vercel の本番反映は手動 Promote。** main へ merge しても Production は作られない（Preview のみ）。完了は Production デプロイの sha と main 先端の一致で判定する
+
+- **[domain-migration.md](./dev/domain-migration.md)** - `setagayafes.org` を第97回の正規ドメインにする手順
+  - 第96回（WordPress）は `96th.setagayafes.org` へ退避し、`/96th/*` は 301 で引き継ぐ
+  - **rewrite プロキシは採らない。** trailing-slash リダイレクトが rewrite より先に走るため無限ループになり、`skipTrailingSlashRedirect` で止めると canonical 未実装の現状で重複URLを生む
+  - 手順の順序（WordPress の `siteurl` 変更 → 301 の本番反映 → DNS 切替）と各段階の検証コマンド
+  - Vercel が要求する DNS レコード（`A 76.76.21.21` / `CNAME cname.vercel-dns.com`）
 
 - **[microcms.md](./dev/microcms.md)** - microCMS API 制約と実装パターン
   - limit 上限100件の制約と offset ページネーション実装
