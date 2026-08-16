@@ -21,7 +21,9 @@ docs/
 ├── frontend/         # フロントエンド関連ドキュメント
 │   ├── design.md                  # デザインシステム（カラー・タイポグラフィトークン）
 │   ├── access-page-design.md      # Accessページの情報設計・UI実装方針
-│   ├── agent-browser-workflow.md  # agent-browserを使用したデザイン再現とデバッグフロー
+│   ├── agent-browser-workflow.md      # agent-browserを使用したデザイン再現とデバッグフロー
+│   ├── browser-observation-limits.md  # ブラウザ観測の前提と限界（何が測れるか）
+│   ├── browser-verification-pitfalls.md # 検証手順そのものが誤る実例
 │   ├── layout-patterns.md         # レイアウトパターンと設計原則
 │   ├── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
 │   └── page-transition.md         # ページ遷移アニメーションとView Transitions API
@@ -141,20 +143,29 @@ docs/
   - フォントスケール（モジュラースケール 1.25）
   - CSS 変数まとめ
 
+> [!NOTE]
+> ブラウザ自動化の知見は3ファイルに分かれています。**手順は `agent-browser-workflow.md`、判断基準は `browser-observation-limits.md`、失敗例は `browser-verification-pitfalls.md`。**
+
 - **[agent-browser-workflow.md](./frontend/agent-browser-workflow.md)** - agent-browserを使用したデザイン再現とデバッグの標準フロー
-  - **観測の前提を測る（先に読むこと）** — 実行環境は一定でない。`framesIn1s` を測ってから検証可否を分岐する
   - デザイン再現3ステップ（分析→実装→検証）
   - 数値測定手法とコマンド集（Header高さ、z-index階層、viewport占有率）
   - レスポンシブテスト標準手順（375px/768px/1920px）
   - デバッグワークフロー（Layout Shift検出、z-index競合確認）
-  - **BFCache の観測** — Vercel preview は `vercel.live` の iframe が阻害するため測れない。ローカル本番ビルドで、プローブ生存 / `pageshow.persisted` / DOM ノード同一性の3点で判定する
-  - `navigation.type` は BFCache 復帰でも `"navigate"` のまま。`"back_forward"` はドキュメント再作成のサイン（逆に読むと判定が反転する）
+
+- **[browser-observation-limits.md](./frontend/browser-observation-limits.md)** - ブラウザ観測の前提と限界（**測る前に読むこと**）
+  - **観測の前提を測る** — 実行環境は一定でない。`framesIn1s` を測ってから検証可否を分岐する
+  - 検証できるもの / できないものの切り分け表
   - **`hidden` なタブで rAF を await するとレンダラが凍結してタブが落ちる**（agent-browser / Claude in Chrome 共通。`visibilityState` を同期評価で先に読む）
   - **`ssr: false` の描画検証の症状はツールで異なる。** agent-browser は canvas がマウントせず、実 Chrome の `hidden` タブは**マウントするが `300×150` のまま未描画**（要素の存在だけで合格判定すると誤判定する）
-  - **外部SPAの管理画面は「操作」に使わない。** 本ワークフローは観測用。設定投入の自動化は失敗が本番に残る（[../dev/microcms.md](./dev/microcms.md) に実例）
+  - **Claude in Chrome の `hidden` タブでは `vh` / `svh` / `dvh` が 0 になる。** レイアウトが潰れ「画像が表示されない」と誤診する
+  - **BFCache の観測** — Vercel preview は `vercel.live` の iframe が阻害するため測れない。ローカル本番ビルドで、プローブ生存 / `pageshow.persisted` / DOM ノード同一性の3点で判定する
+  - `navigation.type` は BFCache 復帰でも `"navigate"` のまま。`"back_forward"` はドキュメント再作成のサイン（逆に読むと判定が反転する）
+
+- **[browser-verification-pitfalls.md](./frontend/browser-verification-pitfalls.md)** - 検証手順そのものが誤る実例
+  - **Tailwind の任意値を `grep` するときは `-F`。** `[...]` が文字クラスになり、存在するのに0件と出る
+  - **CSS のカスタムクラスが効かないときは `.next` を丸ごと削除する。** HMR でも `.next/cache` 削除でも復旧しないことがある
   - **`resize_window` は viewport を変えない。** レスポンシブ検証は agent-browser の `--viewport` かコンテナ幅を直接絞る方法で行う（メディアクエリの切り替わりは実機確認）
-  - **Claude in Chrome の `hidden` タブでは `vh` / `svh` / `dvh` が 0 になる。** レイアウトが潰れ「画像が表示されない」と誤診する。`vh` を使うページは agent-browser で検証する
-  - **検証手順そのものが誤ることがある。** Tailwind の任意値を `grep` するときは `-F`（`[...]` が文字クラスになる）。CSS のカスタムクラスが効かないときは `.next` を丸ごと削除する
+  - **外部SPAの管理画面は「操作」に使わない。** 観測用であり、設定投入の自動化は失敗が本番に残る（[dev/microcms.md](./dev/microcms.md) に実例）
   - 誤診の実例は [page-transition.md](./frontend/page-transition.md) も参照
 
 - **[layout-patterns.md](./frontend/layout-patterns.md)** - レイアウトパターンと設計原則
@@ -199,4 +210,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-08-16
+**最終更新日**: 2026-08-17

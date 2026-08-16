@@ -2,7 +2,7 @@
 
 本ドキュメントでは、React の `<ViewTransition>` によるページ遷移の実装方針と、その過程で判明した Next.js / React 側の落とし穴を記録します。あわせて、Issue #39 で「前ページのDOMが残留する」という**存在しないバグを起票してしまった事故**の原因と、同じ誤診を繰り返さないための計測ルールを定義します。
 
-計測環境そのものの前提は [agent-browser-workflow.md](./agent-browser-workflow.md#観測の前提を測る先に読むこと) の「観測の前提を測る」節を先に読んでください。**自動化環境で観測値を取る前に、必ず `framesIn1s` を測ってください。**
+計測環境そのものの前提は [browser-observation-limits.md](./browser-observation-limits.md#観測の前提を測る先に読むこと) の「観測の前提を測る」節を先に読んでください。**自動化環境で観測値を取る前に、必ず `framesIn1s` を測ってください。**
 
 ---
 
@@ -339,7 +339,7 @@ delay が 0 なので fill-mode 無しでも最初のフレームから 0% キ�
 
 対照として、同一コミットの Vercel preview で「リンク遷移ではクラスなし → `history.back()` で `page-enter-history` が付く」ことを確認済みです。**プローブに検出能力があることを示したうえでの「付かない」**なので、偽陰性ではありません。
 
-観測手順の詳細と落とし穴は [agent-browser-workflow.md](./agent-browser-workflow.md) の「BFCache の観測」を参照してください。
+観測手順の詳細と落とし穴は [browser-observation-limits.md](./browser-observation-limits.md) の「BFCache の観測」を参照してください。
 
 ### hydration 安全性
 
@@ -461,13 +461,13 @@ rAF が止まった同じタブで `$RV($RB)` を手動実行したところ、�
 
 ### DOM 構造の観測でも rAF 生存確認は必要
 
-[agent-browser-workflow.md](./agent-browser-workflow.md#観測の前提を測る先に読むこと) の切り分け表では DOM 構造の確認を「条件付きで検証できる」側に分類していますが、**Suspense のストリーミング差し込みのように DOM 操作そのものが rAF に依存しているケースがあります。** DOM 件数を数えるだけの計測でも、`framesIn1s` を記録に残してください。
+[browser-observation-limits.md](./browser-observation-limits.md#観測の前提を測る先に読むこと) の切り分け表では DOM 構造の確認を「条件付きで検証できる」側に分類していますが、**Suspense のストリーミング差し込みのように DOM 操作そのものが rAF に依存しているケースがあります。** DOM 件数を数えるだけの計測でも、`framesIn1s` を記録に残してください。
 
 `framesIn1s: 0` の環境で `<div hidden id="S:n">` を見つけたら、バグではなく計測アーティファクトです。`$RV($RB)` を手動実行して消えるなら確定です。
 
 ### 自動化環境での view transition の挙動
 
-**自動化環境が `visibilityState: "hidden"` とは限りません。** ツールによって異なり、実測すると次のように割れます。まず [agent-browser-workflow.md](./agent-browser-workflow.md#観測の前提を測る先に読むこと) の手順1 で `visibilityState` と `framesIn1s` を測り、どちらの列にいるかを確定させてください。
+**自動化環境が `visibilityState: "hidden"` とは限りません。** ツールによって異なり、実測すると次のように割れます。まず [browser-observation-limits.md](./browser-observation-limits.md#観測の前提を測る先に読むこと) の手順1 で `visibilityState` と `framesIn1s` を測り、どちらの列にいるかを確定させてください。
 
 | 観測項目                         | `visible` / `framesIn1s > 0` | `hidden` / `framesIn1s: 0`           |
 | -------------------------------- | ---------------------------- | ------------------------------------ |
@@ -528,12 +528,13 @@ document.addEventListener(
 
 Issue #47 に続き Issue #39 も、**`framesIn1s: 0` の環境で得た観測値だけで**起票された誤報でした。問題は「自動化を使ったこと」ではなく、**測定系が死んでいることを確認せずに結論を出したこと**です。
 
-「前ページが残る」「アニメーションが動かない」「要素が見えない」という症状を見つけたら、まず `framesIn1s` を測ってください。`0` なら計測アーティファクトを疑い、実機で再現するまで起票しない。`60` 前後なら、その環境で正当に切り分けられます。依頼の書き方は agent-browser-workflow.md の「代替手段: `framesIn1s: 0` なら実機確認を依頼する」を参照。
+「前ページが残る」「アニメーションが動かない」「要素が見えない」という症状を見つけたら、まず `framesIn1s` を測ってください。`0` なら計測アーティファクトを疑い、実機で再現するまで起票しない。`60` 前後なら、その環境で正当に切り分けられます。依頼の書き方は browser-observation-limits.md の「代替手段: `framesIn1s: 0` なら実機確認を依頼する」を参照。
 
 ---
 
 ## 関連ドキュメント
 
-- [agent-browser-workflow.md](./agent-browser-workflow.md) - 観測の前提（rAF 生存）の測り方と、実機確認の依頼方法
+- [browser-observation-limits.md](./browser-observation-limits.md) - 観測の前提（rAF 生存）の測り方と、実機確認の依頼方法
+- [browser-verification-pitfalls.md](./browser-verification-pitfalls.md) - 検証手順そのものが誤る実例
 - [layout-patterns.md](./layout-patterns.md) - z-index・position の使い分け
 - [design.md](./design.md) - デザインシステム（カラー・タイポグラフィトークン）
