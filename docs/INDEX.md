@@ -153,6 +153,8 @@ docs/
   - **`ssr: false` の描画検証の症状はツールで異なる。** agent-browser は canvas がマウントせず、実 Chrome の `hidden` タブは**マウントするが `300×150` のまま未描画**（要素の存在だけで合格判定すると誤判定する）
   - **外部SPAの管理画面は「操作」に使わない。** 本ワークフローは観測用。設定投入の自動化は失敗が本番に残る（[../dev/microcms.md](./dev/microcms.md) に実例）
   - **`resize_window` は viewport を変えない。** レスポンシブ検証は agent-browser の `--viewport` かコンテナ幅を直接絞る方法で行う（メディアクエリの切り替わりは実機確認）
+  - **Claude in Chrome の `hidden` タブでは `vh` / `svh` / `dvh` が 0 になる。** レイアウトが潰れ「画像が表示されない」と誤診する。`vh` を使うページは agent-browser で検証する
+  - **検証手順そのものが誤ることがある。** Tailwind の任意値を `grep` するときは `-F`（`[...]` が文字クラスになる）。CSS のカスタムクラスが効かないときは `.next` を丸ごと削除する
   - 誤診の実例は [page-transition.md](./frontend/page-transition.md) も参照
 
 - **[layout-patterns.md](./frontend/layout-patterns.md)** - レイアウトパターンと設計原則
