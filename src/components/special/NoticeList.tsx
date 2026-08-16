@@ -1,3 +1,4 @@
+import { AlertTriangle } from "lucide-react";
 import type { NoticeSection } from "@/types/events";
 
 interface NoticeListProps {
@@ -27,7 +28,14 @@ export function NoticeList({ notices }: NoticeListProps) {
             key={`${notice.heading}-${index}`}
             className="rounded-xl border border-gray-200 p-4 md:p-5"
           >
-            <h3 className="mb-2 font-bold text-gray-900">{notice.heading}</h3>
+            {/* アイコンは装飾。見出しテキストだけを読み上げさせる */}
+            <h3 className="mb-2 flex items-start gap-2 font-bold text-gray-900">
+              <AlertTriangle
+                className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600"
+                aria-hidden="true"
+              />
+              {notice.heading}
+            </h3>
             {notice.body && (
               <div
                 className="prose prose-sm max-w-none prose-p:text-gray-900/80 prose-a:text-primary"

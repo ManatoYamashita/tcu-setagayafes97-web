@@ -35,15 +35,24 @@ export function SpecialProfile({ content, photos }: SpecialProfileProps) {
 
       {hasPhotos && (
         <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {photos?.map((photo) => (
-            <li key={photo.url} className="overflow-hidden rounded-xl border border-gray-200">
+          {/* 同じ画像を複数枚選べるため、URL だけでは key が衝突する */}
+          {photos?.map((photo, index) => (
+            <li
+              key={`${photo.url}-${index}`}
+              className="overflow-hidden rounded-xl border border-gray-200"
+            >
+              {/*
+                縦長の写真が入稿されるとモバイルのスクロール量が跳ね上がるため、
+                高さの上限を 70dvh とし、超過分は中心を基準にクロップする。
+                アスペクト比は object-cover が維持する。
+              */}
               <Image
                 src={photo.url}
                 alt=""
                 width={photo.width ?? 800}
                 height={photo.height ?? 600}
                 sizes="(min-width: 640px) 50vw, 100vw"
-                className="h-auto w-full object-cover"
+                className="max-h-[70dvh] w-full object-cover object-center"
               />
             </li>
           ))}
