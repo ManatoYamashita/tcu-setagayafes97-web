@@ -189,6 +189,32 @@ body {
       );
     }
   }
+
+  /* SpecialHero: 左下から右上へ抜けるオーバーレイ。
+     ロゴとタイトルを左下へ置くため、最も濃い領域を左下に寄せている。
+
+     2層構造にしている。対角のグラデーションだけでは、テキストが載る下部の帯が
+     右へ行くほど急に薄くなり、白ロゴが入稿されたときに読めなくなるため、
+     下辺に沿った縦のグラデーションを重ねて可読性を担保する。
+
+     page-hero-overlay と同じく、終端は transparent ではなく同色の alpha 0 とし、
+     補間経路を紫に留める（transparent だと灰色を経由して濁る）。 */
+  .special-hero-overlay {
+    background:
+      linear-gradient(
+        to top,
+        oklch(47% 0.165 314deg / 0.72) 0%,
+        oklch(47% 0.165 314deg / 0.3) 28%,
+        oklch(47% 0.165 314deg / 0) 50%
+      ),
+      linear-gradient(
+        to top right,
+        var(--color-primary-600) 0%,
+        oklch(47% 0.165 314deg / 0.62) 35%,
+        oklch(47% 0.165 314deg / 0.28) 60%,
+        oklch(47% 0.165 314deg / 0) 88%
+      );
+  }
 }
 
 @keyframes spin-slow {
