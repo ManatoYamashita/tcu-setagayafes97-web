@@ -45,7 +45,7 @@ export function TicketTable({ tickets, note }: TicketTableProps) {
                 <th
                   key={`head-${ticket.name}-${index}`}
                   scope="col"
-                  className="min-w-[200px] px-4 py-3 text-left font-semibold text-gray-900"
+                  className="min-w-[220px] px-4 py-3 text-left font-semibold text-gray-900"
                 >
                   {ticket.name}
                 </th>
@@ -143,7 +143,9 @@ export function TicketTable({ tickets, note }: TicketTableProps) {
                         href={ticket.buttonUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
+                        // ラベルは折り返さない。列に min-w-[220px] を確保してあるため
+                        // 通常の文言なら1行に収まり、超える場合は表の横スクロールで読める
+                        className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
                       >
                         {ticket.buttonLabel || "チケットを購入する"}
                         <svg

@@ -126,6 +126,60 @@ c.width === 300 && c.height === 150;
 
 **結論として、`framesIn1s: 0` の環境では `ssr: false` コンポーネントの描画は検証できません。** ラッパー要素の位置・サイズ・z-index・`aria-hidden`、`animate-*` の有無、横スクロールの発生といった**描画に依存しない指標**は検証できるので、そこまでを自動で確認し、回転・チルト・モーション軽減時の静止は実機確認に回してください。
 
+### 例外: Claude in Chrome の `hidden` タブでは `vh` が 0 になる
+
+`visibilityState: "hidden"` のタブでは、**ビューポート由来の単位（`vh` / `svh` / `dvh`）が 0 として評価されます。**
+
+2026-08-16 に `/special/[id]` のヒーローで実測しました。`min-h-[60vh]` のセクションが高さ 0 に潰れ、その中の `next/image` の `fill`（絶対配置で親サイズに追随）も 0×0 になります。
+
+| 計測系                       | `innerHeight` | ヒーロー高さ  | 背景画像 |
+| ---------------------------- | ------------- | ------------- | -------- |
+| Claude in Chrome（`hidden`） | —             | **0**         | **0×0**  |
+| agent-browser 0.13.0         | 720           | 432（= 60vh） | 1280×432 |
+
+**症状が「画像が表示されない」なので、画像の読み込み失敗と誤診します。** 実際には `naturalWidth > 0` で読み込みは成功しており、レイアウトが潰れているだけでした。
+
+判別方法は単純です。
+
+```js
+// 親要素の高さが 0 なら、画像ではなくレイアウトを疑う
+element.getBoundingClientRect().height;
+// 画像自体の読み込みは naturalWidth で見る（レイアウトと独立）
+img.naturalWidth > 0;
+```
+
+**`vh` / `svh` / `dvh` を使うページの検証には agent-browser を使ってください。**
+
+### 検証手順そのものが誤ることがある
+
+観測対象ではなく、**確認の仕方**が結論を狂わせた実例です。
+
+#### `grep` で Tailwind の任意値を検索するときは `-F`
+
+生成CSSに任意値クラスが含まれるかを確認する場面で、`[...]` が正規表現の文字クラスとして解釈され、**存在するのに 0 件と出ました。**
+
+```bash
+# NG: [70dvh] が文字クラスになり一致しない
+grep -c 'max-h-\[70dvh\]' app.css   # → 0（誤り）
+
+# OK: 固定文字列として検索する
+grep -c -F '70dvh' app.css          # → 2（正しい）
+```
+
+「生成されていない」と誤判断し、原因の切り分けを一段遠回りしました。**メタ文字を含むクラス名を数えるときは必ず `-F` を付けてください。**
+
+#### CSS のカスタムクラスが効かないときは `.next` を疑う
+
+`globals.css` に追加した `.special-hero-overlay` が生成CSSに含まれず、**HMR でも `.next/cache` の削除でも復旧しませんでした。** `.next` を丸ごと削除して再起動したところ解決しています。
+
+```bash
+pkill -f "next dev"
+rm -rf .next
+pnpm dev
+```
+
+Tailwind のユーティリティ（`whitespace-nowrap` など既存語彙）は反映されるのに、**新規に定義したカスタムクラスだけが落ちる**という部分的な症状でした。「書いたはずの CSS が効かない」ときは、コードを疑う前にここを潰してください。
+
 ### BFCache の観測
 
 戻る・進むの挙動を検証するとき、BFCache（bfcache）が効いた復帰と、ドキュメントが再作成された復帰は**まったく別の経路**です。取り違えると「防御が効いた」と「そもそも BFCache が起きていない」を区別できません。
@@ -587,6 +641,19 @@ document.documentElement.scrollWidth > document.documentElement.clientWidth; // 
 ```
 
 **限界:** メディアクエリは viewport 基準で評価されるため、この方法では `md:` 以上／未満の切り替わりは再現できない。**ヘッダーのデスクトップ／モバイル切り替えのような検証は実機で行うこと。**
+
+> [!NOTE]
+> **`agent-browser eval` はトップレベル `await` を受け付けない。** 待機を挟む場合は非同期 IIFE で包み、明示的に `return` する。
+>
+> ```bash
+> agent-browser eval "(async () => {
+>   document.querySelector('.target').style.width = '375px';
+>   await new Promise((r) => setTimeout(r, 700));
+>   return JSON.stringify({ w: document.querySelector('.target').clientWidth });
+> })()"
+> ```
+>
+> また **`--viewport` はセッション再利用時に無視される。** 幅を変えるたびに `agent-browser close` を挟むこと。
 
 ## 外部SPAの管理画面は「操作」に使わない
 
