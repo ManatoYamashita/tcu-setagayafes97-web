@@ -78,3 +78,23 @@ export const EVENTS_VISIBLE: boolean = process.env.NEXT_PUBLIC_EVENTS_VISIBLE ==
  * microCMS へのお知らせ系フェッチも行われない。
  */
 export const NEWS_VISIBLE: boolean = process.env.NEXT_PUBLIC_NEWS_VISIBLE === "true";
+
+/**
+ * 著名人企画（type = special）の公開フラグ
+ * 環境変数 NEXT_PUBLIC_SPECIAL_VISIBLE を "true" に設定して再デプロイすると公開される。
+ * 未設定・"true" 以外はすべて非公開（安全側デフォルト）。
+ *
+ * EVENTS_VISIBLE とは独立して評価される。著名人の発表はチケット販売と紐づき、
+ * 一般企画一覧の公開より先行することがあるため、両者を別のフラグにしている。
+ *
+ * | EVENTS_VISIBLE | SPECIAL_VISIBLE | 挙動                                          |
+ * | -------------- | --------------- | --------------------------------------------- |
+ * | false          | false           | すべて準備中                                  |
+ * | false          | true            | /special のみ公開。/events・/timetable は準備中 |
+ * | true           | false           | /events・/timetable は公開。type=special は除外 |
+ * | true           | true            | すべて公開                                    |
+ *
+ * IMPORTANT: 著名人は解禁日が契約で決まっていることが多く、URL の先行露出が事故になる。
+ * microCMS 側を下書きにするだけで済ませず、必ずこのフラグでも塞ぐこと。
+ */
+export const SPECIAL_VISIBLE: boolean = process.env.NEXT_PUBLIC_SPECIAL_VISIBLE === "true";

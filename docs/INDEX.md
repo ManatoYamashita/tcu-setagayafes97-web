@@ -16,6 +16,7 @@ docs/
 ├── dev/              # 開発関連ドキュメント
 │   ├── git.md        # ブランチ戦略とCI/CDワークフロー
 │   ├── ci-env.md     # GitHub Actions 環境変数管理（Secrets/Variables）
+│   ├── domain-migration.md # setagayafes.org を第97回の正規ドメインにする手順
 │   └── microcms.md   # microCMS API 制約と実装パターン
 ├── frontend/         # フロントエンド関連ドキュメント
 │   ├── design.md                  # デザインシステム（カラー・タイポグラフィトークン）
@@ -105,12 +106,25 @@ docs/
   - 企画・お知らせの公開フラグと非公開時の表示範囲
   - ワークフローでの参照方法（`secrets.` vs `vars.`）
   - ローカル開発（.env.local）との対応表
-  - **Vercel の本番反映は手動 Promote。** main へ merge しても Production は作られない（Preview のみ）。完了は Production デプロイの sha と main 先端の一致で判定する
+  - **Vercel の本番反映は手動。** main へ merge しても Production は作られない（Preview のみ）。完了は Production デプロイの sha と main 先端の一致で判定する
+  - **`vercel promote` は使わない。** 再ビルドしないため Preview 環境変数の成果物が本番に出る（`MICROCMS_SERVICE_DOMAIN` は環境別）。`vercel redeploy --target production` を使う
+  - **`Aliased:` 表示は DNS を保証しない。** 公開ドメインは `curl -sI` の `server` / `location` ヘッダで実応答を確認する。`NEXT_PUBLIC_URL` のホストが名前解決できるかも確認する
+  - **`NEXT_PUBLIC_SPECIAL_VISIBLE` は `EVENTS_VISIBLE` と独立。** 4通りの組み合わせ表あり。著名人ページの先行公開には `getSpecialEvents()` を使う（`getEventsList()` は EVENTS_VISIBLE=false で常に空）
+
+- **[domain-migration.md](./dev/domain-migration.md)** - `setagayafes.org` を第97回の正規ドメインにする手順
+  - 第96回（WordPress）は `96th.setagayafes.org` へ退避し、`/96th/*` は 301 で引き継ぐ
+  - **rewrite プロキシは採らない。** trailing-slash リダイレクトが rewrite より先に走るため無限ループになり、`skipTrailingSlashRedirect` で止めると canonical 未実装の現状で重複URLを生む
+  - 手順の順序（WordPress の `siteurl` 変更 → 301 の本番反映 → DNS 切替）と各段階の検証コマンド
+  - Vercel が要求する DNS レコード（`A 76.76.21.21` / `CNAME cname.vercel-dns.com`）
 
 - **[microcms.md](./dev/microcms.md)** - microCMS API 制約と実装パターン
   - limit 上限100件の制約と offset ページネーション実装
   - 適用済み関数（getEventsList）と未適用関数の一覧
   - 使用 API エンドポイント一覧
+  - **select の選択肢を増やしたら正規化関数も直す。** ホワイトリスト方式のため、直さないと新しい値が黙って `other` に落ちる（エラーは出ない）
+  - カスタムフィールドのネスト制約と作成順序（子から親へ）。API をまたいだ参照は不可
+  - **管理画面はブラウザ自動操作で編集できない。** 種類選択が実マウスイベントに依存し、スクリプトでは別の行へ適用される
+  - **下書きコンテンツで動作確認はできない。** `draftKey` は保存のたびに変わり失効する。表示確認はダミーを直接渡す一時ページで行う
 
 ### フロントエンド関連（frontend/）
 
@@ -137,6 +151,8 @@ docs/
   - `navigation.type` は BFCache 復帰でも `"navigate"` のまま。`"back_forward"` はドキュメント再作成のサイン（逆に読むと判定が反転する）
   - **`hidden` なタブで rAF を await するとレンダラが凍結してタブが落ちる**（agent-browser / Claude in Chrome 共通。`visibilityState` を同期評価で先に読む）
   - **`ssr: false` の描画検証の症状はツールで異なる。** agent-browser は canvas がマウントせず、実 Chrome の `hidden` タブは**マウントするが `300×150` のまま未描画**（要素の存在だけで合格判定すると誤判定する）
+  - **外部SPAの管理画面は「操作」に使わない。** 本ワークフローは観測用。設定投入の自動化は失敗が本番に残る（[../dev/microcms.md](./dev/microcms.md) に実例）
+  - **`resize_window` は viewport を変えない。** レスポンシブ検証は agent-browser の `--viewport` かコンテナ幅を直接絞る方法で行う（メディアクエリの切り替わりは実機確認）
   - 誤診の実例は [page-transition.md](./frontend/page-transition.md) も参照
 
 - **[layout-patterns.md](./frontend/layout-patterns.md)** - レイアウトパターンと設計原則
@@ -181,4 +197,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-08-10
+**最終更新日**: 2026-08-16

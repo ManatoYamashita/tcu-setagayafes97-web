@@ -2,24 +2,15 @@
   "apiFields": [
     {
       "fieldId": "type",
-      "name": "お知らせ種別",
+      "name": "タイプ",
       "kind": "select",
       "required": true,
       "multipleSelect": false,
-      "selectInitialValue": null,
+      "initialValue": ["DEFAULT"],
       "selectItems": [
-        {
-          "id": "urgent_001",
-          "value": "urgent"
-        },
-        {
-          "id": "news_002",
-          "value": "news"
-        },
-        {
-          "id": "other_003",
-          "value": "other"
-        }
+        { "id": "VNtiIMqNtp", "value": "urgent : 緊急" },
+        { "id": "ZQRpQmfZNU", "value": "news : お知らせ" },
+        { "id": "4WTIaawKJA", "value": "other : その他" }
       ]
     },
     {

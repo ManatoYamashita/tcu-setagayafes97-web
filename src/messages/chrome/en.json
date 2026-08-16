@@ -1,6 +1,8 @@
 {
   "navigation": {
     "events": "Events",
+    "eventList": "All Events",
+    "special": "Special Guests",
     "timetable": "Timetable",
     "map": "Map & Access",
     "campusMap": "Campus Map",

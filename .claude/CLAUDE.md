@@ -175,7 +175,10 @@ push 時は head をそのまま、PR 時は head を base へマージした結
 **主要フィールド:**
 
 - **News API**: `type` (urgent/news/other), `title`, `thumbnail`, `description`, `content`
-- **Events API**: `date` (day1/day2/both/other), `type` (room/stage/special/other), `place`, `building`, `title`, `organizer`, `thumbnail`, `description`, `content`, `startTime`, `endTime`, `sns`
+- **Events API**: `date` (day1/day2/both/other), `type` (room/stage/special/other), `place`, `building`, `title`, `organizer`, `thumbnail`, `description`, `content`, `startTime`, `endTime`, `sns`, `special`
+  - `sns` は**テキストフィールド1つ**（カスタムフィールドではない）。1企画につきSNSリンクは1件のみ
+  - `special` は `type = special` のときのみ入力する著名人企画LP用のカスタムフィールド。中身は `logo` / `photos` / `openTime` / `goods` / `tickets` / `notices` ほか。詳細は `microcms/README.md`
+  - `select` の値は `day1 : 10月31日（土）` のように **`値 : ラベル`** 形式。コード側は `split(":")` で先頭を取り出す
 - **Informations API**: `category` (sponsor/faq/other), `title`, `description`, `image`, `url`, `priority`
 
 ### パフォーマンス最適化
@@ -237,7 +240,10 @@ push 時は head をそのまま、PR 時は head を base へマージした結
 /                           # トップページ (HOME)
 ├── /events                 # 企画を探す
 │   ├── /                   # 企画検索・一覧
-│   └── /[id]               # 企画詳細 [動的生成]
+│   └── /[id]               # 企画詳細 [動的生成] ※type=special は /special/[id] へ 308
+├── /special                # 著名人企画
+│   ├── /                   # 一覧
+│   └── /[id]               # 著名人企画LP [動的生成]
 ├── /timetable              # タイムテーブル
 ├── /access                 # キャンパスマップ（2D）+ 交通アクセス
 ├── /info                   # インフォメーション

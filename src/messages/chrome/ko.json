@@ -1,6 +1,8 @@
 {
   "navigation": {
     "events": "행사 검색",
+    "eventList": "행사 목록",
+    "special": "특별 게스트",
     "timetable": "시간표",
     "map": "지도 & 교통",
     "campusMap": "캠퍼스 지도",

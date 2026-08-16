@@ -6,136 +6,191 @@
       "kind": "select",
       "required": true,
       "multipleSelect": false,
-      "selectInitialValue": null,
+      "initialValue": ["DEFAULT"],
       "selectItems": [
-        {
-          "id": "day1_001",
-          "value": "day1"
-        },
-        {
-          "id": "day2_002",
-          "value": "day2"
-        },
-        {
-          "id": "both_003",
-          "value": "both"
-        },
-        {
-          "id": "other_004",
-          "value": "other"
-        }
+        { "id": "hE8uK3VMWd", "value": "day1 : 10月31日（土）" },
+        { "id": "ZAR08IMXOE", "value": "day2 : 11月1日（日）" },
+        { "id": "9IDSx6LaXG", "value": "both : 両日" },
+        { "id": "7Y0vbKo-EO", "value": "other : その他" }
       ]
     },
     {
       "fieldId": "type",
-      "name": "企画種別",
+      "name": "企画タイプ",
       "kind": "select",
       "required": true,
       "multipleSelect": false,
-      "selectInitialValue": null,
+      "initialValue": ["DEFAULT"],
       "selectItems": [
-        {
-          "id": "room_001",
-          "value": "room"
-        },
-        {
-          "id": "stage_002",
-          "value": "stage"
-        },
-        {
-          "id": "special_003",
-          "value": "special"
-        },
-        {
-          "id": "other_004",
-          "value": "other"
-        }
+        { "id": "vXKAN6bAHW", "value": "room : 教室企画" },
+        { "id": "HiWE3JsSXV", "value": "stage : ステージ企画" },
+        { "id": "MbWeQ2gfEg", "value": "special : スペシャル企画" },
+        { "id": "251gQP6xuI", "value": "other : その他" }
       ]
     },
     {
       "fieldId": "place",
-      "name": "場所（教室番号等）",
+      "name": "場所",
       "kind": "text",
       "required": true
     },
     {
       "fieldId": "building",
-      "name": "建物名",
+      "name": "建物番号",
       "kind": "text",
-      "required": true
+      "required": false
     },
     {
       "fieldId": "title",
-      "name": "企画タイトル",
+      "name": "タイトル",
       "kind": "text",
       "required": true
     },
     {
       "fieldId": "organizer",
-      "name": "主催団体名",
+      "name": "主催団体",
       "kind": "text",
       "required": true
     },
     {
       "fieldId": "thumbnail",
-      "name": "サムネイル画像",
+      "name": "サムネイル",
       "kind": "media",
       "required": false
     },
     {
       "fieldId": "description",
-      "name": "企画概要",
+      "name": "概要",
       "kind": "textArea",
       "required": true
     },
     {
       "fieldId": "content",
-      "name": "詳細説明",
+      "name": "詳細",
       "kind": "richEditorV2",
       "required": true
     },
     {
       "fieldId": "startTime",
-      "name": "開始時刻（HH:mm）",
+      "name": "開始時刻",
       "kind": "text",
       "required": false
     },
     {
       "fieldId": "endTime",
-      "name": "終了時刻（HH:mm）",
+      "name": "終了時刻",
       "kind": "text",
       "required": false
     },
     {
       "fieldId": "sns",
-      "name": "SNS情報",
-      "kind": "custom",
-      "customFieldId": "sns_links",
+      "name": "SNS",
+      "kind": "text",
       "required": false
+    },
+    {
+      "fieldId": "special",
+      "name": "著名人企画の詳細",
+      "kind": "custom",
+      "required": false,
+      "listViewFieldId": "DEFAULT",
+      "customFieldId": "specialDetail"
     }
   ],
   "customFields": [
     {
-      "fieldId": "sns_links",
-      "name": "SNSリンク",
+      "fieldId": "goodsItem",
+      "name": "物販商品",
       "fields": [
+        { "fieldId": "name", "name": "商品名", "kind": "text", "required": true },
+        { "fieldId": "color", "name": "カラー", "kind": "text", "required": false },
+        { "fieldId": "size", "name": "サイズ", "kind": "text", "required": false },
+        { "fieldId": "price", "name": "販売価格", "kind": "text", "required": false },
+        { "fieldId": "note", "name": "備考", "kind": "textArea", "required": false },
+        { "fieldId": "isNew", "name": "新グッズ", "kind": "boolean", "required": false },
+        { "fieldId": "image", "name": "商品画像", "kind": "media", "required": false }
+      ]
+    },
+    {
+      "fieldId": "ticketPlan",
+      "name": "チケット券種",
+      "fields": [
+        { "fieldId": "name", "name": "券種名", "kind": "text", "required": true },
+        { "fieldId": "price", "name": "料金", "kind": "text", "required": false },
         {
-          "fieldId": "twitter",
-          "name": "Twitter（X）",
+          "fieldId": "salesPeriod",
+          "name": "発売日・販売期間",
           "kind": "text",
           "required": false
         },
         {
-          "fieldId": "instagram",
-          "name": "Instagram",
+          "fieldId": "method",
+          "name": "販売方法・販売場所",
+          "kind": "richEditorV2",
+          "required": false
+        },
+        { "fieldId": "note", "name": "注意事項", "kind": "textArea", "required": false },
+        {
+          "fieldId": "buttonLabel",
+          "name": "購入ボタンのラベル",
           "kind": "text",
           "required": false
         },
+        { "fieldId": "buttonUrl", "name": "購入ページURL", "kind": "text", "required": false }
+      ]
+    },
+    {
+      "fieldId": "noticeSection",
+      "name": "注意事項",
+      "fields": [
+        { "fieldId": "heading", "name": "見出し", "kind": "text", "required": true },
+        { "fieldId": "body", "name": "本文", "kind": "richEditorV2", "required": false }
+      ]
+    },
+    {
+      "fieldId": "specialDetail",
+      "name": "著名人企画の詳細",
+      "fields": [
+        { "fieldId": "logo", "name": "アーティストロゴ", "kind": "media", "required": false },
         {
-          "fieldId": "website",
-          "name": "Webサイト",
-          "kind": "text",
+          "fieldId": "photos",
+          "name": "アーティスト写真（追加）",
+          "kind": "mediaList",
           "required": false
+        },
+        { "fieldId": "openTime", "name": "開場時刻", "kind": "text", "required": false },
+        {
+          "fieldId": "goods",
+          "name": "物販",
+          "kind": "repeater",
+          "required": false,
+          "customFieldIds": ["goodsItem"]
+        },
+        {
+          "fieldId": "goodsNote",
+          "name": "物販の補足",
+          "kind": "richEditorV2",
+          "required": false
+        },
+        {
+          "fieldId": "tickets",
+          "name": "チケット販売",
+          "kind": "repeater",
+          "required": false,
+          "customFieldIds": ["ticketPlan"]
+        },
+        {
+          "fieldId": "ticketNote",
+          "name": "チケットの補足",
+          "kind": "richEditorV2",
+          "required": false
+        },
+        {
+          "fieldId": "notices",
+          "name": "注意事項",
+          "kind": "repeater",
+          "required": false,
+          "customFieldIds": ["noticeSection"]
         }
       ]
     }
