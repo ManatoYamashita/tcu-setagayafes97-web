@@ -48,6 +48,19 @@ function normalizeInformation(rawInfo: RawInformation): Information {
 }
 
 /**
+ * select フィールドは microCMS の filters では絞り込めない
+ *
+ * `[contains]` は select に対して**配列要素の完全一致**で動く。部分一致ではない。
+ * `category` は `sponsor : 協賛企業` のように `値 : ラベル` 形式で登録されているため、
+ * `category[contains]sponsor` は常に 0 件を返す（2026-08-16 に実測。協賛企業一覧が
+ * 空になっていた）。
+ *
+ * ラベルまで含めれば一致するが、入稿側でラベルを直した瞬間に壊れる。
+ * したがって絞り込みは API に任せず、正規化後の値で filter する。
+ * 詳細は `src/lib/events.ts` の同名コメントを参照。
+ */
+
+/**
  * 協賛企業一覧を取得
  * @returns 協賛企業の配列（優先度順）
  */
@@ -58,12 +71,13 @@ export async function getSponsorsList(): Promise<Information[]> {
       endpoint: "informations",
       queries: {
         limit: 100,
-        filters: "category[contains]sponsor",
         orders: "-priority",
       },
     });
-    // データを正規化して返す
-    return response.contents.map(normalizeInformation);
+    // select は API の filters で絞れない（上記コメント参照）。正規化後の値で絞る
+    return response.contents
+      .map(normalizeInformation)
+      .filter((info) => info.category === "sponsor");
   } catch (error) {
     console.error("[getSponsorsList] Error:", error);
     return [];
@@ -80,13 +94,12 @@ export async function getFAQList(): Promise<Information[]> {
     const response: RawInformationListResponse = await client.get({
       endpoint: "informations",
       queries: {
-        limit: 50,
-        filters: "category[contains]faq",
+        limit: 100,
         orders: "-publishedAt",
       },
     });
-    // データを正規化して返す
-    return response.contents.map(normalizeInformation);
+    // select は API の filters で絞れない（上記コメント参照）。正規化後の値で絞る
+    return response.contents.map(normalizeInformation).filter((info) => info.category === "faq");
   } catch (error) {
     console.error("[getFAQList] Error:", error);
     return [];
