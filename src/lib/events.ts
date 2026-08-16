@@ -123,6 +123,27 @@ function normalizeEvent(rawEvent: RawEvent): Event {
 const MICROCMS_MAX_LIMIT = 100;
 
 /**
+ * select フィールドは microCMS の filters では絞り込めない
+ *
+ * `[contains]` は select に対して**配列要素の完全一致**で動く。部分一致ではない。
+ * 本プロジェクトの select は `値 : ラベル` 形式（例: `special : スペシャル企画`）で
+ * 登録されているため、値だけを渡すと常に 0 件になる。
+ *
+ * 実測（2026-08-16）:
+ *
+ * | filters                                  | 件数 |
+ * | ---------------------------------------- | ---- |
+ * | `type[contains]special`                  | 0    |
+ * | `type[contains]スペシャル`               | 0    |
+ * | `type[contains]special : スペシャル企画` | 2    |
+ * | `type[equals]special : スペシャル企画`   | 0    |
+ *
+ * ラベルまで含めれば一致するが、**入稿側でラベルを直した瞬間に壊れる**。
+ * したがって select の絞り込みは API に任せず、正規化後の値で filter する。
+ * text フィールド（`building` など）は `[equals]` が正しく動くため API 側で絞ってよい。
+ */
+
+/**
  * 未解禁の著名人企画を一覧から除外する
  *
  * SPECIAL_VISIBLE が false の間、type = special の企画は
@@ -152,18 +173,21 @@ export async function getEventsList(
   if (!isMicrocmsConfigured) return [];
   try {
     // microCMS filters パラメータの構築
+    // select（date / type）は API では絞れないため、取得後に applyFilters() で適用する
     const filterQueries: string[] = [];
-    if (filters?.date) {
-      filterQueries.push(`date[contains]${filters.date}`);
-    }
-    if (filters?.type) {
-      filterQueries.push(`type[contains]${filters.type}`);
-    }
     if (filters?.building) {
       filterQueries.push(`building[equals]${filters.building}`);
     }
 
     const filterParam = filterQueries.length > 0 ? { filters: filterQueries.join("[and]") } : {};
+
+    /** select の絞り込みを正規化後の値で適用する */
+    const applyFilters = (events: Event[]): Event[] =>
+      events.filter(
+        (event) =>
+          (!filters?.date || event.date === filters.date) &&
+          (!filters?.type || event.type === filters.type)
+      );
 
     // 100件以下なら1回で取得
     if (limit <= MICROCMS_MAX_LIMIT) {
@@ -175,7 +199,7 @@ export async function getEventsList(
           ...filterParam,
         },
       });
-      return excludeUnreleasedSpecial(response.contents.map(normalizeEvent));
+      return excludeUnreleasedSpecial(applyFilters(response.contents.map(normalizeEvent)));
     }
 
     // 100件超: ページネーションで全件取得
@@ -201,7 +225,7 @@ export async function getEventsList(
       offset += perPage;
     }
 
-    return excludeUnreleasedSpecial(allContents.map(normalizeEvent));
+    return excludeUnreleasedSpecial(applyFilters(allContents.map(normalizeEvent)));
   } catch (error) {
     console.error("[getEventsList] Error:", error);
     return [];
@@ -225,10 +249,9 @@ export async function getSpecialEvents(): Promise<Event[]> {
       queries: {
         limit: MICROCMS_MAX_LIMIT,
         orders: "-publishedAt",
-        filters: "type[contains]special",
       },
     });
-    // filters は部分一致のため、正規化後の値で再度絞り込む
+    // select は API の filters で絞れない（上記コメント参照）。正規化後の値で絞る
     return response.contents.map(normalizeEvent).filter((event) => event.type === "special");
   } catch (error) {
     console.error("[getSpecialEvents] Error:", error);
