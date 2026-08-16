@@ -59,6 +59,10 @@ export const navigationConfig = {
   // ヘッダーナビゲーション
   header: [
     { labelKey: "events", href: "/events" },
+    // 著名人企画は年間の目玉であり、階層を下げると発見されにくい。
+    // 未解禁（SPECIAL_VISIBLE=false）でも項目は出す。/special は準備中ページとして
+    // 成立し、「今年も著名人企画がある」ことを伏せる必要はないため（出演者名は出ない）。
+    { labelKey: "special", href: "/special" },
     { labelKey: "timetable", href: "/timetable" },
     { labelKey: "access", href: "/access" },
     {
@@ -81,6 +85,7 @@ export const navigationConfig = {
       titleKey: "eventInfo",
       links: [
         { labelKey: "events", href: "/events" },
+        { labelKey: "special", href: "/special" },
         { labelKey: "timetable", href: "/timetable" },
       ],
     },
