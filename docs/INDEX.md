@@ -112,6 +112,8 @@ docs/
   - **`vercel promote` は使わない。** 再ビルドしないため Preview 環境変数の成果物が本番に出る（`MICROCMS_SERVICE_DOMAIN` は環境別）。`vercel redeploy --target production` を使う
   - **`Aliased:` 表示は DNS を保証しない。** 公開ドメインは `curl -sI` の `server` / `location` ヘッダで実応答を確認する。`NEXT_PUBLIC_URL` のホストが名前解決できるかも確認する
   - **`NEXT_PUBLIC_SPECIAL_VISIBLE` は `EVENTS_VISIBLE` と独立。** 4通りの組み合わせ表あり。著名人ページの先行公開には `getSpecialEvents()` を使う（`getEventsList()` は EVENTS_VISIBLE=false で常に空）
+  - **公開フラグの登録先は4箇所**（`.env.example` / GitHub Variables / Vercel / 本ドキュメント）。**未設定はエラーにならず黙って非公開になるため、登録漏れが「仕様どおりの準備中表示」と区別できない。** 突き合わせコマンドと `SPECIAL_VISIBLE` 登録漏れの実例あり
+  - **`EVENTS_VISIBLE=false` + `SPECIAL_VISIBLE=true` では `/events/[id]` → `/special/[id]` の誘導が効かない。** `getEventById()` が先に `null` を返し、リダイレクト判定へ到達しない
 
 - **[domain-migration.md](./dev/domain-migration.md)** - `setagayafes.org` を第97回の正規ドメインにする手順
   - 第96回（WordPress）は `96th.setagayafes.org` へ退避し、`/96th/*` は 301 で引き継ぐ
