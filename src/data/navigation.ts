@@ -58,11 +58,22 @@ interface FooterSectionConfig {
 export const navigationConfig = {
   // ヘッダーナビゲーション
   header: [
-    { labelKey: "events", href: "/events" },
-    // 著名人企画は年間の目玉であり、階層を下げると発見されにくい。
+    // 著名人企画は「企画を探す」の子として置く。ヘッダー直下に独立項目として
+    // 並べると、デスクトップナビが出る lg (1024px) の下端で要素が接触するため。
+    //
+    // 実測（2026-08-16 / 1280px）: padding 24×2 + ロゴ 208 + ナビ 766 + 言語切替 90 = 1112px。
+    // 6項目では 1024〜1112px の帯で破綻する（5項目なら 1000px で収まっていた）。
+    //
     // 未解禁（SPECIAL_VISIBLE=false）でも項目は出す。/special は準備中ページとして
     // 成立し、「今年も著名人企画がある」ことを伏せる必要はないため（出演者名は出ない）。
-    { labelKey: "special", href: "/special" },
+    {
+      labelKey: "events",
+      href: "/events",
+      children: [
+        { labelKey: "eventList", href: "/events" },
+        { labelKey: "special", href: "/special" },
+      ],
+    },
     { labelKey: "timetable", href: "/timetable" },
     { labelKey: "access", href: "/access" },
     {
