@@ -9,7 +9,7 @@ import { GoodsTable } from "@/components/special/GoodsTable";
 import { TicketTable } from "@/components/special/TicketTable";
 import { NoticeList } from "@/components/special/NoticeList";
 import { SNSLinks } from "@/components/events/SNSLinks";
-import { siteConfig, SPECIAL_VISIBLE } from "@/data/site";
+import { siteConfig, SPECIAL_GOODS_VISIBLE, SPECIAL_VISIBLE } from "@/data/site";
 
 interface SpecialPageProps {
   params: Promise<{ id: string }>;
@@ -192,7 +192,11 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
                 place={event.place}
               />
 
-              <GoodsTable goods={special?.goods} note={special?.goodsNote} />
+              <GoodsTable
+                goods={special?.goods}
+                note={special?.goodsNote}
+                isVisible={SPECIAL_GOODS_VISIBLE}
+              />
 
               <TicketTable tickets={special?.tickets} note={special?.ticketNote} />
 
