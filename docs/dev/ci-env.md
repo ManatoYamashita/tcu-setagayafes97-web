@@ -27,13 +27,18 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 
 ### Repository Variables
 
-| 変数名                        | 内容                     | 値の例                          |
-| ----------------------------- | ------------------------ | ------------------------------- |
-| `NEXT_PUBLIC_URL`             | 本番サイト URL           | `https://setagayafes.tcu.ac.jp` |
-| `NEXT_PUBLIC_GTM_ID`          | Google Tag Manager ID    | `GTM-XXXXXXX`                   |
-| `NEXT_PUBLIC_EVENTS_VISIBLE`  | 企画情報の公開フラグ     | `false`                         |
-| `NEXT_PUBLIC_NEWS_VISIBLE`    | お知らせ情報の公開フラグ | `false`                         |
-| `NEXT_PUBLIC_SPECIAL_VISIBLE` | 著名人企画の公開フラグ   | `false`                         |
+| 変数名                        | 内容                     | 値の例                    | 登録状況（2026-08-17 実測） |
+| ----------------------------- | ------------------------ | ------------------------- | --------------------------- |
+| `NEXT_PUBLIC_URL`             | 本番サイト URL           | `https://setagayafes.org` | **登録済み**                |
+| `NEXT_PUBLIC_GTM_ID`          | Google Tag Manager ID    | `GTM-XXXXXXX`             | 未登録                      |
+| `NEXT_PUBLIC_EVENTS_VISIBLE`  | 企画情報の公開フラグ     | `false`                   | 未登録                      |
+| `NEXT_PUBLIC_NEWS_VISIBLE`    | お知らせ情報の公開フラグ | `false`                   | 未登録                      |
+| `NEXT_PUBLIC_SPECIAL_VISIBLE` | 著名人企画の公開フラグ   | `false`                   | 未登録                      |
+
+> [!NOTE]
+> **この表は「登録すべきもの」であって、現状の登録一覧ではない。** `gh variable list` で確認できるのは `NEXT_PUBLIC_URL` のみ。
+> CI（`feature-ci.yml`）は Lint / Format / Build の検証だけなので、公開フラグが未登録でも **`false` としてビルドが通る**。
+> **つまり CI が緑でも、公開状態のページがビルドできることは何も検証していない。**
 
 ## ワークフローでの参照例
 
@@ -104,6 +109,49 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 > **著名人は解禁日が契約で決まっていることが多く、URL の先行露出が事故になる。**
 > microCMS 側を下書きにするだけで済ませず、必ず `NEXT_PUBLIC_SPECIAL_VISIBLE` でも塞ぐこと。
 
+> [!WARNING]
+> **`EVENTS_VISIBLE=false` / `SPECIAL_VISIBLE=true` の組み合わせでは、`/events/[id]` → `/special/[id]` の誘導が働かない。**
+> `src/app/events/[id]/page.tsx` は `getEventById()` の結果を見てから `type === "special"` を判定するが、
+> `getEventById()` は `EVENTS_VISIBLE=false` の間 microCMS へ問い合わせず `null` を返すため、
+> **リダイレクト判定に到達する前に `notFound()` へ落ちる。**
+> 既に配布済みの `/events/{id}` URL がある場合、この組み合わせの間は誘導されず「企画が見つかりません」になる。
+> 2026-08-17 に本番で実測（`/events/special-event-test` が `/special/...` へ転送されないことを確認）。
+
+### フラグを追加したら登録先は4箇所
+
+> [!IMPORTANT]
+> **公開フラグの未設定はエラーにならず、黙って `false`（非公開）になる。** 安全側デフォルトである代わりに、**登録漏れが「仕様どおりの準備中表示」と見分けられない。** 追加時は下記4箇所すべてを埋めること。
+
+| #   | 登録先                                       | 目的                                     |
+| --- | -------------------------------------------- | ---------------------------------------- |
+| 1   | `.env.example`                               | 新規参加者が `.env.local` を作れるように |
+| 2   | GitHub Repository Variables                  | CI のビルドチェック                      |
+| 3   | Vercel Environment Variables（Prod/Preview） | 実際のデプロイ                           |
+| 4   | 本ファイルの登録一覧・対応表                 | 追跡可能性                               |
+
+#### 実例：`NEXT_PUBLIC_SPECIAL_VISIBLE` の登録漏れ（2026-08-17）
+
+`SPECIAL_VISIBLE` はコードにも本ファイルにも記載済みだったが、**`.env.example` と Vercel の双方から欠落していた。** ローカル `.env.local` にだけ `true` が入っていたため、次の状態になっていた。
+
+| 環境                     | `SPECIAL_VISIBLE` | `/special` の実際の表示  |
+| ------------------------ | ----------------- | ------------------------ |
+| ローカル（`.env.local`） | `true`            | 著名人企画が見える       |
+| Vercel Production        | **未登録＝false** | **準備中 / Coming Soon** |
+
+**「手元で見えている」を本番の状態だと思い込んだのが原因。** 実行委員へ本番URLを共有する直前に発覚した。
+
+登録状況とビルド成果物は必ず実測で確認する。
+
+```bash
+# 3箇所の登録を突き合わせる
+grep -n VISIBLE .env.example
+gh variable list                       # GitHub Repository Variables
+vercel env ls | grep VISIBLE           # environments 列に Production があるか
+
+# ビルド成果物で最終確認（環境変数はビルド時に埋め込まれるため、再デプロイ後に見る）
+curl -s <deployment url>/special | grep -o '準備中'   # 何も出なければ公開されている
+```
+
 ## Vercel の本番反映は手動
 
 > [!IMPORTANT]
@@ -141,11 +189,13 @@ git ls-remote origin refs/heads/main | cut -f1
 
 本プロジェクトは同名の環境変数を環境ごとに別値で登録しています。`vercel env ls` の `environments` 列で確認できます。
 
-| 変数                         | 登録状況                                     |
-| ---------------------------- | -------------------------------------------- |
-| `MICROCMS_SERVICE_DOMAIN`    | **Production と Preview で別行＝別値**       |
-| `MICROCMS_API_KEY`           | Production, Preview で共有／Development は別 |
-| `NEXT_PUBLIC_EVENTS_VISIBLE` | Production, Preview で共有                   |
+| 変数                          | 登録状況                                     |
+| ----------------------------- | -------------------------------------------- |
+| `MICROCMS_SERVICE_DOMAIN`     | **Production と Preview で別行＝別値**       |
+| `MICROCMS_API_KEY`            | Production, Preview で共有／Development は別 |
+| `NEXT_PUBLIC_EVENTS_VISIBLE`  | Production, Preview で共有                   |
+| `NEXT_PUBLIC_NEWS_VISIBLE`    | Production, Preview で共有                   |
+| `NEXT_PUBLIC_SPECIAL_VISIBLE` | Production, Preview で共有                   |
 
 `MICROCMS_SERVICE_DOMAIN` が環境別なので、`promote` すると **Preview の microCMS サービスから取得したコンテンツが本番に出ます。** 正しい操作は Production 環境変数での再ビルドです。
 
@@ -227,4 +277,4 @@ curl -s https://<production deployment url>/robots.txt | grep Sitemap
 
 ---
 
-**最終更新日**: 2026-08-16
+**最終更新日**: 2026-08-17
