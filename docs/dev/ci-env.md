@@ -34,10 +34,10 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 | `NEXT_PUBLIC_EVENTS_VISIBLE`        | 企画情報の公開フラグ               | `false`                   | 未登録                      |
 | `NEXT_PUBLIC_NEWS_VISIBLE`          | お知らせ情報の公開フラグ           | `false`                   | 未登録                      |
 | `NEXT_PUBLIC_SPECIAL_VISIBLE`       | 著名人企画の公開フラグ             | `false`                   | 未登録                      |
-| `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` | 著名人企画LPの物販明細の公開フラグ | `false`                   | 未登録                      |
+| `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` | 著名人企画LPの物販明細の公開フラグ | `false`                   | **登録済み**（2026-08-23）  |
 
 > [!NOTE]
-> **この表は「登録すべきもの」であって、現状の登録一覧ではない。** `gh variable list` で確認できるのは `NEXT_PUBLIC_URL` のみ。
+> **この表は「登録すべきもの」であって、現状の登録一覧ではない。** `gh variable list` で確認できるのは `NEXT_PUBLIC_URL` と `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` のみ（2026-08-23 実測）。**`EVENTS` / `NEWS` / `SPECIAL` の3フラグは GitHub 側が未登録のまま。**
 > CI（`feature-ci.yml`）は Lint / Format / Build の検証だけなので、公開フラグが未登録でも **`false` としてビルドが通る**。
 > **つまり CI が緑でも、公開状態のページがビルドできることは何も検証していない。**
 
@@ -223,14 +223,14 @@ git ls-remote origin refs/heads/main | cut -f1
 
 本プロジェクトは同名の環境変数を環境ごとに別値で登録しています。`vercel env ls` の `environments` 列で確認できます。
 
-| 変数                                | 登録状況                                     |
-| ----------------------------------- | -------------------------------------------- |
-| `MICROCMS_SERVICE_DOMAIN`           | **Production と Preview で別行＝別値**       |
-| `MICROCMS_API_KEY`                  | Production, Preview で共有／Development は別 |
-| `NEXT_PUBLIC_EVENTS_VISIBLE`        | Production, Preview で共有                   |
-| `NEXT_PUBLIC_NEWS_VISIBLE`          | Production, Preview で共有                   |
-| `NEXT_PUBLIC_SPECIAL_VISIBLE`       | Production, Preview で共有                   |
-| `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` | Production, Preview で共有                   |
+| 変数                                | 登録状況                                             |
+| ----------------------------------- | ---------------------------------------------------- |
+| `MICROCMS_SERVICE_DOMAIN`           | **Production と Preview で別行＝別値**               |
+| `MICROCMS_API_KEY`                  | Production, Preview で共有／Development は別         |
+| `NEXT_PUBLIC_EVENTS_VISIBLE`        | Production, Preview で共有                           |
+| `NEXT_PUBLIC_NEWS_VISIBLE`          | Production, Preview で共有                           |
+| `NEXT_PUBLIC_SPECIAL_VISIBLE`       | Production, Preview で共有                           |
+| `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` | Production と Preview で**別行**（値は同じ `false`） |
 
 `MICROCMS_SERVICE_DOMAIN` が環境別なので、`promote` すると **Preview の microCMS サービスから取得したコンテンツが本番に出ます。** 正しい操作は Production 環境変数での再ビルドです。
 
