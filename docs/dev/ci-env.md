@@ -27,13 +27,14 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 
 ### Repository Variables
 
-| 変数名                        | 内容                     | 値の例                    | 登録状況（2026-08-17 実測） |
-| ----------------------------- | ------------------------ | ------------------------- | --------------------------- |
-| `NEXT_PUBLIC_URL`             | 本番サイト URL           | `https://setagayafes.org` | **登録済み**                |
-| `NEXT_PUBLIC_GTM_ID`          | Google Tag Manager ID    | `GTM-XXXXXXX`             | 未登録                      |
-| `NEXT_PUBLIC_EVENTS_VISIBLE`  | 企画情報の公開フラグ     | `false`                   | 未登録                      |
-| `NEXT_PUBLIC_NEWS_VISIBLE`    | お知らせ情報の公開フラグ | `false`                   | 未登録                      |
-| `NEXT_PUBLIC_SPECIAL_VISIBLE` | 著名人企画の公開フラグ   | `false`                   | 未登録                      |
+| 変数名                              | 内容                               | 値の例                    | 登録状況（2026-08-17 実測） |
+| ----------------------------------- | ---------------------------------- | ------------------------- | --------------------------- |
+| `NEXT_PUBLIC_URL`                   | 本番サイト URL                     | `https://setagayafes.org` | **登録済み**                |
+| `NEXT_PUBLIC_GTM_ID`                | Google Tag Manager ID              | `GTM-XXXXXXX`             | 未登録                      |
+| `NEXT_PUBLIC_EVENTS_VISIBLE`        | 企画情報の公開フラグ               | `false`                   | 未登録                      |
+| `NEXT_PUBLIC_NEWS_VISIBLE`          | お知らせ情報の公開フラグ           | `false`                   | 未登録                      |
+| `NEXT_PUBLIC_SPECIAL_VISIBLE`       | 著名人企画の公開フラグ             | `false`                   | 未登録                      |
+| `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` | 著名人企画LPの物販明細の公開フラグ | `false`                   | 未登録                      |
 
 > [!NOTE]
 > **この表は「登録すべきもの」であって、現状の登録一覧ではない。** `gh variable list` で確認できるのは `NEXT_PUBLIC_URL` のみ。
@@ -53,6 +54,7 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
     NEXT_PUBLIC_EVENTS_VISIBLE: ${{ vars.NEXT_PUBLIC_EVENTS_VISIBLE }}
     NEXT_PUBLIC_NEWS_VISIBLE: ${{ vars.NEXT_PUBLIC_NEWS_VISIBLE }}
     NEXT_PUBLIC_SPECIAL_VISIBLE: ${{ vars.NEXT_PUBLIC_SPECIAL_VISIBLE }}
+    NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE: ${{ vars.NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE }}
 ```
 
 ## 登録手順
@@ -71,21 +73,23 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 
 ## ローカル開発との対応
 
-| CI 環境変数                        | ローカル (.env.local)                   |
-| ---------------------------------- | --------------------------------------- |
-| `secrets.MICROCMS_SERVICE_DOMAIN`  | `MICROCMS_SERVICE_DOMAIN=setagayafes97` |
-| `secrets.MICROCMS_API_KEY`         | `MICROCMS_API_KEY=xxxxx`                |
-| `vars.NEXT_PUBLIC_URL`             | `NEXT_PUBLIC_URL=http://localhost:3000` |
-| `vars.NEXT_PUBLIC_GTM_ID`          | `NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX`        |
-| `vars.NEXT_PUBLIC_EVENTS_VISIBLE`  | `NEXT_PUBLIC_EVENTS_VISIBLE=false`      |
-| `vars.NEXT_PUBLIC_NEWS_VISIBLE`    | `NEXT_PUBLIC_NEWS_VISIBLE=false`        |
-| `vars.NEXT_PUBLIC_SPECIAL_VISIBLE` | `NEXT_PUBLIC_SPECIAL_VISIBLE=false`     |
+| CI 環境変数                              | ローカル (.env.local)                     |
+| ---------------------------------------- | ----------------------------------------- |
+| `secrets.MICROCMS_SERVICE_DOMAIN`        | `MICROCMS_SERVICE_DOMAIN=setagayafes97`   |
+| `secrets.MICROCMS_API_KEY`               | `MICROCMS_API_KEY=xxxxx`                  |
+| `vars.NEXT_PUBLIC_URL`                   | `NEXT_PUBLIC_URL=http://localhost:3000`   |
+| `vars.NEXT_PUBLIC_GTM_ID`                | `NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX`          |
+| `vars.NEXT_PUBLIC_EVENTS_VISIBLE`        | `NEXT_PUBLIC_EVENTS_VISIBLE=false`        |
+| `vars.NEXT_PUBLIC_NEWS_VISIBLE`          | `NEXT_PUBLIC_NEWS_VISIBLE=false`          |
+| `vars.NEXT_PUBLIC_SPECIAL_VISIBLE`       | `NEXT_PUBLIC_SPECIAL_VISIBLE=false`       |
+| `vars.NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` | `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE=false` |
 
 ## コンテンツ公開フラグ
 
 - `NEXT_PUBLIC_EVENTS_VISIBLE=false`: 企画一覧・タイムテーブルは準備中表示にし、トップのおすすめ企画・企画詳細URL・サイトマップの企画詳細URLを非公開にする。microCMS の企画データは取得しない。
 - `NEXT_PUBLIC_NEWS_VISIBLE=false`: お知らせ一覧とトップの NEWS セクションは準備中表示にし、トップの最新ニュース・お知らせ詳細URL・サイトマップのお知らせ詳細URLを非公開にする。microCMS のお知らせデータは取得しない。
 - `NEXT_PUBLIC_SPECIAL_VISIBLE=false`: 著名人企画（`type = special`）を全面的に非公開にする。`/special` は準備中表示になり、`/special/[id]` は生成されず 404。企画一覧・タイムテーブル・おすすめ企画・サイトマップからも `type = special` を除外する。
+- `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE=false`: 著名人企画LPの物販セクションを「グッズ販売予定」のプレースホルダー表示にする。商品テーブルと物販の補足（`goodsNote`）は **HTML に一切出力されない**ため、解禁前に商品名・価格が漏れることはない。ページ自体は公開されたまま。
 - いずれも `true` の場合のみ公開する。未設定または `true` 以外は安全側として非公開になる。
 - ビルド時に評価されるため、値を変更した後は再ビルド・再デプロイが必要。
 
@@ -117,17 +121,42 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 > 既に配布済みの `/events/{id}` URL がある場合、この組み合わせの間は誘導されず「企画が見つかりません」になる。
 > 2026-08-17 に本番で実測（`/events/special-event-test` が `/special/...` へ転送されないことを確認）。
 
-### フラグを追加したら登録先は4箇所
+### SPECIAL_VISIBLE と SPECIAL_GOODS_VISIBLE の従属関係
+
+**この2つは独立ではない。`SPECIAL_GOODS_VISIBLE` は `SPECIAL_VISIBLE` に従属する。** LP そのものが 404 なら物販フラグは評価される機会がない。
+
+| `SPECIAL_VISIBLE` | `SPECIAL_GOODS_VISIBLE` | 挙動                                                   |
+| ----------------- | ----------------------- | ------------------------------------------------------ |
+| `false`           | 任意                    | `/special/[id]` は 404。**物販フラグは無効**           |
+| `true`            | `false`                 | LP は公開。物販セクションは「グッズ販売予定」のみ表示  |
+| `true`            | `true`                  | 物販セクションは商品テーブル＋補足を表示（従来どおり） |
+
+分けている理由は、著名人の出演自体の解禁とグッズ詳細の確定が別のタイミングで来るため。第97回では「出演は発表できるが、グッズの商品名・価格はまだ出せない」という状態が実際に発生した（2026-08-23 クライアント依頼）。
+
+> [!NOTE]
+> **`goods` を microCMS に入稿しても、このフラグが `false` の間は表示されない。**
+> 逆に、フラグが `true` でも `goods` が空なら物販セクションごと出力されない（物販を行わない企画のため）。
+> 「入稿したのに出ない」ときは、まずこのフラグを疑うこと。`microcms/README.md` にも同じ注意書きがある。
+
+### フラグを追加したら登録先は7箇所
 
 > [!IMPORTANT]
-> **公開フラグの未設定はエラーにならず、黙って `false`（非公開）になる。** 安全側デフォルトである代わりに、**登録漏れが「仕様どおりの準備中表示」と見分けられない。** 追加時は下記4箇所すべてを埋めること。
+> **公開フラグの未設定はエラーにならず、黙って `false`（非公開）になる。** 安全側デフォルトである代わりに、**登録漏れが「仕様どおりの準備中表示」と見分けられない。** 追加時は下記7箇所すべてを埋めること。
 
-| #   | 登録先                                       | 目的                                     |
-| --- | -------------------------------------------- | ---------------------------------------- |
-| 1   | `.env.example`                               | 新規参加者が `.env.local` を作れるように |
-| 2   | GitHub Repository Variables                  | CI のビルドチェック                      |
-| 3   | Vercel Environment Variables（Prod/Preview） | 実際のデプロイ                           |
-| 4   | 本ファイルの登録一覧・対応表                 | 追跡可能性                               |
+> [!CAUTION]
+> **この一覧はかつて「4箇所」だったが、実際には足りていなかった。** 外部サービス側（GitHub / Vercel）とドキュメントだけを数えており、**フラグを機能させるコード本体（`src/data/site.ts`）と CI のワークフロー定義が抜けていた。** `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` の追加時（2026-08-23）に発覚し、7箇所へ改めた。
+
+| #   | 登録先                                       | 種別       | 目的                                                                                              |
+| --- | -------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------- |
+| 1   | `src/data/site.ts`                           | コード     | `=== "true"` で評価する `const` を export する                                                    |
+| 2   | 参照する側のコンポーネント／ページ           | コード     | フラグを実際に分岐へ繋ぐ（**ここまでやって初めて動く**）                                          |
+| 3   | `.env.example`                               | リポジトリ | 新規参加者が `.env.local` を作れるように                                                          |
+| 4   | `.github/workflows/feature-ci.yml`           | CI         | `Build project` ステップの `env` へ追加。**書かないと `vars` に登録しても CI のビルドへ渡らない** |
+| 5   | `README.md` の「コンテンツ公開フラグ」表     | リポジトリ | 一覧性                                                                                            |
+| 6   | GitHub Repository Variables                  | 外部       | CI のビルドチェック                                                                               |
+| 7   | Vercel Environment Variables（Prod/Preview） | 外部       | 実際のデプロイ                                                                                    |
+
+本ファイルの登録一覧・対応表（Repository Variables / ワークフロー参照例 / ローカル対応表 / Vercel 環境変数）も併せて更新すること。
 
 #### 実例：`NEXT_PUBLIC_SPECIAL_VISIBLE` の登録漏れ（2026-08-17）
 
@@ -143,8 +172,13 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 登録状況とビルド成果物は必ず実測で確認する。
 
 ```bash
-# 3箇所の登録を突き合わせる
-grep -n VISIBLE .env.example
+# リポジトリ内の4箇所を突き合わせる（行数が揃わなければどこかが漏れている）
+grep -c VISIBLE .env.example
+grep -c 'VISIBLE: boolean' src/data/site.ts
+grep -c VISIBLE .github/workflows/feature-ci.yml
+grep -c NEXT_PUBLIC_.*_VISIBLE README.md
+
+# 外部2箇所
 gh variable list                       # GitHub Repository Variables
 vercel env ls | grep VISIBLE           # environments 列に Production があるか
 
@@ -189,13 +223,14 @@ git ls-remote origin refs/heads/main | cut -f1
 
 本プロジェクトは同名の環境変数を環境ごとに別値で登録しています。`vercel env ls` の `environments` 列で確認できます。
 
-| 変数                          | 登録状況                                     |
-| ----------------------------- | -------------------------------------------- |
-| `MICROCMS_SERVICE_DOMAIN`     | **Production と Preview で別行＝別値**       |
-| `MICROCMS_API_KEY`            | Production, Preview で共有／Development は別 |
-| `NEXT_PUBLIC_EVENTS_VISIBLE`  | Production, Preview で共有                   |
-| `NEXT_PUBLIC_NEWS_VISIBLE`    | Production, Preview で共有                   |
-| `NEXT_PUBLIC_SPECIAL_VISIBLE` | Production, Preview で共有                   |
+| 変数                                | 登録状況                                     |
+| ----------------------------------- | -------------------------------------------- |
+| `MICROCMS_SERVICE_DOMAIN`           | **Production と Preview で別行＝別値**       |
+| `MICROCMS_API_KEY`                  | Production, Preview で共有／Development は別 |
+| `NEXT_PUBLIC_EVENTS_VISIBLE`        | Production, Preview で共有                   |
+| `NEXT_PUBLIC_NEWS_VISIBLE`          | Production, Preview で共有                   |
+| `NEXT_PUBLIC_SPECIAL_VISIBLE`       | Production, Preview で共有                   |
+| `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` | Production, Preview で共有                   |
 
 `MICROCMS_SERVICE_DOMAIN` が環境別なので、`promote` すると **Preview の microCMS サービスから取得したコンテンツが本番に出ます。** 正しい操作は Production 環境変数での再ビルドです。
 
@@ -277,4 +312,4 @@ curl -s https://<production deployment url>/robots.txt | grep Sitemap
 
 ---
 
-**最終更新日**: 2026-08-17
+**最終更新日**: 2026-08-23
