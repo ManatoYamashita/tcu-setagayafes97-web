@@ -20,11 +20,21 @@ interface SpecialHeroProps {
  * 配置は PageHero（`flex items-end` + `container mx-auto px-4`）と同じ構造に揃えており、
  * 白いシート内の本文と左端が一致します。
  *
+ * 高さはヘッダーを除いたビューポート全面（`calc(100svh - var(--header-height))`）。
+ * HeroSection・AboutHero と同じ式に揃えています。ヘッダーは `position: sticky` で
+ * 通常フローに場所を取るため、`100svh` をそのまま指定すると下端が画面外へ落ち、
+ * 左下のロゴと開催者名が見切れます（1280x720 で実測: 出演者名が 43px 下にはみ出す）。
+ *
+ * `vh` ではなく `svh` を使うのは、モバイル Safari でアドレスバーの伸縮により
+ * `100vh` が実表示領域を超えるためです。既存2箇所は `h-` ですが、ここだけ `min-h-` に
+ * しているのは、ロゴ画像の高さが入稿次第で変わるため、低いビューポートで
+ * 文字が潰れるより伸びたほうが安全だからです。
+ *
  * ロゴの有無にかかわらず h1 は出力します（ロゴがある場合は画像の alt が見出しになります）。
  */
 export function SpecialHero({ title, organizer, logo, photo }: SpecialHeroProps) {
   return (
-    <section className="relative isolate flex min-h-[60vh] items-end overflow-hidden bg-primary-dark pb-10 pt-20 md:pb-16">
+    <section className="relative isolate flex min-h-[calc(100svh-var(--header-height))] items-end overflow-hidden bg-primary-dark pb-10 pt-20 md:pb-16">
       {/* 背景写真 */}
       {photo && (
         <>
