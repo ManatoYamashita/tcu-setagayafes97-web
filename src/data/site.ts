@@ -41,7 +41,7 @@ export const siteConfig = {
   // メタデータ
   metadata: {
     siteName: "東京都市大学 第97回 世田谷祭",
-    siteUrl: process.env.NEXT_PUBLIC_URL || "https://setagayafes.tcu.ac.jp",
+    siteUrl: process.env.NEXT_PUBLIC_URL || "https://setagayafes.org",
     ogImage: "/ogp.webp",
   },
 
