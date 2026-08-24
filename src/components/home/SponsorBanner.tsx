@@ -13,7 +13,7 @@ export async function SponsorBanner() {
   }
 
   return (
-    <section className="overflow-hidden py-16">
+    <section className="overflow-hidden bg-white py-16">
       <div className="container mx-auto px-4">
         <h2 className="mb-10 text-center text-3xl font-bold">協賛企業</h2>
       </div>
