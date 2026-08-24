@@ -287,13 +287,52 @@ const kaiseiOpti = Kaisei_Opti({
 
 ---
 
+## リッチテキスト（`prose`）の扱い
+
+microCMS のリッチテキストは `dangerouslySetInnerHTML` で挿入し、コンテナに `prose` クラスを付けている（`SpecialProfile` / `NoticeList` / `GoodsTable` / `TicketTable` / `info/[id]` / `EventDetail` の6箇所）。
+
+### `@tailwindcss/typography` は導入していない
+
+そのため **`prose` / `prose-lg` / `prose-invert` / `prose-a:*` / `prose-p:*` はCSSを1行も生成しない**。単なるクラス名として存在するだけである。
+
+**これが厄介なのは、ビルドもLintも通り、警告も出ないこと。** `prose-a:text-primary` と書いてあれば効いているように読めるが、実際にはリンクは Preflight の `a { color: inherit }` のまま黒く表示される。2026-08-25 の指摘「リンクを紫にして」はこれが原因だった。
+
+### 装飾を足す場合は `@layer base` に直接書く
+
+`src/app/globals.css` の `@layer base` にセレクタを直接定義する。
+
+```css
+@layer base {
+  .prose a {
+    color: var(--color-primary);
+    text-decoration: none;
+    text-underline-offset: 2px;
+  }
+}
+```
+
+**`@layer components` に書いてはいけない。** Tailwind v4 は `@layer components` / `@layer utilities` の中身を「登録可能なユーティリティ定義」として解釈するため、`.prose a` のような**複合セレクタは黙って破棄される**。出力CSSには `@layer components;` という空の宣言だけが残り、エラーも警告も出ない。
+
+検証は「見た目」ではなく出力CSSの実体で行うこと。
+
+```js
+// ブラウザのコンソールで、配信されたCSSに規則が含まれるか確認する
+const href = document.querySelector("link[rel=stylesheet]").href;
+(await fetch(href).then((r) => r.text())).includes(".prose a");
+```
+
+レイヤー順（`theme` → `base` → `components` → `utilities`）により、`@layer base` に置いた `.prose a`（詳細度 0-1-1）は Preflight の `a`（0-0-1）に勝ち、要素に直接当てた `text-*` ユーティリティには負ける。これが望ましい優先順位である。
+
+---
+
 ## 参照・関連ドキュメント
 
 - [layout-patterns.md](./layout-patterns.md) — z-index・レイアウト設計原則
+- [browser-verification-pitfalls.md](./browser-verification-pitfalls.md) — 検証手順そのものが誤る実例
 - [.claude/CLAUDE.md](../../.claude/CLAUDE.md) — プロジェクト全体設計方針（テーマカラー・多言語対応）
 - [require.md](../requires/require.md) — プロジェクト要件定義書
 - Google Fonts: Kaisei Opti — https://fonts.google.com/specimen/Kaisei+Opti
 
 ---
 
-**最終更新日**: 2026-02-19
+**最終更新日**: 2026-08-25

@@ -144,6 +144,7 @@ docs/
   - Kaisei Opti ブランドフォント仕様と使用制限
   - フォントスケール（モジュラースケール 1.25）
   - CSS 変数まとめ
+  - リッチテキスト（`prose`）の扱い — typography プラグイン未導入と `@layer` の選び方
 
 > [!NOTE]
 > ブラウザ自動化の知見は3ファイルに分かれています。**手順は `agent-browser-workflow.md`、判断基準は `browser-observation-limits.md`、失敗例は `browser-verification-pitfalls.md`。**
