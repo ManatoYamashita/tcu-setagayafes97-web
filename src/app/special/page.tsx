@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { getSpecialEvents } from "@/lib/events";
 import { EventCard } from "@/components/events/EventCard";
 import { ComingSoon } from "@/components/common/ComingSoon";
@@ -42,8 +43,9 @@ export const revalidate = 3600;
 /**
  * 著名人企画の一覧ページ
  *
- * 登録が1組でも成立します。URL を手で削って `/special` に到達したときに
- * 行き止まりにしないためのページでもあります。
+ * 著名人が1組だけのときは、一覧に情報がないため、その企画のLPへ送ります。
+ * 2組以上になれば自動的に一覧表示へ戻るため、恒久リダイレクト（308）にはしません。
+ * URL を手で削って `/special` に到達したときに行き止まりにしないためのページでもあります。
  *
  * SPECIAL_VISIBLE が false の間は準備中表示（EVENTS_VISIBLE とは独立）。
  */
@@ -70,6 +72,11 @@ export default async function SpecialPage() {
         />
       </PageSheetLayout>
     );
+  }
+
+  // 1組だけなら一覧を挟まずLPへ送る。ID はハードコードせず取得結果から導く。
+  if (events.length === 1) {
+    redirect(`/special/${events[0].id}`);
   }
 
   return (
