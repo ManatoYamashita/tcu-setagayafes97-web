@@ -1,13 +1,14 @@
 import { MetadataRoute } from "next";
 import { getEventsList, getSpecialEvents } from "@/lib/events";
 import { getNewsList } from "@/lib/news";
+import { siteConfig } from "@/data/site";
 
 /**
  * サイトマップ自動生成
  * Next.js 14+ の sitemap.ts ファイルで動的生成
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://setagayafes97.tcu.ac.jp"; // 本番URLに変更
+  const baseUrl = siteConfig.metadata.siteUrl;
 
   // 静的ページ
   const staticPages: MetadataRoute.Sitemap = [
