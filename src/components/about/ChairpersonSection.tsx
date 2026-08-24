@@ -90,7 +90,7 @@ const TRIANGLE_CLIP = "polygon(50% 0%, 0% 100%, 100% 100%)";
  * DOM 順は縦積み時の読み順（テーマ → 挨拶ヘッダー → 署名 → 本文）に合わせてあり、
  * lg 以上は全要素が col-start / row-start で明示配置されるため DOM 順の影響を受けない。
  *
- * セクションが画面内に入ると各要素が入場する（ScrollTrigger, once）。
+ * 各要素が画面内に入るとそれぞれ入場する（ScrollTrigger, once）。
  * 見出しとテーマ解説は SplitText で行単位に分割してリヴィールする。
  */
 export function ChairpersonSection() {
@@ -115,11 +115,11 @@ export function ChairpersonSection() {
     const splits: SplitText[] = [];
 
     const ctx = gsap.context(() => {
-      const scrollTriggerBase = {
-        trigger: sectionRef.current,
+      const createScrollTrigger = (trigger: Element | null) => ({
+        trigger,
         start: "top 80%",
         once: true,
-      };
+      });
 
       // フェード + スライドアップ（このセクションの基本の入場）
       const fadeUp = (target: Element | null, vars: gsap.TweenVars = {}) => {
@@ -130,7 +130,7 @@ export function ChairpersonSection() {
           duration: 0.7,
           ease: "power4.out",
           force3D: true,
-          scrollTrigger: { ...scrollTriggerBase },
+          scrollTrigger: createScrollTrigger(target),
           ...vars,
         });
       };
@@ -158,7 +158,7 @@ export function ChairpersonSection() {
                 ease: "power3.out",
                 stagger: 0.12,
                 force3D: true,
-                scrollTrigger: { ...scrollTriggerBase },
+                scrollTrigger: createScrollTrigger(headingRef.current),
                 onComplete: () => {
                   headingRevealed = true;
                 },
@@ -188,7 +188,7 @@ export function ChairpersonSection() {
                 ease: "power3.out",
                 stagger: 0.05,
                 force3D: true,
-                scrollTrigger: { ...scrollTriggerBase },
+                scrollTrigger: createScrollTrigger(briefRef.current),
                 onComplete: () => {
                   briefRevealed = true;
                 },
@@ -209,7 +209,7 @@ export function ChairpersonSection() {
           duration: 0.9,
           ease: "power3.out",
           force3D: true,
-          scrollTrigger: { ...scrollTriggerBase },
+          scrollTrigger: createScrollTrigger(imageFrameRef.current),
         });
 
         const imageEl = imageFrameRef.current.querySelector("img");
@@ -219,7 +219,7 @@ export function ChairpersonSection() {
             duration: 1.4,
             ease: "power2.out",
             force3D: true,
-            scrollTrigger: { ...scrollTriggerBase },
+            scrollTrigger: createScrollTrigger(imageFrameRef.current),
           });
         }
       }
@@ -233,7 +233,7 @@ export function ChairpersonSection() {
           ease: "power3.out",
           stagger: 0.12,
           force3D: true,
-          scrollTrigger: { ...scrollTriggerBase },
+          scrollTrigger: createScrollTrigger(messageRef.current),
         });
       }
     }, sectionRef);
@@ -252,7 +252,7 @@ export function ChairpersonSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden bg-gray-50 py-24 lg:py-32"
+      className="relative overflow-hidden bg-gradient-to-b from-gray-50 via-gray-50 to-secondary py-24 lg:py-32"
       aria-labelledby="about-theme-heading"
     >
       {/* ── 装飾三角形 ×6（lg以上のみ、常時ゆっくり漂う） ── */}
