@@ -98,3 +98,26 @@ export const NEWS_VISIBLE: boolean = process.env.NEXT_PUBLIC_NEWS_VISIBLE === "t
  * microCMS 側を下書きにするだけで済ませず、必ずこのフラグでも塞ぐこと。
  */
 export const SPECIAL_VISIBLE: boolean = process.env.NEXT_PUBLIC_SPECIAL_VISIBLE === "true";
+
+/**
+ * 著名人企画LPの物販（グッズ）明細の公開フラグ
+ * 環境変数 NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE を "true" に設定して再デプロイすると公開される。
+ * 未設定・"true" 以外はすべて非公開（安全側デフォルト）。
+ *
+ * false の間、/special/[id] の物販セクションは商品テーブルと物販の補足（goodsNote）の
+ * 両方を出力せず、「グッズ販売予定」のプレースホルダーだけを表示する。
+ * 商品名・価格を HTML に残さないため、解禁前に値が漏れることはない。
+ *
+ * SPECIAL_VISIBLE に従属する。ページ自体が非公開なら本フラグは意味を持たない。
+ *
+ * | SPECIAL_VISIBLE | SPECIAL_GOODS_VISIBLE | 挙動                                    |
+ * | --------------- | --------------------- | --------------------------------------- |
+ * | false           | 任意                  | /special/[id] は 404。本フラグは無効     |
+ * | true            | false                 | LPは公開。物販は「グッズ販売予定」のみ   |
+ * | true            | true                  | 物販は商品テーブル＋補足を表示（従来通り） |
+ *
+ * グッズの詳細が確定したら、この環境変数を "true" にして再ビルド・再デプロイする。
+ * microCMS への入稿だけでは表示されない点に注意（microcms/README.md にも記載）。
+ */
+export const SPECIAL_GOODS_VISIBLE: boolean =
+  process.env.NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE === "true";

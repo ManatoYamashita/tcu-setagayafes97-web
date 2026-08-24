@@ -157,6 +157,13 @@ else links.website = sns;
 金額・時刻をすべて `text` にしているのは意図的です。「¥3,000（税込）」「18:00（予定）」
 「未定」といった実際の入稿文言を受けるためで、`number` / `date` にすると入りません。
 
+> [!IMPORTANT]
+> **`goods` / `goodsNote` は入稿しただけではサイトに表示されません。**
+> 環境変数 `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` が `"true"` で再ビルドされるまで、
+> 物販セクションは「グッズ販売予定」のプレースホルダー表示のままです。
+> グッズ詳細の解禁時は、入稿と併せてフラグの切り替え・再デプロイを依頼してください。
+> 詳細は [docs/dev/ci-env.md](../docs/dev/ci-env.md) の「コンテンツ公開フラグ」を参照。
+
 ### Informations API (informations.json)
 
 **実機と照合済み（2026-08-16）**
