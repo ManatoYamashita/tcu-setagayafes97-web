@@ -11,10 +11,10 @@
 | 旧URLの扱い          | `setagayafes.org/96th/*` → **301** → `96th.setagayafes.org/*` |
 | `NEXT_PUBLIC_URL`    | `https://setagayafes.org`                                     |
 
-## 現状（未了）
+## 現状
 
 > [!WARNING]
-> **DNS のカットオーバーは未実施。** `setagayafes.org` はさくらを向いており、第96回サイトを配信している。第97回サイトはVercelのデプロイURLでのみ到達できる。第96回のサブドメインはさくら側に登録済みだが、公開DNSへの反映とSSL発行は未完了。
+> **移行作業は反映済み。** `setagayafes.org` はVercelの第97回サイト、`96th.setagayafes.org` はさくらの第96回WordPressを配信している。
 
 | 項目                            | 状態                                                         |
 | ------------------------------- | ------------------------------------------------------------ |
@@ -23,18 +23,36 @@
 | `/96th/*` の 301                | **実装済み**（`next.config.ts`）                             |
 | `96th.setagayafes.org` の作成   | **完了**（さくら側、2026-08-24）                             |
 | 第96回ファイルバックアップ      | **完了**（SnapUP、2026-08-24、正常終了）                     |
-| 第96回DBバックアップ            | **未了**（phpMyAdmin認証情報待ち）                           |
-| 第96回サブドメインのSSL         | **未了**（DNS名前解決の反映待ち）                            |
-| WordPress の `siteurl` / `home` | **未了**（さくら側の作業）                                   |
-| `setagayafes.org` の DNS 切替   | **未了**（さくら側の作業）                                   |
+| 第96回DBバックアップ            | **完了**（phpMyAdmin、2026-08-24）                           |
+| 第96回サブドメインのSSL         | **完了**（Let's Encrypt、2026-08-24）                        |
+| WordPress の `siteurl` / `home` | **完了**（`https://96th.setagayafes.org`）                   |
+| `setagayafes.org` の DNS 切替   | **完了**（Vercel）                                           |
 
 ### 2026-08-24 の実施内容
 
+- SnapUPで `/home/setagayafes/www/top/96th` のファイルバックアップを取得（スナップショット #1、正常終了）。ディレクトリ形式のためDBは含まれない。
 - さくらに `96th.setagayafes.org` を追加し、公開フォルダーを `~/www/top/96th` に設定。
-- SnapUPで `/home/setagayafes/www/top/96th` のファイルバックアップを取得（スナップショット #1、正常終了）。
-- 旧ドメイン参照を `https://setagayafes.org` に統一し、`sitemap.xml` / `robots.txt` は `siteConfig.metadata.siteUrl` から生成するよう修正。
-- `next.config.ts` の `setagayafes.org/96th/*` → `96th.setagayafes.org/*` の301設定が `main` に存在することを確認。
-- DNS名前解決前のため、Let's EncryptのSSL発行は保留。
+- さくら側のDNSゾーンに `A 49.212.207.29` が登録されたことを確認。
+- DNS名前解決前のため、IP直指定のHTTPリクエストで第96回WordPressが返ることを確認。
+- Let's Encryptの申請画面まで確認したが、DNS名前解決が未反映のためSSL発行は保留。
+
+### 2026-08-24 の第97回本番公開前チェック
+
+- `origin/main` は `05220a8`。このブランチの `next.config.ts` には第96回向け301がまだなく、`sitemap.ts` / `robots.ts` は `https://setagayafes97.tcu.ac.jp` を参照している。
+- 最新のVercel Productionデプロイは成功済みだが、対象SHAは `d0f5fb5`、対象ブランチは `feature/special-goods-visible-flag`。`main` の公開確認には使用しない。
+- GitHub Repository Variableの `NEXT_PUBLIC_URL` は `https://setagayafes.org`。Vercel CLIはローカル未認証・未導入のため、Vercel環境変数の実測確認は未了。
+- ローカルの `pnpm lint` はエラーなし（既存警告13件）、`pnpm format:check` は正常、`pnpm build` は終了コード0。ただしローカル `.env.local` のmicroCMSキーが無効で、生成中に401警告が発生した。またNode.jsはv22で、`package.json` の要求（>=24）を満たしていない。
+- ローカルProductionサーバーで、`/96th/access?q=1` → 301、末尾スラッシュ付きURLは先に308で正規化されることを確認。`robots.txt` と `sitemap.xml` は現状まだ旧ドメインを出力する。
+- 公開DNSは未切替（apexは `49.212.207.29`、wwwは `2s6odn9q.rs.webaccel.jp.`、応答はnginx 302 → `/96th/`）。
+
+### 2026-08-24 の移行後修正・最終確認
+
+- 第96回の `/home/setagayafes/www/top/96th/.htaccess` に残っていた旧サブディレクトリ用rewrite（`RewriteBase /96th/`、`/96th/index.php`）を、サブドメイン直下用（`RewriteBase /`、`/index.php`）へ修正。
+- 修正後、96thトップ、固定ページ、記事、フィード、画像、管理画面ログイン導線が正常応答。主要ページはすべて200、`/wp-admin/` はログイン画面へ302。
+- 96thのSSLはLet’s Encryptへ切り替わり、証明書SANに `96th.setagayafes.org` を確認。有効期限は2026-11-22。
+- 第97回のrobots、sitemap、OGP URLを `https://setagayafes.org` に統一し、Vercel Productionへ反映。
+- Vercel側のapexドメインに残っていた `setagayafes.org → www.setagayafes.org` リダイレクトを解除。`/96th/*` は `96th.setagayafes.org/*` へ301。
+- 96th本文には旧 `/96th/` および `/95th/` の画像URLが一部残るため、コンテンツ内リンクの整理は別作業として残す。
 
 ## なぜ rewrite ではなく redirect なのか
 
@@ -152,4 +170,4 @@ curl -s https://setagayafes.org/robots.txt | grep Sitemap
 
 ---
 
-**最終更新日**: 2026-08-24
+**最終更新日**: 2026-08-15
