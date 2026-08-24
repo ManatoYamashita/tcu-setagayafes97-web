@@ -47,19 +47,19 @@
 
 ## ページ構成
 
-- [トップページ](https://setagayafes.tcu.ac.jp/): メインビジュアル、開催概要、最新ニュース、おすすめ企画
-- [企画を探す](https://setagayafes.tcu.ac.jp/events): 企画検索・一覧（日程・場所・カテゴリ・キーワードで絞り込み）
-- [タイムテーブル](https://setagayafes.tcu.ac.jp/timetable): ステージイベントの時間割
-- [マップ](https://setagayafes.tcu.ac.jp/map): キャンパスマップ
-- [アクセス](https://setagayafes.tcu.ac.jp/map/access): 交通アクセス情報
-- [お知らせ](https://setagayafes.tcu.ac.jp/info): ニュース・お知らせ一覧
-- [ご来場の方へ](https://setagayafes.tcu.ac.jp/info/guide): 来場時の注意事項・ルール
-- [よくある質問](https://setagayafes.tcu.ac.jp/info/faq): FAQ
-- [パンフレット](https://setagayafes.tcu.ac.jp/info/pamphlet): パンフレットダウンロード
-- [委員会について](https://setagayafes.tcu.ac.jp/about): 委員長挨拶・理念
-- [協賛企業](https://setagayafes.tcu.ac.jp/about/sponsors): 協賛企業一覧
-- [お問い合わせ](https://setagayafes.tcu.ac.jp/about/contact): お問い合わせフォーム
-- [プライバシーポリシー](https://setagayafes.tcu.ac.jp/about/privacy): 個人情報の取り扱い
+- [トップページ](https://setagayafes.org/): メインビジュアル、開催概要、最新ニュース、おすすめ企画
+- [企画を探す](https://setagayafes.org/events): 企画検索・一覧（日程・場所・カテゴリ・キーワードで絞り込み）
+- [タイムテーブル](https://setagayafes.org/timetable): ステージイベントの時間割
+- [マップ](https://setagayafes.org/map): キャンパスマップ
+- [アクセス](https://setagayafes.org/map/access): 交通アクセス情報
+- [お知らせ](https://setagayafes.org/info): ニュース・お知らせ一覧
+- [ご来場の方へ](https://setagayafes.org/info/guide): 来場時の注意事項・ルール
+- [よくある質問](https://setagayafes.org/info/faq): FAQ
+- [パンフレット](https://setagayafes.org/info/pamphlet): パンフレットダウンロード
+- [委員会について](https://setagayafes.org/about): 委員長挨拶・理念
+- [協賛企業](https://setagayafes.org/about/sponsors): 協賛企業一覧
+- [お問い合わせ](https://setagayafes.org/about/contact): お問い合わせフォーム
+- [プライバシーポリシー](https://setagayafes.org/about/privacy): 個人情報の取り扱い
 
 ## お問い合わせ
 
@@ -74,5 +74,5 @@
 
 ## 公式Webサイト
 
-- URL: https://setagayafes.tcu.ac.jp
+- URL: https://setagayafes.org
 - 過去の世田谷祭: https://setagayafes.org/
