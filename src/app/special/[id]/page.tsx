@@ -16,9 +16,9 @@ interface SpecialPageProps {
 }
 
 /**
- * ISR設定: 1時間ごとに再検証
+ * ISR設定: 開発中は変更反映を早めるため10分ごとに再検証
  */
-export const revalidate = 3600;
+export const revalidate = 600;
 
 /**
  * 静的パラメータ生成
