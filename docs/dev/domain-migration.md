@@ -20,7 +20,7 @@
 | ------------------------------- | ------------------------------------------------------------ |
 | Vercel のドメイン割当           | **完了**（`setagayafes.org` / `www.setagayafes.org` の両方） |
 | `NEXT_PUBLIC_URL`               | **完了**（Vercel / GitHub Variables とも `setagayafes.org`） |
-| `/96th/*` の 301                | **実装済み**（`next.config.ts`）                             |
+| `/96th/*` の 301                | **実装済み**（`src/proxy.ts` / `next.config.ts`）            |
 | `96th.setagayafes.org` の作成   | **完了**（さくら側、2026-08-24）                             |
 | 第96回ファイルバックアップ      | **完了**（SnapUP、2026-08-24、正常終了）                     |
 | 第96回DBバックアップ            | **完了**（phpMyAdmin、2026-08-24）                           |
@@ -79,13 +79,13 @@ Preview デプロイで確認した結果（`96th.setagayafes.org` はまだ存�
 | リクエスト      | ホップ | 最終到達先                            |
 | --------------- | ------ | ------------------------------------- |
 | `/96th`         | 1      | `https://96th.setagayafes.org/`       |
-| `/96th/`        | **2**  | `https://96th.setagayafes.org/`       |
+| `/96th/`        | **1**  | `https://96th.setagayafes.org/`       |
 | `/96th/access/` | **2**  | `https://96th.setagayafes.org/access` |
-| `/96th/?q=1`    | **2**  | `https://96th.setagayafes.org/?q=1`   |
+| `/96th/?q=1`    | **1**  | `https://96th.setagayafes.org/?q=1`   |
 
 パスもクエリも正しく引き継がれる。
 
-**末尾スラッシュつきのURLは 2 ホップになる。** `trailingSlash: false`（既定）のため Next.js がまず `/96th/` → `/96th` へ正規化し、そのあと 301 が走るためである。1 ホップにするにはサイト全体の `trailingSlash` 方針を変える必要があり、割に合わない。
+`/96th/` は `src/proxy.ts` で直接301を返す。その他の末尾スラッシュ付きURLは `src/proxy.ts` が従来どおり308で正規化するため、サイト全体の `trailingSlash` 方針は変わらない。
 
 また `/96th/access/` は `/access`（末尾スラッシュなし）へ引き継がれるため、移行先の WordPress が `/access` → `/access/` へ 301 する場合は合計 3 ホップになる。実用上の問題はない。
 
