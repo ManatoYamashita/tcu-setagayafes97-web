@@ -34,10 +34,16 @@ export function PageHero({
     : title;
 
   return (
-    <section className="relative h-[70svh] min-h-[400px] w-full overflow-hidden bg-secondary">
+    <section
+      className="relative h-[70svh] min-h-[400px] w-full overflow-hidden bg-secondary"
+      data-page-hero
+    >
       {/* 画像レイヤー */}
       {hasImage && (
-        <div className="page-hero-image-fade absolute inset-0 lg:inset-auto lg:right-0 lg:top-0 lg:h-full lg:w-[70vw]">
+        <div
+          className="page-hero-image-fade absolute inset-0 lg:inset-auto lg:right-0 lg:top-0 lg:h-full lg:w-[70vw]"
+          data-page-hero-image
+        >
           <Image
             src={imageSrc}
             alt={imageAlt ?? ""}
@@ -67,7 +73,7 @@ export function PageHero({
         }
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={hasImage ? "max-w-md lg:max-w-lg" : ""}>
+          <div className={hasImage ? "max-w-md lg:max-w-lg" : ""} data-page-hero-copy>
             {subtitle && (
               <span className="mb-3 inline-block text-sm font-semibold uppercase tracking-widest text-gray-600 lg:mb-4">
                 {subtitle}
