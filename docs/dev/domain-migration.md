@@ -66,7 +66,7 @@ Next.js の trailing-slash リダイレクトは **rewrite より先**に走る�
 /96th/  → Next が 308 → /96th  → rewrite → さくら 301 → /96th/  → …
 ```
 
-`skipTrailingSlashRedirect: true` で止められるが、サイト全体の trailing-slash 正規化が効かなくなる。本プロジェクトは `alternates.canonical` を実装していないため、`/events` と `/events/` の両方が 200 を返す重複URLが生まれる。
+`skipTrailingSlashRedirect: true` を設定し、`src/proxy.ts` で通常の末尾スラッシュ308を再現する。これによりサイト全体の正規化を維持したまま、旧アーカイブURLだけを直接301にできる。
 
 ### 理由2: Vercel の帯域を消費する
 
@@ -74,20 +74,20 @@ WordPress の全アセット（画像・CSS・JS）が Vercel を経由する。
 
 ## 301 の実測挙動
 
-Preview デプロイで確認した結果（`96th.setagayafes.org` はまだ存在しないため、最終ホップは名前解決に失敗する）。
+Previewおよび本番デプロイで確認した結果。
 
 | リクエスト      | ホップ | 最終到達先                            |
 | --------------- | ------ | ------------------------------------- |
 | `/96th`         | 1      | `https://96th.setagayafes.org/`       |
 | `/96th/`        | **1**  | `https://96th.setagayafes.org/`       |
-| `/96th/access/` | **2**  | `https://96th.setagayafes.org/access` |
+| `/96th/access/` | **1**  | `https://96th.setagayafes.org/access` |
 | `/96th/?q=1`    | **1**  | `https://96th.setagayafes.org/?q=1`   |
 
 パスもクエリも正しく引き継がれる。
 
 `/96th/` は `src/proxy.ts` で直接301を返す。その他の末尾スラッシュ付きURLは `src/proxy.ts` が従来どおり308で正規化するため、サイト全体の `trailingSlash` 方針は変わらない。
 
-また `/96th/access/` は `/access`（末尾スラッシュなし）へ引き継がれるため、移行先の WordPress が `/access` → `/access/` へ 301 する場合は合計 3 ホップになる。実用上の問題はない。
+また `/96th/access/` は `/access`（末尾スラッシュなし）へ引き継がれるため、移行先の WordPress が `/access` → `/access/` へ 301 する場合は合計 2 ホップになる。実用上の問題はない。
 
 > [!NOTE]
 > `permanent: true` は **308** を返す。本プロジェクトは `statusCode: 301` を明示している。308 の検索エンジンでの扱いは 301 と同等だが、古いクローラやリンクチェッカには 301 のほうが確実に伝わるためである。アーカイブへの GET 導線に method 保持（308 の利点）は不要。
