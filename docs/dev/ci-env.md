@@ -27,13 +27,14 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 
 ### Repository Variables
 
-| 変数名                        | 内容                     | 値の例                    | 登録状況（2026-08-17 実測） |
-| ----------------------------- | ------------------------ | ------------------------- | --------------------------- |
-| `NEXT_PUBLIC_URL`             | 本番サイト URL           | `https://setagayafes.org` | **登録済み**                |
-| `NEXT_PUBLIC_GTM_ID`          | Google Tag Manager ID    | `GTM-XXXXXXX`             | 未登録                      |
-| `NEXT_PUBLIC_EVENTS_VISIBLE`  | 企画情報の公開フラグ     | `false`                   | 未登録                      |
-| `NEXT_PUBLIC_NEWS_VISIBLE`    | お知らせ情報の公開フラグ | `false`                   | 未登録                      |
-| `NEXT_PUBLIC_SPECIAL_VISIBLE` | 著名人企画の公開フラグ   | `false`                   | 未登録                      |
+| 変数名                              | 内容                           | 値の例                    | 登録状況（2026-08-17 実測） |
+| ----------------------------------- | ------------------------------ | ------------------------- | --------------------------- |
+| `NEXT_PUBLIC_URL`                   | 本番サイト URL                 | `https://setagayafes.org` | **登録済み**                |
+| `NEXT_PUBLIC_GTM_ID`                | Google Tag Manager ID          | `GTM-XXXXXXX`             | 未登録                      |
+| `NEXT_PUBLIC_EVENTS_VISIBLE`        | 企画情報の公開フラグ           | `false`                   | 未登録                      |
+| `NEXT_PUBLIC_NEWS_VISIBLE`          | お知らせ情報の公開フラグ       | `false`                   | 未登録                      |
+| `NEXT_PUBLIC_SPECIAL_VISIBLE`       | 著名人企画の公開フラグ         | `false`                   | 未登録                      |
+| `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` | 著名人企画の物販欄の公開フラグ | `false`                   | 未登録                      |
 
 > [!NOTE]
 > **この表は「登録すべきもの」であって、現状の登録一覧ではない。** `gh variable list` で確認できるのは `NEXT_PUBLIC_URL` のみ。
@@ -53,6 +54,7 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
     NEXT_PUBLIC_EVENTS_VISIBLE: ${{ vars.NEXT_PUBLIC_EVENTS_VISIBLE }}
     NEXT_PUBLIC_NEWS_VISIBLE: ${{ vars.NEXT_PUBLIC_NEWS_VISIBLE }}
     NEXT_PUBLIC_SPECIAL_VISIBLE: ${{ vars.NEXT_PUBLIC_SPECIAL_VISIBLE }}
+    NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE: ${{ vars.NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE }}
 ```
 
 ## 登録手順
@@ -71,21 +73,23 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 
 ## ローカル開発との対応
 
-| CI 環境変数                        | ローカル (.env.local)                   |
-| ---------------------------------- | --------------------------------------- |
-| `secrets.MICROCMS_SERVICE_DOMAIN`  | `MICROCMS_SERVICE_DOMAIN=setagayafes97` |
-| `secrets.MICROCMS_API_KEY`         | `MICROCMS_API_KEY=xxxxx`                |
-| `vars.NEXT_PUBLIC_URL`             | `NEXT_PUBLIC_URL=http://localhost:3000` |
-| `vars.NEXT_PUBLIC_GTM_ID`          | `NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX`        |
-| `vars.NEXT_PUBLIC_EVENTS_VISIBLE`  | `NEXT_PUBLIC_EVENTS_VISIBLE=false`      |
-| `vars.NEXT_PUBLIC_NEWS_VISIBLE`    | `NEXT_PUBLIC_NEWS_VISIBLE=false`        |
-| `vars.NEXT_PUBLIC_SPECIAL_VISIBLE` | `NEXT_PUBLIC_SPECIAL_VISIBLE=false`     |
+| CI 環境変数                              | ローカル (.env.local)                     |
+| ---------------------------------------- | ----------------------------------------- |
+| `secrets.MICROCMS_SERVICE_DOMAIN`        | `MICROCMS_SERVICE_DOMAIN=setagayafes97`   |
+| `secrets.MICROCMS_API_KEY`               | `MICROCMS_API_KEY=xxxxx`                  |
+| `vars.NEXT_PUBLIC_URL`                   | `NEXT_PUBLIC_URL=http://localhost:3000`   |
+| `vars.NEXT_PUBLIC_GTM_ID`                | `NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX`          |
+| `vars.NEXT_PUBLIC_EVENTS_VISIBLE`        | `NEXT_PUBLIC_EVENTS_VISIBLE=false`        |
+| `vars.NEXT_PUBLIC_NEWS_VISIBLE`          | `NEXT_PUBLIC_NEWS_VISIBLE=false`          |
+| `vars.NEXT_PUBLIC_SPECIAL_VISIBLE`       | `NEXT_PUBLIC_SPECIAL_VISIBLE=false`       |
+| `vars.NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` | `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE=false` |
 
 ## コンテンツ公開フラグ
 
 - `NEXT_PUBLIC_EVENTS_VISIBLE=false`: 企画一覧・タイムテーブルは準備中表示にし、トップのおすすめ企画・企画詳細URL・サイトマップの企画詳細URLを非公開にする。microCMS の企画データは取得しない。
 - `NEXT_PUBLIC_NEWS_VISIBLE=false`: お知らせ一覧とトップの NEWS セクションは準備中表示にし、トップの最新ニュース・お知らせ詳細URL・サイトマップのお知らせ詳細URLを非公開にする。microCMS のお知らせデータは取得しない。
 - `NEXT_PUBLIC_SPECIAL_VISIBLE=false`: 著名人企画（`type = special`）を全面的に非公開にする。`/special` は準備中表示になり、`/special/[id]` は生成されず 404。企画一覧・タイムテーブル・おすすめ企画・サイトマップからも `type = special` を除外する。
+- `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE=false`: 著名人企画のプロフィール・出演情報・チケット等は維持したまま、`/special/[id]` の物販欄だけを非表示にする。
 - いずれも `true` の場合のみ公開する。未設定または `true` 以外は安全側として非公開になる。
 - ビルド時に評価されるため、値を変更した後は再ビルド・再デプロイが必要。
 

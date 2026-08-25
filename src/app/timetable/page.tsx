@@ -6,34 +6,25 @@ import { ComingSoon } from "@/components/common/ComingSoon";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
 import { pageHeroes } from "@/data/page-heroes";
 import { EVENTS_VISIBLE } from "@/data/site";
+import { createPageMetadata } from "@/lib/metadata";
 
 /**
  * メタデータ
  * EVENTS_VISIBLE が false の間は準備中の文言を表示
  */
 export const metadata: Metadata = EVENTS_VISIBLE
-  ? {
-      title: "タイムテーブル | 東京都市大学 第97回 世田谷祭",
+  ? createPageMetadata({
+      title: "タイムテーブル",
       description:
         "東京都市大学 第97回 世田谷祭のタイムテーブルページ。ステージ企画の開催時刻を確認できます。",
-      openGraph: {
-        title: "タイムテーブル | 東京都市大学 第97回 世田谷祭",
-        description:
-          "東京都市大学 第97回 世田谷祭のタイムテーブルページ。ステージ企画の開催時刻を確認できます。",
-        type: "website",
-      },
-    }
-  : {
-      title: "タイムテーブル | 東京都市大学 第97回 世田谷祭",
+      pathname: "/timetable",
+    })
+  : createPageMetadata({
+      title: "タイムテーブル",
       description:
         "東京都市大学 第97回 世田谷祭のタイムテーブルは現在準備中です。公開までもうしばらくお待ちください。",
-      openGraph: {
-        title: "タイムテーブル | 東京都市大学 第97回 世田谷祭",
-        description:
-          "東京都市大学 第97回 世田谷祭のタイムテーブルは現在準備中です。公開までもうしばらくお待ちください。",
-        type: "website",
-      },
-    };
+      pathname: "/timetable",
+    });
 
 /**
  * ISR設定: 1時間ごとに再検証

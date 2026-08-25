@@ -21,6 +21,7 @@ import { guideConfig, type PrecautionId } from "@/data/guide";
 import { pageHeroes, type PageHeroData } from "@/data/page-heroes";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import { createPageMetadata } from "@/lib/metadata";
 
 /**
  * 注意事項のカテゴリ別カラー
@@ -57,17 +58,13 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "guide" });
 
-  return {
+  return createPageMetadata({
     title: t("meta.title"),
     description: t("meta.description"),
-    openGraph: {
-      title: t("meta.title"),
-      description: t("meta.description"),
-      type: "website",
-      locale:
-        locale === "ja" ? "ja_JP" : locale === "zh" ? "zh_CN" : locale === "ko" ? "ko_KR" : "en_US",
-    },
-  };
+    pathname: "/info/guide",
+    locale: locale as "ja" | "en" | "zh" | "ko",
+    localized: true,
+  });
 }
 
 /**

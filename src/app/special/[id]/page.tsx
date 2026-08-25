@@ -9,7 +9,8 @@ import { GoodsTable } from "@/components/special/GoodsTable";
 import { TicketTable } from "@/components/special/TicketTable";
 import { NoticeList } from "@/components/special/NoticeList";
 import { SNSLinks } from "@/components/events/SNSLinks";
-import { siteConfig, SPECIAL_VISIBLE } from "@/data/site";
+import { siteConfig, SPECIAL_GOODS_VISIBLE, SPECIAL_VISIBLE } from "@/data/site";
+import { createPageMetadata } from "@/lib/metadata";
 
 interface SpecialPageProps {
   params: Promise<{ id: string }>;
@@ -38,38 +39,27 @@ export async function generateMetadata({ params }: SpecialPageProps): Promise<Me
   const event = await getSpecialEventById(id);
 
   if (!event) {
-    return {
-      title: "ページが見つかりません | 東京都市大学 第97回 世田谷祭",
-    };
+    return createPageMetadata({
+      title: "ページが見つかりません",
+      description: "お探しのページは見つかりませんでした。",
+      pathname: `/special/${id}`,
+    });
   }
 
-  const title = `${event.title} | 東京都市大学 第97回 世田谷祭`;
-
-  return {
-    title,
+  return createPageMetadata({
+    title: event.title,
     description: event.description,
-    openGraph: {
-      title,
-      description: event.description,
-      type: "article",
-      images: event.thumbnail
-        ? [
-            {
-              url: event.thumbnail.url,
-              width: event.thumbnail.width,
-              height: event.thumbnail.height,
-              alt: event.title,
-            },
-          ]
-        : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description: event.description,
-      images: event.thumbnail ? [event.thumbnail.url] : undefined,
-    },
-  };
+    pathname: `/special/${id}`,
+    type: "article",
+    image: event.thumbnail
+      ? {
+          url: event.thumbnail.url,
+          width: event.thumbnail.width,
+          height: event.thumbnail.height,
+          alt: event.title,
+        }
+      : undefined,
+  });
 }
 
 /**
@@ -192,7 +182,9 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
                 place={event.place}
               />
 
-              <GoodsTable goods={special?.goods} note={special?.goodsNote} />
+              {SPECIAL_GOODS_VISIBLE && (
+                <GoodsTable goods={special?.goods} note={special?.goodsNote} />
+              )}
 
               <TicketTable tickets={special?.tickets} note={special?.ticketNote} />
 

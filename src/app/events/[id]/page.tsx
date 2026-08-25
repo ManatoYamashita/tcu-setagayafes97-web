@@ -5,6 +5,7 @@ import { getEventById, getEventsList } from "@/lib/events";
 import { SPECIAL_VISIBLE } from "@/data/site";
 import { EventDetail } from "@/components/events/EventDetail";
 import { RelatedEvents } from "@/components/events/RelatedEvents";
+import { createPageMetadata } from "@/lib/metadata";
 interface EventPageProps {
   params: Promise<{ id: string }>;
 }
@@ -36,36 +37,27 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
   const event = await getEventById(id);
 
   if (!event) {
-    return {
-      title: "企画が見つかりません | 東京都市大学 第97回 世田谷祭",
-    };
+    return createPageMetadata({
+      title: "企画が見つかりません",
+      description: "お探しの企画は見つかりませんでした。",
+      pathname: `/events/${id}`,
+    });
   }
 
-  return {
-    title: `${event.title} | 東京都市大学 第97回 世田谷祭`,
+  return createPageMetadata({
+    title: event.title,
     description: event.description,
-    openGraph: {
-      title: `${event.title} | 東京都市大学 第97回 世田谷祭`,
-      description: event.description,
-      type: "article",
-      images: event.thumbnail
-        ? [
-            {
-              url: event.thumbnail.url,
-              width: event.thumbnail.width,
-              height: event.thumbnail.height,
-              alt: event.title,
-            },
-          ]
-        : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${event.title} | 東京都市大学 第97回 世田谷祭`,
-      description: event.description,
-      images: event.thumbnail ? [event.thumbnail.url] : undefined,
-    },
-  };
+    pathname: `/events/${id}`,
+    type: "article",
+    image: event.thumbnail
+      ? {
+          url: event.thumbnail.url,
+          width: event.thumbnail.width,
+          height: event.thumbnail.height,
+          alt: event.title,
+        }
+      : undefined,
+  });
 }
 
 /**

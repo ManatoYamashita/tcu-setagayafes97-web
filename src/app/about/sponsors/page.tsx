@@ -4,20 +4,16 @@ import Link from "next/link";
 import { Heart, ExternalLink } from "lucide-react";
 import { getSponsorsList } from "@/lib/informations";
 import type { Information } from "@/types/informations";
+import { createPageMetadata } from "@/lib/metadata";
 /**
  * メタデータ
  */
-export const metadata: Metadata = {
-  title: "協賛企業一覧 | 東京都市大学 第97回 世田谷祭",
+export const metadata: Metadata = createPageMetadata({
+  title: "協賛企業一覧",
   description:
     "東京都市大学 第97回 世田谷祭を支援してくださる協賛企業様をご紹介します。心より感謝申し上げます。",
-  openGraph: {
-    title: "協賛企業一覧 | 東京都市大学 第97回 世田谷祭",
-    description:
-      "東京都市大学 第97回 世田谷祭を支援してくださる協賛企業様をご紹介します。心より感謝申し上げます。",
-    type: "website",
-  },
-};
+  pathname: "/about/sponsors",
+});
 
 /**
  * ISR設定: 1時間ごとに再検証

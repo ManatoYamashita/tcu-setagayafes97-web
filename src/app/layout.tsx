@@ -69,6 +69,9 @@ export const metadata: Metadata = {
     images: [siteConfig.metadata.ogImage],
   },
   metadataBase: new URL(siteConfig.metadata.siteUrl),
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: "/favicon.ico",
   },
