@@ -6,6 +6,7 @@ import { pageHeroes, type PageHeroData } from "@/data/page-heroes";
 import { privacyPolicyConfig } from "@/data/privacy";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import { createPageMetadata } from "@/lib/metadata";
 
 /**
  * 静的パラメータ生成
@@ -25,17 +26,13 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "privacy" });
 
-  return {
+  return createPageMetadata({
     title: t("meta.title"),
     description: t("meta.description"),
-    openGraph: {
-      title: t("meta.title"),
-      description: t("meta.description"),
-      type: "website",
-      locale:
-        locale === "ja" ? "ja_JP" : locale === "zh" ? "zh_CN" : locale === "ko" ? "ko_KR" : "en_US",
-    },
-  };
+    pathname: "/about/privacy",
+    locale: locale as "ja" | "en" | "zh" | "ko",
+    localized: true,
+  });
 }
 
 /**

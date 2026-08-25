@@ -98,3 +98,12 @@ export const NEWS_VISIBLE: boolean = process.env.NEXT_PUBLIC_NEWS_VISIBLE === "t
  * microCMS 側を下書きにするだけで済ませず、必ずこのフラグでも塞ぐこと。
  */
 export const SPECIAL_VISIBLE: boolean = process.env.NEXT_PUBLIC_SPECIAL_VISIBLE === "true";
+
+/**
+ * 著名人企画の物販表示フラグ
+ * 環境変数 NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE を "true" に設定した場合のみ、
+ * /special/[id] の物販情報を表示する。未設定・それ以外は非表示。
+ * SPECIAL_VISIBLE とは独立しており、プロフィール・出演情報・チケット等は維持する。
+ */
+export const SPECIAL_GOODS_VISIBLE: boolean =
+  process.env.NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE === "true";

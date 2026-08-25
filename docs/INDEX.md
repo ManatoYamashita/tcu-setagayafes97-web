@@ -17,6 +17,7 @@ docs/
 │   ├── git.md        # ブランチ戦略とCI/CDワークフロー
 │   ├── ci-env.md     # GitHub Actions 環境変数管理（Secrets/Variables）
 │   ├── domain-migration.md # setagayafes.org を第97回の正規ドメインにする手順
+│   ├── seo-metadata.md # 共通metadata・canonicalとテストページ除外
 │   └── microcms.md   # microCMS API 制約と実装パターン
 ├── frontend/         # フロントエンド関連ドキュメント
 │   ├── design.md                  # デザインシステム（カラー・タイポグラフィトークン）
@@ -112,6 +113,7 @@ docs/
   - **`vercel promote` は使わない。** 再ビルドしないため Preview 環境変数の成果物が本番に出る（`MICROCMS_SERVICE_DOMAIN` は環境別）。`vercel redeploy --target production` を使う
   - **`Aliased:` 表示は DNS を保証しない。** 公開ドメインは `curl -sI` の `server` / `location` ヘッダで実応答を確認する。`NEXT_PUBLIC_URL` のホストが名前解決できるかも確認する
   - **`NEXT_PUBLIC_SPECIAL_VISIBLE` は `EVENTS_VISIBLE` と独立。** 4通りの組み合わせ表あり。著名人ページの先行公開には `getSpecialEvents()` を使う（`getEventsList()` は EVENTS_VISIBLE=false で常に空）
+  - **`NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` は物販だけを独立制御。** `SPECIAL_VISIBLE=true` のまま、`/special/[id]` のプロフィール・チケット・注意事項を維持して物販欄だけを非表示にできる
   - **公開フラグの登録先は4箇所**（`.env.example` / GitHub Variables / Vercel / 本ドキュメント）。**未設定はエラーにならず黙って非公開になるため、登録漏れが「仕様どおりの準備中表示」と区別できない。** 突き合わせコマンドと `SPECIAL_VISIBLE` 登録漏れの実例あり
   - **`EVENTS_VISIBLE=false` + `SPECIAL_VISIBLE=true` では `/events/[id]` → `/special/[id]` の誘導が効かない。** `getEventById()` が先に `null` を返し、リダイレクト判定へ到達しない
 
@@ -120,6 +122,11 @@ docs/
   - **rewrite プロキシは採らない。** trailing-slash リダイレクトが rewrite より先に走るため無限ループになり、`skipTrailingSlashRedirect` で止めると canonical 未実装の現状で重複URLを生む
   - 手順の順序（WordPress の `siteurl` 変更 → 301 の本番反映 → DNS 切替）と各段階の検証コマンド
   - Vercel が要求する DNS レコード（`A 76.76.21.21` / `CNAME cname.vercel-dns.com`）
+
+- **[seo-metadata.md](./dev/seo-metadata.md)** - 共通metadata・canonicalとテストページ除外
+  - ページごとのmetadata、canonical、Open Graph、Twitter Cardの生成方針
+  - 多言語ページのcanonicalとhreflang相当のalternate設定
+  - `/api-test` と `/test-ui` を本番404にする運用
 
 - **[microcms.md](./dev/microcms.md)** - microCMS API 制約と実装パターン
   - limit 上限100件の制約と offset ページネーション実装
@@ -135,6 +142,7 @@ docs/
 - **[access-page-design.md](./frontend/access-page-design.md)** - Accessページの情報設計・UI実装方針
   - 会場所在地・推奨経路・注意事項の情報優先順位
   - 地図iframe、外部リンク、経路リストのアクセシビリティ要件
+  - 初期表示・スクロール連動アニメーションとモーション軽減時の表示方針
   - 交通情報の管理場所と公式情報の参照基準
 
 - **[design.md](./frontend/design.md)** - デザインシステム（カラー・タイポグラフィトークン）
@@ -143,6 +151,7 @@ docs/
   - アクセシビリティ（コントラスト比）ガイドライン
   - Kaisei Opti ブランドフォント仕様と使用制限
   - フォントスケール（モジュラースケール 1.25）
+  - Aboutページ開催概要のシンプルな2列情報リスト
   - CSS 変数まとめ
 
 > [!NOTE]

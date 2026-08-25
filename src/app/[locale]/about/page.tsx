@@ -5,6 +5,7 @@ import { AboutHero } from "@/components/about/AboutHero";
 import { ChairpersonSection } from "@/components/about/ChairpersonSection";
 import { EventOverviewTable } from "@/components/about/EventOverviewTable";
 import { SponsorBanner } from "@/components/home/SponsorBanner";
+import { createPageMetadata } from "@/lib/metadata";
 
 /**
  * 静的パラメータ生成
@@ -24,17 +25,13 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "about" });
 
-  return {
+  return createPageMetadata({
     title: t("meta.title"),
     description: t("meta.description"),
-    openGraph: {
-      title: t("meta.title"),
-      description: t("meta.description"),
-      type: "website",
-      locale:
-        locale === "ja" ? "ja_JP" : locale === "zh" ? "zh_CN" : locale === "ko" ? "ko_KR" : "en_US",
-    },
-  };
+    pathname: "/about",
+    locale: locale as "ja" | "en" | "zh" | "ko",
+    localized: true,
+  });
 }
 
 /**

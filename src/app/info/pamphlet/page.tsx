@@ -1,20 +1,16 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Download, FileText, AlertCircle } from "lucide-react";
+import { createPageMetadata } from "@/lib/metadata";
 /**
  * メタデータ
  */
-export const metadata: Metadata = {
-  title: "パンフレットダウンロード | 東京都市大学 第97回 世田谷祭",
+export const metadata: Metadata = createPageMetadata({
+  title: "パンフレットダウンロード",
   description:
     "東京都市大学 第97回 世田谷祭の公式パンフレットをダウンロードいただけます。企画情報、タイムテーブル、マップなどを掲載しています。",
-  openGraph: {
-    title: "パンフレットダウンロード | 東京都市大学 第97回 世田谷祭",
-    description:
-      "東京都市大学 第97回 世田谷祭の公式パンフレットをダウンロードいただけます。企画情報、タイムテーブル、マップなどを掲載しています。",
-    type: "website",
-  },
-};
+  pathname: "/info/pamphlet",
+});
 
 /**
  * パンフレット情報
