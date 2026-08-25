@@ -34,6 +34,9 @@ const withBundleAnalyzer = bundleAnalyzer({
 const ARCHIVE_96TH_ORIGIN = "https://96th.setagayafes.org";
 
 const nextConfig: NextConfig = {
+  // `/96th/` の専用301をNext.jsの自動308より先に処理するため、
+  // 末尾スラッシュの自動リダイレクトは proxy.ts で明示的に再現する。
+  skipTrailingSlashRedirect: true,
   async redirects() {
     return [
       {
