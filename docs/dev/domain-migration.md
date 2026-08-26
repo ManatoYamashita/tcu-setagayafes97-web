@@ -9,6 +9,7 @@
 | 第97回の正規ドメイン | **`setagayafes.org`**（apex）                                 |
 | 第96回の退避先       | **`96th.setagayafes.org`**（さくらに残す）                    |
 | 旧URLの扱い          | `setagayafes.org/96th/*` → **301** → `96th.setagayafes.org/*` |
+| 旧委員会URLの扱い    | `setagayafes.org/sfa` → **301** → `setagayafes.org/about`     |
 | `NEXT_PUBLIC_URL`    | `https://setagayafes.org`                                     |
 
 ## 現状
@@ -21,6 +22,7 @@
 | Vercel のドメイン割当           | **完了**（`setagayafes.org` / `www.setagayafes.org` の両方）        |
 | `NEXT_PUBLIC_URL`               | **完了**（Vercel / GitHub Variables とも `setagayafes.org`）        |
 | `/96th/*` の 301                | **実装済み**（`src/proxy.ts` / `next.config.ts`）                   |
+| `/sfa` の 301                   | **実装済み**（`next.config.ts`、`/about`へ統合）                    |
 | `96th.setagayafes.org` の作成   | **完了**（さくら側、2026-08-24）                                    |
 | 第96回ファイルバックアップ      | **完了**（SnapUP、2026-08-24、正常終了）                            |
 | 第96回DBバックアップ            | **完了**（phpMyAdmin、2026-08-24、[検証台帳](./96th-db-backup.md)） |
@@ -53,6 +55,13 @@
 - 第97回のrobots、sitemap、OGP URLを `https://setagayafes.org` に統一し、Vercel Productionへ反映。
 - Vercel側のapexドメインに残っていた `setagayafes.org → www.setagayafes.org` リダイレクトを解除。`/96th/*` は `96th.setagayafes.org/*` へ301。
 - 96th本文には旧 `/96th/` および `/95th/` の画像URLが一部残るため、コンテンツ内リンクの整理は別作業として残す。
+
+### 2026-08-26 の追加SEO対応
+
+- 旧実行委員会トップ `/sfa` を、現行の実行委員会紹介 `/about` へ301で統合。内容が一致しない `/sfa/*` は一括転送せず404を維持する。
+- 第97回の名称・開催日をdescriptionと `WebSite` JSON-LDで明示し、500×500のfaviconをmetadataから指定する。
+- Googlebotの大きな画像プレビューを許可し、トップと委員会紹介の代表画像をサイトマップへ追加する。
+- Production反映後、Search Consoleでトップ・`/about` のインデックス登録をリクエストし、`sitemap.xml` を再送信する。
 
 ## なぜ rewrite ではなく redirect なのか
 

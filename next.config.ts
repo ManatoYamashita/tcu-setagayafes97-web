@@ -40,6 +40,13 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        // 旧・実行委員会サイトのトップを、現在の委員会紹介へ統合する。
+        // サブページは内容が一致しないため一括転送せず、404のまま整理する。
+        source: "/sfa",
+        destination: "/about",
+        statusCode: 301,
+      },
+      {
         source: "/96th/:path*",
         destination: `${ARCHIVE_96TH_ORIGIN}/:path*`,
         /*

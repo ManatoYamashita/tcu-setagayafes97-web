@@ -40,8 +40,33 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      {
+        url: "/images/brand/favicon.png",
+        type: "image/png",
+        sizes: "500x500",
+      },
+    ],
+    apple: [
+      {
+        url: "/images/brand/favicon.png",
+        type: "image/png",
+        sizes: "500x500",
+      },
+    ],
   },
 };
 

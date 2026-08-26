@@ -121,6 +121,7 @@ docs/
 
 - **[domain-migration.md](./dev/domain-migration.md)** - `setagayafes.org` を第97回の正規ドメインにする手順
   - 第96回（WordPress）は `96th.setagayafes.org` へ退避し、`/96th/*` は 301 で引き継ぐ
+  - 旧実行委員会トップ `/sfa` は現行の `/about` へ301で統合し、内容が一致しないサブページは404を維持する
   - **rewrite プロキシは採らない。** trailing-slash リダイレクトが rewrite より先に走るため無限ループになり、`skipTrailingSlashRedirect` で止めると canonical 未実装の現状で重複URLを生む
   - 手順の順序（WordPress の `siteurl` 変更 → 301 の本番反映 → DNS 切替）と各段階の検証コマンド
   - Vercel が要求する DNS レコード（`A 76.76.21.21` / `CNAME cname.vercel-dns.com`）
@@ -132,6 +133,7 @@ docs/
 - **[seo-metadata.md](./dev/seo-metadata.md)** - 共通metadata・canonicalとテストページ除外
   - ページごとのmetadata、canonical、Open Graph、Twitter Cardの生成方針
   - 多言語ページのcanonicalとhreflang相当のalternate設定
+  - 年次切替後のfavicon・構造化データ・画像サイトマップとSearch Console再送信の運用
   - `/api-test` と `/test-ui` を本番404にする運用
 
 - **[microcms.md](./dev/microcms.md)** - microCMS API 制約と実装パターン
