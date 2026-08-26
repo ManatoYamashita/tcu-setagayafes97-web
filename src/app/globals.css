@@ -65,11 +65,6 @@ body {
   text-wrap: balance;
 }
 
-@utility font-display-mincho {
-  font-family:
-    var(--font-shippori-mincho, "Shippori Mincho"), "Hiragino Mincho ProN", "Yu Mincho", serif;
-}
-
 @utility animate-spin-slow {
   animation: spin 240s linear infinite;
 }

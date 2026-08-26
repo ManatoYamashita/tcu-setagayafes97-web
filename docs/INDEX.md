@@ -27,6 +27,7 @@ docs/
 │   ├── browser-verification-pitfalls.md # 検証手順そのものが誤る実例
 │   ├── layout-patterns.md         # レイアウトパターンと設計原則
 │   ├── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
+│   ├── performance.md             # Lighthouse基準値とフロントエンド性能ルール
 │   └── page-transition.md         # ページ遷移アニメーションとView Transitions API
 └── requires/         # 要件定義・仕様関連
     ├── require.md           # プロジェクト要件定義書
@@ -153,6 +154,11 @@ docs/
   - フォントスケール（モジュラースケール 1.25）
   - Aboutページ開催概要のシンプルな2列情報リスト
   - CSS 変数まとめ
+
+- **[performance.md](./frontend/performance.md)** - Lighthouse基準値とフロントエンド性能ルール
+  - トップページ desktop の基準値と LCP 内訳
+  - LCP、動画、レスポンシブ画像、無限ロゴ列、Webフォントの実装ルール
+  - 静的検査、ローカル本番ビルド、ブラウザ、Lighthouse の検証手順
 
 > [!NOTE]
 > ブラウザ自動化の知見は3ファイルに分かれています。**手順は `agent-browser-workflow.md`、判断基準は `browser-observation-limits.md`、失敗例は `browser-verification-pitfalls.md`。**

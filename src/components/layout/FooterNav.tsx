@@ -29,7 +29,7 @@ export function FooterNav() {
                 <Link
                   href={link.href}
                   hrefLang={link.hrefLang}
-                  className="text-white/70 hover:text-white"
+                  className="text-white/85 hover:text-white"
                 >
                   {link.label}
                 </Link>
