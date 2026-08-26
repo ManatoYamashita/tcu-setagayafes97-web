@@ -4,11 +4,8 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import { aboutConfig } from "@/data/about";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const { topSection } = aboutConfig;
 
@@ -31,65 +28,108 @@ export function AboutSection() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (ctxRef.current) return;
+    const section = sectionRef.current;
+    if (!section) return;
 
-    const ctx = gsap.context(() => {
-      const scrollTriggerBase = {
-        trigger: sectionRef.current,
-        start: "top 80%",
-        once: true,
-      };
+    let disposed = false;
 
-      // 画像: スケールアップ + フェードイン
-      if (imageWrapperRef.current) {
-        gsap.set(imageWrapperRef.current, { opacity: 0, scale: 0.85 });
-        gsap.to(imageWrapperRef.current, {
+    const startAnimation = async () => {
+      // ABOUT is below the hero on the initial view. Load ScrollTrigger only
+      // when the section is close to entering the viewport.
+      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+      if (disposed || ctxRef.current) return;
+      gsap.registerPlugin(ScrollTrigger);
+
+      const ctx = gsap.context(() => {
+        const scrollTriggerBase = {
+          trigger: sectionRef.current,
+          start: "top 80%",
+          once: true,
+        };
+
+        // 画像: スケールアップ + フェードイン
+        if (imageWrapperRef.current) {
+          gsap.set(imageWrapperRef.current, { opacity: 0, scale: 0.85 });
+          gsap.to(imageWrapperRef.current, {
+            opacity: 1,
+            scale: 1,
+            duration: 0.8,
+            ease: "power3.out",
+            force3D: true,
+            scrollTrigger: scrollTriggerBase,
+          });
+        }
+
+        // 歯車: 回転 + フェードイン（遅延）
+        if (gearRef.current) {
+          gsap.set(gearRef.current, { opacity: 0, rotation: -45 });
+          gsap.to(gearRef.current, {
+            opacity: 1,
+            rotation: 0,
+            duration: 0.9,
+            ease: "power3.out",
+            force3D: true,
+            delay: 0.3,
+            scrollTrigger: { ...scrollTriggerBase },
+          });
+        }
+
+        // テキスト要素: スタガーでフェードイン + スライドアップ
+        const textTargets = [
+          labelRef.current,
+          headingRef.current,
+          taglineRef.current,
+          paragraphsRef.current,
+          ctaRef.current,
+        ].filter(Boolean) as HTMLElement[];
+
+        gsap.set(textTargets, { opacity: 0, y: 30 });
+        gsap.to(textTargets, {
           opacity: 1,
-          scale: 1,
-          duration: 0.8,
-          ease: "power3.out",
+          y: 0,
+          duration: 0.7,
+          ease: "power4.out",
+          stagger: 0.12,
           force3D: true,
-          scrollTrigger: scrollTriggerBase,
-        });
-      }
-
-      // 歯車: 回転 + フェードイン（遅延）
-      if (gearRef.current) {
-        gsap.set(gearRef.current, { opacity: 0, rotation: -45 });
-        gsap.to(gearRef.current, {
-          opacity: 1,
-          rotation: 0,
-          duration: 0.9,
-          ease: "power3.out",
-          force3D: true,
-          delay: 0.3,
           scrollTrigger: { ...scrollTriggerBase },
         });
-      }
+      }, sectionRef);
 
-      // テキスト要素: スタガーでフェードイン + スライドアップ
-      const textTargets = [
-        labelRef.current,
-        headingRef.current,
-        taglineRef.current,
-        paragraphsRef.current,
-        ctaRef.current,
-      ].filter(Boolean) as HTMLElement[];
+      ctxRef.current = ctx;
+    };
 
-      gsap.set(textTargets, { opacity: 0, y: 30 });
-      gsap.to(textTargets, {
-        opacity: 1,
-        y: 0,
-        duration: 0.7,
-        ease: "power4.out",
-        stagger: 0.12,
-        force3D: true,
-        scrollTrigger: { ...scrollTriggerBase },
-      });
-    }, sectionRef);
+    if (!("IntersectionObserver" in window)) {
+      void startAnimation();
+      return () => {
+        disposed = true;
+        ctxRef.current?.revert();
+        ctxRef.current = null;
+      };
+    }
 
-    ctxRef.current = ctx;
+    const observeTarget = imageWrapperRef.current ?? section;
+    if (observeTarget.getBoundingClientRect().bottom <= 0) {
+      void startAnimation();
+      return () => {
+        disposed = true;
+        ctxRef.current?.revert();
+        ctxRef.current = null;
+      };
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        observer.disconnect();
+        void startAnimation();
+      },
+      { rootMargin: "0px 0px -35% 0px" }
+    );
+    observer.observe(observeTarget);
 
     return () => {
+      disposed = true;
+      observer.disconnect();
       ctxRef.current?.revert();
       ctxRef.current = null;
     };

@@ -72,10 +72,10 @@ CSS分割・日本語フォントの転送量・GSAP由来の強制リフロー�
 チャンクが読み込まれることが分かったため、`FeaturedGearScene` は768px未満で描画を止め、
 R3F/Three.jsの初期転送を避ける。
 
-## 2026-08-26 残存CSS・強制リフローの次PR
+## 2026-08-26 残存CSS・強制リフロー（PR #105）
 
-PR #104 の本番再計測で残った未使用CSS（推定 97 KiB）と強制リフローを、次の性能改善PRで
-追加対応する。
+PR #104 の本番再計測で残った未使用CSS（推定 97 KiB）と強制リフローのうち、初期描画の仕事量を
+PR #105で先行して削減した。
 
 - `NewsUnavailable`、協賛バナー、企画セクションへ `content-visibility: auto` と
   `contain-intrinsic-size` を適用し、初期ビューポート外のスタイル計算・レイアウト・描画を遅延する。
@@ -86,11 +86,31 @@ PR #104 の本番再計測で残った未使用CSS（推定 97 KiB）と強制�
 
 `content-visibility` は初期レンダリングの仕事量を減らすもので、グローバルCSSの転送バイト数そのものを
 削減する機能ではない。未使用CSS 97 KiB、レンダリングをブロックするリクエスト、WebフォントCSSの
-配信量は本番PageSpeed Insightsで再計測し、必要ならCSS分割またはフォント構成を別PRで検討する。
+配信量は本番PageSpeed Insightsで再計測し、必要ならCSS分割またはフォント構成を本PRで検討する。
 
 ローカル本番ビルドと `agent-browser` で、390x844 / 1440x900 の表示、対象セクションのスクロール後の
 表示、横溢れ、コンソールエラーを確認する。PageSpeed Insightsのスコア改善は本番反映後の同条件計測で
 判定する。
+
+## 2026-08-26 未使用CSS・強制リフロー・render-blocking対応PR
+
+PR #105 の本番 mobile 計測（Performance 81、FCP 2.1 秒、LCP 4.7 秒）では、未使用CSS 97 KiB、
+レンダリングをブロックするリクエストの削減余地 1,750 ms、強制リフロー 96 ms が残った。
+内訳は、初期HTMLに一括で含めていた Kaisei Opti / Dela Gothic One のフォントCSSと、
+スクロール前の ABOUT / NEWS アニメーションである。
+
+本性能改善PRでは次を行う。
+
+- Kaisei Opti / Dela Gothic One をルートレイアウトから外し、クライアント側の遅延チャンクで適用する。
+  初期HTMLのスタイルシートを Noto Sans JP・共通CSS・ロゴ列CSSに限定し、フォントの見た目は維持する。
+- ABOUT / NEWS の ScrollTrigger を IntersectionObserver で対象セクションの接近時だけ初期化する。
+  `gsap/ScrollTrigger` の登録とレイアウト読み取りを初期表示から外し、スクロール時の演出は維持する。
+- `prefers-reduced-motion` と IntersectionObserver 非対応時は従来どおり安全なフォールバックを使う。
+
+ローカル本番ビルドではトップページの初期HTMLに含まれるCSSリンクが5本から3本へ減り、Kaisei / Dela の
+フォントCSS（約281 KiB、非圧縮）は遅延チャンクへ移動した。390x844 の実機相当ブラウザでフォント適用、
+ABOUT / NEWS のスクロール演出、横溢れ、コンソールエラーを再確認する。マージ後は同一URL・mobile presetで
+PageSpeed Insightsを再計測し、未使用CSS、render-blocking、強制リフローの内訳を比較する。
 
 ## 実装ルール
 
@@ -123,6 +143,7 @@ PR #104 の本番再計測で残った未使用CSS（推定 97 KiB）と強制�
 ### Webフォント
 
 - `next/font` の変数をルート要素へ付けると、対応するフォントCSSが全ページへ配信される。
+- 初期表示に不要な装飾フォントは、遅延チャンクで変数を付け、初期HTMLのrender-blocking CSSに含めない。
 - 使用箇所のないフォントは import・変数・CSS utility を残さない。
 - 日本語フォントは `unicode-range` ごとの分割ファイルが多いため、原則 `preload: false` とし、
   実際に使う文字範囲だけをブラウザに取得させる。
