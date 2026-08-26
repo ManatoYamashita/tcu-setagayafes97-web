@@ -7,6 +7,7 @@ import { gsap } from "gsap";
 import type { News } from "@/types/news";
 import { CircularText } from "@/components/ui/CircularText";
 import { NewsFilter } from "./NewsFilter";
+import { loadKaiseiFont } from "@/components/layout/loadKaiseiFont";
 
 interface NewsSectionProps {
   newsList: News[];
@@ -37,6 +38,7 @@ export function NewsSectionInteractive({ newsList }: NewsSectionProps) {
     const startAnimation = async () => {
       // NEWS is below the initial viewport. Defer the ScrollTrigger bundle and
       // its layout reads until the section is close to entering the viewport.
+      void loadKaiseiFont();
       const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       if (prefersReduced) {

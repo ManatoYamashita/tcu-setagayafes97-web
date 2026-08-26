@@ -6,6 +6,7 @@ import Link from "next/link";
 import { gsap } from "gsap";
 
 import { aboutConfig } from "@/data/about";
+import { loadKaiseiFont } from "@/components/layout/loadKaiseiFont";
 
 const { topSection } = aboutConfig;
 
@@ -36,6 +37,7 @@ export function AboutSection() {
     const startAnimation = async () => {
       // ABOUT is below the hero on the initial view. Load ScrollTrigger only
       // when the section is close to entering the viewport.
+      void loadKaiseiFont();
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
       if (disposed || ctxRef.current) return;
       gsap.registerPlugin(ScrollTrigger);
