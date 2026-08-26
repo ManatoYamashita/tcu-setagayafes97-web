@@ -16,17 +16,17 @@
 > [!WARNING]
 > **移行作業は反映済み。** `setagayafes.org` はVercelの第97回サイト、`96th.setagayafes.org` はさくらの第96回WordPressを配信している。
 
-| 項目                            | 状態                                                         |
-| ------------------------------- | ------------------------------------------------------------ |
-| Vercel のドメイン割当           | **完了**（`setagayafes.org` / `www.setagayafes.org` の両方） |
-| `NEXT_PUBLIC_URL`               | **完了**（Vercel / GitHub Variables とも `setagayafes.org`） |
-| `/96th/*` の 301                | **実装済み**（`src/proxy.ts` / `next.config.ts`）            |
-| `96th.setagayafes.org` の作成   | **完了**（さくら側、2026-08-24）                             |
-| 第96回ファイルバックアップ      | **完了**（SnapUP、2026-08-24、正常終了）                     |
-| 第96回DBバックアップ            | **完了**（phpMyAdmin、2026-08-24）                           |
-| 第96回サブドメインのSSL         | **完了**（Let's Encrypt、2026-08-24）                        |
-| WordPress の `siteurl` / `home` | **完了**（`https://96th.setagayafes.org`）                   |
-| `setagayafes.org` の DNS 切替   | **完了**（Vercel）                                           |
+| 項目                            | 状態                                                                |
+| ------------------------------- | ------------------------------------------------------------------- |
+| Vercel のドメイン割当           | **完了**（`setagayafes.org` / `www.setagayafes.org` の両方）        |
+| `NEXT_PUBLIC_URL`               | **完了**（Vercel / GitHub Variables とも `setagayafes.org`）        |
+| `/96th/*` の 301                | **実装済み**（`src/proxy.ts` / `next.config.ts`）                   |
+| `96th.setagayafes.org` の作成   | **完了**（さくら側、2026-08-24）                                    |
+| 第96回ファイルバックアップ      | **完了**（SnapUP、2026-08-24、正常終了）                            |
+| 第96回DBバックアップ            | **完了**（phpMyAdmin、2026-08-24、[検証台帳](./96th-db-backup.md)） |
+| 第96回サブドメインのSSL         | **完了**（Let's Encrypt、2026-08-24）                               |
+| WordPress の `siteurl` / `home` | **完了**（`https://96th.setagayafes.org`）                          |
+| `setagayafes.org` の DNS 切替   | **完了**（Vercel）                                                  |
 
 ### 2026-08-24 の実施内容
 
