@@ -169,7 +169,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
           height={500}
           sizes="(max-width: 639px) 75vw, (max-width: 767px) 50vw, (max-width: 1023px) 35vw, 30vw"
           fetchPriority="high"
-          quality={60}
+          quality={40}
           className="h-auto w-full animate-spin-slow"
           priority
         />
