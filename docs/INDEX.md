@@ -17,6 +17,7 @@ docs/
 │   ├── git.md        # ブランチ戦略とCI/CDワークフロー
 │   ├── ci-env.md     # GitHub Actions 環境変数管理（Secrets/Variables）
 │   ├── domain-migration.md # setagayafes.org を第97回の正規ドメインにする手順
+│   ├── 96th-db-backup.md # 第96回 WordPress DBバックアップの検証情報と取扱い
 │   ├── seo-metadata.md # 共通metadata・canonicalとテストページ除外
 │   └── microcms.md   # microCMS API 制約と実装パターン
 ├── frontend/         # フロントエンド関連ドキュメント
@@ -124,6 +125,10 @@ docs/
   - 手順の順序（WordPress の `siteurl` 変更 → 301 の本番反映 → DNS 切替）と各段階の検証コマンド
   - Vercel が要求する DNS レコード（`A 76.76.21.21` / `CNAME cname.vercel-dns.com`）
 
+- **[96th-db-backup.md](./dev/96th-db-backup.md)** - 第96回 WordPress DBバックアップの検証情報と安全な取扱い
+  - 取得日・サイズ・SHA-256による原本照合
+  - 機密な生ダンプをリポジトリ外で保管する理由と復元前チェック
+
 - **[seo-metadata.md](./dev/seo-metadata.md)** - 共通metadata・canonicalとテストページ除外
   - ページごとのmetadata、canonical、Open Graph、Twitter Cardの生成方針
   - 多言語ページのcanonicalとhreflang相当のalternate設定
@@ -158,7 +163,8 @@ docs/
 - **[performance.md](./frontend/performance.md)** - Lighthouse基準値とフロントエンド性能ルール
   - トップページ desktop の基準値と LCP 内訳
   - LCP、動画、レスポンシブ画像、無限ロゴ列、Webフォントの実装ルール
-  - `content-visibility` による初期描画遅延と、LogoLoop の強制リフロー回避
+  - `content-visibility` による初期描画遅延、フォントCSSの遅延配信、ScrollTriggerの遅延初期化
+  - LogoLoop の強制リフロー回避
   - 静的検査、ローカル本番ビルド、ブラウザ、Lighthouse の検証手順
 
 > [!NOTE]

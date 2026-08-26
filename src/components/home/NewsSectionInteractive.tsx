@@ -4,12 +4,9 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { News } from "@/types/news";
 import { CircularText } from "@/components/ui/CircularText";
 import { NewsFilter } from "./NewsFilter";
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface NewsSectionProps {
   newsList: News[];
@@ -32,166 +29,212 @@ export function NewsSectionInteractive({ newsList }: NewsSectionProps) {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (ctxRef.current) return;
+    const section = sectionRef.current;
+    if (!section) return;
 
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let disposed = false;
 
-    if (prefersReduced) {
-      // reduced-motion: 全要素を即座に表示
-      if (heroImageRef.current) {
-        heroImageRef.current.style.clipPath = "none";
+    const startAnimation = async () => {
+      // NEWS is below the initial viewport. Defer the ScrollTrigger bundle and
+      // its layout reads until the section is close to entering the viewport.
+      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (prefersReduced) {
+        // reduced-motion: 全要素を即座に表示
+        if (heroImageRef.current) {
+          heroImageRef.current.style.clipPath = "none";
+        }
+
+        const targets = [
+          whiteSheetRef.current,
+          ctaRef.current,
+          gear1Ref.current,
+          gear2Ref.current,
+        ].filter(Boolean) as HTMLElement[];
+
+        targets.forEach((el) => {
+          el.style.opacity = "1";
+          el.style.transform = "none";
+        });
+
+        const cards = sectionRef.current?.querySelectorAll(".news-card");
+        cards?.forEach((el) => {
+          (el as HTMLElement).style.opacity = "1";
+          (el as HTMLElement).style.transform = "none";
+        });
+        return;
       }
 
-      const targets = [
-        whiteSheetRef.current,
-        ctaRef.current,
-        gear1Ref.current,
-        gear2Ref.current,
-      ].filter(Boolean) as HTMLElement[];
+      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+      if (disposed || ctxRef.current) return;
+      gsap.registerPlugin(ScrollTrigger);
 
-      targets.forEach((el) => {
-        el.style.opacity = "1";
-        el.style.transform = "none";
-      });
+      const ctx = gsap.context(() => {
+        const scrollTriggerBase = {
+          trigger: sectionRef.current,
+          start: "top 80%",
+          once: true,
+        };
 
-      const cards = sectionRef.current?.querySelectorAll(".news-card");
-      cards?.forEach((el) => {
-        (el as HTMLElement).style.opacity = "1";
-        (el as HTMLElement).style.transform = "none";
-      });
-      return;
-    }
+        // 1. 背景画像: clipPathリヴィール（左→右）+ スケールダウン
+        if (heroImageRef.current) {
+          gsap.set(heroImageRef.current, {
+            clipPath: "inset(0% 100% 0% 0%)",
+            opacity: 1,
+          });
+          gsap.set(heroImageRef.current.querySelector("img"), {
+            scale: 1.3,
+          });
 
-    const ctx = gsap.context(() => {
-      const scrollTriggerBase = {
-        trigger: sectionRef.current,
-        start: "top 80%",
-        once: true,
-      };
+          const revealTl = gsap.timeline({
+            scrollTrigger: scrollTriggerBase,
+          });
 
-      // 1. 背景画像: clipPathリヴィール（左→右）+ スケールダウン
-      if (heroImageRef.current) {
-        gsap.set(heroImageRef.current, {
-          clipPath: "inset(0% 100% 0% 0%)",
-          opacity: 1,
-        });
-        gsap.set(heroImageRef.current.querySelector("img"), {
-          scale: 1.3,
-        });
+          revealTl.to(heroImageRef.current, {
+            clipPath: "inset(0% 0% 0% 0%)",
+            duration: 1.2,
+            ease: "power4.inOut",
+            force3D: true,
+          });
+          revealTl.to(
+            heroImageRef.current.querySelector("img"),
+            {
+              scale: 1,
+              duration: 1.4,
+              ease: "power3.out",
+              force3D: true,
+            },
+            0.15
+          );
+        }
 
-        const revealTl = gsap.timeline({
-          scrollTrigger: scrollTriggerBase,
-        });
+        // 2. 白シート: スライドアップ + フェードイン
+        if (whiteSheetRef.current) {
+          gsap.set(whiteSheetRef.current, { opacity: 0, y: 40 });
+          gsap.to(whiteSheetRef.current, {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: "power4.out",
+            force3D: true,
+            scrollTrigger: { ...scrollTriggerBase },
+          });
+        }
 
-        revealTl.to(heroImageRef.current, {
-          clipPath: "inset(0% 0% 0% 0%)",
-          duration: 1.2,
-          ease: "power4.inOut",
-          force3D: true,
-        });
-        revealTl.to(
-          heroImageRef.current.querySelector("img"),
-          {
-            scale: 1,
-            duration: 1.4,
+        // 3. ヘッダー + タブ: staggerスライドアップ
+        const headerTargets = sectionRef.current?.querySelectorAll(".news-header, .news-tabs");
+        if (headerTargets && headerTargets.length > 0) {
+          gsap.set(headerTargets, { opacity: 0, y: 30 });
+          gsap.to(headerTargets, {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: "power4.out",
+            stagger: 0.12,
+            force3D: true,
+            delay: 0.15,
+            scrollTrigger: { ...scrollTriggerBase },
+          });
+        }
+
+        // 4. カード群: staggerスライドアップ
+        const cards = sectionRef.current?.querySelectorAll(".news-card");
+        if (cards && cards.length > 0) {
+          gsap.set(cards, { opacity: 0, y: 30 });
+          gsap.to(cards, {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power3.out",
+            stagger: 0.1,
+            force3D: true,
+            delay: 0.4,
+            scrollTrigger: {
+              ...scrollTriggerBase,
+              onEnter: () => {
+                // アニメーション完了後にinline styleをクリア（フィルター切替対応）
+                setTimeout(
+                  () => {
+                    cards.forEach((card) => {
+                      gsap.set(card, { clearProps: "all" });
+                    });
+                  },
+                  600 + cards.length * 100 + 400
+                );
+              },
+            },
+          });
+        }
+
+        // 5. CTAボタン: スライドアップ + フェードイン
+        if (ctaRef.current) {
+          gsap.set(ctaRef.current, { opacity: 0, y: 20 });
+          gsap.to(ctaRef.current, {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power3.out",
+            delay: 0.6,
+            force3D: true,
+            scrollTrigger: { ...scrollTriggerBase },
+          });
+        }
+
+        // 6. 歯車装飾: 回転 + フェードイン（AboutSectionパターン）
+        const gears = [gear1Ref.current, gear2Ref.current].filter(Boolean) as HTMLElement[];
+        if (gears.length > 0) {
+          gsap.set(gears, { opacity: 0, rotation: -45 });
+          gsap.to(gears, {
+            opacity: 1,
+            rotation: 0,
+            duration: 0.9,
             ease: "power3.out",
             force3D: true,
-          },
-          0.15
-        );
-      }
+            delay: 0.3,
+            stagger: 0.15,
+            scrollTrigger: { ...scrollTriggerBase },
+          });
+        }
+      }, sectionRef);
 
-      // 2. 白シート: スライドアップ + フェードイン
-      if (whiteSheetRef.current) {
-        gsap.set(whiteSheetRef.current, { opacity: 0, y: 40 });
-        gsap.to(whiteSheetRef.current, {
-          opacity: 1,
-          y: 0,
-          duration: 0.7,
-          ease: "power4.out",
-          force3D: true,
-          scrollTrigger: { ...scrollTriggerBase },
-        });
-      }
+      ctxRef.current = ctx;
+    };
 
-      // 3. ヘッダー + タブ: staggerスライドアップ
-      const headerTargets = sectionRef.current?.querySelectorAll(".news-header, .news-tabs");
-      if (headerTargets && headerTargets.length > 0) {
-        gsap.set(headerTargets, { opacity: 0, y: 30 });
-        gsap.to(headerTargets, {
-          opacity: 1,
-          y: 0,
-          duration: 0.7,
-          ease: "power4.out",
-          stagger: 0.12,
-          force3D: true,
-          delay: 0.15,
-          scrollTrigger: { ...scrollTriggerBase },
-        });
-      }
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      !("IntersectionObserver" in window)
+    ) {
+      void startAnimation();
+      return () => {
+        disposed = true;
+        ctxRef.current?.revert();
+        ctxRef.current = null;
+      };
+    }
 
-      // 4. カード群: staggerスライドアップ
-      const cards = sectionRef.current?.querySelectorAll(".news-card");
-      if (cards && cards.length > 0) {
-        gsap.set(cards, { opacity: 0, y: 30 });
-        gsap.to(cards, {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          ease: "power3.out",
-          stagger: 0.1,
-          force3D: true,
-          delay: 0.4,
-          scrollTrigger: {
-            ...scrollTriggerBase,
-            onEnter: () => {
-              // アニメーション完了後にinline styleをクリア（フィルター切替対応）
-              setTimeout(
-                () => {
-                  cards.forEach((card) => {
-                    gsap.set(card, { clearProps: "all" });
-                  });
-                },
-                600 + cards.length * 100 + 400
-              );
-            },
-          },
-        });
-      }
+    const observeTarget = heroImageRef.current ?? section;
+    if (observeTarget.getBoundingClientRect().bottom <= 0) {
+      void startAnimation();
+      return () => {
+        disposed = true;
+        ctxRef.current?.revert();
+        ctxRef.current = null;
+      };
+    }
 
-      // 5. CTAボタン: スライドアップ + フェードイン
-      if (ctaRef.current) {
-        gsap.set(ctaRef.current, { opacity: 0, y: 20 });
-        gsap.to(ctaRef.current, {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          ease: "power3.out",
-          delay: 0.6,
-          force3D: true,
-          scrollTrigger: { ...scrollTriggerBase },
-        });
-      }
-
-      // 6. 歯車装飾: 回転 + フェードイン（AboutSectionパターン）
-      const gears = [gear1Ref.current, gear2Ref.current].filter(Boolean) as HTMLElement[];
-      if (gears.length > 0) {
-        gsap.set(gears, { opacity: 0, rotation: -45 });
-        gsap.to(gears, {
-          opacity: 1,
-          rotation: 0,
-          duration: 0.9,
-          ease: "power3.out",
-          force3D: true,
-          delay: 0.3,
-          stagger: 0.15,
-          scrollTrigger: { ...scrollTriggerBase },
-        });
-      }
-    }, sectionRef);
-
-    ctxRef.current = ctx;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        observer.disconnect();
+        void startAnimation();
+      },
+      { rootMargin: "0px 0px -20% 0px" }
+    );
+    observer.observe(observeTarget);
 
     return () => {
+      disposed = true;
+      observer.disconnect();
       ctxRef.current?.revert();
       ctxRef.current = null;
     };
