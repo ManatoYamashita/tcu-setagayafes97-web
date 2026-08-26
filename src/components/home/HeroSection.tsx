@@ -167,7 +167,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
           alt="世田谷祭のアイコン"
           width={500}
           height={500}
-          sizes="(max-width: 639px) 75vw, (max-width: 767px) 50vw, (max-width: 1023px) 35vw, 30vw"
+          sizes="min(500px, 100vw)"
           fetchPriority="high"
           quality={60}
           className="h-auto w-full animate-spin-slow"
