@@ -129,6 +129,24 @@ body {
     container-type: inline-size;
   }
 
+  /*
+   * Below-the-fold sections do not need style/layout/paint work during the
+   * first viewport. The intrinsic size approximates the section's content box
+   * until it enters the viewport, so the scroll range does not start at zero.
+   */
+  .deferred-section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 15rem;
+  }
+
+  .deferred-section--sponsors {
+    contain-intrinsic-size: auto 11rem;
+  }
+
+  .deferred-section--events {
+    contain-intrinsic-size: auto 32rem;
+  }
+
   /* CircularText 回転アニメーション */
   .animate-spin-slow {
     animation: spin-slow 60s linear infinite;
