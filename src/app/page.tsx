@@ -4,7 +4,20 @@ import { NewsSection } from "@/components/home/NewsSection";
 import { FeaturedEvents } from "@/components/home/FeaturedEvents";
 import { SponsorBanner } from "@/components/home/SponsorBanner";
 import { getLatestHeroNews, getNewsList } from "@/lib/news";
-import { NEWS_VISIBLE } from "@/data/site";
+import { NEWS_VISIBLE, siteConfig } from "@/data/site";
+
+const homeUrl = new URL("/", siteConfig.metadata.siteUrl).toString();
+const websiteStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${homeUrl}#website`,
+  url: homeUrl,
+  name: siteConfig.metadata.siteName,
+  alternateName: [`第${siteConfig.edition}回 世田谷祭`, siteConfig.shortName],
+  description: siteConfig.description,
+  inLanguage: "ja",
+};
+
 /**
  * トップページ
  * 第97回世田谷祭の公式Webサイト
@@ -16,6 +29,12 @@ export default async function Home() {
 
   return (
     <main className="overflow-x-clip">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(websiteStructuredData).replace(/</g, "\\u003c"),
+        }}
+      />
       <div className="hero-about-bg">
         <HeroSection latestNews={heroNews} />
         <AboutSection />
