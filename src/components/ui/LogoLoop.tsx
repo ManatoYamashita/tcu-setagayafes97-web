@@ -257,13 +257,13 @@ export const LogoLoop = memo(function LogoLoop({
     // after writing the vertical container height: that ordering can force a
     // synchronous layout on every ResizeObserver callback.
     const containerWidth = container.clientWidth;
-    const currentHeight = container.clientHeight;
-    const parentHeight = container.parentElement?.clientHeight ?? 0;
     const sequenceRect = sequence.getBoundingClientRect();
     const sequenceWidth = sequenceRect.width;
     const sequenceHeight = sequenceRect.height;
 
     if (isVertical) {
+      const currentHeight = container.clientHeight;
+      const parentHeight = container.parentElement?.clientHeight ?? 0;
       const targetHeight = parentHeight > 0 ? Math.ceil(parentHeight) : 0;
       const viewport = targetHeight || currentHeight || sequenceHeight;
 

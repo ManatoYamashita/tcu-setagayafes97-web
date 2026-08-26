@@ -140,11 +140,17 @@ body {
   }
 
   .deferred-section--sponsors {
-    contain-intrinsic-size: auto 11rem;
+    contain-intrinsic-size: auto 8rem;
   }
 
   .deferred-section--events {
     contain-intrinsic-size: auto 32rem;
+  }
+
+  @media (min-width: 64rem) {
+    .deferred-section--events {
+      contain-intrinsic-size: auto 42rem;
+    }
   }
 
   /* CircularText 回転アニメーション */
