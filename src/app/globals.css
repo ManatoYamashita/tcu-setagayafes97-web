@@ -53,6 +53,13 @@ body {
   background-color: #ffffff;
 }
 
+/* モバイルではLCPを覆うオープナーを表示せず、初期表示を遅らせない。 */
+@media (max-width: 767px) {
+  .opener-container {
+    display: none;
+  }
+}
+
 @layer base {
   h1,
   h2,

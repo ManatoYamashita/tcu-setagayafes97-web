@@ -25,6 +25,20 @@ export function Opener() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    // モバイルではオープナーがLCP対象のヒーロー画像を覆い、低速回線で
+    // 初期表示を約1〜2秒遅らせる。演出はデスクトップに残し、モバイルは
+    // 本文をすぐ操作できる状態にする。
+    if (
+      window.matchMedia("(max-width: 767px)").matches ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      const hideOpener = window.setTimeout(() => {
+        setShowOpener(false);
+        window.dispatchEvent(new CustomEvent("opener-done"));
+      }, 0);
+      return () => window.clearTimeout(hideOpener);
+    }
+
     const safetyTimeout = setTimeout(() => {
       setShowOpener(false);
       window.dispatchEvent(new CustomEvent("opener-done"));
@@ -181,8 +195,9 @@ export function Opener() {
               src="/images/brand/favicon-white.webp"
               alt="世田谷祭ロゴ"
               fill
-              priority
               sizes="256px"
+              loading="lazy"
+              fetchPriority="low"
               quality={60}
               className="object-contain"
             />
@@ -193,8 +208,9 @@ export function Opener() {
               src="/images/brand/favicon.webp"
               alt="世田谷祭ロゴ"
               fill
-              priority
               sizes="256px"
+              loading="lazy"
+              fetchPriority="low"
               quality={60}
               className="object-contain"
             />
