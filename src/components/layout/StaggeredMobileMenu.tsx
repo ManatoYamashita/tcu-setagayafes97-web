@@ -323,6 +323,7 @@ export function StaggeredMobileMenu({
           className="staggered-menu-panel pointer-events-auto absolute top-0 right-0 z-10 flex h-full flex-col overflow-y-auto bg-white p-[4em_2em_2em_2em] backdrop-blur-[12px]"
           style={{ WebkitBackdropFilter: "blur(12px)" }}
           aria-hidden={!isOpen}
+          inert={!isOpen}
         >
           {/* 閉じるボタン */}
           <button
