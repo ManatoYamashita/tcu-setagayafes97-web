@@ -178,10 +178,11 @@ Kaisei Opti は毛筆書体（楷書）の筆法を残しつつ、現代的な�
 
 ```tsx
 // src/app/layout.tsx
+// src/components/layout/KaiseiFont.ts
 import { Kaisei_Opti } from "next/font/google";
 
 const kaiseiOpti = Kaisei_Opti({
-  weight: ["400", "500", "700"],
+  weight: ["400", "700"],
   subsets: ["latin"],
   display: "swap",
   variable: "--font-kaisei-opti",
@@ -189,7 +190,8 @@ const kaiseiOpti = Kaisei_Opti({
 ```
 
 `next/font` の変数をルートへ付けるとフォントCSSが全ページへ配信される。
-使用箇所のないフォントは将来用に読み込まず、必要になった時点で追加する。
+使用箇所のないフォントは将来用に読み込まず、必要になった時点で追加する。Kaisei Opti は
+ページ見出しでのみ遅延ロードし、本文はOSのシステムフォントを使用する。
 性能上の判断基準は [performance.md](./performance.md) を参照する。
 
 ```css
@@ -286,7 +288,7 @@ Aboutページの開催概要は、カード状の枠や行ごとの区切りを
 
   /* ===== Typography ===== */
   --font-display: var(--font-kaisei-opti), "Hiragino Mincho Pro", "Yu Mincho", serif;
-  --font-body: "Noto Sans JP", "Hiragino Sans", sans-serif;
+  --font-body: ui-sans-serif, system-ui, sans-serif, "Hiragino Sans", sans-serif;
 
   --text-xs: 0.75rem; /* 12px */
   --text-sm: 0.875rem; /* 14px */

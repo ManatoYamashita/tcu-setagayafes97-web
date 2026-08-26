@@ -158,6 +158,24 @@ PageSpeed Insightsを再計測し、未使用CSS、render-blocking、強制リ�
 4. Lighthouse を同条件で複数回実行し、中央値を比較する。
 5. 本番反映後は PageSpeed Insights で LCP 内訳、画像削減量、アクセシビリティ監査を再確認する。
 
+## 2026-08-26 フォントCSSの分割・削減
+
+PR #106 の本番 mobile 計測では、初期HTMLのCSSリンクは3本に減った一方、遅延後に読み込まれる
+フォントCSSが未使用CSSとして約97 KiB残った。ブラウザ実測で `font-sans` はシステムフォントへ
+解決しており、Noto Sans JP の `@font-face`（転送約31 KiB）は使用されていなかった。
+
+本PRでは次を行う。
+
+- 未使用だった Noto Sans JP の `next/font` import と変数を削除し、`font-sans` を明示的なシステム
+  フォントスタックへ戻す。
+- Dela Gothic One はホームの `HeroSection` だけで遅延ロードし、他ページへCSSを配信しない。
+- Kaisei Opti はホームの初期ビューポートでは読み込まず、非ホームではハイドレーション後、ホームでは
+  ABOUT / NEWS がビューポートへ近づいた時点で一度だけ読み込む。
+
+これによりホーム初期表示からNoto Sans JPとKaisei OptiのフォントCSSを外し、ブランド見出しは
+対象ページ・対象セクションで適用する。初期の見た目をシステムフォントで崩さないこと、ABOUT / NEWS
+のスクロール演出とフォント適用が競合しないことをブラウザで確認する。
+
 ## 関連
 
 - GitHub Issue #101

@@ -173,11 +173,7 @@ export function AboutHero() {
         >
           {description}
         </p>
-        <h1
-          ref={titleRef}
-          className="leading-tight"
-          style={{ fontFamily: "var(--font-noto-sans-jp), sans-serif" }}
-        >
+        <h1 ref={titleRef} className="leading-tight" style={{ fontFamily: "var(--font-sans)" }}>
           <span className="block text-2xl font-semibold tracking-[0.08em] text-gray-900 sm:text-3xl lg:text-4xl">
             第
             <span

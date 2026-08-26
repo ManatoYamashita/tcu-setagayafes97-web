@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/data/site";
 import { Header } from "@/components/layout/Header";
@@ -7,17 +6,7 @@ import { HtmlLangSync } from "@/components/layout/HtmlLangSync";
 import { Footer } from "@/components/layout/Footer";
 import { Opener } from "@/components/layout/Opener";
 import { AgentationDevTool } from "@/components/dev/AgentationDevTool";
-import { DeferredDecorativeFontsLoader } from "@/components/layout/DeferredDecorativeFontsLoader";
-
-const notoSansJP = Noto_Sans_JP({
-  subsets: ["latin"],
-  weight: "variable",
-  variable: "--font-noto-sans-jp",
-  display: "swap",
-  // 日本語フォントは unicode-range ごとに多数のファイルへ分割される。
-  // 全分割ファイルを preload せず、実際に使う文字だけブラウザに選ばせる。
-  preload: false,
-});
+import { DeferredKaiseiFontsLoader } from "@/components/layout/DeferredKaiseiFontsLoader";
 
 export const metadata: Metadata = {
   title: {
@@ -64,9 +53,9 @@ export default function RootLayout({
   return (
     // 初期値は既定ロケール。実際のロケールへは HtmlLangSync が同期する
     <html lang="ja">
-      <body className={`${notoSansJP.variable} font-sans antialiased text-gray-900`}>
+      <body className="font-sans antialiased text-gray-900">
         <HtmlLangSync />
-        <DeferredDecorativeFontsLoader />
+        <DeferredKaiseiFontsLoader />
         <Opener />
         <Header />
         {children}

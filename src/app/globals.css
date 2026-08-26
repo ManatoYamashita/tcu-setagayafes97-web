@@ -37,7 +37,9 @@
   --color-primary-dark: var(--color-primary-600);
 
   /* フォント設定 */
-  --font-sans: var(--font-noto-sans-jp), sans-serif;
+  --font-sans:
+    ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji";
   --font-serif: var(--font-kaisei-opti), serif;
   --font-heading: var(--font-kaisei-opti), serif;
 }

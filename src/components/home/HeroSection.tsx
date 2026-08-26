@@ -7,6 +7,7 @@ import { gsap } from "gsap";
 import { siteConfig } from "@/data/site";
 import { cn } from "@/lib/utils";
 import type { News, NewsType } from "@/types/news";
+import { DeferredDecorativeFontsLoader } from "@/components/layout/DeferredDecorativeFontsLoader";
 
 /**
  * 日付文字列(YYYY-MM-DD)から年・月・日・曜日を分解
@@ -160,6 +161,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       id="hero-section"
       className="w-full h-[calc(100svh-var(--header-height))] relative z-10 overflow-hidden flex items-center justify-center pb-16 md:pb-20 lg:pb-24"
     >
+      <DeferredDecorativeFontsLoader />
       {/* [z-20] ロゴ画像（中央配置） */}
       <div className="relative z-20 flex w-full max-w-[75vw] -translate-y-10 items-center justify-center sm:max-w-[50vw] sm:-translate-y-6 md:max-w-[35vw] md:translate-y-0 lg:max-w-[30vw]">
         <Image
