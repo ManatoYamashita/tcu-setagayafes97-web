@@ -169,7 +169,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
           height={500}
           sizes="min(500px, 100vw)"
           fetchPriority="high"
-          quality={60}
+          quality={40}
           className="h-auto w-full animate-spin-slow"
           priority
         />
