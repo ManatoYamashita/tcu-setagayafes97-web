@@ -12,14 +12,23 @@ import type { News, NewsType } from "@/types/news";
  * 日付文字列(YYYY-MM-DD)から年・月・日・曜日を分解
  */
 function getDateParts(dateStr: string) {
-  const date = new Date(dateStr);
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const dayOfWeekIndex = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+
   return {
-    year: date.getFullYear(),
-    month: date.getMonth() + 1,
-    day: String(date.getDate()).padStart(2, "0"),
-    dayOfWeek: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][date.getDay()],
+    year,
+    month,
+    day: String(day).padStart(2, "0"),
+    dayOfWeek: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][dayOfWeekIndex],
   };
 }
+
+const newsDateFormatter = new Intl.DateTimeFormat("ja-JP", {
+  timeZone: "Asia/Tokyo",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
 
 /**
  * 日付ブロック（参考画像スタイル: 月/日+曜日、斜線で区切り）
@@ -58,8 +67,13 @@ function getNewsTypeLabel(type: NewsType): string {
 
 function formatNewsDate(dateStr?: string): string {
   if (!dateStr) return "";
-  const d = new Date(dateStr);
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+  const parts = Object.fromEntries(
+    newsDateFormatter
+      .formatToParts(new Date(dateStr))
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value])
+  );
+  return `${parts.year}.${parts.month}.${parts.day}`;
 }
 
 interface HeroSectionProps {
@@ -73,7 +87,6 @@ interface HeroSectionProps {
 export function HeroSection({ latestNews }: HeroSectionProps) {
   // --- Entrance animation refs ---
   const sectionRef = useRef<HTMLElement>(null);
-  const gearRef = useRef<HTMLDivElement>(null);
   const h1Ref = useRef<HTMLHeadingElement>(null);
   const dateBlockRef = useRef<HTMLDivElement>(null);
   const newsBlockRef = useRef<HTMLDivElement>(null);
@@ -92,12 +105,10 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
 
       const ctx = gsap.context(() => {
         // メイン要素を出現順に収集（null除外）
-        const mainTargets = [
-          gearRef.current,
-          h1Ref.current,
-          dateBlockRef.current,
-          newsBlockRef.current,
-        ].filter(Boolean) as HTMLElement[];
+        // LCP画像は初期HTMLから表示し、タイトルなどの補助要素だけを演出する。
+        const mainTargets = [h1Ref.current, dateBlockRef.current, newsBlockRef.current].filter(
+          Boolean
+        ) as HTMLElement[];
 
         gsap.set(mainTargets, { opacity: 0, y: 30 });
 
@@ -150,15 +161,15 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       className="w-full h-[calc(100svh-var(--header-height))] relative z-10 overflow-hidden flex items-center justify-center pb-16 md:pb-20 lg:pb-24"
     >
       {/* [z-20] ロゴ画像（中央配置） */}
-      <div
-        ref={gearRef}
-        className="relative z-20 flex items-center justify-center w-full max-w-[75vw] sm:max-w-[50vw] md:max-w-[35vw] lg:max-w-[30vw] will-change-transform opacity-0 -translate-y-10 sm:-translate-y-6 md:translate-y-0"
-      >
+      <div className="relative z-20 flex w-full max-w-[75vw] -translate-y-10 items-center justify-center sm:max-w-[50vw] sm:-translate-y-6 md:max-w-[35vw] md:translate-y-0 lg:max-w-[30vw]">
         <Image
           src="/images/brand/favicon-outline.webp"
           alt="世田谷祭のアイコン"
-          width={800}
-          height={800}
+          width={500}
+          height={500}
+          sizes="(max-width: 639px) 75vw, (max-width: 767px) 50vw, (max-width: 1023px) 35vw, 30vw"
+          fetchPriority="high"
+          quality={60}
           className="h-auto w-full animate-spin-slow"
           priority
         />

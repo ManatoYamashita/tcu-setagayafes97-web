@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { Menu } from "lucide-react";
 import { siteConfig } from "@/data/site";
@@ -14,7 +13,6 @@ const StaggeredMobileMenu = dynamic(
   () => import("@/components/layout/StaggeredMobileMenu").then((m) => m.StaggeredMobileMenu),
   { ssr: false }
 );
-import { LogoVideo } from "@/components/home/LogoVideo";
 
 /**
  * 共通ヘッダーコンポーネント（フラット⇔ピル型モーフィング）
@@ -28,9 +26,6 @@ import { LogoVideo } from "@/components/home/LogoVideo";
  * IMPORTANT: padding変更時は globals.css の --header-height も更新すること
  */
 export function Header() {
-  const pathname = usePathname();
-  const isAboutPage = pathname === "/about" || pathname.endsWith("/about");
-
   // ロケール解決はここで1回だけ行い、子へは props で流す。
   // 子でも呼ぶと usePathname() の購読と useMemo が二重になるうえ、
   // デスクトップナビとモバイルメニューが同じ結果を共有することが読み取れなくなる。
@@ -38,7 +33,6 @@ export function Header() {
 
   const [isAtTop, setIsAtTop] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [openerDone, setOpenerDone] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,12 +42,8 @@ export function Header() {
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
 
-    const handleOpenerDone = () => setOpenerDone(true);
-    window.addEventListener("opener-done", handleOpenerDone);
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("opener-done", handleOpenerDone);
     };
   }, []);
 
@@ -85,23 +75,22 @@ export function Header() {
           <Link
             href={home.href}
             hrefLang={home.hrefLang}
-            className="hover:opacity-80"
+            className={`relative block shrink-0 hover:opacity-80 ${
+              isAtTop ? "h-[83px] w-52" : "h-[45px] w-28"
+            }`}
             aria-label={siteConfig.shortName}
           >
-            {isAboutPage ? (
-              <Image
-                src="/images/brand/logo.webp"
-                alt="世田谷祭ロゴ"
-                width={208}
-                height={40}
-                className={`h-auto object-contain transition-[width,opacity] duration-300 ${isAtTop ? "w-52" : "w-28"}`}
-                priority
-              />
-            ) : (
-              <LogoVideo
-                className={`transition-[width,opacity] duration-300 ${openerDone ? (isAtTop ? "w-52" : "w-28") : "w-0 opacity-0"}`}
-              />
-            )}
+            <Image
+              src="/images/brand/logo.webp"
+              alt="世田谷祭ロゴ"
+              width={208}
+              height={83}
+              sizes="208px"
+              className={`absolute left-0 top-0 h-auto w-52 max-w-none origin-top-left object-contain transition-transform duration-300 ${
+                isAtTop ? "scale-100" : "scale-[0.538]"
+              }`}
+              loading="eager"
+            />
           </Link>
 
           {/* 中央: デスクトップナビ */}

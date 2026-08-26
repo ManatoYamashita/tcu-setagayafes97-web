@@ -143,18 +143,20 @@ export function AboutSection() {
                   alt={topSection.image.alt}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 640px) 300px, (max-width: 1024px) 360px, 420px"
+                  sizes="(max-width: 639px) 300px, (max-width: 1535px) 360px, 420px"
                 />
               </div>
 
               {/* 歯車装飾: 右下に1個 */}
-              <img
+              <Image
                 ref={gearRef}
                 src="/materials/geer1.webp"
                 alt=""
                 aria-hidden="true"
-                className="absolute bottom-[2%] right-[2%] w-16 sm:w-20 lg:w-24 pointer-events-none select-none will-change-transform opacity-0"
-                loading="lazy"
+                width={500}
+                height={500}
+                sizes="(max-width: 639px) 64px, (max-width: 1023px) 80px, 96px"
+                className="pointer-events-none absolute bottom-[2%] right-[2%] h-auto w-16 select-none opacity-0 will-change-transform sm:w-20 lg:w-24"
                 draggable={false}
               />
             </div>

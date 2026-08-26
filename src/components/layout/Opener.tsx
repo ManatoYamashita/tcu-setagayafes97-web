@@ -149,15 +149,12 @@ export function Opener() {
       ctxRef.current = ctx;
     };
 
-    if (document.readyState === "complete") {
-      startAnimation();
-    } else {
-      window.addEventListener("load", startAnimation);
-    }
+    // 全画像・動画の load を待つと、オープナー自体が表示完了を数秒遅らせる。
+    // useEffect 時点で参照は揃っているため、ハイドレーション直後に開始する。
+    startAnimation();
 
     return () => {
       clearTimeout(safetyTimeout);
-      window.removeEventListener("load", startAnimation);
       pulseTlRef.current?.kill();
       ctxRef.current?.revert();
     };
@@ -186,6 +183,7 @@ export function Opener() {
               fill
               priority
               sizes="256px"
+              quality={60}
               className="object-contain"
             />
           </div>
@@ -197,6 +195,7 @@ export function Opener() {
               fill
               priority
               sizes="256px"
+              quality={60}
               className="object-contain"
             />
           </div>

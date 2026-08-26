@@ -317,24 +317,28 @@ export function NewsSection({ newsList, isVisible }: NewsSectionProps) {
             </div>
 
             {/* 歯車装飾: 右下（複数歯車） */}
-            <img
+            <Image
               ref={gear1Ref}
               src="/materials/geers.webp"
               alt=""
               aria-hidden="true"
+              width={500}
+              height={500}
+              sizes="(max-width: 767px) 112px, (max-width: 1023px) 160px, 192px"
               className="pointer-events-none absolute -bottom-8 right-8 z-20 w-28 select-none opacity-0 will-change-transform md:w-40 lg:w-48"
-              loading="lazy"
               draggable={false}
             />
 
             {/* 歯車装飾: 左下（単体歯車） */}
-            <img
+            <Image
               ref={gear2Ref}
               src="/materials/geer1.webp"
-              alt="歯車"
+              alt=""
               aria-hidden="true"
+              width={500}
+              height={500}
+              sizes="(max-width: 767px) 56px, (max-width: 1023px) 80px, 96px"
               className="pointer-events-none absolute -bottom-6 left-12 z-20 w-14 select-none opacity-0 will-change-transform md:w-20 lg:w-24"
-              loading="lazy"
               draggable={false}
             />
           </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useCallback } from "react";
+import Image from "next/image";
 import { LogoLoop, type LogoItem } from "@/components/ui/LogoLoop";
 import { SponsorModal } from "./SponsorModal";
 import type { Information } from "@/types/informations";
@@ -24,6 +25,8 @@ export function SponsorLogoLoop({ sponsors }: SponsorLogoLoopProps) {
       filteredSponsors.map((s) => ({
         src: s.image!.url,
         alt: s.title,
+        width: s.image!.width,
+        height: s.image!.height,
       })),
     [filteredSponsors]
   );
@@ -45,10 +48,30 @@ export function SponsorLogoLoop({ sponsors }: SponsorLogoLoopProps) {
 
   const renderItem = useCallback(
     (item: LogoItem, key: string) => {
-      const itemIndex = Number(key.split("-")[1]);
-      const imgItem = item as { src: string; alt?: string };
+      const [copyIndexText, itemIndexText] = key.split("-");
+      const copyIndex = Number(copyIndexText);
+      const itemIndex = Number(itemIndexText);
+      const imgItem = item as { src: string; alt?: string; width: number; height: number };
       const src = imgItem.src;
       const alt = imgItem.alt ?? "";
+      const displayWidth = Math.max(1, Math.round((imgItem.width / imgItem.height) * 40));
+      const logoImage = (
+        <Image
+          src={src}
+          alt={copyIndex === 0 ? alt : ""}
+          width={displayWidth}
+          height={40}
+          sizes={`${displayWidth}px`}
+          loading="lazy"
+          draggable={false}
+        />
+      );
+
+      // 無限スクロール用の複製列は aria-hidden。操作要素を内包すると
+      // Lighthouse違反になるため、先頭列だけをボタンにする。
+      if (copyIndex > 0) {
+        return logoImage;
+      }
 
       return (
         <button
@@ -57,7 +80,7 @@ export function SponsorLogoLoop({ sponsors }: SponsorLogoLoopProps) {
           className="cursor-pointer border-0 bg-transparent p-0"
           aria-label={`${alt || "協賛企業"}の詳細を見る`}
         >
-          <img src={src} alt={alt} loading="lazy" decoding="async" draggable={false} />
+          {logoImage}
         </button>
       );
     },

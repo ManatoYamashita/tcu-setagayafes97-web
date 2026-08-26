@@ -188,6 +188,10 @@ const kaiseiOpti = Kaisei_Opti({
 });
 ```
 
+`next/font` の変数をルートへ付けるとフォントCSSが全ページへ配信される。
+使用箇所のないフォントは将来用に読み込まず、必要になった時点で追加する。
+性能上の判断基準は [performance.md](./performance.md) を参照する。
+
 ```css
 /* globals.css */
 :root {

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Noto_Sans_JP, Kaisei_Opti, Shippori_Mincho, Dela_Gothic_One } from "next/font/google";
+import { Noto_Sans_JP, Kaisei_Opti, Dela_Gothic_One } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/data/site";
 import { Header } from "@/components/layout/Header";
@@ -10,17 +10,11 @@ import { AgentationDevTool } from "@/components/dev/AgentationDevTool";
 
 const notoSansJP = Noto_Sans_JP({
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  weight: "variable",
   variable: "--font-noto-sans-jp",
   display: "swap",
-  preload: true,
-});
-
-const shipporiMincho = Shippori_Mincho({
-  subsets: ["latin"],
-  weight: ["400", "700", "800"],
-  variable: "--font-shippori-mincho",
-  display: "swap",
+  // 日本語フォントは unicode-range ごとに多数のファイルへ分割される。
+  // 全分割ファイルを preload せず、実際に使う文字だけブラウザに選ばせる。
   preload: false,
 });
 
@@ -34,10 +28,10 @@ const delaGothicOne = Dela_Gothic_One({
 
 const kaiseiOpti = Kaisei_Opti({
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  weight: ["400", "700"],
   variable: "--font-kaisei-opti",
   display: "swap",
-  preload: true,
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -86,7 +80,7 @@ export default function RootLayout({
     // 初期値は既定ロケール。実際のロケールへは HtmlLangSync が同期する
     <html lang="ja">
       <body
-        className={`${notoSansJP.variable} ${kaiseiOpti.variable} ${shipporiMincho.variable} ${delaGothicOne.variable} font-sans antialiased text-gray-900`}
+        className={`${notoSansJP.variable} ${kaiseiOpti.variable} ${delaGothicOne.variable} font-sans antialiased text-gray-900`}
       >
         <HtmlLangSync />
         <Opener />
