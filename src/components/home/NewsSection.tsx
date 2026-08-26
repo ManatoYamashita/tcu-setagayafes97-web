@@ -13,7 +13,7 @@ interface NewsSectionProps {
  */
 function NewsUnavailable({ isVisible }: { isVisible: boolean }) {
   return (
-    <section className="relative bg-secondary py-32">
+    <section className="deferred-section relative bg-secondary py-32">
       <CircularText
         text="· SETAGAYA FES 97th · SETAGAYA FES 97th "
         spinDuration={20}

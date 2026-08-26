@@ -158,6 +158,7 @@ docs/
 - **[performance.md](./frontend/performance.md)** - Lighthouse基準値とフロントエンド性能ルール
   - トップページ desktop の基準値と LCP 内訳
   - LCP、動画、レスポンシブ画像、無限ロゴ列、Webフォントの実装ルール
+  - `content-visibility` による初期描画遅延と、LogoLoop の強制リフロー回避
   - 静的検査、ローカル本番ビルド、ブラウザ、Lighthouse の検証手順
 
 > [!NOTE]
