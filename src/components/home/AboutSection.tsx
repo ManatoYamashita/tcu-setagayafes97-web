@@ -143,7 +143,7 @@ export function AboutSection() {
                   alt={topSection.image.alt}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 639px) 300px, (max-width: 1535px) 360px, 420px"
+                  sizes="(max-width: 639px) 300px, (max-width: 1023px) 360px, 420px"
                 />
               </div>
 

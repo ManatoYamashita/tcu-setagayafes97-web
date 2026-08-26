@@ -70,7 +70,15 @@ export function SponsorLogoLoop({ sponsors }: SponsorLogoLoopProps) {
       // 無限スクロール用の複製列は aria-hidden。操作要素を内包すると
       // Lighthouse違反になるため、先頭列だけをボタンにする。
       if (copyIndex > 0) {
-        return logoImage;
+        return (
+          <span
+            className="inline-flex cursor-pointer"
+            onClick={() => handleSponsorClick(itemIndex)}
+            aria-hidden="true"
+          >
+            {logoImage}
+          </span>
+        );
       }
 
       return (
