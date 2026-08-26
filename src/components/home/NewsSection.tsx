@@ -17,7 +17,7 @@ function NewsUnavailable({ isVisible }: { isVisible: boolean }) {
       <CircularText
         text="· SETAGAYA FES 97th · SETAGAYA FES 97th "
         spinDuration={20}
-        className="pointer-events-none absolute right-0 top-32 z-0 w-72 -translate-y-1/2 translate-x-1/2 text-primary-400/60 md:w-80"
+        className="pointer-events-none absolute right-0 top-32 z-0 w-72 -translate-y-1/2 translate-x-1/2 text-primary-400/60 md:w-80 lg:w-96"
       />
       <div className="container mx-auto px-4">
         <div className="relative">
