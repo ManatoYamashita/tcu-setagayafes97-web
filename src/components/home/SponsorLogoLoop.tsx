@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { LogoLoop, type LogoItem } from "@/components/ui/LogoLoop";
 import { SponsorModal } from "./SponsorModal";
@@ -8,13 +8,14 @@ import type { Information } from "@/types/informations";
 
 interface SponsorLogoLoopProps {
   sponsors: Information[];
+  onReady?: () => void;
 }
 
 /**
  * 協賛企業ロゴの無限スクロールアニメーション（クライアントコンポーネント）
  * ロゴクリックでスポンサー詳細モーダルを表示
  */
-export function SponsorLogoLoop({ sponsors }: SponsorLogoLoopProps) {
+export function SponsorLogoLoop({ sponsors, onReady }: SponsorLogoLoopProps) {
   const [selectedSponsor, setSelectedSponsor] = useState<Information | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -45,6 +46,10 @@ export function SponsorLogoLoop({ sponsors }: SponsorLogoLoopProps) {
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
   }, []);
+
+  useEffect(() => {
+    onReady?.();
+  }, [onReady]);
 
   const renderItem = useCallback(
     (item: LogoItem, key: string) => {

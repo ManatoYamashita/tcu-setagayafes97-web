@@ -190,8 +190,9 @@ PR #107 の本番 mobile 計測（Performance 92、FCP 1.4 秒、LCP 2.9 秒、T
 
 - ホームのヒーロー文字を端末標準の丸ゴシックへ切り替え、使用箇所のないDela Gothic Oneの
   `next/font` import・遅延ローダー・CSS utilityを削除する。
-- オープナー、ABOUT、企画カルーセル、スポンサーのLogoLoopを動的ロードへ分離する。特にスポンサーの
-  LogoLoopは `ssr: false` のローダーにして、下部専用CSSとアニメーションJSを初期HTMLから外す。
+- オープナー、ABOUT、企画カルーセル、スポンサーのLogoLoopを動的ロードへ分離する。スポンサー欄は
+  静的ロゴと高さをSSRし、IntersectionObserverで近接時だけ `ssr: false` のLogoLoopを読み込むことで、
+  CSS/アニメーションJSを初期HTMLから外しつつ、遅延・失敗時もロゴ表示とレイアウトを保つ。
 - `next/image` のAVIFを優先形式へ追加し、既存WebPを未対応ブラウザ向けフォールバックとして残す。
   ヘッダー・フッターの固定ロゴは品質を75から60へ下げ、表示寸法に対して過剰な転送を避ける。
 
