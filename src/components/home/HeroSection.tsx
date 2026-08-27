@@ -97,8 +97,9 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
     if (typeof window === "undefined") return;
     if (ctxRef.current) return;
 
-    // Openerが稼働中かどうかをDOM存在で判定
-    const hasOpener = !!document.querySelector(".opener-container");
+    // 遅延ローダーの空フォールバックは、実体のオープナーとして扱わない。
+    // 取得が遅い場合もHeroを隠さず、実体がマウント済みのときだけ完了イベントを待つ。
+    const hasOpener = !!document.querySelector("[data-opener-active]");
 
     const runEntrance = () => {
       if (!sectionRef.current || ctxRef.current) return;

@@ -179,7 +179,7 @@ export function Opener() {
   }
 
   return (
-    <div ref={containerRef} className="opener-container">
+    <div ref={containerRef} className="opener-container" data-opener-active="true">
       {/* 紫レイヤー（初期: 薄ピンク → 濃い紫にフェード） */}
       <div
         ref={primaryLayerRef}
