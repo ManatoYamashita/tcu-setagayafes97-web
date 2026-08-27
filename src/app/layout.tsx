@@ -4,7 +4,7 @@ import { siteConfig } from "@/data/site";
 import { Header } from "@/components/layout/Header";
 import { HtmlLangSync } from "@/components/layout/HtmlLangSync";
 import { Footer } from "@/components/layout/Footer";
-import { Opener } from "@/components/layout/Opener";
+import { OpenerLoader } from "@/components/layout/OpenerLoader";
 import { AgentationDevTool } from "@/components/dev/AgentationDevTool";
 import { DeferredKaiseiFontsLoader } from "@/components/layout/DeferredKaiseiFontsLoader";
 
@@ -84,7 +84,7 @@ export default function RootLayout({
       <body className="font-sans antialiased text-gray-900">
         <HtmlLangSync />
         <DeferredKaiseiFontsLoader />
-        <Opener />
+        <OpenerLoader />
         <Header />
         {children}
         <Footer />

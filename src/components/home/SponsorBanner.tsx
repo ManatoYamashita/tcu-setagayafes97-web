@@ -1,5 +1,5 @@
 import { getSponsorsList } from "@/lib/informations";
-import { SponsorLogoLoop } from "./SponsorLogoLoop";
+import { SponsorLogoLoopLoader } from "./SponsorLogoLoopLoader";
 
 /**
  * 協賛企業バナーセクション（サーバーコンポーネント）
@@ -17,7 +17,7 @@ export async function SponsorBanner() {
       <div className="container mx-auto px-4">
         <h2 className="mb-10 text-center text-3xl font-bold">協賛企業</h2>
       </div>
-      <SponsorLogoLoop sponsors={sponsors} />
+      <SponsorLogoLoopLoader sponsors={sponsors} />
     </section>
   );
 }

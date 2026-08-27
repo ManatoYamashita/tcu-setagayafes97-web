@@ -78,8 +78,10 @@ body {
   animation: spin 240s linear infinite;
 }
 
-@utility font-dela-gothic {
-  font-family: var(--font-dela-gothic-one, "Dela Gothic One"), sans-serif;
+@utility font-hero-display {
+  /* ヒーローのSVG文字はフォントCSSを追加取得せず、端末標準の丸ゴシックを使う。 */
+  font-family: "Hiragino Maru Gothic ProN", "Arial Rounded MT Bold", sans-serif;
+  font-weight: 900;
 }
 
 @utility animate-scroll-line {
