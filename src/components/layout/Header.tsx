@@ -33,6 +33,7 @@ export function Header() {
 
   const [isAtTop, setIsAtTop] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mobileMenuRequested, setMobileMenuRequested] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,6 +51,15 @@ export function Header() {
   const handleCloseMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(false);
   }, []);
+
+  const requestMobileMenu = useCallback(() => {
+    setMobileMenuRequested(true);
+  }, []);
+
+  const handleOpenMobileMenu = useCallback(() => {
+    requestMobileMenu();
+    setIsMobileMenuOpen(true);
+  }, [requestMobileMenu]);
 
   return (
     <>
@@ -74,6 +84,7 @@ export function Header() {
           {/* 左: ロゴ */}
           <Link
             href={home.href}
+            prefetch={false}
             hrefLang={home.hrefLang}
             className={`relative block shrink-0 hover:opacity-80 ${
               isAtTop ? "h-[83px] w-52" : "h-[45px] w-28"
@@ -104,8 +115,10 @@ export function Header() {
               className="inline-flex items-center justify-center rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900 lg:hidden"
               aria-label={messages.header.openMenu}
               aria-expanded={isMobileMenuOpen}
-              aria-controls="staggered-menu-panel"
-              onClick={() => setIsMobileMenuOpen(true)}
+              aria-controls={mobileMenuRequested ? "staggered-menu-panel" : undefined}
+              onClick={handleOpenMobileMenu}
+              onPointerEnter={requestMobileMenu}
+              onFocus={requestMobileMenu}
               type="button"
             >
               <Menu size={24} />
@@ -115,12 +128,14 @@ export function Header() {
       </header>
 
       {/* モバイルメニュー（StaggeredMenu: 外部制御） */}
-      <StaggeredMobileMenu
-        isOpen={isMobileMenuOpen}
-        onClose={handleCloseMobileMenu}
-        items={headerItems}
-        closeLabel={messages.header.closeMenu}
-      />
+      {mobileMenuRequested && (
+        <StaggeredMobileMenu
+          isOpen={isMobileMenuOpen}
+          onClose={handleCloseMobileMenu}
+          items={headerItems}
+          closeLabel={messages.header.closeMenu}
+        />
+      )}
     </>
   );
 }

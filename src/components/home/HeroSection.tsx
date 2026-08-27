@@ -252,6 +252,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
         {/* モバイル用CTA（md以上では非表示） */}
         <Link
           href="/events"
+          prefetch={false}
           className="inline-block bg-primary-600 text-white text-sm font-medium px-6 py-3 rounded-full hover:bg-primary-700 transition-colors mt-4 md:hidden"
         >
           企画を探す
@@ -280,6 +281,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
           </p>
           <Link
             href={`/info/${latestNews.id}`}
+            prefetch={false}
             className="text-sm text-gray-700 hover:text-gray-500 transition-colors font-medium"
           >
             詳しく見る →
