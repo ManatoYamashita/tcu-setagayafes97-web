@@ -5,18 +5,9 @@ import { FeaturedEvents } from "@/components/home/FeaturedEvents";
 import { SponsorBanner } from "@/components/home/SponsorBanner";
 import { getLatestHeroNews, getNewsList } from "@/lib/news";
 import { NEWS_VISIBLE, siteConfig } from "@/data/site";
+import { createHomeStructuredData, serializeJsonLd } from "@/lib/structured-data";
 
-const homeUrl = new URL("/", siteConfig.metadata.siteUrl).toString();
-const websiteStructuredData = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "@id": `${homeUrl}#website`,
-  url: homeUrl,
-  name: siteConfig.metadata.siteName,
-  alternateName: [`第${siteConfig.edition}回 世田谷祭`, siteConfig.shortName],
-  description: siteConfig.description,
-  inLanguage: "ja",
-};
+const homeStructuredData = createHomeStructuredData();
 
 /**
  * トップページ
@@ -32,7 +23,7 @@ export default async function Home() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(websiteStructuredData).replace(/</g, "\\u003c"),
+          __html: serializeJsonLd(homeStructuredData),
         }}
       />
       <div className="hero-about-bg">

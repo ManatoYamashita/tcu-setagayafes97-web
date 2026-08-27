@@ -8,6 +8,7 @@
 - 多言語ページは各ロケールURLを canonical とし、`alternates.languages` に `ja`、`en`、`zh`、`ko`、`x-default` を出力する。
 - ページ固有のOG画像がない場合は `/ogp.webp`（1200×630）を使用する。microCMS画像を使用する場合は絶対URLへ変換する。
 - トップページは `WebSite` のJSON-LDで第97回の名称・説明・正規URLを明示する。
+- トップページのJSON-LDは `WebSite`、主催 `Organization`、祭全体の `Event` を `@graph` で接続する。サイト名は年次をまたいで一貫する簡潔な「世田谷祭」、第97回の正式名称は `alternateName` とページタイトルで示す。
 - faviconはクロール可能な500×500 PNG（`/images/brand/favicon.png`）を安定URLで配信する。
 - Googlebotには大きな画像プレビューを許可し、サイトマップの主要ページに代表画像を含める。ただし検索結果画像の採用はGoogle側の判断であり保証されない。
 
@@ -20,6 +21,13 @@
 5. 反映まで数日以上かかる場合があるため、検索結果を継続観測する。
 
 `og:image` はSNS共有向けの指定であり、Google検索結果のサムネイルを直接固定するものではない。
+
+## 第96回アーカイブの検索除外
+
+- `96th.setagayafes.org` は閲覧用アーカイブとして残すが、全HTMLと画像などの非HTMLリソースへ `X-Robots-Tag: noindex` を付与する。
+- `robots.txt` で `/` をクロール禁止にしない。Googlebotが既存URLを再クロールして `noindex` を確認できないと、検索結果からの恒久的な削除が遅れるため。
+- Search Consoleの削除ツールは一時的な非表示を早める補助手段として使い、恒久対応はサーバー側の `noindex` とする。
+- 第96回のサイトマップはSearch Consoleから削除し、新規送信しない。第97回の `https://setagayafes.org/sitemap.xml` のみ再送信する。
 
 ## テストページ
 

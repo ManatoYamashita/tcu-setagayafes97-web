@@ -33,14 +33,21 @@ export const siteConfig = {
 
   // SNS
   sns: {
-    twitter: "https://x.com/setagayafes_tcu?s=11",
-    instagram: "https://www.instagram.com/setagayafes_sfa?igsh=bWpzYWpqOGozZ3Nr&utm_source=qr",
-    youtube: "https://youtube.com/@setagayafes?si=WvB8ya5RrqvHg0Vj",
+    twitter: "https://x.com/setagayafes_tcu",
+    instagram: "https://www.instagram.com/setagayafes_sfa/",
+    youtube: "https://www.youtube.com/@setagayafes",
+  },
+
+  // 主催組織（構造化データと発行者情報で共通利用）
+  organization: {
+    name: "東京都市大学 世田谷祭実行委員会",
+    currentName: "第97回東京都市大学世田谷祭実行委員会",
   },
 
   // メタデータ
   metadata: {
     siteName: "東京都市大学 第97回 世田谷祭",
+    searchSiteName: "世田谷祭",
     siteUrl: process.env.NEXT_PUBLIC_URL || "https://setagayafes.org",
     ogImage: "/ogp.webp",
   },

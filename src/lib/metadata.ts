@@ -98,7 +98,7 @@ export function createPageMetadata({
       title: fullTitle,
       description,
       url: canonicalUrl,
-      siteName,
+      siteName: siteConfig.metadata.searchSiteName,
       images,
       locale: localeOpenGraph[locale],
       type,

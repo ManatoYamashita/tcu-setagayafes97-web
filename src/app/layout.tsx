@@ -9,6 +9,7 @@ import { AgentationDevTool } from "@/components/dev/AgentationDevTool";
 import { DeferredKaiseiFontsLoader } from "@/components/layout/DeferredKaiseiFontsLoader";
 
 export const metadata: Metadata = {
+  applicationName: siteConfig.metadata.searchSiteName,
   title: {
     default: siteConfig.metadata.siteName,
     template: `%s | ${siteConfig.shortName}`,
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
     title: siteConfig.metadata.siteName,
     description: siteConfig.description,
     url: siteConfig.metadata.siteUrl,
-    siteName: siteConfig.metadata.siteName,
+    siteName: siteConfig.metadata.searchSiteName,
     images: [
       {
         url: siteConfig.metadata.ogImage,
@@ -37,6 +38,8 @@ export const metadata: Metadata = {
     images: [siteConfig.metadata.ogImage],
   },
   metadataBase: new URL(siteConfig.metadata.siteUrl),
+  creator: siteConfig.organization.name,
+  publisher: siteConfig.organization.name,
   alternates: {
     canonical: "/",
   },
