@@ -19,7 +19,9 @@ function StaticSponsorLogos({ sponsors }: { sponsors: Information[] }) {
     .filter((sponsor) => sponsor.image?.url)
     .map((sponsor) => {
       const image = sponsor.image!;
-      const displayWidth = Math.max(1, Math.round((image.width / Math.max(1, image.height)) * 40));
+      const width = image.width ?? 1;
+      const height = image.height ?? 1;
+      const displayWidth = Math.max(1, Math.round((width / Math.max(1, height)) * 40));
       return { sponsor, displayWidth };
     });
 
@@ -54,7 +56,7 @@ export function SponsorLogoLoopLoader({ sponsors }: { sponsors: Information[] })
     if (!container) return;
 
     if (!("IntersectionObserver" in window)) {
-      setShouldLoad(true);
+      // 静的フォールバックをそのまま使い、古いブラウザでの同期再描画を避ける。
       return;
     }
 
