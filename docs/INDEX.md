@@ -133,7 +133,8 @@ docs/
 - **[seo-metadata.md](./dev/seo-metadata.md)** - 共通metadata・canonicalとテストページ除外
   - ページごとのmetadata、canonical、Open Graph、Twitter Cardの生成方針
   - 多言語ページのcanonicalとhreflang相当のalternate設定
-  - 年次切替後のfavicon・構造化データ・画像サイトマップとSearch Console再送信の運用
+  - 年次切替後のfavicon・サイト主体/開催イベント構造化データ・画像サイトマップとSearch Console再送信の運用
+  - 第96回アーカイブをクロール可能なままnoindex化し、検索結果から恒久除外する運用
   - `/api-test` と `/test-ui` を本番404にする運用
 
 - **[microcms.md](./dev/microcms.md)** - microCMS API 制約と実装パターン
