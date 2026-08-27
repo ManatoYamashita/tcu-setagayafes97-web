@@ -176,6 +176,30 @@ PR #106 の本番 mobile 計測では、初期HTMLのCSSリンクは3本に減�
 対象ページ・対象セクションで適用する。初期の見た目をシステムフォントで崩さないこと、ABOUT / NEWS
 のスクロール演出とフォント適用が競合しないことをブラウザで確認する。
 
+## 2026-08-26 残存CSS・JS・render-blocking・画像の対応
+
+PR #107 の本番 mobile 計測（Performance 92、FCP 1.4 秒、LCP 2.9 秒、TBT 10 ms、CLS 0）では、
+次の残存候補を確認した。
+
+- 未使用CSS: 推定 31 KiB。Dela Gothic One のフォントCSS（約32 KiB）がほぼ全量未使用。
+- 未使用JavaScript: 推定 22 KiB。初期チャンクに含まれる下部セクション・演出用コードが対象。
+- render-blocking: 推定 170 ms。LogoLoop CSSを含む初期スタイルシートが対象。
+- 画像配信: 推定 27 KiB。ヒーロー画像・ヘッダーロゴ・フッターロゴの圧縮余地。
+
+次回の性能改善PRでは、以下の方針で対応する。
+
+- ホームのヒーロー文字を端末標準の丸ゴシックへ切り替え、使用箇所のないDela Gothic Oneの
+  `next/font` import・遅延ローダー・CSS utilityを削除する。
+- オープナー、ABOUT、企画カルーセル、スポンサーのLogoLoopを動的ロードへ分離する。スポンサー欄は
+  静的ロゴと高さをSSRし、IntersectionObserverで近接時だけ `ssr: false` のLogoLoopを読み込むことで、
+  CSS/アニメーションJSを初期HTMLから外しつつ、遅延・失敗時もロゴ表示とレイアウトを保つ。
+- `next/image` のAVIFを優先形式へ追加し、既存WebPを未対応ブラウザ向けフォールバックとして残す。
+  ヘッダー・フッターの固定ロゴは品質を75から60へ下げ、表示寸法に対して過剰な転送を避ける。
+
+下部セクションの見出しと本文はSSRを維持し、データ欠落時のレイアウトとSEOを変えない。今回の検証は
+ローカル本番ビルドと静的HTMLの参照確認までとし、マージ・本番反映後に同一URL・mobile presetで
+PageSpeed Insightsを再計測して、未使用CSS/JS、render-blocking、画像削減量を比較する。
+
 ## 関連
 
 - GitHub Issue #101

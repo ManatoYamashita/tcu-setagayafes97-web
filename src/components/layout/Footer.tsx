@@ -25,6 +25,7 @@ export function Footer() {
               width={192}
               height={77}
               sizes="192px"
+              quality={60}
               className="h-auto w-48"
             />
           </div>
@@ -52,6 +53,7 @@ export function Footer() {
               width={48}
               height={19}
               sizes="48px"
+              quality={60}
               className="mb-3 h-auto w-12"
             />
             <p className="mb-2">{siteConfig.name}</p>

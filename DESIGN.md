@@ -80,32 +80,27 @@
 
 ## 3. Typography Rules
 
-### 3.1 フォント一覧（Google Fonts）
+### 3.1 フォント一覧（実装）
 
-| フォント名      | 分類           | ウェイト      | CSS変数                  | Preload | 用途                     |
-| --------------- | -------------- | ------------- | ------------------------ | ------- | ------------------------ |
-| Noto Sans JP    | ゴシック体     | 400, 500, 700 | `--font-noto-sans-jp`    | true    | 本文テキスト             |
-| Kaisei Opti     | 明朝体（楷書） | 400, 500, 700 | `--font-kaisei-opti`     | true    | 見出し・ブランドフォント |
-| Shippori Mincho | 明朝体（古典） | 400, 700, 800 | `--font-shippori-mincho` | false   | 装飾テキスト             |
-| Dela Gothic One | ディスプレイ   | 400           | `--font-dela-gothic-one` | false   | ロゴ・特大タイトル       |
+| フォント名         | 分類           | ウェイト | CSS変数              | Preload | 用途                     |
+| ------------------ | -------------- | -------- | -------------------- | ------- | ------------------------ |
+| Kaisei Opti        | 明朝体（楷書） | 400, 700 | `--font-kaisei-opti` | false   | 見出し・ブランドフォント |
+| システムサンセリフ | ゴシック体     | OS依存   | `--font-sans`        | —       | 本文テキスト             |
+| システム丸ゴシック | ディスプレイ   | OS依存   | `font-hero-display`  | —       | ホームのヒーロー文字     |
 
 ### 3.2 font-family 指定
 
 ```css
 /* 本文（デフォルト） */
---font-sans: var(--font-noto-sans-jp), sans-serif;
+--font-sans: ui-sans-serif, system-ui, sans-serif;
 
 /* 見出し（h1, h2, h3 に自動適用） */
 --font-heading: var(--font-kaisei-opti), serif;
 --font-serif: var(--font-kaisei-opti), serif;
 
-/* 装飾用（カスタムユーティリティで切替） */
-/* @utility font-display-mincho */
-font-family: var(--font-shippori-mincho), "Hiragino Mincho ProN", "Yu Mincho", serif;
-
-/* ロゴ用（カスタムユーティリティ） */
-/* @utility font-dela-gothic */
-font-family: var(--font-dela-gothic-one), sans-serif;
+/* ヒーロー用（カスタムユーティリティ） */
+/* @utility font-hero-display */
+font-family: "Hiragino Maru Gothic ProN", "Arial Rounded MT Bold", sans-serif;
 ```
 
 ### 3.3 Kaisei Opti 使用制限（重要）

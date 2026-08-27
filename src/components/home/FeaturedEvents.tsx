@@ -1,7 +1,12 @@
+import dynamic from "next/dynamic";
 import { getFeaturedEvents } from "@/lib/events";
 import { EVENTS_VISIBLE } from "@/data/site";
-import { FeaturedCarousel } from "./FeaturedCarousel";
 import { FeaturedGearScene } from "./FeaturedGearScene";
+
+// 初期ビューポート外のカルーセルをトップページ初期JSから分離する。
+const FeaturedCarousel = dynamic(() =>
+  import("./FeaturedCarousel").then((module) => module.FeaturedCarousel)
+);
 
 /**
  * おすすめ企画セクション

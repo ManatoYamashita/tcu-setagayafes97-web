@@ -1,5 +1,5 @@
+import dynamic from "next/dynamic";
 import { HeroSection } from "@/components/home/HeroSection";
-import { AboutSection } from "@/components/home/AboutSection";
 import { NewsSection } from "@/components/home/NewsSection";
 import { FeaturedEvents } from "@/components/home/FeaturedEvents";
 import { SponsorBanner } from "@/components/home/SponsorBanner";
@@ -8,6 +8,11 @@ import { NEWS_VISIBLE, siteConfig } from "@/data/site";
 import { createHomeStructuredData, serializeJsonLd } from "@/lib/structured-data";
 
 const homeStructuredData = createHomeStructuredData();
+
+// ABOUT はヒーローの下にあるため、HTMLはSSRしつつクライアントJSを初期チャンクから分離する。
+const AboutSection = dynamic(() =>
+  import("@/components/home/AboutSection").then((module) => module.AboutSection)
+);
 
 /**
  * トップページ

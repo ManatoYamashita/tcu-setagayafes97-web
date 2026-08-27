@@ -168,6 +168,7 @@ docs/
   - LCP、動画、レスポンシブ画像、無限ロゴ列、Webフォントの実装ルール
   - `content-visibility` による初期描画遅延、フォントCSSの遅延配信、ScrollTriggerの遅延初期化
   - LogoLoop の強制リフロー回避
+  - 未使用CSS/JS、render-blocking CSS、AVIF画像配信の残存候補と次回対応方針
   - 静的検査、ローカル本番ビルド、ブラウザ、Lighthouse の検証手順
 
 > [!NOTE]

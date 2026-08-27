@@ -43,7 +43,8 @@ export function AboutHero() {
     if (typeof window === "undefined") return;
     if (ctxRef.current) return;
 
-    const hasOpener = !!document.querySelector(".opener-container");
+    // 遅延ローダーの空フォールバックは、実体のオープナーとして扱わない。
+    const hasOpener = !!document.querySelector("[data-opener-active]");
 
     const runEntrance = () => {
       if (!sectionRef.current || ctxRef.current) return;
