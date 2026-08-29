@@ -321,12 +321,14 @@ microCMS のリッチテキストは `dangerouslySetInnerHTML` で挿入し、�
 ```css
 @layer base {
   .prose a {
-    color: var(--color-primary);
+    color: var(--color-primary-dark);
     text-decoration: none;
     text-underline-offset: 2px;
   }
 }
 ```
+
+**リンク色に `--color-primary`（`#CD79EE`）を使ってはいけない。** 白背景でのコントラストが約 2.8:1 しかなく、上記「コントラスト比」節の「Primary 紫は白背景での通常テキストに使用禁止」に抵触する。本文中のインラインリンクは大テキストでも CTA でもないため、`--color-primary-dark`（`#8E3AB0`、約 6.2:1）を使う。
 
 **`@layer components` に書いてはいけない。** Tailwind v4 は `@layer components` / `@layer utilities` の中身を「登録可能なユーティリティ定義」として解釈するため、`.prose a` のような**複合セレクタは黙って破棄される**。出力CSSには `@layer components;` という空の宣言だけが残り、エラーも警告も出ない。
 

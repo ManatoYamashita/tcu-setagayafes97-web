@@ -75,7 +75,10 @@ body {
      Preflight の a { color: inherit } には詳細度で勝ち、
      個別に当てた text-* ユーティリティには負ける優先順位になる */
   .prose a {
-    color: var(--color-primary);
+    /* Primary(#CD79EE) は白背景の通常テキストでコントラスト約2.8:1 となり
+       WCAG AA を満たさない。本文中のインラインリンクには 6.2:1 の
+       primary-dark(#8E3AB0) を使う。詳細は docs/frontend/design.md */
+    color: var(--color-primary-dark);
     text-decoration: none;
     text-underline-offset: 2px;
   }
@@ -94,10 +97,44 @@ body {
   animation: spin 240s linear infinite;
 }
 
+/*
+ * ヒーロー見出し（h1 の SVG textPath）専用の Kaisei Opti 700。
+ *
+ * next/font 版（KaiseiFont.ts）は DeferredKaiseiFontsLoader が読み込むが、
+ * `/` だけは意図的に読み込まない（ヒーローの初期ビューを待たせないため）。
+ * そのため見出しをそちらに頼ると、トップで最も目立つ要素がフォント切り替わりを起こす。
+ *
+ * ここでは「第97回世田谷祭」の8文字だけを含むサブセット（2,832バイト）を自前配信し、
+ * 追加のCSSチャンクもレンダーブロッキングも発生させずに確定描画する。
+ *
+ * IMPORTANT: unicode-range は下の8文字に固定されている。
+ *   第(U+7B2C) 9(U+39) 7(U+37) 回(U+56DE) 世(U+4E16) 田(U+7530) 谷(U+8C37) 祭(U+796D)
+ * ヒーローの文言を変える場合（例: 第98回）は woff2 の作り直しが必要。手順:
+ *   curl -G --data-urlencode "text=<新しい文言>" \
+ *     "https://fonts.googleapis.com/css2?family=Kaisei+Opti:wght@700&display=block"
+ *   返ってきた CSS の src URL を public/fonts/kaisei-opti-hero-700.woff2 へ保存し、
+ *   同じ CSS の unicode-range をここへ転記する。
+ *   ※ ブラウザのUAでリクエストすること（woff2 を返させるため）
+ *
+ * ライセンス: Kaisei Opti / SIL Open Font License 1.1（自前配信可）
+ */
+@font-face {
+  font-family: "Kaisei Opti Hero";
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url("/fonts/kaisei-opti-hero-700.woff2") format("woff2");
+  unicode-range: U+37, U+39, U+4e16, U+56de, U+7530, U+796d, U+7b2c, U+8c37;
+}
+
 @utility font-hero-display {
-  /* ヒーローのSVG文字はフォントCSSを追加取得せず、端末標準の丸ゴシックを使う。 */
-  font-family: "Hiragino Maru Gothic ProN", "Arial Rounded MT Bold", sans-serif;
-  font-weight: 900;
+  /*
+   * 1番目: 上記サブセット（自前配信・8文字・即時）
+   * 2番目: 遅延読み込み済みの next/font 版（トップ以外のページ向けの保険）
+   * 3番目: 端末の明朝
+   */
+  font-family: "Kaisei Opti Hero", var(--font-kaisei-opti), "Hiragino Mincho ProN", serif;
+  font-weight: 700;
 }
 
 @utility animate-scroll-line {
