@@ -97,12 +97,12 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 
 **この2つは独立している。** 著名人の発表はチケット販売と紐づき、一般企画一覧の公開より先行することがあるため、別のフラグに分けている。
 
-| `EVENTS_VISIBLE` | `SPECIAL_VISIBLE` | 挙動                                                              |
-| ---------------- | ----------------- | ----------------------------------------------------------------- |
-| `false`          | `false`           | すべて準備中                                                      |
-| `false`          | **`true`**        | **`/special` のみ公開。`/events` `/timetable` は準備中**          |
-| `true`           | `false`           | `/events` `/timetable` は公開。**ただし `type = special` は除外** |
-| `true`           | `true`            | すべて公開                                                        |
+| `EVENTS_VISIBLE` | `SPECIAL_VISIBLE` | 挙動                                                                                           |
+| ---------------- | ----------------- | ---------------------------------------------------------------------------------------------- |
+| `false`          | `false`           | すべて準備中                                                                                   |
+| `false`          | **`true`**        | **`/special` と `/events` の著名人セクションを公開。`/events` の一覧と `/timetable` は準備中** |
+| `true`           | `false`           | `/events` `/timetable` は公開。**ただし `type = special` は除外**                              |
+| `true`           | `true`            | すべて公開                                                                                     |
 
 > [!WARNING]
 > **著名人ページを先行公開するときは `getSpecialEvents()` / `getSpecialEventById()` を使うこと。**

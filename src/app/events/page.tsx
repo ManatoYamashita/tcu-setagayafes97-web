@@ -35,9 +35,25 @@ export const revalidate = 3600;
 /**
  * 企画一覧ページ
  * SSG + クライアントサイドフィルタリング
- * EVENTS_VISIBLE が false の間は準備中表示
+ * EVENTS_VISIBLE が false の間は準備中表示（著名人企画のセクションは下記のとおり残す）
  */
 export default async function EventsPage() {
+  /*
+   * 著名人企画は EVENTS_VISIBLE ではなく SPECIAL_VISIBLE だけで解禁する。
+   * 企画一覧が準備中でも、解禁済みの著名人企画には /events から到達できなければならない。
+   * データ層（getSpecialEventById）も同じ理由で EVENTS_VISIBLE に依存しないため、
+   * ここで組み立てておけば準備中・公開中のどちらの分岐でもそのまま置ける。
+   *
+   * ラッパーの余白だけが残らないよう、SPECIAL_VISIBLE で括ってから組み立てる
+   * （SpecialGuestSection 自身も false なら null を返すが、それでは div が残る）。
+   * 左右端は ComingSoon / EventsContent のルート（container mx-auto px-4）に合わせる。
+   */
+  const specialGuestSection = SPECIAL_VISIBLE ? (
+    <div className="container mx-auto px-4 pb-12">
+      <SpecialGuestSection variant="sheet" />
+    </div>
+  ) : null;
+
   if (!EVENTS_VISIBLE) {
     return (
       <PageSheetLayout hero={pageHeroes.events}>
@@ -45,6 +61,9 @@ export default async function EventsPage() {
           title="企画情報は準備中です"
           description="第97回 世田谷祭の企画情報は現在準備中です。公開までもうしばらくお待ちください。"
         />
+        {/* 準備中でも著名人企画だけは出す。上部の細いリンクは、ここでは一覧を挟まず
+            すぐ下にこのセクションが来るため重複になるので付けない */}
+        {specialGuestSection}
       </PageSheetLayout>
     );
   }
@@ -81,14 +100,8 @@ export default async function EventsPage() {
       {/* 企画一覧コンテンツ */}
       <EventsContent initialEvents={events} />
 
-      {/* 一覧を見終えた来場者をもう一度 LP へ送る。上部の細いリンクとは粒度が違うので併存させる。
-          左右端は EventsContent のルート（container mx-auto px-4）に合わせる。
-          ラッパーの余白だけが残らないよう、上のリンクと同じ SPECIAL_VISIBLE で括る */}
-      {SPECIAL_VISIBLE && (
-        <div className="container mx-auto px-4 pb-12">
-          <SpecialGuestSection variant="sheet" />
-        </div>
-      )}
+      {/* 一覧を見終えた来場者をもう一度 LP へ送る。上部の細いリンクとは粒度が違うので併存させる */}
+      {specialGuestSection}
     </PageSheetLayout>
   );
 }
