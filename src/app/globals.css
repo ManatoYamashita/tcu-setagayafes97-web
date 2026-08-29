@@ -125,10 +125,6 @@ body {
   text-wrap: balance;
 }
 
-@utility animate-spin-slow {
-  animation: spin 240s linear infinite;
-}
-
 /*
  * ヒーロー見出し（h1 の SVG textPath）専用の Kaisei Opti 700。
  *
