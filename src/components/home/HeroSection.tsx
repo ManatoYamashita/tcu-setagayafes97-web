@@ -210,14 +210,26 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
               />
             </filter>
           </defs>
-          {/* 第97回（上段・小さめ） */}
+          {/*
+            第97回（上段・小さめ）
+
+            letterSpacing / strokeWidth は書体に追随させる値であり、独立に決められない。
+            見出しは Dela Gothic One（極太のディスプレイ書体）で、字画も字面も明朝より太い。
+            前任の Kaisei Opti 700 に合わせた負の字間と太い縁取りをそのまま当てると、
+            隣り合う字がくっつき、「祭」「谷」の内部の白が紺の縁取りに埋まって潰れる。
+            現在の負の字間は、ロゴとしての密度を優先して意図的に詰めた値である。
+            「谷」と「祭」は縁取りが接触して境界が1本に融合するが、Dela の字形は
+            輪郭が明快なため判別は保てる（実描画で4段階を比較して決定）。
+            strokeWidth をこれ以上太くすると、その融合部が塊になって潰れる。
+            書体を差し替える場合は、この2値も実描画で見直すこと。
+          */}
           <text
             className="font-hero-display"
             fontSize="56"
-            letterSpacing="-1"
+            letterSpacing="-3"
             fill="#f7edd0"
             stroke="#1e3a5f"
-            strokeWidth="4"
+            strokeWidth="3"
             paintOrder="stroke fill"
             filter="url(#hero-text-shadow)"
           >
@@ -229,10 +241,10 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
           <text
             className="font-hero-display"
             fontSize="120"
-            letterSpacing="-2"
+            letterSpacing="-6"
             fill="#f7edd0"
             stroke="#1e3a5f"
-            strokeWidth="5.5"
+            strokeWidth="4"
             paintOrder="stroke fill"
             filter="url(#hero-text-shadow)"
           >
