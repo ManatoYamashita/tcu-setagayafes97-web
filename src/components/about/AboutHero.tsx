@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { gsap } from "gsap";
 import { aboutConfig } from "@/data/about";
+import { OPENER_FAILSAFE_MS } from "@/lib/motion";
 
 const Grainient = dynamic(() => import("@/components/ui/Grainient"), {
   ssr: false,
@@ -116,7 +117,7 @@ export function AboutHero() {
       runEntrance();
     } else {
       window.addEventListener("opener-done", runEntrance);
-      const failsafe = setTimeout(runEntrance, 5000);
+      const failsafe = setTimeout(runEntrance, OPENER_FAILSAFE_MS);
 
       return () => {
         window.removeEventListener("opener-done", runEntrance);

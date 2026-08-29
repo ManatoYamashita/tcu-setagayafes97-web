@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
+import { OPENER_SAFETY_MS } from "@/lib/motion";
 
 /**
  * オープナーアニメーションコンポーネント
@@ -42,7 +43,7 @@ export function Opener() {
     const safetyTimeout = setTimeout(() => {
       setShowOpener(false);
       window.dispatchEvent(new CustomEvent("opener-done"));
-    }, 6000);
+    }, OPENER_SAFETY_MS);
 
     const startAnimation = () => {
       if (

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { gsap } from "gsap";
 import { siteConfig } from "@/data/site";
 import { cn } from "@/lib/utils";
+import { OPENER_FAILSAFE_MS } from "@/lib/motion";
 import type { News, NewsType } from "@/types/news";
 
 /**
@@ -139,7 +140,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
     } else {
       // Opener稼働中 → イベント待機 + フェイルセーフ
       window.addEventListener("opener-done", runEntrance);
-      const failsafe = setTimeout(runEntrance, 5000);
+      const failsafe = setTimeout(runEntrance, OPENER_FAILSAFE_MS);
 
       return () => {
         window.removeEventListener("opener-done", runEntrance);
