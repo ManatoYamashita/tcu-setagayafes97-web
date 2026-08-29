@@ -227,11 +227,19 @@ body {
     contain-intrinsic-size: auto 8rem;
   }
 
+  .deferred-section--special {
+    contain-intrinsic-size: auto 66rem;
+  }
+
   .deferred-section--events {
     contain-intrinsic-size: auto 32rem;
   }
 
   @media (min-width: 64rem) {
+    .deferred-section--special {
+      contain-intrinsic-size: auto 80rem;
+    }
+
     .deferred-section--events {
       contain-intrinsic-size: auto 42rem;
     }

@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import { HeroSection } from "@/components/home/HeroSection";
 import { NewsSection } from "@/components/home/NewsSection";
+import { SpecialGuestSection } from "@/components/home/SpecialGuestSection";
 import { FeaturedEvents } from "@/components/home/FeaturedEvents";
 import { SponsorBanner } from "@/components/home/SponsorBanner";
 import { getLatestHeroNews, getNewsList } from "@/lib/news";
@@ -36,6 +37,7 @@ export default async function Home() {
         <AboutSection />
       </div>
       <NewsSection newsList={newsList} isVisible={NEWS_VISIBLE} />
+      <SpecialGuestSection />
       <FeaturedEvents />
       <SponsorBanner />
     </main>
