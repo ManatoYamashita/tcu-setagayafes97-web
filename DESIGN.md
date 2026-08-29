@@ -400,7 +400,7 @@ Line Height:  1.75
 | コンポーネント      | 手法                                | 効果                                                              |
 | ------------------- | ----------------------------------- | ----------------------------------------------------------------- |
 | HeroSection         | `duration(0.5s)` / `stagger(0.08s)` | 3要素の順次フェードイン + スライドアップ（ロゴはLCPのため対象外） |
-| Opener              | 4フェーズ / 合計1.12s               | 薄紫 → 濃紫フェード → スライドアウト                              |
+| Opener              | 2フェーズ / 合計1.6s                | 濃紫 + 白ロゴを見せる → スライドアウト                            |
 | AboutSection        | ScrollTrigger                       | スクロール時の画像スケール + テキスト stagger                     |
 | ChairpersonSection  | ScrollTrigger + SplitText           | 行単位リヴィール + 画像二層ズーム + 段落 stagger                  |
 | StaggeredMobileMenu | タイムライン                        | 背景スライドイン + メニュー項目 stagger                           |

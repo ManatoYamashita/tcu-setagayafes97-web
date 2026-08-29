@@ -12,12 +12,10 @@ import {
 } from "@/lib/motion";
 
 /**
- * オープナーアニメーションコンポーネント（4フェーズ / 合計 約1.12秒）
+ * オープナーアニメーションコンポーネント（2フェーズ / 合計 約1.6秒）
  *
- * 1. 薄ピンク背景 + 白アイコン(favicon-white) フェードイン
- * 2. 濃い紫背景 + カラーアイコン(favicon) にクロスフェード
- * 3. Hero への合図(`opener-done`)と同時にカラーアイコンをフェードアウト
- * 4. 紫レイヤーがスライドアウト
+ * 1. 濃い紫背景 + 白アイコン(favicon-white) をフェードインし、そのまま見せる
+ * 2. Hero への合図(`opener-done`)と同時にアイコンを消し、紫レイヤーを開く
  *
  * 各フェーズの尺は src/lib/motion.ts の OPENER_SEC に集約している。
  * 合図の位置は tl.duration() からの逆算ではなくラベルで表すこと。
@@ -32,8 +30,6 @@ export function Opener() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const primaryLayerRef = useRef<HTMLDivElement | null>(null);
   const iconWrapperRef = useRef<HTMLDivElement | null>(null);
-  const iconWhiteRef = useRef<HTMLDivElement | null>(null);
-  const iconColorRef = useRef<HTMLDivElement | null>(null);
   const ctxRef = useRef<gsap.Context | null>(null);
 
   useEffect(() => {
@@ -61,20 +57,11 @@ export function Opener() {
     }, OPENER_SAFETY_MS);
 
     const startAnimation = () => {
-      if (
-        !containerRef.current ||
-        !primaryLayerRef.current ||
-        !iconWrapperRef.current ||
-        !iconWhiteRef.current ||
-        !iconColorRef.current
-      )
-        return;
+      if (!containerRef.current || !primaryLayerRef.current || !iconWrapperRef.current) return;
 
       const ctx = gsap.context(() => {
         // 初期状態
         gsap.set(iconWrapperRef.current, { opacity: 0, scale: 0.7 });
-        gsap.set(iconWhiteRef.current, { opacity: 1 });
-        gsap.set(iconColorRef.current, { opacity: 0 });
         gsap.set(primaryLayerRef.current, { y: 0 });
 
         // メインタイムライン
@@ -86,7 +73,7 @@ export function Opener() {
           },
         });
 
-        // Phase 1: 白アイコンフェードイン
+        // Phase 1: ロゴをフェードインし、そのまま見せる
         tl.to(iconWrapperRef.current, {
           opacity: 1,
           scale: 1,
@@ -94,37 +81,13 @@ export function Opener() {
           ease: "power4.out",
           force3D: true,
         });
-
-        // Phase 2: 白→カラー + 背景を濃い紫にクロスフェード
-        tl.to(iconWhiteRef.current, {
-          opacity: 0,
-          duration: OPENER_SEC.crossFade,
-          ease: "power2.inOut",
-        });
-        tl.to(
-          iconColorRef.current,
-          {
-            opacity: 1,
-            duration: OPENER_SEC.crossFade,
-            ease: "power2.inOut",
-          },
-          "<"
-        );
-        tl.to(
-          primaryLayerRef.current,
-          {
-            backgroundColor: "#7B2D8E",
-            duration: OPENER_SEC.crossFade,
-            ease: "power2.inOut",
-          },
-          "<"
-        );
+        tl.to({}, { duration: OPENER_SEC.hold });
 
         // アイコンが去り始める瞬間 = Hero への合図。ここから先は末尾からの
         // 逆算をせず、すべてこのラベル基準の絶対指定で置く。
         tl.addLabel(HERO_CUE);
 
-        // Phase 3: Heroアニメーション開始トリガー
+        // Heroアニメーション開始トリガー
         tl.call(
           () => {
             markOpenerDone();
@@ -134,7 +97,7 @@ export function Opener() {
           HERO_CUE
         );
 
-        // Phase 3: カラーアイコンフェードアウト
+        // Phase 2: ロゴを消し、紫レイヤーを開く
         tl.to(
           iconWrapperRef.current,
           {
@@ -146,7 +109,6 @@ export function Opener() {
           HERO_CUE
         );
 
-        // Phase 4: 紫レイヤースライドアウト
         tl.to(
           primaryLayerRef.current,
           {
@@ -192,41 +154,25 @@ export function Opener() {
 
   return (
     <div ref={containerRef} className="opener-container" data-opener-active="true">
-      {/* 紫レイヤー（初期: 薄ピンク → 濃い紫にフェード） */}
+      {/* 紫レイヤー（最初から最後まで濃い紫のまま、最後に下へ抜ける） */}
       <div
         ref={primaryLayerRef}
-        style={{ backgroundColor: "#E8C8F0" }}
+        style={{ backgroundColor: "#7B2D8E" }}
         className="fixed inset-0 z-[51] overflow-hidden flex items-center justify-center will-change-transform"
         aria-hidden="true"
       >
         {/* アイコンラッパー */}
         <div ref={iconWrapperRef} className="relative w-64 h-64 will-change-transform opacity-0">
-          {/* 白アイコン（初期表示） */}
-          <div ref={iconWhiteRef} className="absolute inset-0">
-            <Image
-              src="/images/brand/favicon-white.webp"
-              alt="世田谷祭ロゴ"
-              fill
-              sizes="256px"
-              loading="lazy"
-              fetchPriority="low"
-              quality={60}
-              className="object-contain"
-            />
-          </div>
-          {/* カラーアイコン（2番目） */}
-          <div ref={iconColorRef} className="absolute inset-0 opacity-0">
-            <Image
-              src="/images/brand/favicon.webp"
-              alt="世田谷祭ロゴ"
-              fill
-              sizes="256px"
-              loading="lazy"
-              fetchPriority="low"
-              quality={60}
-              className="object-contain"
-            />
-          </div>
+          <Image
+            src="/images/brand/favicon-white.webp"
+            alt="世田谷祭ロゴ"
+            fill
+            sizes="256px"
+            loading="lazy"
+            fetchPriority="low"
+            quality={60}
+            className="object-contain"
+          />
         </div>
       </div>
     </div>

@@ -15,20 +15,20 @@
  * ずれた場合は Opener.tsx の開発ビルド用アサーションが警告する。
  */
 export const OPENER_SEC = {
-  /** 白アイコンのフェードイン */
-  iconIn: 0.22,
-  /** 白→カラー + 紫レイヤーを濃紫へ（3本同時） */
-  crossFade: 0.3,
-  /** アイコンのフェードアウト。合図と同時に始まり、スライドアウトの内側に収まる */
-  iconOut: 0.2,
+  /** ロゴのフェードイン */
+  iconIn: 0.45,
+  /** フェードイン後にそのまま見せる時間 */
+  hold: 0.35,
+  /** ロゴのフェードアウト。合図と同時に始まり、スライドアウトの内側に収まる */
+  iconOut: 0.25,
   /** 合図からスライドアウト開始までの間 */
   slideDelay: 0.05,
   /** 紫レイヤーのスライドアウト */
-  slideOut: 0.55,
+  slideOut: 0.75,
 } as const;
 
-/** `opener-done` を発火する時刻（秒）。アイコンのフェードアウト開始と同時。 */
-export const OPENER_HERO_CUE_SEC = OPENER_SEC.iconIn + OPENER_SEC.crossFade;
+/** `opener-done` を発火する時刻（秒）。ロゴのフェードアウト開始と同時。 */
+export const OPENER_HERO_CUE_SEC = OPENER_SEC.iconIn + OPENER_SEC.hold;
 
 /** タイムライン合計（秒）。iconOut は内側に収まるため合計に効かない。 */
 export const OPENER_TOTAL_SEC = OPENER_HERO_CUE_SEC + OPENER_SEC.slideDelay + OPENER_SEC.slideOut;
