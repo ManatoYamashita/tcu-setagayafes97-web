@@ -397,13 +397,13 @@ Line Height:  1.75
 
 プロジェクトでは GSAP を高度なアニメーションに使用。
 
-| コンポーネント      | 手法                      | 効果                                             |
-| ------------------- | ------------------------- | ------------------------------------------------ |
-| HeroSection         | `stagger(0.12s)`          | 4要素の順次フェードイン + スライドアップ         |
-| Opener              | 6フェーズタイムライン     | 薄紫 → 濃紫フェード → スライドアウト             |
-| AboutSection        | ScrollTrigger             | スクロール時の画像スケール + テキスト stagger    |
-| ChairpersonSection  | ScrollTrigger + SplitText | 行単位リヴィール + 画像二層ズーム + 段落 stagger |
-| StaggeredMobileMenu | タイムライン              | 背景スライドイン + メニュー項目 stagger          |
+| コンポーネント      | 手法                                | 効果                                                              |
+| ------------------- | ----------------------------------- | ----------------------------------------------------------------- |
+| HeroSection         | `duration(0.5s)` / `stagger(0.08s)` | 3要素の順次フェードイン + スライドアップ（ロゴはLCPのため対象外） |
+| Opener              | 4フェーズ / 合計1.12s               | 薄紫 → 濃紫フェード → スライドアウト                              |
+| AboutSection        | ScrollTrigger                       | スクロール時の画像スケール + テキスト stagger                     |
+| ChairpersonSection  | ScrollTrigger + SplitText           | 行単位リヴィール + 画像二層ズーム + 段落 stagger                  |
+| StaggeredMobileMenu | タイムライン                        | 背景スライドイン + メニュー項目 stagger                           |
 
 GSAP 使用時は `force3D: true` を設定し GPU 加速を有効にする。
 
