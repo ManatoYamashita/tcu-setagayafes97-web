@@ -95,6 +95,17 @@ export function SponsorLogoLoopLoader({ sponsors }: { sponsors: Information[] })
           <SponsorLogoLoop sponsors={sponsors} onReady={handleReady} />
         </div>
       )}
+      {/* 両端のフェード。静的フォールバックと LogoLoop 本体のどちらが表示されていても
+          同じ見え方になるよう、ローダー側で1組だけ持つ。LogoLoop の fadeOut は使わない
+          （同じグラデを2枚重ねると中間が濃くなる）。幅は LogoLoop.css の fade と揃えている。 */}
+      <div
+        className="pointer-events-none absolute inset-y-0 left-0 z-20 w-[clamp(24px,8%,120px)] bg-gradient-to-r from-white to-white/0"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute inset-y-0 right-0 z-20 w-[clamp(24px,8%,120px)] bg-gradient-to-l from-white to-white/0"
+        aria-hidden="true"
+      />
     </div>
   );
 }
