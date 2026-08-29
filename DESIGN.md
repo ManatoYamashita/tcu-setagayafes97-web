@@ -534,8 +534,11 @@ JS 側は各コンポーネントで `window.matchMedia("(prefers-reduced-motion
 
 ### Hero タイトルエフェクト
 
+**現在は未実装。** かつて `@utility text-hero-title` として定義していたが、
+どのコンポーネントからも参照されないまま残っていたため 2026-08-29 に削除した。
+以下は意匠の記録であり、必要になった時点で `globals.css` へ再定義する。
+
 ```css
-/* @utility text-hero-title */
 color: #fffde6;
 -webkit-text-stroke: 1.5px #1e3a5f;
 paint-order: stroke fill;

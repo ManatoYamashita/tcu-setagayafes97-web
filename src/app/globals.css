@@ -153,18 +153,6 @@ body {
   }
 }
 
-@utility text-hero-title {
-  color: #fffde6;
-  -webkit-text-stroke: 1.5px #1e3a5f;
-  paint-order: stroke fill;
-  text-shadow:
-    2px 2px 0 #1e3a5f,
-    -1px -1px 0 #1e3a5f,
-    1px -1px 0 #1e3a5f,
-    -1px 1px 0 #1e3a5f,
-    0 4px 8px rgba(30, 58, 95, 0.3);
-}
-
 @layer utilities {
   .diagonal-bg {
     clip-path: polygon(0 5%, 100% 0, 100% 95%, 0 100%);
