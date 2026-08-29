@@ -125,54 +125,58 @@ body {
   text-wrap: balance;
 }
 
-@utility animate-spin-slow {
-  animation: spin 240s linear infinite;
-}
-
 /*
- * ヒーロー見出し（h1 の SVG textPath）専用の Kaisei Opti 700。
+ * ヒーロー見出し（h1 の SVG textPath）専用の Dela Gothic One。
  *
- * next/font 版（KaiseiFont.ts）は DeferredKaiseiFontsLoader が読み込むが、
+ * 以前は Kaisei Opti 700（明朝）だったが、白抜き+紺の縁取りと重なると
+ * 明朝の細い横画が縁取りに食われて視認性を落としていたため、
+ * ディスプレイ用の極太ゴシックへ差し替えた（2026-08-30）。
+ *
+ * 本文用の next/font 版（KaiseiFont.ts）は DeferredKaiseiFontsLoader が読み込むが、
  * `/` だけは意図的に読み込まない（ヒーローの初期ビューポートを待たせないため）。
  * そちらに頼ると、トップで最も目立つ要素がフォント切り替わりを起こす。
- * 端末標準の丸ゴシックを使う手もあるが、Hiragino は macOS / iOS にしか無く、
+ * 端末標準のゴシックを使う手もあるが、Hiragino は macOS / iOS にしか無く、
  * Windows と Android では全く別の書体になってしまう。
  *
- * ここでは「第97回世田谷祭」の8文字だけを含むサブセット（2,832バイト）を自前配信し、
+ * ここでは「第97回世田谷祭」の8文字だけを含むサブセット（1,876バイト）を自前配信し、
  * 追加のCSSチャンクもレンダーブロッキングも発生させずに確定描画する。
- * next/font 版（@font-face 369面 / CSS 94 KB）を読むより2桁小さい。
+ * next/font 版を読むより2桁小さい。
  *
  * IMPORTANT: unicode-range は下の8文字に固定されている。
  *   第(U+7B2C) 9(U+39) 7(U+37) 回(U+56DE) 世(U+4E16) 田(U+7530) 谷(U+8C37) 祭(U+796D)
  * ヒーローの文言を変える場合（例: 第98回）は woff2 の作り直しが必要。手順:
  *   curl -A "<ブラウザのUA>" -G --data-urlencode "text=<新しい文言>" \
- *     "https://fonts.googleapis.com/css2?family=Kaisei+Opti:wght@700&display=block"
- *   返ってきた CSS の src URL を public/fonts/kaisei-opti-hero-700.woff2 へ保存し、
+ *     "https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=block"
+ *   返ってきた CSS の src URL を public/fonts/dela-gothic-one-hero-400.woff2 へ保存し、
  *   同じ CSS の unicode-range をここへ転記する。
  *   ※ UA を偽装しないと woff2 ではなく ttf が返る。
+ *   ※ Noto Sans JP は `text=` を無視して可変フォント全体（2.2 MB）を返すため使えない。
  *
- * ライセンス: Kaisei Opti / SIL Open Font License 1.1（自前配信可）
+ * IMPORTANT: font-weight を単一の 400 ではなく範囲で宣言している。
+ * Dela Gothic One は 400 しか持たないディスプレイ書体だが、下の @utility は
+ * フォールバック（端末標準ゴシック）が効いたときに痩せないよう 700 を指定する。
+ * ここを 400 に固定すると、700 指定に対してブラウザが合成ボールドを掛け、
+ * 元から極太の字形が潰れる。範囲宣言なら 700 でもこのフェースが素のまま選ばれる。
+ *
+ * ライセンス: Dela Gothic One / SIL Open Font License 1.1（自前配信可）
  */
 @font-face {
-  font-family: "Kaisei Opti Hero";
+  font-family: "Dela Gothic Hero";
   font-style: normal;
-  font-weight: 700;
+  font-weight: 400 900;
   font-display: block;
-  src: url("/fonts/kaisei-opti-hero-700.woff2") format("woff2");
+  src: url("/fonts/dela-gothic-one-hero-400.woff2") format("woff2");
   unicode-range: U+37, U+39, U+4e16, U+56de, U+7530, U+796d, U+7b2c, U+8c37;
 }
 
 @utility font-hero-display {
   /*
    * 1番目: 上記サブセット（自前配信・8文字・即時）
-   * 2番目: 遅延読み込み済みの next/font 版（トップ以外のページ向けの保険）
-   * 3番目: 端末の明朝
-   *
-   * IMPORTANT: var() のフォールバックを省いてはいけない。理由は
-   * @theme の --font-serif / --font-heading のコメントを参照。
+   * 2番目以降: 端末標準のゴシック。--font-kaisei-opti は明朝なので、
+   * ここでフォールバック先に混ぜてはいけない（差し替えの意図と逆になる）。
    */
   font-family:
-    "Kaisei Opti Hero", var(--font-kaisei-opti, "Kaisei Opti"), "Hiragino Mincho ProN", serif;
+    "Dela Gothic Hero", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
   font-weight: 700;
 }
 
@@ -266,6 +270,24 @@ body {
   /* CircularText 回転アニメーション */
   .animate-spin-slow {
     animation: spin-slow 60s linear infinite;
+  }
+
+  /*
+   * ヒーロー入場の対象。初期状態を不可視にしたうえで、GSAP が走らなかった
+   * 場合の保険として遅れて表示する。
+   *
+   * 素の `opacity-0` を SSR HTML に焼くだけだと、JS の失敗やチャンク取得の
+   * 失敗で見出しが永久に不可視になる。かといって完成形を出して gsap.from() で
+   * 引き戻す方式は、このエフェクトが実測で 2.7 秒後に走るため
+   * 「表示 → 消失 → 再出現」のチラつきになる。そこで初期状態は不可視のまま、
+   * GSAP が走らなかったときだけ CSS で表示する。
+   *
+   * GSAP が入場を始めたら HeroSection.tsx 側でこのクラスを外すこと。
+   * 外さないと 4 秒後にこの animation が発火し、演出と競合する。
+   */
+  .hero-entrance-target {
+    opacity: 0;
+    animation: hero-entrance-failsafe 0.4s ease-out 4s forwards;
   }
 
   /* Hero → 著名人企画 → About をまとめて塗る背景グラデーション。
@@ -373,6 +395,19 @@ body {
         oklch(47% 0.165 314deg / 0.28) 60%,
         oklch(47% 0.165 314deg / 0) 88%
       );
+  }
+}
+
+/*
+ * ヒーロー入場のフェイルセーフ（.hero-entrance-target）。
+ *
+ * @keyframes は必ず @layer の外に置くこと。レイヤーの内側に書くと
+ * animation-name が解決されず、getAnimations() が空になり、
+ * アニメーションが一切生成されない（2026-08-30 実測）。
+ */
+@keyframes hero-entrance-failsafe {
+  to {
+    opacity: 1;
   }
 }
 
@@ -628,5 +663,14 @@ body {
    */
   .animate-spin-slow {
     animation: none !important;
+  }
+
+  /*
+   * ヒーロー入場のフェイルセーフは止めないこと。`animation: none` にすると
+   * opacity: 0 のまま固定され、見出しが永久に不可視になる。モーション軽減では
+   * フェード自体を省き、遅延後に瞬時へ切り替える。
+   */
+  .hero-entrance-target {
+    animation-duration: 0.01ms;
   }
 }

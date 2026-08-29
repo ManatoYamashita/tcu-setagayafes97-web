@@ -397,20 +397,31 @@ Line Height:  1.75
 
 プロジェクトでは GSAP を高度なアニメーションに使用。
 
-| コンポーネント      | 手法                      | 効果                                                          |
-| ------------------- | ------------------------- | ------------------------------------------------------------- |
-| HeroSection         | `stagger(0.12s)`          | 4要素の順次フェードイン + スライドアップ                      |
-| Opener              | 6フェーズタイムライン     | 薄紫 → 濃紫フェード → スライドアウト                          |
-| AboutSection        | ScrollTrigger             | スクロール時の画像スケール + テキスト stagger                 |
-| SpecialGuestMotion  | ScrollTrigger             | 著名人企画の告知セクション。写真のリビール + テキスト stagger |
-| ChairpersonSection  | ScrollTrigger + SplitText | 行単位リヴィール + 画像二層ズーム + 段落 stagger              |
-| StaggeredMobileMenu | タイムライン              | 背景スライドイン + メニュー項目 stagger                       |
+| コンポーネント      | 手法                                | 効果                                                              |
+| ------------------- | ----------------------------------- | ----------------------------------------------------------------- |
+| HeroSection         | `duration(0.5s)` / `stagger(0.08s)` | 3要素の順次フェードイン + スライドアップ（ロゴはLCPのため対象外） |
+| Opener              | 2フェーズ / 合計1.6s                | 濃紫 + 白ロゴを見せる → スライドアウト                            |
+| AboutSection        | ScrollTrigger                       | スクロール時の画像スケール + テキスト stagger                     |
+| SpecialGuestMotion  | ScrollTrigger                       | 著名人企画の告知セクション。写真のリビール + テキスト stagger     |
+| ChairpersonSection  | ScrollTrigger + SplitText           | 行単位リヴィール + 画像二層ズーム + 段落 stagger                  |
+| StaggeredMobileMenu | タイムライン                        | 背景スライドイン + メニュー項目 stagger                           |
 
 GSAP 使用時は `force3D: true` を設定し GPU 加速を有効にする。
 
 ScrollTrigger の入場は `{ start: "top 80%", once: true }` を共通の基準とし、各 tween には
 スプレッドしたコピー `{ ...scrollTriggerBase }` を渡す。入場は `gsap.set` + `gsap.to` ではなく
 `gsap.from()` で書くと、モーション軽減時に「何もしない」だけで完成形が表示される。
+
+ただしヒーローのようにエフェクトの実行が遅いものは `gsap.from()` にしない。トップの
+`HeroSection` は実測でエフェクトが 2.7 秒後に走るため、完成形を出してから引き戻すと
+「表示 → 消失 → 再出現」のチラつきになる。初期状態を不可視にしたうえで、GSAP が
+走らなかった場合の保険を CSS 側に持たせること（`.hero-entrance-target`）。
+GSAP が入場を始めたらそのクラスを外し、CSS 側と競合させない。
+
+**`@keyframes` は `@layer` の外に定義すること。** レイヤーの内側に書くと
+`animation-name` が解決されず、`getAnimations()` が空になってアニメーションが
+一切生成されない（2026-08-30 実測）。`globals.css` の既存の keyframes はすべて
+レイヤー外にある。
 
 Server Component へ演出だけ足す場合は、非表示マーカーを1つ置いて `data-*` 属性を
 フックにする（`SpecialPageMotion` / `AccessPageMotion` / `SpecialGuestMotion`）。

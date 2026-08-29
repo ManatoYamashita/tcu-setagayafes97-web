@@ -3,16 +3,11 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { OPENER_FAILSAFE_MS, shouldWaitForOpener } from "@/lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
-
-/**
- * オープナーが `opener-done` を発火できなかった場合に入場を始める上限時間。
- * HeroSection / AboutHero と同じ 5 秒に揃えている。
- */
-const OPENER_FAILSAFE_MS = 5000;
 
 type RevealVariant = "left" | "right" | "scale" | "up";
 
@@ -177,11 +172,9 @@ export function SpecialPageMotion() {
       });
     };
 
-    // 遅延ローダーの空フォールバックは、実体のオープナーとして扱わない。
-    const hasOpener = !!document.querySelector("[data-opener-active]");
     let failsafeId: number | undefined;
 
-    if (hasOpener) {
+    if (shouldWaitForOpener()) {
       window.addEventListener("opener-done", runEntrance);
       failsafeId = window.setTimeout(runEntrance, OPENER_FAILSAFE_MS);
     } else {

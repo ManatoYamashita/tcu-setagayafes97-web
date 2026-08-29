@@ -301,7 +301,11 @@ push 時は head をそのまま、PR 時は head を base へマージした結
 
 ### トップページ (HOME)
 
-- **起動時アニメーション**: WebM動画（ロゴアニメーション）、初回訪問時のみ表示（sessionStorage管理）
+- **起動時アニメーション**: GSAPタイムライン（`src/components/layout/Opener.tsx`）。
+  デスクトップ（≥768px）かつ `prefers-reduced-motion` 未指定のときのみ、毎回表示。
+  2フェーズ（濃紫背景＋白ロゴを見せる → レイヤーが下へ開く）、合計約1.6秒。
+  完了を待たず 0.8秒地点で `opener-done` を発火して各ページの入場を始める。
+  尺は `src/lib/motion.ts` に集約（WebM動画・sessionStorage を使う旧実装は 2026-02-19 に削除済み）
 - **カウントダウン**: 開催日までのカウントダウン（日:時:分:秒）、開催中は「開催中！」バナー、終了後はお礼メッセージ
 - **主要セクション**: メインビジュアル、著名人企画の告知、開催概要、News（最新3件）、おすすめ企画、協賛バナーエリア
 - **著名人企画の告知**: `SpecialGuestSection`（`src/components/special/`）を Hero の直下に置く。

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { gsap } from "gsap";
 import { siteConfig } from "@/data/site";
 import { cn } from "@/lib/utils";
+import { HERO_ENTRANCE, OPENER_FAILSAFE_MS, shouldWaitForOpener } from "@/lib/motion";
 import type { News, NewsType } from "@/types/news";
 
 /**
@@ -97,9 +98,15 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
     if (typeof window === "undefined") return;
     if (ctxRef.current) return;
 
-    // 遅延ローダーの空フォールバックは、実体のオープナーとして扱わない。
-    // 取得が遅い場合もHeroを隠さず、実体がマウント済みのときだけ完了イベントを待つ。
-    const hasOpener = !!document.querySelector("[data-opener-active]");
+    // オープナーが走る環境かをメディアクエリで判定する。DOM の
+    // [data-opener-active] を見る方式は、Opener が dynamic(ssr:false) のため
+    // このエフェクトより後にしかマウントされず、初回表示では常に「居ない」と
+    // 誤判定していた。結果、入場が覆いの裏で終わっていた。
+    //
+    // ただし合図を待つのは「まだ撃たれていない」ときだけにする。このエフェクトは
+    // データ取得を挟んだストリーミングの後に走るため、オープナーより1秒以上
+    // 遅れることがあり、ワンショットの opener-done を取りこぼしうる。
+    const waitForOpener = shouldWaitForOpener();
 
     const runEntrance = () => {
       if (!sectionRef.current || ctxRef.current) return;
@@ -111,19 +118,22 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
           Boolean
         ) as HTMLElement[];
 
+        // 先に inline で不可視にしてから CSS のフェイルセーフを外す。
+        // 順序が逆だと、クラスを外した瞬間に opacity が 1 に戻って一瞬ちらつく。
         gsap.set(mainTargets, { opacity: 0, y: 30 });
+        mainTargets.forEach((el) => el.classList.remove("hero-entrance-target"));
 
         const tl = gsap.timeline();
 
-        // メイン要素: stagger 0.12s で順次出現
+        // メイン要素: HERO_ENTRANCE.stagger で順次出現
         tl.to(
           mainTargets,
           {
             opacity: 1,
             y: 0,
-            duration: 0.7,
-            ease: "power4.out",
-            stagger: 0.12,
+            duration: HERO_ENTRANCE.duration,
+            ease: HERO_ENTRANCE.ease,
+            stagger: HERO_ENTRANCE.stagger,
             force3D: true,
           },
           0
@@ -133,13 +143,13 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       ctxRef.current = ctx;
     };
 
-    if (!hasOpener) {
+    if (!waitForOpener) {
       // Opener完了済み/不在 → 即座にアニメーション実行
       runEntrance();
     } else {
       // Opener稼働中 → イベント待機 + フェイルセーフ
       window.addEventListener("opener-done", runEntrance);
-      const failsafe = setTimeout(runEntrance, 5000);
+      const failsafe = setTimeout(runEntrance, OPENER_FAILSAFE_MS);
 
       return () => {
         window.removeEventListener("opener-done", runEntrance);
@@ -179,7 +189,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       {/* [z-30] h1 タイトル（2行アーチ型・アイコンの上に重なる） */}
       <h1
         ref={h1Ref}
-        className="absolute z-30 w-[85vw] sm:w-[70vw] md:w-[55vw] lg:w-[50vw] will-change-transform opacity-0 -translate-y-10 sm:-translate-y-6 md:translate-y-0"
+        className="absolute z-30 w-[85vw] sm:w-[70vw] md:w-[55vw] lg:w-[50vw] will-change-transform hero-entrance-target -translate-y-10 sm:-translate-y-6 md:translate-y-0"
       >
         <svg
           viewBox="0 0 600 280"
@@ -200,14 +210,26 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
               />
             </filter>
           </defs>
-          {/* 第97回（上段・小さめ） */}
+          {/*
+            第97回（上段・小さめ）
+
+            letterSpacing / strokeWidth は書体に追随させる値であり、独立に決められない。
+            見出しは Dela Gothic One（極太のディスプレイ書体）で、字画も字面も明朝より太い。
+            前任の Kaisei Opti 700 に合わせた負の字間と太い縁取りをそのまま当てると、
+            隣り合う字がくっつき、「祭」「谷」の内部の白が紺の縁取りに埋まって潰れる。
+            現在の負の字間は、ロゴとしての密度を優先して意図的に詰めた値である。
+            「谷」と「祭」は縁取りが接触して境界が1本に融合するが、Dela の字形は
+            輪郭が明快なため判別は保てる（実描画で4段階を比較して決定）。
+            strokeWidth をこれ以上太くすると、その融合部が塊になって潰れる。
+            書体を差し替える場合は、この2値も実描画で見直すこと。
+          */}
           <text
             className="font-hero-display"
             fontSize="56"
-            letterSpacing="-1"
+            letterSpacing="-3"
             fill="#f7edd0"
             stroke="#1e3a5f"
-            strokeWidth="4"
+            strokeWidth="3"
             paintOrder="stroke fill"
             filter="url(#hero-text-shadow)"
           >
@@ -219,10 +241,10 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
           <text
             className="font-hero-display"
             fontSize="120"
-            letterSpacing="-2"
+            letterSpacing="-6"
             fill="#f7edd0"
             stroke="#1e3a5f"
-            strokeWidth="5.5"
+            strokeWidth="4"
             paintOrder="stroke fill"
             filter="url(#hero-text-shadow)"
           >
@@ -236,7 +258,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       {/* [z-30] 左下 日付表示 */}
       <div
         ref={dateBlockRef}
-        className="absolute left-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 will-change-transform opacity-0"
+        className="absolute left-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 will-change-transform hero-entrance-target"
         aria-label={`開催日: ${siteConfig.dates.day1} - ${siteConfig.dates.day2}`}
       >
         <p className="text-sm md:text-base font-serif italic tracking-[0.3em] text-primary-400 mb-2 md:mb-3">
@@ -263,7 +285,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       {latestNews && (
         <div
           ref={newsBlockRef}
-          className="absolute right-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 max-w-sm hidden md:block will-change-transform opacity-0"
+          className="absolute right-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 max-w-sm hidden md:block will-change-transform hero-entrance-target"
         >
           <div className="flex items-center gap-2 mb-2">
             <span

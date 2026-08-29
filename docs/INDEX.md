@@ -179,6 +179,7 @@ docs/
   - リッチテキスト（`prose`）の扱い — typography プラグイン未導入と `@layer` の選び方
 
 - **[performance.md](./frontend/performance.md)** - Lighthouse基準値とフロントエンド性能ルール
+  - 初期表示モーションの尺は `src/lib/motion.ts` に集約（2026-08-29）
   - トップページ desktop の基準値と LCP 内訳
   - LCP、動画、レスポンシブ画像、無限ロゴ列、Webフォントの実装ルール
   - `content-visibility` による初期描画遅延、フォントCSSの遅延配信、ScrollTriggerの遅延初期化

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { gsap } from "gsap";
 import { aboutConfig } from "@/data/about";
+import { OPENER_FAILSAFE_MS, shouldWaitForOpener } from "@/lib/motion";
 
 const Grainient = dynamic(() => import("@/components/ui/Grainient"), {
   ssr: false,
@@ -42,9 +43,6 @@ export function AboutHero() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (ctxRef.current) return;
-
-    // 遅延ローダーの空フォールバックは、実体のオープナーとして扱わない。
-    const hasOpener = !!document.querySelector("[data-opener-active]");
 
     const runEntrance = () => {
       if (!sectionRef.current || ctxRef.current) return;
@@ -112,11 +110,11 @@ export function AboutHero() {
       ctxRef.current = ctx;
     };
 
-    if (!hasOpener) {
+    if (!shouldWaitForOpener()) {
       runEntrance();
     } else {
       window.addEventListener("opener-done", runEntrance);
-      const failsafe = setTimeout(runEntrance, 5000);
+      const failsafe = setTimeout(runEntrance, OPENER_FAILSAFE_MS);
 
       return () => {
         window.removeEventListener("opener-done", runEntrance);
