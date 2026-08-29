@@ -227,11 +227,29 @@ body {
     contain-intrinsic-size: auto 8rem;
   }
 
+  .deferred-section--special {
+    contain-intrinsic-size: auto 62rem;
+  }
+
   .deferred-section--events {
     contain-intrinsic-size: auto 32rem;
   }
 
+  /*
+   * 著名人企画バナーは 768px 以上で画像とテキストが横並びになるため、
+   * 縦積みの推定高さをそのまま使うとスクロール範囲が過大になる。
+   */
+  @media (min-width: 48rem) {
+    .deferred-section--special {
+      contain-intrinsic-size: auto 40rem;
+    }
+  }
+
   @media (min-width: 64rem) {
+    .deferred-section--special {
+      contain-intrinsic-size: auto 45rem;
+    }
+
     .deferred-section--events {
       contain-intrinsic-size: auto 42rem;
     }
