@@ -132,8 +132,15 @@ body {
    * 1番目: 上記サブセット（自前配信・8文字・即時）
    * 2番目: 遅延読み込み済みの next/font 版（トップ以外のページ向けの保険）
    * 3番目: 端末の明朝
+   *
+   * IMPORTANT: var() のフォールバックを省いてはいけない。
+   * --font-kaisei-opti は DeferredKaiseiFontsLoader が body へ class を足して
+   * 初めて定義されるが、トップページ (`/`) では意図的に読み込まれない。
+   * 未定義の var() をフォールバック無しで書くと、宣言全体が「計算値時に無効」となり
+   * font-family が body の --font-sans を継承してしまう（実測で踏んだ）。
    */
-  font-family: "Kaisei Opti Hero", var(--font-kaisei-opti), "Hiragino Mincho ProN", serif;
+  font-family:
+    "Kaisei Opti Hero", var(--font-kaisei-opti, "Kaisei Opti"), "Hiragino Mincho ProN", serif;
   font-weight: 700;
 }
 
