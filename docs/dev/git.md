@@ -245,6 +245,59 @@ git commit -m "FEATURE: 新機能を追加" -m "
 "
 ```
 
+## ステージングの規約
+
+### `git add -A` / `git add .` は使わない
+
+> [!CAUTION]
+> **必ずパスを明示してステージングしてください。** ワイルドカードのステージングは、作業ツリーに残っている**別作業の未コミット変更や生成物を無差別に取り込みます。**
+
+```bash
+# NG
+git add -A
+git add .
+
+# OK
+git status --short                     # まず全体を見る
+git add src/app/globals.css src/components/home/SponsorBanner.tsx
+git diff --cached --name-only          # ステージした内容を確認してからコミット
+```
+
+**Why:** 2026-08-29、UIフィードバック対応の PR で `git add -A` を使ったところ、次の3つを巻き込んだ。
+
+| 巻き込んだもの                                          | 実害                                         |
+| ------------------------------------------------------- | -------------------------------------------- |
+| `home-dev.html`（dev サーバのHTMLダンプ 100KB）         | Prettier の `format:check` が落ち、CI が失敗 |
+| Kaisei Opti サブセットの自前配信（`@font-face`＋woff2） | 未レビューの別作業が PR に混入               |
+| `--font-serif` 等の `var()` フォールバック追加          | 同上（2回目は検知して回避）                  |
+
+**このリポジトリでは複数のエージェント・セッションが同じ作業ツリーを触ることがある。** 自分が編集していないファイルが `git status` に現れるのは異常ではなく通常であり、**ワイルドカードのステージングはそれを黙って取り込む。**
+
+### コミット前のチェックリスト
+
+1. `git status --short` — 身に覚えのないファイルが無いか
+2. `git diff --cached --stat` — ステージした差分が意図どおりか
+3. `git diff origin/main...HEAD --stat` — PR 全体のスコープが説明と一致しているか
+
+3 は特に重要で、**PR の説明と実体が食い違っていないか**を最後に必ず見る。
+
+### 巻き込んでしまった場合の復旧
+
+**他人の作業を消してはいけない。** まず別ブランチへ退避して git 履歴に残し、そのうえで自分の PR から取り除く。
+
+```bash
+# 1. 現在の HEAD から退避ブランチを作り、未コミット分も含めて保全
+git switch -c feature/<退避先>
+git add <該当パス> && git commit -m "..."
+git push -u origin feature/<退避先>
+
+# 2. 元のブランチへ戻り、対象ファイルを main の状態に戻してから自分の変更だけ再適用
+git switch <元のブランチ>
+git rm --cached <巻き込んだ資産>
+git checkout origin/main -- <巻き込まれたファイル>
+# → エディタで自分の変更だけを入れ直す
+```
+
 ## 運用フロー例
 
 ### 典型的な開発フロー
@@ -261,7 +314,8 @@ git commit -m "FEATURE: 新機能を追加" -m "
 
    ```bash
    # ファイル編集...
-   git add .
+   git status --short                    # 意図しないファイルが無いか確認
+   git add src/components/Foo.tsx        # パスを明示（git add . は禁止）
    git commit -m "FEATURE: 新機能を追加"
    git push origin feature/new-feature
    ```
@@ -412,3 +466,4 @@ git push origin feature-add-gtm
 
 - 2025-12-05: 初版作成（テンプレートプロジェクト用に汎用化）
 - 2026-08-16: `.github/workflows/` の push が拒否される場合の回避手順を追加
+- 2026-08-29: 「ステージングの規約」を追加（`git add -A` / `git add .` の禁止、コミット前チェックリスト、巻き込み時の復旧手順）
