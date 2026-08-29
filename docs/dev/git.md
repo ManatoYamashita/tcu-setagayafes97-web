@@ -299,6 +299,77 @@ git checkout origin/main -- <巻き込まれたファイル>
 # → エディタで自分の変更だけを入れ直す
 ```
 
+## マージ前の検証
+
+### diff ではなく「実マージ結果」を見る
+
+> [!CAUTION]
+> **GitHub の `mergeStateStatus=CLEAN` は「競合が無い」ことしか意味しません。マージによってファイルが消えないことは保証しません。**
+
+`git diff` は two-dot でも three-dot でもこれを検知できません。**実際にマージした結果のツリーを作って確認します。**
+
+```bash
+git fetch origin
+
+# 結果ツリーを作る（作業ツリーは変更されない）
+git merge-tree --write-tree origin/main origin/<ブランチ> > /tmp/mt.txt \
+  && echo "クリーンにマージ可能" || { echo "競合あり"; head /tmp/mt.txt; }
+
+TREE=$(head -1 /tmp/mt.txt)
+
+# 消えるファイルが無いか（ここが本題）
+git diff --diff-filter=D --name-only origin/main "$TREE"
+
+# 変わるファイル全体
+git diff --stat origin/main "$TREE"
+```
+
+**Why:** 2026-08-29、退避ブランチ（PR #116）は GitHub 上で `CLEAN` だったが、実際にマージすると
+`public/fonts/kaisei-opti-hero-700.woff2` と `@font-face` 宣言の**両方が無言で消えた。**
+残るのは存在しないフォントを参照する `.font-hero-display` だけで、エラーも警告も出ず静かに
+フォールバックする状態になっていた。
+
+原因は git の3-wayマージの正常な挙動である。**マージベースに存在し、片方で削除され、
+もう片方で未変更なら、削除が採用される。** この PR ではマージベースにファイルがあり、
+`main` 側で削除されていた（別 PR のスコープ整理）ため、こうなった。
+
+### アセットを含む PR は worktree で実際に動かす
+
+結果ツリーの検査で足りない場合（本当に動くかを見たい場合）は、**worktree を切る。**
+本体の作業ツリーを汚さず、他のセッションの未コミット作業とも衝突しない。
+
+```bash
+W=/tmp/wt-review
+git worktree add "$W" <ブランチ>
+cd "$W" && git merge origin/main        # ここで削除・競合が可視化される
+pnpm install --frozen-lockfile --prefer-offline
+PORT=3456 pnpm dev                       # 使用中のポートを避ける
+# 確認後
+git worktree remove --force "$W"
+```
+
+> [!WARNING]
+> **`node_modules` をシンボリックリンクで済ませない。** Turbopack が
+> `Symlink node_modules is invalid, it points out of the filesystem root` で panic する。
+> worktree 内で `pnpm install` すること（pnpm のストアが効くので数秒で終わる）。
+
+### 検証で分かることと分からないこと
+
+**アニメーションに依存する描画は自動操作では判定できない。** オープナー演出は自動操作下で
+t=0 のまま固まり、ヒーロー SVG が 0×0 のまま発火しないことがある。
+`document.fonts.load()` のような**明示的な API で「素材が正しいこと」までは確認できる**が、
+「実際に描画されるか」は実ブラウザでの目視が要る。詳細は
+[browser-verification-pitfalls.md](../frontend/browser-verification-pitfalls.md)。
+
+### マージ前チェックリスト
+
+1. `git merge-tree --write-tree` の結果ツリーで `--diff-filter=D` を確認 — **消えるファイルは無いか**
+2. `git diff --stat origin/main "$TREE"` — 変更範囲が PR の説明と一致しているか
+3. **その作業が既に `main` へ別経路で入っていないか** — 入っていればマージは巻き戻しになる
+
+3 も実際に起きた。PR #116 の内容は別コミット（`bf56d1a`）で `main` へ入っており、
+しかも `main` 側の実装のほうが後発で改善を含んでいた。**マージしていれば改善を打ち消していた。**
+
 ## 運用フロー例
 
 ### 典型的な開発フロー
@@ -468,3 +539,4 @@ git push origin feature-add-gtm
 - 2025-12-05: 初版作成（テンプレートプロジェクト用に汎用化）
 - 2026-08-16: `.github/workflows/` の push が拒否される場合の回避手順を追加
 - 2026-08-29: 「ステージングの規約」を追加（`git add -A` / `git add .` の禁止、コミット前チェックリスト、巻き込み時の復旧手順）
+- 2026-08-29: 「マージ前の検証」を追加（`merge-tree` で消えるファイルを確認、worktree での実動確認、マージ前チェックリスト）
