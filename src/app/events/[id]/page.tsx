@@ -182,7 +182,7 @@ export default async function EventPage({ params }: EventPageProps) {
           <div className="mx-auto mt-12 max-w-4xl">
             <Link
               href="/events"
-              className="inline-flex items-center gap-2 text-primary-light hover:underline"
+              className="inline-flex items-center gap-2 text-primary-700 hover:underline"
             >
               <svg
                 className="h-5 w-5"

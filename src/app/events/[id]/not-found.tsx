@@ -37,7 +37,7 @@ export default function EventDetailNotFound() {
       {/* 404メッセージ */}
       <div className="container mx-auto px-4 py-24">
         <div className="mx-auto max-w-md text-center">
-          <div className="mb-6 text-6xl font-bold text-primary-light">404</div>
+          <div className="mb-6 text-6xl font-bold text-primary-700">404</div>
           <h2 className="mb-4 text-2xl font-bold text-gray-900">企画が見つかりません</h2>
           <p className="mb-8 text-gray-900/80">
             お探しの企画は存在しないか、削除された可能性があります。

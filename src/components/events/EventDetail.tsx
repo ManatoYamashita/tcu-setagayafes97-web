@@ -40,7 +40,7 @@ export function EventDetail({ event }: EventDetailProps) {
         <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl">{event.title}</h1>
 
         {/* 主催団体 */}
-        <p className="text-xl font-semibold text-primary-light">{event.organizer}</p>
+        <p className="text-xl font-semibold text-primary-700">{event.organizer}</p>
       </div>
 
       {/* メタ情報 */}
@@ -51,7 +51,7 @@ export function EventDetail({ event }: EventDetailProps) {
           <div className="flex items-start gap-3">
             <dt className="flex items-center gap-2 text-sm font-semibold text-gray-900/90">
               <svg
-                className="h-5 w-5 text-primary-light"
+                className="h-5 w-5 text-primary-700"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -79,7 +79,7 @@ export function EventDetail({ event }: EventDetailProps) {
             <div className="flex items-start gap-3">
               <dt className="flex items-center gap-2 text-sm font-semibold text-gray-900/90">
                 <svg
-                  className="h-5 w-5 text-primary-light"
+                  className="h-5 w-5 text-primary-700"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -104,7 +104,7 @@ export function EventDetail({ event }: EventDetailProps) {
           <div className="flex items-start gap-3">
             <dt className="flex items-center gap-2 text-sm font-semibold text-gray-900/90">
               <svg
-                className="h-5 w-5 text-primary-light"
+                className="h-5 w-5 text-primary-700"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -128,7 +128,7 @@ export function EventDetail({ event }: EventDetailProps) {
           <div className="flex items-start gap-3">
             <dt className="flex items-center gap-2 text-sm font-semibold text-gray-900/90">
               <svg
-                className="h-5 w-5 text-primary-light"
+                className="h-5 w-5 text-primary-700"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

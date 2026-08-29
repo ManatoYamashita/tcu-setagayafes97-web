@@ -38,7 +38,14 @@
 
   /* ===== Alias（後方互換性のため残す） ===== */
   --color-primary: var(--color-primary-400);
+  /* 前景テキスト・アイコンに使ってはいけない。ページ背景 --color-secondary との
+     コントラストは 1.23:1、白10%を重ねたカードでも 1.32:1 しかなく、ほぼ同色になる。
+     暗色背景時代の名残であり、淡紫背景の現行デザインでは装飾用途に限る。
+     淡紫背景上のテキストは --color-primary-700(5.64:1) を使うこと（docs/frontend/design.md）。
+     比率は出力CSSの実配信値で算出している。上の各行の HEX コメントは Lightning CSS が
+     oklch から変換した実値とずれるため、コントラストの根拠に使わないこと */
   --color-primary-light: var(--color-primary-300);
+  /* 白背景では 7.45:1 だが、淡紫背景では 3.75:1 で AA に届かない。背景で使い分けること */
   --color-primary-dark: var(--color-primary-600);
 
   /* フォント設定 */
