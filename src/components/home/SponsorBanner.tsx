@@ -1,3 +1,4 @@
+import { SPONCERS_VISIBLE } from "@/data/site";
 import { getSponsorsList } from "@/lib/informations";
 import { SponsorLogoLoop } from "./SponsorLogoLoop";
 
@@ -6,6 +7,10 @@ import { SponsorLogoLoop } from "./SponsorLogoLoop";
  * データ取得のみ担当し、表示はクライアントコンポーネントに委譲
  */
 export async function SponsorBanner() {
+  if (!SPONCERS_VISIBLE) {
+    return null;
+  }
+
   const sponsors = await getSponsorsList();
 
   if (sponsors.length === 0) {

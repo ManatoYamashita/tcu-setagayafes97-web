@@ -80,6 +80,14 @@ export const EVENTS_VISIBLE: boolean = process.env.NEXT_PUBLIC_EVENTS_VISIBLE ==
 export const NEWS_VISIBLE: boolean = process.env.NEXT_PUBLIC_NEWS_VISIBLE === "true";
 
 /**
+ * 協賛企業バナーの公開フラグ
+ * 環境変数 NEXT_PUBLIC_SPONCERS_VISIBLE を "true" に設定して再デプロイすると公開される。
+ * 未設定・"true" 以外はすべて非公開（安全側デフォルト）。
+ * false の間は SponsorBanner が描画されず、microCMS への協賛企業データ取得も行われない。
+ */
+export const SPONCERS_VISIBLE: boolean = process.env.NEXT_PUBLIC_SPONCERS_VISIBLE === "true";
+
+/**
  * 著名人企画（type = special）の公開フラグ
  * 環境変数 NEXT_PUBLIC_SPECIAL_VISIBLE を "true" に設定して再デプロイすると公開される。
  * 未設定・"true" 以外はすべて非公開（安全側デフォルト）。

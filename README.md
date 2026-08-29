@@ -59,6 +59,7 @@ cp .env.example .env.local
 | ----------------------------------- | --------------------------------------------------------------- |
 | `NEXT_PUBLIC_EVENTS_VISIBLE`        | `/events`・`/timetable`・おすすめ企画・企画詳細・sitemap の企画 |
 | `NEXT_PUBLIC_NEWS_VISIBLE`          | `/info` 一覧                                                    |
+| `NEXT_PUBLIC_SPONCERS_VISIBLE`      | トップ・Aboutページの協賛企業バナー                             |
 | `NEXT_PUBLIC_SPECIAL_VISIBLE`       | 著名人企画（`type = special`）全般。`EVENTS_VISIBLE` とは独立   |
 | `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` | 著名人企画LPの物販明細。false の間は「グッズ販売予定」のみ表示  |
 
