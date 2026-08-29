@@ -118,7 +118,7 @@ function SponsorCard({ sponsor }: SponsorCardProps) {
 
         {/* Webサイトリンク */}
         {sponsor.url && (
-          <div className="mt-4 flex items-center gap-2 text-sm text-primary-light">
+          <div className="mt-4 flex items-center gap-2 text-sm text-primary-700">
             <ExternalLink className="h-4 w-4" />
             <span className="group-hover:underline">Webサイトを見る</span>
           </div>

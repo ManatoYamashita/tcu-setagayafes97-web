@@ -44,7 +44,7 @@ export function EventCard({ event, variant = "default" }: EventCardProps) {
           </h3>
 
           {/* 主催団体 */}
-          <p className="mb-3 text-sm font-semibold text-primary-light">{event.organizer}</p>
+          <p className="mb-3 text-sm font-semibold text-primary-700">{event.organizer}</p>
 
           {/* 説明文 */}
           <p className="mb-4 line-clamp-3 text-sm text-gray-900/80">{event.description}</p>

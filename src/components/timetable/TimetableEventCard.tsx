@@ -22,7 +22,7 @@ export function TimetableEventCard({ event }: TimetableEventCardProps) {
       <h3 className="mb-1 text-sm font-bold text-gray-900 line-clamp-2">{event.title}</h3>
 
       {/* 時刻 */}
-      <p className="mb-1 text-xs font-medium text-primary-light">
+      <p className="mb-1 text-xs font-medium text-primary-700">
         {event.startTime} - {event.endTime}
       </p>
 
