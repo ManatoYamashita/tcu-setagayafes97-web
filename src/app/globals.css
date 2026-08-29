@@ -256,6 +256,24 @@ body {
     animation: spin-slow 60s linear infinite;
   }
 
+  /*
+   * ヒーロー入場の対象。初期状態を不可視にしたうえで、GSAP が走らなかった
+   * 場合の保険として遅れて表示する。
+   *
+   * 素の `opacity-0` を SSR HTML に焼くだけだと、JS の失敗やチャンク取得の
+   * 失敗で見出しが永久に不可視になる。かといって完成形を出して gsap.from() で
+   * 引き戻す方式は、このエフェクトが実測で 2.7 秒後に走るため
+   * 「表示 → 消失 → 再出現」のチラつきになる。そこで初期状態は不可視のまま、
+   * GSAP が走らなかったときだけ CSS で表示する。
+   *
+   * GSAP が入場を始めたら HeroSection.tsx 側でこのクラスを外すこと。
+   * 外さないと 4 秒後にこの animation が発火し、演出と競合する。
+   */
+  .hero-entrance-target {
+    opacity: 0;
+    animation: hero-entrance-failsafe 0.4s ease-out 4s forwards;
+  }
+
   /* Hero+About背景グラデーション（モバイル: 下30%で紫グラデ） */
   .hero-about-bg {
     background: linear-gradient(
@@ -338,6 +356,19 @@ body {
         oklch(47% 0.165 314deg / 0.28) 60%,
         oklch(47% 0.165 314deg / 0) 88%
       );
+  }
+}
+
+/*
+ * ヒーロー入場のフェイルセーフ（.hero-entrance-target）。
+ *
+ * @keyframes は必ず @layer の外に置くこと。レイヤーの内側に書くと
+ * animation-name が解決されず、getAnimations() が空になり、
+ * アニメーションが一切生成されない（2026-08-30 実測）。
+ */
+@keyframes hero-entrance-failsafe {
+  to {
+    opacity: 1;
   }
 }
 
@@ -593,5 +624,14 @@ body {
    */
   .animate-spin-slow {
     animation: none !important;
+  }
+
+  /*
+   * ヒーロー入場のフェイルセーフは止めないこと。`animation: none` にすると
+   * opacity: 0 のまま固定され、見出しが永久に不可視になる。モーション軽減では
+   * フェード自体を省き、遅延後に瞬時へ切り替える。
+   */
+  .hero-entrance-target {
+    animation-duration: 0.01ms;
   }
 }

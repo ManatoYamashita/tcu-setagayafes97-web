@@ -118,7 +118,10 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
           Boolean
         ) as HTMLElement[];
 
+        // 先に inline で不可視にしてから CSS のフェイルセーフを外す。
+        // 順序が逆だと、クラスを外した瞬間に opacity が 1 に戻って一瞬ちらつく。
         gsap.set(mainTargets, { opacity: 0, y: 30 });
+        mainTargets.forEach((el) => el.classList.remove("hero-entrance-target"));
 
         const tl = gsap.timeline();
 
@@ -186,7 +189,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       {/* [z-30] h1 タイトル（2行アーチ型・アイコンの上に重なる） */}
       <h1
         ref={h1Ref}
-        className="absolute z-30 w-[85vw] sm:w-[70vw] md:w-[55vw] lg:w-[50vw] will-change-transform opacity-0 -translate-y-10 sm:-translate-y-6 md:translate-y-0"
+        className="absolute z-30 w-[85vw] sm:w-[70vw] md:w-[55vw] lg:w-[50vw] will-change-transform hero-entrance-target -translate-y-10 sm:-translate-y-6 md:translate-y-0"
       >
         <svg
           viewBox="0 0 600 280"
@@ -243,7 +246,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       {/* [z-30] 左下 日付表示 */}
       <div
         ref={dateBlockRef}
-        className="absolute left-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 will-change-transform opacity-0"
+        className="absolute left-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 will-change-transform hero-entrance-target"
         aria-label={`開催日: ${siteConfig.dates.day1} - ${siteConfig.dates.day2}`}
       >
         <p className="text-sm md:text-base font-serif italic tracking-[0.3em] text-primary-400 mb-2 md:mb-3">
@@ -270,7 +273,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       {latestNews && (
         <div
           ref={newsBlockRef}
-          className="absolute right-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 max-w-sm hidden md:block will-change-transform opacity-0"
+          className="absolute right-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 max-w-sm hidden md:block will-change-transform hero-entrance-target"
         >
           <div className="flex items-center gap-2 mb-2">
             <span
