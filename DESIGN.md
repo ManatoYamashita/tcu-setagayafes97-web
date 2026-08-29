@@ -397,19 +397,30 @@ Line Height:  1.75
 
 プロジェクトでは GSAP を高度なアニメーションに使用。
 
-| コンポーネント      | 手法                      | 効果                                             |
-| ------------------- | ------------------------- | ------------------------------------------------ |
-| HeroSection         | `stagger(0.12s)`          | 4要素の順次フェードイン + スライドアップ         |
-| Opener              | 6フェーズタイムライン     | 薄紫 → 濃紫フェード → スライドアウト             |
-| AboutSection        | ScrollTrigger             | スクロール時の画像スケール + テキスト stagger    |
-| ChairpersonSection  | ScrollTrigger + SplitText | 行単位リヴィール + 画像二層ズーム + 段落 stagger |
-| StaggeredMobileMenu | タイムライン              | 背景スライドイン + メニュー項目 stagger          |
+| コンポーネント      | 手法                      | 効果                                                          |
+| ------------------- | ------------------------- | ------------------------------------------------------------- |
+| HeroSection         | `stagger(0.12s)`          | 4要素の順次フェードイン + スライドアップ                      |
+| Opener              | 6フェーズタイムライン     | 薄紫 → 濃紫フェード → スライドアウト                          |
+| AboutSection        | ScrollTrigger             | スクロール時の画像スケール + テキスト stagger                 |
+| SpecialGuestMotion  | ScrollTrigger             | 著名人企画の告知セクション。写真のリビール + テキスト stagger |
+| ChairpersonSection  | ScrollTrigger + SplitText | 行単位リヴィール + 画像二層ズーム + 段落 stagger              |
+| StaggeredMobileMenu | タイムライン              | 背景スライドイン + メニュー項目 stagger                       |
 
 GSAP 使用時は `force3D: true` を設定し GPU 加速を有効にする。
 
 ScrollTrigger の入場は `{ start: "top 80%", once: true }` を共通の基準とし、各 tween には
 スプレッドしたコピー `{ ...scrollTriggerBase }` を渡す。入場は `gsap.set` + `gsap.to` ではなく
 `gsap.from()` で書くと、モーション軽減時に「何もしない」だけで完成形が表示される。
+
+Server Component へ演出だけ足す場合は、非表示マーカーを1つ置いて `data-*` 属性を
+フックにする（`SpecialPageMotion` / `AccessPageMotion` / `SpecialGuestMotion`）。
+`"use client"` を本文側へ広げずに済む。
+
+ScrollTrigger を IntersectionObserver で遅延取得する場合、**IO の `rootMargin` は
+先読みの向き（正の値）にする。** `AboutSection` のような負のマージンだと、
+ScrollTrigger を生成した時点で既に `top 80%` を通過しており、トリガーが即発火して
+開始位置が IO の境界で決まってしまう。`SpecialGuestMotion` は `600px 0px` で先読みし、
+発火は `top 80%` に任せている。
 
 #### SplitText と日本語（重要）
 

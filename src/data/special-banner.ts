@@ -1,5 +1,11 @@
 /**
- * トップページの著名人企画（スペシャル企画）告知セクションの表示内容
+ * 著名人企画（スペシャル企画）告知セクションの表示内容
+ *
+ * 参照するのは3箇所です。文言を変えるときは全部に効くと考えてください。
+ *
+ * - トップページ Hero 直下の告知セクション（SpecialGuestSection variant="hero"）
+ * - /events 最下部の告知セクション（同 variant="sheet"）
+ * - next.config.ts の `SPECIAL_LANDING_PATH`（`eventId` から /special の転送先を組み立てる）
  *
  * 文言と画像は microCMS ではなくここで管理します。LP（/special/[id]）の
  * チケット表（microCMS の `special.tickets`）と同じ内容を、トップで読める粒度へ要約します。
@@ -11,7 +17,7 @@
  * LP の TicketTable を変更したら、ここも必ず追随させてください。
  *
  * リンク先の URL は eventId から組み立てます。LP が公開されているかどうかは
- * 表示側で `getSpecialEventById()` を使って確認します。
+ * 表示側（各セクション）が `getSpecialEventById()` を使って確認します。
  */
 
 /** 定義リストで表示する明細の 1 ブロック */
@@ -27,8 +33,27 @@ export interface SpecialBannerData {
   eventId: string;
   /** 出演者名の上に置く小ラベル */
   label: string;
-  /** 出演者名（セクション見出し） */
+  /**
+   * 出演者名。見出しは `nameLogo` の画像で表示するため、この文字列は
+   * 画像の代替テキスト（= 見出しのアクセシブル名）として使われます。
+   */
   name: string;
+  /**
+   * 出演者名のロゴ画像。見出しの本体です。
+   *
+   * LP（/special/[id]）が使うロゴは microCMS の `special.logo` で、こことは別系統です。
+   * あちらは暗いヒーローの上に置くため白ロゴを想定しており、ここは淡い紫または白の
+   * 背景に置くため黒ロゴを使います。取り違えるとどちらかが背景に溶けます。
+   *
+   * 差し替える場合は必ず背景が透過したアセットを用意してください。入稿された原本は
+   * 白地に黒の線画（不透明）で、そのまま置くと紫の背景に白い板が浮きます。
+   */
+  nameLogo: {
+    src: string;
+    /** 元画像の実寸（next/image のレイアウト計算に使用） */
+    width: number;
+    height: number;
+  };
   /** バナー画像 */
   image: {
     src: string;
@@ -47,6 +72,11 @@ export const specialBanner: SpecialBannerData = {
   eventId: "special-event-mon7a",
   label: "著名人スペシャル企画決定！",
   name: "MON7A",
+  nameLogo: {
+    src: "/images/special/mon7a-logo.webp",
+    width: 1524,
+    height: 405,
+  },
   image: {
     src: "/images/special/mon7a.webp",
     alt: "MON7A のアーティスト写真",

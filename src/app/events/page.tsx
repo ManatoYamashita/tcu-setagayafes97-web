@@ -4,6 +4,7 @@ import { getEventsList } from "@/lib/events";
 import { EventsContent } from "@/components/events/EventsContent";
 import { ComingSoon } from "@/components/common/ComingSoon";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
+import { SpecialGuestSection } from "@/components/special/SpecialGuestSection";
 import { pageHeroes } from "@/data/page-heroes";
 import { EVENTS_VISIBLE, SPECIAL_VISIBLE } from "@/data/site";
 import { createPageMetadata } from "@/lib/metadata";
@@ -79,6 +80,15 @@ export default async function EventsPage() {
 
       {/* 企画一覧コンテンツ */}
       <EventsContent initialEvents={events} />
+
+      {/* 一覧を見終えた来場者をもう一度 LP へ送る。上部の細いリンクとは粒度が違うので併存させる。
+          左右端は EventsContent のルート（container mx-auto px-4）に合わせる。
+          ラッパーの余白だけが残らないよう、上のリンクと同じ SPECIAL_VISIBLE で括る */}
+      {SPECIAL_VISIBLE && (
+        <div className="container mx-auto px-4 pb-12">
+          <SpecialGuestSection variant="sheet" />
+        </div>
+      )}
     </PageSheetLayout>
   );
 }

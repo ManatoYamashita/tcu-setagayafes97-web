@@ -1,8 +1,8 @@
 import dynamic from "next/dynamic";
 import { HeroSection } from "@/components/home/HeroSection";
 import { NewsSection } from "@/components/home/NewsSection";
-import { SpecialGuestSection } from "@/components/home/SpecialGuestSection";
 import { FeaturedEvents } from "@/components/home/FeaturedEvents";
+import { SpecialGuestSection } from "@/components/special/SpecialGuestSection";
 import { SponsorBanner } from "@/components/home/SponsorBanner";
 import { getLatestHeroNews, getNewsList } from "@/lib/news";
 import { NEWS_VISIBLE, siteConfig } from "@/data/site";
@@ -34,10 +34,12 @@ export default async function Home() {
       />
       <div className="hero-about-bg">
         <HeroSection latestNews={heroNews} />
+        {/* 著名人企画はチケット販売と直結する導線なので Hero の直後に置く。
+            背景は持たせず、Hero と ABOUT を包む .hero-about-bg のグラデーションを透かす */}
+        <SpecialGuestSection />
         <AboutSection />
       </div>
       <NewsSection newsList={newsList} isVisible={NEWS_VISIBLE} />
-      <SpecialGuestSection />
       <FeaturedEvents />
       <SponsorBanner />
     </main>
