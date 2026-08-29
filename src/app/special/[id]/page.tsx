@@ -166,9 +166,11 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
                 </li>
                 <li aria-hidden="true">/</li>
                 <li>
-                  <Link href="/special" className="hover:text-gray-900 hover:underline">
-                    著名人企画
-                  </Link>
+                  {/*
+                    リンクにしない。公開が1組の間は /special がこの LP へ転送されるため、
+                    リンクにすると現在地の親が自分自身になる。
+                  */}
+                  <span>著名人企画</span>
                 </li>
                 <li aria-hidden="true">/</li>
                 <li aria-current="page" className="text-gray-900">

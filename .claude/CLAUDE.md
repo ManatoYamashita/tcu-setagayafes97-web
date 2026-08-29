@@ -240,9 +240,9 @@ push 時は head をそのまま、PR 時は head を base へマージした結
 /                           # トップページ (HOME)
 ├── /events                 # 企画を探す
 │   ├── /                   # 企画検索・一覧
-│   └── /[id]               # 企画詳細 [動的生成] ※type=special は /special/[id] へ 308
+│   └── /[id]               # 企画詳細 [動的生成] ※type=special は /special/[id] へ誘導（下記の注意）
 ├── /special                # 著名人企画
-│   ├── /                   # 一覧
+│   ├── /                   # 一覧（現在は /special/[id] へ 302。下記の注意）
 │   └── /[id]               # 著名人企画LP [動的生成]
 ├── /timetable              # タイムテーブル
 ├── /access                 # キャンパスマップ（2D）+ 交通アクセス
@@ -259,6 +259,37 @@ push 時は head をそのまま、PR 時は head を base へマージした結
 │   └── /privacy            # プライバシーポリシー
 └── /[locale]               # 多言語ページ (en, zh, ko)
 ```
+
+### リダイレクトはページ内 `redirect()` で実装しないこと（重要）
+
+**このアプリでは Server Component 内の `redirect()` が HTTP リダイレクトにならない。**
+ルート直下の `src/app/loading.tsx` によりストリーミングのシェルが先に送出されるため、
+ページのレンダリング中に投げた `redirect()` はステータスコードに反映されず、
+`<meta http-equiv="refresh" content="1;url=...">` へ格下げされる。
+結果は **HTTP 200 + 1秒待ってからのクライアント遷移**になる。
+`export const dynamic = "force-dynamic"` を足しても変わらない（2026-08-29 実測）。
+
+本物のリダイレクトを返せる層は次の2つだけである。
+
+| 層                                | 用途                                                   |
+| --------------------------------- | ------------------------------------------------------ |
+| `next.config.ts` の `redirects()` | 静的に決まる転送。動的ルートの照合より先に走る（推奨） |
+| `src/proxy.ts`                    | リクエスト内容を見て決める必要がある転送               |
+
+現在の転送一覧と設計判断は [`docs/dev/domain-migration.md`](../docs/dev/domain-migration.md) を参照。
+
+> [!WARNING]
+> `src/app/events/[id]/page.tsx` の `type=special` → `/special/[id]` 誘導は
+> ページ内 `redirect()` のままであり、上記のとおり 200 + meta refresh になっている。
+> 未解消（要Issue）。
+
+### 未知のロケールセグメントが 200 を返す問題（未解消）
+
+`src/app/[locale]/` の `[locale]` は任意の文字列にマッチするため、
+`/foo/about` や `/hoge/access` が 404 ではなく `/about`・`/access` と同じ内容を
+200 で返している。`src/app/[locale]/layout.tsx` の `notFound()` はストリーミングの
+シェル送出後に投げられるためステータスに反映されない。
+`/97th/about` だけは `next.config.ts` の 302 で個別に塞いだが、根本解決は未着手（要Issue）。
 
 ## 主要機能
 
