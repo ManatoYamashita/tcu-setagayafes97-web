@@ -40,8 +40,23 @@
   --font-sans:
     ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
     "Noto Color Emoji";
-  --font-serif: var(--font-kaisei-opti), serif;
-  --font-heading: var(--font-kaisei-opti), serif;
+  /*
+   * IMPORTANT: var() のフォールバック（第2引数）を省いてはいけない。
+   *
+   * --font-kaisei-opti は next/font が生成する変数で、DeferredKaiseiFontsLoader が
+   * body へ class を足して初めて定義される。トップページ (`/`) では意図的に読み込まず、
+   * 他のページでもハイドレーション後まで未定義である。
+   *
+   * 未定義の var() をフォールバック無しで書くと、CSS の仕様上その宣言は
+   * 「計算値時に無効(invalid at computed-value time)」となり、末尾に書いた serif ごと
+   * 破棄されて継承値になる。つまり body の --font-sans（sans-serif）が効いてしまい、
+   * 「明朝が落ちたら serif」という意図と逆の結果になる。
+   *
+   * 実測（`/`・Chrome）: h1/h2/h3 の computed fontFamily が
+   * "ui-sans-serif, system-ui, sans-serif, ..." になっていた。
+   */
+  --font-serif: var(--font-kaisei-opti, "Kaisei Opti"), serif;
+  --font-heading: var(--font-kaisei-opti, "Kaisei Opti"), serif;
 }
 
 :root {
@@ -66,7 +81,10 @@ body {
   h1,
   h2,
   h3 {
-    font-family: var(--font-kaisei-opti), serif;
+    /* フォールバックが必須。理由は @theme の --font-serif / --font-heading のコメント。
+       ここを素の var() にしていたため、トップページの見出しが serif ではなく
+       body の --font-sans を継承していた */
+    font-family: var(--font-kaisei-opti, "Kaisei Opti"), serif;
   }
 
   /* @tailwindcss/typography は導入していないため prose-* 修飾子は CSS を生成しない。
