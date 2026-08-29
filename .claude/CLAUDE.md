@@ -311,8 +311,18 @@ push 時は head をそのまま、PR 時は head を base へマージした結
 ### ブラウザ対応
 
 - Chrome / Safari / Firefox / Edge（最新2バージョン）
-- iOS Safari（iOS 15以上）
+- iOS Safari（**iOS 16.4 以上**）
 - Android Chrome（最新）
+
+下限を決めているのは自前のCSSではなく **TailwindCSS v4 自体**である。v4 は
+`@property` と `color-mix()` に依存し、公式に Safari 16.4 / Chrome 111 /
+Firefox 128 を要求する。本番CSSにも `@property` と `color-mix()` が実際に
+出力されているため、これより古い環境ではレイアウトが崩れる。
+下限を引き下げたい場合は TailwindCSS v3.4 へ戻す以外に方法はない。
+
+View Transitions（Safari 18）、`text-wrap: balance`（Safari 17.5）、
+`content-visibility`（Safari 18）は、非対応環境で演出や微調整が効かないだけの
+プログレッシブエンハンスメントであり、下限には含めない。
 
 ## デザイン仕様
 
@@ -362,4 +372,4 @@ push 時は head をそのまま、PR 時は head を base へマージした結
 
 ---
 
-**最終更新日**: 2026-08-10
+**最終更新日**: 2026-08-29
