@@ -402,7 +402,7 @@ Line Height:  1.75
 | HeroSection         | `duration(0.5s)` / `stagger(0.08s)` | 3要素の順次フェードイン + スライドアップ（ロゴはLCPのため対象外） |
 | Opener              | 2フェーズ / 合計1.6s                | 濃紫 + 白ロゴを見せる → スライドアウト                            |
 | AboutSection        | ScrollTrigger                       | スクロール時の画像スケール + テキスト stagger                     |
-| SpecialGuestMotion  | ScrollTrigger                       | 著名人企画の告知セクション。写真のリビール + テキスト stagger     |
+| useScrollReveal     | ScrollTrigger                       | `data-*` 属性のリビール + stagger。下の3コンポーネントが共有      |
 | ChairpersonSection  | ScrollTrigger + SplitText           | 行単位リヴィール + 画像二層ズーム + 段落 stagger                  |
 | StaggeredMobileMenu | タイムライン                        | 背景スライドイン + メニュー項目 stagger                           |
 
@@ -424,14 +424,40 @@ GSAP が入場を始めたらそのクラスを外し、CSS 側と競合させ�
 レイヤー外にある。
 
 Server Component へ演出だけ足す場合は、非表示マーカーを1つ置いて `data-*` 属性を
-フックにする（`SpecialPageMotion` / `AccessPageMotion` / `SpecialGuestMotion`）。
-`"use client"` を本文側へ広げずに済む。
+フックにする。`"use client"` を本文側へ広げずに済む。実装は
+**`src/lib/use-scroll-reveal.ts` の `useScrollReveal` に集約されており**、
+`SpecialPageMotion` / `AccessPageMotion` / `SpecialGuestMotion` はそれぞれ属性名と
+発火位置、ヒーロー入場だけを宣言する。**reveal / stagger の tween を各所で
+書き直さないこと。** 値を変えるならフック側を1箇所直す。
 
-ScrollTrigger を IntersectionObserver で遅延取得する場合、**IO の `rootMargin` は
-先読みの向き（正の値）にする。** `AboutSection` のような負のマージンだと、
-ScrollTrigger を生成した時点で既に `top 80%` を通過しており、トリガーが即発火して
-開始位置が IO の境界で決まってしまう。`SpecialGuestMotion` は `600px 0px` で先読みし、
-発火は `top 80%` に任せている。
+新しいページで使うときの最小形。
+
+```tsx
+const MY_MOTION: UseScrollRevealOptions = {
+  revealAttribute: "data-my-reveal",
+  staggerAttribute: "data-my-stagger",
+};
+
+export function MyPageMotion() {
+  const markerRef = useScrollReveal(MY_MOTION);
+  return <span ref={markerRef} hidden aria-hidden="true" />;
+}
+```
+
+`options` は**モジュールスコープの定数として渡すこと。** 依存配列が `[options]` なので、
+インラインのオブジェクトリテラルだと毎レンダー effect が張り直され、
+`ctx.revert()` → 再生成でモーションが壊れる。
+
+**ヒーロー入場（`entrance`）に ScrollTrigger を持ち込まないこと。** フックは
+`entrance` を動的 import の外（同期パス）で呼ぶ。ここに ScrollTrigger を足すと
+`opener-done` の後にチャンク取得のぶんだけヒーローが遅れて動き出す。
+
+ScrollTrigger は**フックが IntersectionObserver 越しに動的取得する**。**IO の
+`rootMargin` は先読みの向き（正の値）にしてある**（既定 `600px 0px`）。
+`AboutSection` のような負のマージンだと、ScrollTrigger を生成した時点で既に
+`start` を通過しており、トリガーが即発火して開始位置が IO の境界で決まってしまう。
+実測では、この分離により ScrollTrigger（44K）が `/access` と `/special/[id]` の
+初期スクリプトから外れ、3ページ共通の非同期チャンク1つになった（2026-08-30）。
 
 #### SplitText と日本語（重要）
 

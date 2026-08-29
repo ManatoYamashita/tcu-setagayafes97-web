@@ -162,7 +162,8 @@ docs/
 > `docs/` の外にあるため本索引の管理対象ではないが、次の2件は参照頻度が高い。
 >
 > - `DESIGN.md` §10 — GSAP の入場規約（`gsap.from()` / `{ start: "top 80%", once: true }`）、
->   Server Component へ演出だけ足すマーカー + `data-*` 方式、ScrollTrigger を
+>   Server Component へ演出だけ足すマーカー + `data-*` 方式（実装は
+>   `src/lib/use-scroll-reveal.ts` の `useScrollReveal` に集約）、ScrollTrigger を
 >   IntersectionObserver で遅延取得する際の `rootMargin` の向き
 > - `.claude/CLAUDE.md` デザイン仕様 — トップの `.hero-about-bg` グラデーションの
 >   停止位置を `%` へ戻してはいけない理由（実測値つき）
