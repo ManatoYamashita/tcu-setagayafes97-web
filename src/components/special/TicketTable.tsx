@@ -28,7 +28,7 @@ export function TicketTable({ tickets, note }: TicketTableProps) {
   const hasButton = tickets.some((ticket) => ticket.buttonUrl);
 
   return (
-    <section aria-labelledby="special-tickets" className="py-8">
+    <section aria-labelledby="special-tickets" className="py-8" data-special-reveal="up">
       <h2 id="special-tickets" className="mb-4 text-xl font-bold text-gray-900 md:text-2xl">
         チケット販売
       </h2>
@@ -52,7 +52,7 @@ export function TicketTable({ tickets, note }: TicketTableProps) {
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-200" data-special-stagger>
             {hasPrice && (
               <tr>
                 <th

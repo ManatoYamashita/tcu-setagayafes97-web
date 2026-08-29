@@ -21,7 +21,7 @@ export function SpecialProfile({ content, photos }: SpecialProfileProps) {
   if (!content && !hasPhotos) return null;
 
   return (
-    <section aria-labelledby="special-profile" className="py-8">
+    <section aria-labelledby="special-profile" className="py-8" data-special-reveal="up">
       <h2 id="special-profile" className="mb-4 text-xl font-bold text-gray-900 md:text-2xl">
         出演者情報
       </h2>
@@ -36,7 +36,7 @@ export function SpecialProfile({ content, photos }: SpecialProfileProps) {
       {/* grid だと枚数が奇数のとき最後の1枚が左カラムに固定されるため、
           中央寄せできる flex-wrap を使う */}
       {hasPhotos && (
-        <ul className="mt-6 flex flex-wrap justify-center gap-4">
+        <ul className="mt-6 flex flex-wrap justify-center gap-4" data-special-stagger>
           {/* 同じ画像を複数枚選べるため、URL だけでは key が衝突する */}
           {photos?.map((photo, index) => (
             <li
