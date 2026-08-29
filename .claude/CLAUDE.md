@@ -283,13 +283,19 @@ push 時は head をそのまま、PR 時は head を base へマージした結
 > ページ内 `redirect()` のままであり、上記のとおり 200 + meta refresh になっている。
 > 未解消（要Issue）。
 
-### 未知のロケールセグメントが 200 を返す問題（未解消）
+### 未知のロケールセグメントの扱い
 
-`src/app/[locale]/` の `[locale]` は任意の文字列にマッチするため、
+`src/app/[locale]/` の `[locale]` は任意の文字列にマッチするため、放置すると
 `/foo/about` や `/hoge/access` が 404 ではなく `/about`・`/access` と同じ内容を
-200 で返している。`src/app/[locale]/layout.tsx` の `notFound()` はストリーミングの
+200 で返す。`src/app/[locale]/layout.tsx` の `notFound()` はストリーミングの
 シェル送出後に投げられるためステータスに反映されない。
-`/97th/about` だけは `next.config.ts` の 302 で個別に塞いだが、根本解決は未着手（要Issue）。
+
+`src/app/[locale]/layout.tsx` の `export const dynamicParams = false;` で解決済み
+（#128）。`generateStaticParams` が返す4ロケール以外は、レンダリングより前の
+ルート照合で 404 になる。**この宣言を外すと重複配信が再発する。**
+
+なお `/en` `/zh` `/ko` 単体のURLは別問題（多言語トップページが無い）で、
+引き続き 404 のまま。#35 で追跡。
 
 ## 主要機能
 

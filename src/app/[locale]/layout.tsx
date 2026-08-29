@@ -12,6 +12,23 @@ export function generateStaticParams() {
 }
 
 /**
+ * `generateStaticParams` が返さないロケールを Next.js のルーティング層で404にする。
+ *
+ * IMPORTANT: 下の `notFound()` だけでは 404 にならない。ルート直下の
+ * `src/app/loading.tsx` によりストリーミングのシェルが先に送出されるため、
+ * レンダリング中に投げた `notFound()` は HTTP ステータスへ反映されず、
+ * 404の本文が 200 のまま返る。その結果 `/foo/about` や `/97th/access` が
+ * `/about`・`/access` と同じ内容を200で重複配信していた。
+ *
+ * `dynamicParams` はレンダリングより前のルート照合で評価されるため、この影響を
+ * 受けない。下の `notFound()` は型の絞り込みと将来の防御として残す。
+ *
+ * ロケールを増やすときは `src/i18n/routing.ts` の `locales` を更新すること。
+ * `generateStaticParams` はそこから生成しているため、追随は自動で効く。
+ */
+export const dynamicParams = false;
+
+/**
  * ロケール対応レイアウト
  *
  * - 多言語対応ページ専用のレイアウト
