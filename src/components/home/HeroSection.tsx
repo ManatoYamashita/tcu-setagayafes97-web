@@ -6,7 +6,7 @@ import Link from "next/link";
 import { gsap } from "gsap";
 import { siteConfig } from "@/data/site";
 import { cn } from "@/lib/utils";
-import { OPENER_FAILSAFE_MS } from "@/lib/motion";
+import { HERO_ENTRANCE, OPENER_FAILSAFE_MS, willRunOpener } from "@/lib/motion";
 import type { News, NewsType } from "@/types/news";
 
 /**
@@ -98,9 +98,11 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
     if (typeof window === "undefined") return;
     if (ctxRef.current) return;
 
-    // 遅延ローダーの空フォールバックは、実体のオープナーとして扱わない。
-    // 取得が遅い場合もHeroを隠さず、実体がマウント済みのときだけ完了イベントを待つ。
-    const hasOpener = !!document.querySelector("[data-opener-active]");
+    // オープナーが走る環境かをメディアクエリで判定する。DOM の
+    // [data-opener-active] を見る方式は、Opener が dynamic(ssr:false) のため
+    // このエフェクトより後にしかマウントされず、初回表示では常に「居ない」と
+    // 誤判定していた。結果、入場が覆いの裏で終わっていた。
+    const hasOpener = willRunOpener();
 
     const runEntrance = () => {
       if (!sectionRef.current || ctxRef.current) return;
@@ -116,15 +118,15 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
 
         const tl = gsap.timeline();
 
-        // メイン要素: stagger 0.12s で順次出現
+        // メイン要素: HERO_ENTRANCE.stagger で順次出現
         tl.to(
           mainTargets,
           {
             opacity: 1,
             y: 0,
-            duration: 0.7,
-            ease: "power4.out",
-            stagger: 0.12,
+            duration: HERO_ENTRANCE.duration,
+            ease: HERO_ENTRANCE.ease,
+            stagger: HERO_ENTRANCE.stagger,
             force3D: true,
           },
           0

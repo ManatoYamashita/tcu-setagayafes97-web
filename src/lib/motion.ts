@@ -52,6 +52,16 @@ export const OPENER_SAFETY_MS = Math.round(OPENER_TOTAL_SEC * 1000) + 2000;
 export const OPENER_FAILSAFE_MS = Math.round(OPENER_HERO_CUE_SEC * 1000) + 2000;
 
 /**
+ * トップのヒーロー入場（h1 / 日付 / 最新ニュースの3要素）。
+ * ロゴ画像は LCP 候補のため入場の対象に含めない。
+ */
+export const HERO_ENTRANCE = {
+  duration: 0.5,
+  stagger: 0.08,
+  ease: "power4.out",
+} as const;
+
+/**
  * この閲覧環境でオープナーが走るか。OpenerLoader のロード条件と同一の述語。
  *
  * DOM の [data-opener-active] を見る方式では判定できない。Opener は
