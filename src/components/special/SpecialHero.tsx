@@ -20,11 +20,17 @@ interface SpecialHeroProps {
  * 配置は PageHero（`flex items-end` + `container mx-auto px-4`）と同じ構造に揃えており、
  * 白いシート内の本文と左端が一致します。
  *
+ * 高さは画面幅によらず「ヘッダーを除いた1画面ぶん」で固定します。
+ * ヘッダーは sticky でフロー上に高さを占有するため、単純に 100svh とすると
+ * 下端がヘッダーの高さぶん折り返し線の下へ沈み、下寄せしたロゴと主催者名が
+ * 初期表示で切れます。HeroSection / AboutHero と同じ計算式に揃えています。
+ * 長いタイトルで内容がはみ出す場合に伸びるよう、h ではなく min-h を使います。
+ *
  * ロゴの有無にかかわらず h1 は出力します（ロゴがある場合は画像の alt が見出しになります）。
  */
 export function SpecialHero({ title, organizer, logo, photo }: SpecialHeroProps) {
   return (
-    <section className="relative isolate flex min-h-[60vh] items-end overflow-hidden bg-primary-dark pb-10 pt-20 md:pb-16">
+    <section className="relative isolate flex min-h-[calc(100svh-var(--header-height))] items-end overflow-hidden bg-primary-dark pb-10 pt-20 md:pb-16">
       {/* 背景写真 */}
       {photo && (
         <>
