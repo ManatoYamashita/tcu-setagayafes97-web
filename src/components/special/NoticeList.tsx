@@ -17,12 +17,12 @@ export function NoticeList({ notices }: NoticeListProps) {
   if (!notices || notices.length === 0) return null;
 
   return (
-    <section aria-labelledby="special-notices" className="py-8">
+    <section aria-labelledby="special-notices" className="py-8" data-special-reveal="up">
       <h2 id="special-notices" className="mb-4 text-xl font-bold text-gray-900 md:text-2xl">
         注意事項
       </h2>
 
-      <div className="space-y-4">
+      <div className="space-y-4" data-special-stagger>
         {notices.map((notice, index) => (
           <article
             key={`${notice.heading}-${index}`}

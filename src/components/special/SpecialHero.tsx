@@ -20,38 +20,40 @@ interface SpecialHeroProps {
  * 配置は PageHero（`flex items-end` + `container mx-auto px-4`）と同じ構造に揃えており、
  * 白いシート内の本文と左端が一致します。
  *
- * 高さは画面幅によらず「ヘッダーを除いた1画面ぶん」で固定します。
- * ヘッダーは sticky でフロー上に高さを占有するため、単純に 100svh とすると
- * 下端がヘッダーの高さぶん折り返し線の下へ沈み、下寄せしたロゴと主催者名が
- * 初期表示で切れます。HeroSection / AboutHero と同じ計算式に揃えています。
- * 長いタイトルで内容がはみ出す場合に伸びるよう、h ではなく min-h を使います。
- *
  * ロゴの有無にかかわらず h1 は出力します（ロゴがある場合は画像の alt が見出しになります）。
+ *
+ * `data-special-hero-*` は SpecialPageMotion が入場アニメーションの対象を探すための
+ * フックです。この属性を消すと、該当要素だけ演出が無くなります（エラーにはなりません）。
  */
 export function SpecialHero({ title, organizer, logo, photo }: SpecialHeroProps) {
   return (
-    <section className="relative isolate flex min-h-[calc(100svh-var(--header-height))] items-end overflow-hidden bg-primary-dark pb-10 pt-20 md:pb-16">
-      {/* 背景写真 */}
+    <section className="relative isolate flex min-h-[60vh] items-end overflow-hidden bg-primary-dark pb-10 pt-20 md:pb-16">
+      {/* 背景写真
+          ラッパーを挟んでいるのは、SpecialPageMotion が中の <img> だけを拡大縮小するため。
+          `fill` は position 指定のある親を必要とするので absolute inset-0 を持たせている。 */}
       {photo && (
         <>
-          <Image
-            src={photo.url}
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-            aria-hidden="true"
-          />
+          <div className="absolute inset-0" data-special-hero-image>
+            <Image
+              src={photo.url}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+              aria-hidden="true"
+            />
+          </div>
           <div
             className="special-hero-overlay pointer-events-none absolute inset-0"
             aria-hidden="true"
+            data-special-hero-overlay
           />
         </>
       )}
 
       <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex max-w-2xl flex-col gap-4">
+        <div className="flex max-w-2xl flex-col gap-4" data-special-hero-copy>
           {logo ? (
             <h1 className="flex">
               <Image

@@ -27,7 +27,7 @@ export function GoodsTable({ goods, note }: GoodsTableProps) {
   const hasNote = goods.some((item) => item.note);
 
   return (
-    <section aria-labelledby="special-goods" className="py-8">
+    <section aria-labelledby="special-goods" className="py-8" data-special-reveal="up">
       <h2 id="special-goods" className="mb-4 text-xl font-bold text-gray-900 md:text-2xl">
         物販
       </h2>
@@ -82,7 +82,7 @@ export function GoodsTable({ goods, note }: GoodsTableProps) {
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-200" data-special-stagger>
             {goods.map((item, index) => (
               <tr key={`${item.name}-${index}`}>
                 {hasImage && (

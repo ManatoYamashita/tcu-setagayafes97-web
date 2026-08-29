@@ -8,6 +8,7 @@ import { SpecialProfile } from "@/components/special/SpecialProfile";
 import { GoodsTable } from "@/components/special/GoodsTable";
 import { TicketTable } from "@/components/special/TicketTable";
 import { NoticeList } from "@/components/special/NoticeList";
+import { SpecialPageMotion } from "@/components/special/SpecialPageMotion";
 import { SNSLinks } from "@/components/events/SNSLinks";
 import { siteConfig, SPECIAL_GOODS_VISIBLE, SPECIAL_VISIBLE } from "@/data/site";
 import { createPageMetadata } from "@/lib/metadata";
@@ -140,6 +141,9 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
       />
 
       <div className="min-h-screen bg-secondary">
+        {/* ヒーローと各セクションの入場モーション（DOM は出力しない） */}
+        <SpecialPageMotion />
+
         <SpecialHero
           title={event.title}
           organizer={event.organizer}
@@ -147,7 +151,10 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
           photo={event.thumbnail}
         />
 
-        <div className="relative z-10 -mt-6 mx-4 min-h-[50vh] rounded-t-3xl bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] sm:mx-6 lg:mx-8">
+        <div
+          className="relative z-10 -mt-6 mx-4 min-h-[50vh] rounded-t-3xl bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] sm:mx-6 lg:mx-8"
+          data-special-sheet
+        >
           <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
             {/* パンくずリスト */}
             <nav aria-label="パンくずリスト" className="mb-4">

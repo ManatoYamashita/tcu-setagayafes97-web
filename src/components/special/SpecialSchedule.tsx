@@ -57,12 +57,15 @@ export function SpecialSchedule({
   const performance = startTime && endTime ? `${startTime} 〜 ${endTime}` : startTime;
 
   return (
-    <section aria-labelledby="special-schedule" className="py-8">
+    <section aria-labelledby="special-schedule" className="py-8" data-special-reveal="up">
       <h2 id="special-schedule" className="mb-4 text-xl font-bold text-gray-900 md:text-2xl">
         開催日時・会場
       </h2>
 
-      <dl className="divide-y divide-gray-200 rounded-xl border border-gray-200">
+      <dl
+        className="divide-y divide-gray-200 rounded-xl border border-gray-200"
+        data-special-stagger
+      >
         <div className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:gap-4">
           <dt className="w-32 shrink-0 text-sm font-semibold text-gray-900/70">日程</dt>
           <dd className="text-sm text-gray-900">{formatEventDate(date)}</dd>
