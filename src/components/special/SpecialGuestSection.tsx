@@ -6,6 +6,8 @@ import { SPECIAL_VISIBLE } from "@/data/site";
 import { getSpecialEventById } from "@/lib/events";
 import { cn } from "@/lib/utils";
 
+import { SpecialGuestMotion } from "./SpecialGuestMotion";
+
 /**
  * 著名人企画（スペシャル企画）の告知セクション
  *
@@ -38,9 +40,14 @@ import { cn } from "@/lib/utils";
  *
  * - `hero`: トップページ用。Hero と ABOUT を包む `.hero-about-bg` の中に入るため、
  *   自前の背景を持たずグラデーションを透かします。
- * - `card`: /events 用。白いシートの中に角丸カードとして収まります。
+ * - `sheet`: /events 用。白いシートの中へ地続きに置き、上の区切り線だけで前の要素と分けます。
+ *
+ * どちらも自前の背景を持ちません。`sheet` を囲まないのは、白いシート内のブロックは
+ * 「不透明な border と余白だけで区切り、角丸・影・セル背景を足さない」という
+ * docs/frontend/design.md:247 の規約に従うためです。/special/[id] も同じ考えで、
+ * 親の `divide-y divide-gray-200` と子の余白だけでセクションを分けています。
  */
-type SpecialGuestSectionVariant = "hero" | "card";
+type SpecialGuestSectionVariant = "hero" | "sheet";
 
 interface SpecialGuestSectionProps {
   variant?: SpecialGuestSectionVariant;
@@ -58,25 +65,30 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
   }
 
   const { label, name, nameLogo, image, details, ctaLabel } = specialBanner;
-  const isCard = variant === "card";
+  const isSheet = variant === "sheet";
 
   return (
     <section
       className={cn(
-        isCard
-          ? // 最下部にあるため描画を遅延させる。推定高さは globals.css の
-            // `.deferred-section--special` にある
-            "deferred-section deferred-section--special rounded-3xl bg-secondary px-6 py-12 sm:px-10 sm:py-14 lg:px-14 lg:py-16"
+        isSheet
+          ? // 白いシートの白をそのまま使い、上の区切り線だけで前の要素と分ける。
+            // 左右の余白は親の container が持つため、ここでは上下だけ。
+            // 最下部にあるため描画を遅延させる（推定高さは globals.css の
+            // `.deferred-section--special`）
+            "deferred-section deferred-section--special border-t border-gray-200 pt-12 sm:pt-14 lg:pt-16"
           : // z-10 は必須。直後の ABOUT が `-mt-48` でこのセクションへ 192px 潜り込み、
             // その中の装飾blob（`absolute inset-0`）が上に乗るため、Hero と同じ層へ上げる。
             // content-visibility はフォールド直下では効果が無く CLS だけ残るので付けない
             "relative z-10 py-20 lg:py-28"
       )}
     >
-      <div className={isCard ? undefined : "container mx-auto px-4"}>
+      {/* 入場モーション。DOM は出さず、下の data 属性を探して animate する */}
+      <SpecialGuestMotion />
+
+      <div className={isSheet ? undefined : "container mx-auto px-4"}>
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-10 md:flex-row md:items-center md:gap-12 lg:flex-row-reverse lg:gap-16">
-          {/* テキスト側 */}
-          <div className="w-full md:flex-1">
+          {/* テキスト側。直下の子（見出し → 明細 → CTA）が入場の stagger 単位になる */}
+          <div className="w-full md:flex-1" data-special-guest-stagger>
             {/* 見出し（トップページは Kaisei Opti を読み込まないため font-sans を明示する）。
                 出演者名はロゴ画像で、alt が見出しのアクセシブル名を担う */}
             <h2 className="font-sans">
@@ -141,7 +153,10 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
           </div>
 
           {/* 画像側。縦積みのときだけ order で先頭へ出す */}
-          <div className="order-first w-full max-w-sm shrink-0 overflow-hidden rounded-3xl md:order-none md:w-[42%] md:max-w-none lg:w-[45%]">
+          <div
+            className="order-first w-full max-w-sm shrink-0 overflow-hidden rounded-3xl md:order-none md:w-[42%] md:max-w-none lg:w-[45%]"
+            data-special-guest-reveal
+          >
             <Image
               src={image.src}
               alt={image.alt}

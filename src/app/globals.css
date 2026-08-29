@@ -228,12 +228,16 @@ body {
   }
 
   /*
-   * 著名人企画バナーは /events の最下部（variant="card"）でだけ遅延させる。
+   * 著名人企画バナーは /events の最下部（variant="sheet"）でだけ遅延させる。
    * トップページ（variant="hero"）は Hero の直下でフォールドに掛かるため、
    * content-visibility が効かず初回の推定高さによる CLS だけが残る。
+   *
+   * 推定高さが実寸から離れると、入場モーション（SpecialGuestMotion）の
+   * ScrollTrigger が画面外の推定値でトリガー位置を測ってしまう。値を変えたときは
+   * /events で実測し直すこと。
    */
   .deferred-section--special {
-    contain-intrinsic-size: auto 62rem;
+    contain-intrinsic-size: auto 61rem;
   }
 
   .deferred-section--events {
@@ -246,15 +250,11 @@ body {
    */
   @media (min-width: 48rem) {
     .deferred-section--special {
-      contain-intrinsic-size: auto 50rem;
+      contain-intrinsic-size: auto 43rem;
     }
   }
 
   @media (min-width: 64rem) {
-    .deferred-section--special {
-      contain-intrinsic-size: auto 47rem;
-    }
-
     .deferred-section--events {
       contain-intrinsic-size: auto 42rem;
     }
