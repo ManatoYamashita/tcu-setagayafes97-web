@@ -28,6 +28,13 @@ WEB担当長　沖山美羽　様
 - 対応ブラウザ：Chrome／Safari／Firefox／Edge（最新2バージョン）、iOS Safari（iOS 16.4以上）、Android Chrome（最新）
 - ホスティング：Vercel（Free Plan）
 
+> **注記（2026-08-29 改訂）**
+> 対応ブラウザの下限を iOS 15 から **iOS 16.4** へ改めた。
+> 下限を決めているのは実装ではなく TailwindCSS v4 の要求
+> （Safari 16.4 / Chrome 111 / Firefox 128）であり、`@property` と `color-mix()` に依存する。
+> 引き下げるには TailwindCSS v3.4 へのダウングレードが必要になる。
+> **本書を実行委員会へ提出済みの場合、提出版との差異について確認および差し替えの要否を判断すること。**
+
 ## 3. 業務内容
 
 - ホームページ全体のデザインリニューアル

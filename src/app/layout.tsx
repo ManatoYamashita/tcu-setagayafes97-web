@@ -3,6 +3,7 @@ import "./globals.css";
 import { siteConfig } from "@/data/site";
 import { Header } from "@/components/layout/Header";
 import { HtmlLangSync } from "@/components/layout/HtmlLangSync";
+import { NoImageDrag } from "@/components/layout/NoImageDrag";
 import { Footer } from "@/components/layout/Footer";
 import { OpenerLoader } from "@/components/layout/OpenerLoader";
 import { AgentationDevTool } from "@/components/dev/AgentationDevTool";
@@ -83,6 +84,7 @@ export default function RootLayout({
     <html lang="ja">
       <body className="font-sans antialiased text-gray-900">
         <HtmlLangSync />
+        <NoImageDrag />
         <DeferredKaiseiFontsLoader />
         <OpenerLoader />
         <Header />
