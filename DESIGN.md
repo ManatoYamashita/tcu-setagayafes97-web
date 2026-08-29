@@ -402,6 +402,7 @@ Line Height:  1.75
 | HeroSection         | `duration(0.5s)` / `stagger(0.08s)` | 3要素の順次フェードイン + スライドアップ（ロゴはLCPのため対象外） |
 | Opener              | 2フェーズ / 合計1.6s                | 濃紫 + 白ロゴを見せる → スライドアウト                            |
 | AboutSection        | ScrollTrigger                       | スクロール時の画像スケール + テキスト stagger                     |
+| SpecialGuestMotion  | ScrollTrigger                       | 著名人企画の告知セクション。写真のリビール + テキスト stagger     |
 | ChairpersonSection  | ScrollTrigger + SplitText           | 行単位リヴィール + 画像二層ズーム + 段落 stagger                  |
 | StaggeredMobileMenu | タイムライン                        | 背景スライドイン + メニュー項目 stagger                           |
 
@@ -421,6 +422,16 @@ GSAP が入場を始めたらそのクラスを外し、CSS 側と競合させ�
 `animation-name` が解決されず、`getAnimations()` が空になってアニメーションが
 一切生成されない（2026-08-30 実測）。`globals.css` の既存の keyframes はすべて
 レイヤー外にある。
+
+Server Component へ演出だけ足す場合は、非表示マーカーを1つ置いて `data-*` 属性を
+フックにする（`SpecialPageMotion` / `AccessPageMotion` / `SpecialGuestMotion`）。
+`"use client"` を本文側へ広げずに済む。
+
+ScrollTrigger を IntersectionObserver で遅延取得する場合、**IO の `rootMargin` は
+先読みの向き（正の値）にする。** `AboutSection` のような負のマージンだと、
+ScrollTrigger を生成した時点で既に `top 80%` を通過しており、トリガーが即発火して
+開始位置が IO の境界で決まってしまう。`SpecialGuestMotion` は `600px 0px` で先読みし、
+発火は `top 80%` に任せている。
 
 #### SplitText と日本語（重要）
 

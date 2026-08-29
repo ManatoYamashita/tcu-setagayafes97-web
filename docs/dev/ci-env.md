@@ -88,7 +88,7 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 
 - `NEXT_PUBLIC_EVENTS_VISIBLE=false`: 企画一覧・タイムテーブルは準備中表示にし、トップのおすすめ企画・企画詳細URL・サイトマップの企画詳細URLを非公開にする。microCMS の企画データは取得しない。
 - `NEXT_PUBLIC_NEWS_VISIBLE=false`: お知らせ一覧とトップの NEWS セクションは準備中表示にし、トップの最新ニュース・お知らせ詳細URL・サイトマップのお知らせ詳細URLを非公開にする。microCMS のお知らせデータは取得しない。
-- `NEXT_PUBLIC_SPECIAL_VISIBLE=false`: 著名人企画（`type = special`）を全面的に非公開にする。`/special` は準備中表示になり、`/special/[id]` は生成されず 404。企画一覧・タイムテーブル・おすすめ企画・サイトマップからも `type = special` を除外し、トップページの著名人告知セクションも表示しない。
+- `NEXT_PUBLIC_SPECIAL_VISIBLE=false`: 著名人企画（`type = special`）を全面的に非公開にする。`/special` は準備中表示になり、`/special/[id]` は生成されず 404。企画一覧・タイムテーブル・おすすめ企画・サイトマップからも `type = special` を除外し、著名人告知セクション（トップページの Hero 直下と `/events` の最下部の2箇所）も表示しない。
 - `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE=false`: 著名人企画のプロフィール・出演情報・チケット等は維持したまま、`/special/[id]` の物販欄だけを非表示にする。
 - いずれも `true` の場合のみ公開する。未設定または `true` 以外は安全側として非公開になる。
 - ビルド時に評価されるため、値を変更した後は再ビルド・再デプロイが必要。

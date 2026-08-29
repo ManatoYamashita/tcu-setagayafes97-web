@@ -110,7 +110,7 @@ docs/
 - **[ci-env.md](./dev/ci-env.md)** - GitHub Actions 環境変数管理
   - Repository Secrets / Variables の使い分け基準
   - 本プロジェクトの登録一覧（MICROCMS*\*, NEXT_PUBLIC*\*）
-  - 企画・お知らせの公開フラグと非公開時の表示範囲
+  - 企画・お知らせの公開フラグと非公開時の表示範囲（著名人告知はトップ Hero 直下と /events 最下部の2箇所）
   - ワークフローでの参照方法（`secrets.` vs `vars.`）
   - ローカル開発（.env.local）との対応表
   - 本番反映の完了判定（sha 突き合わせ／公開ドメインをポーリングしない）
@@ -157,13 +157,24 @@ docs/
   - 初期表示・スクロール連動アニメーションとモーション軽減時の表示方針
   - 交通情報の管理場所と公式情報の参照基準
 
+> [!NOTE]
+> リポジトリルートの `DESIGN.md` と `.claude/CLAUDE.md` にも UI 規約がある。
+> `docs/` の外にあるため本索引の管理対象ではないが、次の2件は参照頻度が高い。
+>
+> - `DESIGN.md` §10 — GSAP の入場規約（`gsap.from()` / `{ start: "top 80%", once: true }`）、
+>   Server Component へ演出だけ足すマーカー + `data-*` 方式、ScrollTrigger を
+>   IntersectionObserver で遅延取得する際の `rootMargin` の向き
+> - `.claude/CLAUDE.md` デザイン仕様 — トップの `.hero-about-bg` グラデーションの
+>   停止位置を `%` へ戻してはいけない理由（実測値つき）
+
 - **[design.md](./frontend/design.md)** - デザインシステム（カラー・タイポグラフィトークン）
   - ブランドカラー `#CD79EE` の HLC 定義（H319 / L64 / C70）と oklch CSS 実装
   - Primary スケール・Neutral スケール・Semantic カラートークン
   - アクセシビリティ（コントラスト比）ガイドライン
   - Kaisei Opti ブランドフォント仕様と使用制限
   - フォントスケール（モジュラースケール 1.25）
-  - Aboutページ開催概要のシンプルな2列情報リスト
+  - Aboutページ開催概要のシンプルな2列情報リスト（**この節の「角丸・影・横罫線を足さない」は
+    開催概要リスト限定の規約であり、白いシート全体の規約ではない**）
   - CSS 変数まとめ
   - リッチテキスト（`prose`）の扱い — typography プラグイン未導入と `@layer` の選び方
 
