@@ -179,7 +179,7 @@ export function AboutHero() {
             第
             <span
               className="text-4xl font-bold bg-gradient-to-r from-purple-500 to-pink-400 bg-clip-text text-transparent tracking-tighter sm:text-5xl lg:text-6xl"
-              style={{ fontFamily: "var(--font-kaisei-opti), serif" }}
+              style={{ fontFamily: 'var(--font-kaisei-opti, "Kaisei Opti"), serif' }}
             >
               97
             </span>
