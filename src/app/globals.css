@@ -227,8 +227,13 @@ body {
     contain-intrinsic-size: auto 8rem;
   }
 
+  /*
+   * 著名人企画バナーは /events の最下部（variant="card"）でだけ遅延させる。
+   * トップページ（variant="hero"）は Hero の直下でフォールドに掛かるため、
+   * content-visibility が効かず初回の推定高さによる CLS だけが残る。
+   */
   .deferred-section--special {
-    contain-intrinsic-size: auto 67rem;
+    contain-intrinsic-size: auto 62rem;
   }
 
   .deferred-section--events {
@@ -241,13 +246,13 @@ body {
    */
   @media (min-width: 48rem) {
     .deferred-section--special {
-      contain-intrinsic-size: auto 45rem;
+      contain-intrinsic-size: auto 50rem;
     }
   }
 
   @media (min-width: 64rem) {
     .deferred-section--special {
-      contain-intrinsic-size: auto 50rem;
+      contain-intrinsic-size: auto 47rem;
     }
 
     .deferred-section--events {
@@ -260,14 +265,28 @@ body {
     animation: spin-slow 60s linear infinite;
   }
 
-  /* Hero+About背景グラデーション（モバイル: 下30%で紫グラデ） */
+  /* Hero → 著名人企画 → About をまとめて塗る背景グラデーション。
+     白から始まり、最終的に --color-secondary（後続の NEWS 以降と同色）へ着地する。
+
+     停止位置は % ではなく svh で持つ。% はこの要素の全高が基準になるため、
+     中のセクションが増減するたび Hero 内の色が動いてしまう。実測では著名人企画を
+     Hero の直下へ入れた時点で要素高が 2004px → 3105px（390px幅）へ伸び、
+     Hero 下端の色が primary-50→primary-100 間の 64.9% から 26.7% まで後退した。
+
+     svh なら Hero（h-[calc(100svh-var(--header-height))]）と同じ土俵になるので、
+     後続コンテンツの量から完全に独立する。SPECIAL_VISIBLE=false で著名人企画が
+     消えても Hero の見た目が変わらないのはこのため。
+
+     現在の値は viewport 844px 時点の従来の停止位置（px）を svh へ換算したもの。
+     停止位置を変えるときは、Hero 下端（100svh - 5.5rem）が
+     primary-50 と primary-100 の間のどこに来るかで判断すること。 */
   .hero-about-bg {
     background: linear-gradient(
       to bottom,
-      #ffffff 0%,
-      var(--color-primary-50) 15%,
-      var(--color-primary-100) 50%,
-      var(--color-secondary) 80%
+      #ffffff 0,
+      var(--color-primary-50) 36svh,
+      var(--color-primary-100) 119svh,
+      var(--color-secondary) 190svh
     );
   }
 
@@ -275,10 +294,10 @@ body {
     .hero-about-bg {
       background: linear-gradient(
         to bottom,
-        #ffffff 0%,
-        var(--color-primary-50) 20%,
-        var(--color-primary-100) 55%,
-        var(--color-secondary) 85%
+        #ffffff 0,
+        var(--color-primary-50) 40svh,
+        var(--color-primary-100) 109svh,
+        var(--color-secondary) 169svh
       );
     }
   }

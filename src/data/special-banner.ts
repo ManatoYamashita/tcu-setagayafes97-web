@@ -27,8 +27,27 @@ export interface SpecialBannerData {
   eventId: string;
   /** 出演者名の上に置く小ラベル */
   label: string;
-  /** 出演者名（セクション見出し） */
+  /**
+   * 出演者名。見出しは `nameLogo` の画像で表示するため、この文字列は
+   * 画像の代替テキスト（= 見出しのアクセシブル名）として使われます。
+   */
   name: string;
+  /**
+   * 出演者名のロゴ画像。見出しの本体です。
+   *
+   * LP（/special/[id]）が使うロゴは microCMS の `special.logo` で、こことは別系統です。
+   * あちらは暗いヒーローの上に置くため白ロゴを想定しており、ここは淡い紫または白の
+   * 背景に置くため黒ロゴを使います。取り違えるとどちらかが背景に溶けます。
+   *
+   * 差し替える場合は必ず背景が透過したアセットを用意してください。入稿された原本は
+   * 白地に黒の線画（不透明）で、そのまま置くと紫の背景に白い板が浮きます。
+   */
+  nameLogo: {
+    src: string;
+    /** 元画像の実寸（next/image のレイアウト計算に使用） */
+    width: number;
+    height: number;
+  };
   /** バナー画像 */
   image: {
     src: string;
@@ -47,6 +66,11 @@ export const specialBanner: SpecialBannerData = {
   eventId: "special-event-mon7a",
   label: "著名人スペシャル企画決定！",
   name: "MON7A",
+  nameLogo: {
+    src: "/images/special/mon7a-logo.webp",
+    width: 1524,
+    height: 405,
+  },
   image: {
     src: "/images/special/mon7a.webp",
     alt: "MON7A のアーティスト写真",
