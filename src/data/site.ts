@@ -99,7 +99,7 @@ export const NEWS_VISIBLE: boolean = process.env.NEXT_PUBLIC_NEWS_VISIBLE === "t
  * | EVENTS_VISIBLE | SPECIAL_VISIBLE | 挙動                                          |
  * | -------------- | --------------- | --------------------------------------------- |
  * | false          | false           | すべて準備中                                  |
- * | false          | true            | /special のみ公開。/events・/timetable は準備中 |
+ * | false          | true            | /special と /events の著名人セクションを公開。/events の一覧・/timetable は準備中 |
  * | true           | false           | /events・/timetable は公開。type=special は除外 |
  * | true           | true            | すべて公開                                    |
  *

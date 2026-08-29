@@ -17,8 +17,8 @@ import { SpecialGuestMotion } from "./SpecialGuestMotion";
  * SPECIAL_VISIBLE が false の間はセクションごと非表示にします。著名人は解禁日が
  * 契約で決まっており、URL の先行露出が事故になるためです（src/data/site.ts のコメント参照）。
  * EVENTS_VISIBLE には依存しないため、著名人だけを先行公開する運用でも表示されます。
- * ただし /events 自体が EVENTS_VISIBLE=false のとき準備中表示で終わるため、
- * そちらのカードが出るのは両方が true のときだけです。
+ * /events は EVENTS_VISIBLE=false のとき一覧が準備中表示になりますが、その場合も
+ * このセクションだけは準備中カードの下に残します（src/app/events/page.tsx）。
  *
  * 文言は microCMS ではなく src/data/special-banner.ts が持ちますが、リンク先が実在するか
  * どうかだけは getSpecialEventById() で確認します。ID が変わって LP に到達できない場合は、
