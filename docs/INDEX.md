@@ -113,6 +113,7 @@ docs/
   - 企画・お知らせの公開フラグと非公開時の表示範囲
   - ワークフローでの参照方法（`secrets.` vs `vars.`）
   - ローカル開発（.env.local）との対応表
+  - 本番反映の完了判定（sha 突き合わせ／公開ドメインをポーリングしない）
   - **Vercel の本番反映は挙動が変わった。** 2026-08-27 以降は main へのマージコミットが約1分で自動 Production 化される（それ以前は人手のみ）。**どちらの前提も思い込まず、毎回 Production デプロイの sha と main 先端の一致で判定する。** 一致していても意図した変更が出ているかは公開ドメインの実応答で確認する
   - **`vercel promote` は使わない。** 再ビルドしないため Preview 環境変数の成果物が本番に出る（`MICROCMS_SERVICE_DOMAIN` は環境別）。`vercel redeploy --target production` を使う
   - **`Aliased:` 表示は DNS を保証しない。** 公開ドメインは `curl -sI` の `server` / `location` ヘッダで実応答を確認する。`NEXT_PUBLIC_URL` のホストが名前解決できるかも確認する
