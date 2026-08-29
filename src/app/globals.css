@@ -228,7 +228,7 @@ body {
   }
 
   .deferred-section--special {
-    contain-intrinsic-size: auto 62rem;
+    contain-intrinsic-size: auto 67rem;
   }
 
   .deferred-section--events {
@@ -241,13 +241,13 @@ body {
    */
   @media (min-width: 48rem) {
     .deferred-section--special {
-      contain-intrinsic-size: auto 40rem;
+      contain-intrinsic-size: auto 45rem;
     }
   }
 
   @media (min-width: 64rem) {
     .deferred-section--special {
-      contain-intrinsic-size: auto 45rem;
+      contain-intrinsic-size: auto 50rem;
     }
 
     .deferred-section--events {
