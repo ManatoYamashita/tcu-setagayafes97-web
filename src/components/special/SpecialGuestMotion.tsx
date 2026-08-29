@@ -64,7 +64,11 @@ export function SpecialGuestMotion() {
           once: true,
         };
 
-        // 画像。スケールと位置だけを動かし、写真そのものは最初から見えている
+        // 画像。autoAlpha も動かすが、この写真は LCP 候補ではないため許容する
+        // （トップの LCP はヒーローのロゴ、/events は PageHero の写真）。
+        // from 状態が入るのは IntersectionObserver が先読みした画面外の時点なので、
+        // 表示済みの画像が一瞬消えることはない（実測: 画像上端が viewport の
+        // 173% の位置で opacity 0 になり、79% で入場が始まる）
         const revealTargets = gsap.utils.toArray<HTMLElement>("[data-special-guest-reveal]", root);
 
         revealTargets.forEach((target) => {
@@ -109,41 +113,29 @@ export function SpecialGuestMotion() {
       ScrollTrigger.refresh();
     };
 
-    if (!("IntersectionObserver" in window)) {
+    // IntersectionObserver 非対応、または既にスクロールで通り過ぎている場合は待たない
+    const canObserve = "IntersectionObserver" in window && root.getBoundingClientRect().bottom > 0;
+
+    const observer = canObserve
+      ? new IntersectionObserver(
+          ([entry]) => {
+            if (!entry.isIntersecting) return;
+            observer?.disconnect();
+            void startAnimation();
+          },
+          { rootMargin: PRELOAD_ROOT_MARGIN }
+        )
+      : null;
+
+    if (observer) {
+      observer.observe(root);
+    } else {
       void startAnimation();
-
-      return () => {
-        disposed = true;
-        ctxRef.current?.revert();
-        ctxRef.current = null;
-      };
     }
-
-    // 既にスクロールで通り過ぎている場合は待たずに実行する
-    if (root.getBoundingClientRect().bottom <= 0) {
-      void startAnimation();
-
-      return () => {
-        disposed = true;
-        ctxRef.current?.revert();
-        ctxRef.current = null;
-      };
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        observer.disconnect();
-        void startAnimation();
-      },
-      { rootMargin: PRELOAD_ROOT_MARGIN }
-    );
-
-    observer.observe(root);
 
     return () => {
       disposed = true;
-      observer.disconnect();
+      observer?.disconnect();
       ctxRef.current?.revert();
       ctxRef.current = null;
     };

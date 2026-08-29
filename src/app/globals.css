@@ -254,6 +254,9 @@ body {
     }
   }
 
+  /* 1024px 以上の上書きは持たない。/events で実測すると md 43.0rem /
+     lg 42.7rem とほぼ同値で、別値を置く意味が無いため上の 43rem を継ぐ。 */
+
   @media (min-width: 64rem) {
     .deferred-section--events {
       contain-intrinsic-size: auto 42rem;
@@ -277,16 +280,25 @@ body {
      後続コンテンツの量から完全に独立する。SPECIAL_VISIBLE=false で著名人企画が
      消えても Hero の見た目が変わらないのはこのため。
 
-     現在の値は viewport 844px 時点の従来の停止位置（px）を svh へ換算したもの。
+     svh の値は viewport 844px 時点の従来の停止位置（px）を換算したもの。
      停止位置を変えるときは、Hero 下端（100svh - 5.5rem）が
-     primary-50 と primary-100 の間のどこに来るかで判断すること。 */
+     primary-50 と primary-100 の間のどこに来るかで判断すること。
+
+     ただし svh 単独では、要素が背の高いビューポートに対して短い場合に
+     グラデーションが要素の下端へ届かず、直下の NewsSection（bg-secondary）との
+     境目にバンドが出る。実測: 1280x1600 かつ SPECIAL_VISIBLE=false のとき
+     要素高 2434px に対し最終停止位置が 2704px となり、境界で 11/255 の段差が出た。
+
+     そこで min() で従来の % を上限に被せる。通常時は svh 側が小さいので
+     従来どおり Hero の高さに追従し、要素が短いときだけ % 側へ落ちて
+     必ず要素内で secondary へ着地する。**片方だけ外さないこと。** */
   .hero-about-bg {
     background: linear-gradient(
       to bottom,
       #ffffff 0,
-      var(--color-primary-50) 36svh,
-      var(--color-primary-100) 119svh,
-      var(--color-secondary) 190svh
+      var(--color-primary-50) min(36svh, 15%),
+      var(--color-primary-100) min(119svh, 50%),
+      var(--color-secondary) min(190svh, 80%)
     );
   }
 
@@ -295,9 +307,9 @@ body {
       background: linear-gradient(
         to bottom,
         #ffffff 0,
-        var(--color-primary-50) 40svh,
-        var(--color-primary-100) 109svh,
-        var(--color-secondary) 169svh
+        var(--color-primary-50) min(40svh, 20%),
+        var(--color-primary-100) min(109svh, 55%),
+        var(--color-secondary) min(169svh, 85%)
       );
     }
   }

@@ -42,10 +42,13 @@ import { SpecialGuestMotion } from "./SpecialGuestMotion";
  *   自前の背景を持たずグラデーションを透かします。
  * - `sheet`: /events 用。白いシートの中へ地続きに置き、上の区切り線だけで前の要素と分けます。
  *
- * どちらも自前の背景を持ちません。`sheet` を囲まないのは、白いシート内のブロックは
- * 「不透明な border と余白だけで区切り、角丸・影・セル背景を足さない」という
- * docs/frontend/design.md:247 の規約に従うためです。/special/[id] も同じ考えで、
- * 親の `divide-y divide-gray-200` と子の余白だけでセクションを分けています。
+ * どちらも自前の背景を持ちません。`sheet` を囲まないのは、白いシート内のセクション区切りが
+ * `/special/[id]` の流儀に揃っているためです。あちらは親の `divide-y divide-gray-200` と
+ * 子の `py-8` だけで各セクションを分け、子には枠・影・背景を持たせません
+ * （src/app/special/[id]/page.tsx）。単独のセクションである本コンポーネントでは、
+ * その等価物が上端の `border-t border-gray-200` になります。
+ * 色を `gray-200` にしているのは、白いシート内の罫線が例外なくこの不透明値だからです
+ * （半透明の `border-gray-200/20` は暗色背景時代の名残で、白の上では見えません）。
  */
 type SpecialGuestSectionVariant = "hero" | "sheet";
 
@@ -66,6 +69,16 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
 
   const { label, name, nameLogo, image, details, ctaLabel } = specialBanner;
   const isSheet = variant === "sheet";
+
+  /*
+   * バナー画像の実描画幅は variant で変わる。/events は PageSheetLayout の
+   * `mx-*` と `px-*` が内側に二重で効くため、横方向の余白がトップページより
+   * 片側 32px（lg では 48px）多い。同じ sizes を使うと srcset の過大な候補を
+   * 掴むので分ける。lg は inner の max-w-5xl が効いて両者とも 460px に収束する。
+   */
+  const imageSizes = isSheet
+    ? "(min-width: 1024px) 460px, (min-width: 768px) 36vw, min(384px, calc(100vw - 6rem))"
+    : "(min-width: 1024px) 460px, (min-width: 768px) 42vw, min(384px, calc(100vw - 2rem))";
 
   return (
     <section
@@ -162,7 +175,7 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
               alt={image.alt}
               width={image.width}
               height={image.height}
-              sizes="(min-width: 1024px) 460px, (min-width: 768px) 42vw, min(384px, calc(100vw - 2rem))"
+              sizes={imageSizes}
               quality={75}
               className="h-auto w-full"
             />

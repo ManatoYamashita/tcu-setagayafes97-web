@@ -82,10 +82,13 @@ export default async function EventsPage() {
       <EventsContent initialEvents={events} />
 
       {/* 一覧を見終えた来場者をもう一度 LP へ送る。上部の細いリンクとは粒度が違うので併存させる。
-          左右端は EventsContent のルート（container mx-auto px-4）に合わせる */}
-      <div className="container mx-auto px-4 pb-12">
-        <SpecialGuestSection variant="sheet" />
-      </div>
+          左右端は EventsContent のルート（container mx-auto px-4）に合わせる。
+          ラッパーの余白だけが残らないよう、上のリンクと同じ SPECIAL_VISIBLE で括る */}
+      {SPECIAL_VISIBLE && (
+        <div className="container mx-auto px-4 pb-12">
+          <SpecialGuestSection variant="sheet" />
+        </div>
+      )}
     </PageSheetLayout>
   );
 }

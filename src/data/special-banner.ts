@@ -1,5 +1,11 @@
 /**
- * トップページの著名人企画（スペシャル企画）告知セクションの表示内容
+ * 著名人企画（スペシャル企画）告知セクションの表示内容
+ *
+ * 参照するのは3箇所です。文言を変えるときは全部に効くと考えてください。
+ *
+ * - トップページ Hero 直下の告知セクション（SpecialGuestSection variant="hero"）
+ * - /events 最下部の告知セクション（同 variant="sheet"）
+ * - next.config.ts の `SPECIAL_LANDING_PATH`（`eventId` から /special の転送先を組み立てる）
  *
  * 文言と画像は microCMS ではなくここで管理します。LP（/special/[id]）の
  * チケット表（microCMS の `special.tickets`）と同じ内容を、トップで読める粒度へ要約します。
@@ -11,7 +17,7 @@
  * LP の TicketTable を変更したら、ここも必ず追随させてください。
  *
  * リンク先の URL は eventId から組み立てます。LP が公開されているかどうかは
- * 表示側で `getSpecialEventById()` を使って確認します。
+ * 表示側（各セクション）が `getSpecialEventById()` を使って確認します。
  */
 
 /** 定義リストで表示する明細の 1 ブロック */
