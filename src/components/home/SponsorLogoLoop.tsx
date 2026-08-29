@@ -113,8 +113,6 @@ export function SponsorLogoLoop({ sponsors, onReady }: SponsorLogoLoopProps) {
         pauseOnHover
         logoHeight={40}
         gap={48}
-        fadeOut
-        fadeOutColor="#ffffff"
         ariaLabel="協賛企業ロゴ"
         renderItem={renderItem}
       />
