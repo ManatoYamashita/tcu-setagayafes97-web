@@ -68,6 +68,25 @@ body {
   h3 {
     font-family: var(--font-kaisei-opti), serif;
   }
+
+  /* @tailwindcss/typography は導入していないため prose-* 修飾子は CSS を生成しない。
+     microCMS のリッチテキスト内リンクだけは本文と区別する必要があるので直接定義する。
+     Tailwind v4 は @layer components に書いた複合セレクタを破棄するので base に置く。
+     Preflight の a { color: inherit } には詳細度で勝ち、
+     個別に当てた text-* ユーティリティには負ける優先順位になる */
+  .prose a {
+    /* Primary(#CD79EE) は白背景の通常テキストでコントラスト約2.8:1 となり
+       WCAG AA を満たさない。本文中のインラインリンクには 6.2:1 の
+       primary-dark(#8E3AB0) を使う。詳細は docs/frontend/design.md */
+    color: var(--color-primary-dark);
+    text-decoration: none;
+    text-underline-offset: 2px;
+  }
+
+  .prose a:hover,
+  .prose a:focus-visible {
+    text-decoration: underline;
+  }
 }
 
 @utility text-balance {

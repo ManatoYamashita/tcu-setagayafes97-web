@@ -162,6 +162,7 @@ docs/
   - フォントスケール（モジュラースケール 1.25）
   - Aboutページ開催概要のシンプルな2列情報リスト
   - CSS 変数まとめ
+  - リッチテキスト（`prose`）の扱い — typography プラグイン未導入と `@layer` の選び方
 
 - **[performance.md](./frontend/performance.md)** - Lighthouse基準値とフロントエンド性能ルール
   - トップページ desktop の基準値と LCP 内訳

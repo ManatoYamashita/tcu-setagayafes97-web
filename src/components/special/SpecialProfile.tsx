@@ -33,13 +33,15 @@ export function SpecialProfile({ content, photos }: SpecialProfileProps) {
         />
       )}
 
+      {/* grid だと枚数が奇数のとき最後の1枚が左カラムに固定されるため、
+          中央寄せできる flex-wrap を使う */}
       {hasPhotos && (
-        <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <ul className="mt-6 flex flex-wrap justify-center gap-4">
           {/* 同じ画像を複数枚選べるため、URL だけでは key が衝突する */}
           {photos?.map((photo, index) => (
             <li
               key={`${photo.url}-${index}`}
-              className="overflow-hidden rounded-xl border border-gray-200"
+              className="w-full overflow-hidden rounded-xl border border-gray-200 shadow-lg sm:w-[calc(50%-0.5rem)]"
             >
               {/*
                 縦長の写真が入稿されるとモバイルのスクロール量が跳ね上がるため、
