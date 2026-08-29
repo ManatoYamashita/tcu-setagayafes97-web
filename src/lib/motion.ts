@@ -9,19 +9,47 @@
  */
 
 /**
+ * オープナー各フェーズの尺（秒）。GSAP の duration にそのまま渡す。
+ *
+ * 合計を変えたら OPENER_SAFETY_MS と OPENER_FAILSAFE_MS も追随する。
+ * ずれた場合は Opener.tsx の開発ビルド用アサーションが警告する。
+ */
+export const OPENER_SEC = {
+  /** 白アイコンのフェードイン */
+  iconIn: 0.22,
+  /** 白→カラー + 紫レイヤーを濃紫へ（3本同時） */
+  crossFade: 0.3,
+  /** アイコンのフェードアウト。合図と同時に始まり、スライドアウトの内側に収まる */
+  iconOut: 0.2,
+  /** 合図からスライドアウト開始までの間 */
+  slideDelay: 0.05,
+  /** 紫レイヤーのスライドアウト */
+  slideOut: 0.55,
+} as const;
+
+/** `opener-done` を発火する時刻（秒）。アイコンのフェードアウト開始と同時。 */
+export const OPENER_HERO_CUE_SEC = OPENER_SEC.iconIn + OPENER_SEC.crossFade;
+
+/** タイムライン合計（秒）。iconOut は内側に収まるため合計に効かない。 */
+export const OPENER_TOTAL_SEC = OPENER_HERO_CUE_SEC + OPENER_SEC.slideDelay + OPENER_SEC.slideOut;
+
+/**
  * オープナーの保険。タイムラインが完走しなかった場合に覆いを外す上限。
  * 保険しているのは「timeline が組まれない / 進まない」ケース（ref が揃わない、
  * バックグラウンドタブで rAF が止まる等）で、チャンク到着の遅れではない
  * （このタイマーは Opener の mount 後に張られるため）。
+ *
+ * 短すぎるとタイムラインの途中で覆いが消え、紫レイヤーがスライドアウトせず
+ * ハードカットになる。合計の約2.8倍を確保している。
  */
-export const OPENER_SAFETY_MS = 6000;
+export const OPENER_SAFETY_MS = Math.round(OPENER_TOTAL_SEC * 1000) + 2000;
 
 /**
  * ページ側の保険。`opener-done` が届かなかった場合に入場を開始する上限。
  * HeroSection は初期状態の opacity:0 を SSR HTML に焼いているため、
  * これが発火しないと見出しが不可視のまま残る。
  */
-export const OPENER_FAILSAFE_MS = 5000;
+export const OPENER_FAILSAFE_MS = Math.round(OPENER_HERO_CUE_SEC * 1000) + 2000;
 
 /**
  * この閲覧環境でオープナーが走るか。OpenerLoader のロード条件と同一の述語。

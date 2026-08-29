@@ -3,16 +3,24 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
-import { OPENER_SAFETY_MS } from "@/lib/motion";
+import { OPENER_HERO_CUE_SEC, OPENER_SAFETY_MS, OPENER_SEC, OPENER_TOTAL_SEC } from "@/lib/motion";
 
 /**
- * オープナーアニメーションコンポーネント
+ * オープナーアニメーションコンポーネント（4フェーズ / 合計 約1.12秒）
  *
- * 1. 薄ピンク背景 + 白アイコン(favicon-white) フェードイン + pulse
+ * 1. 薄ピンク背景 + 白アイコン(favicon-white) フェードイン
  * 2. 濃い紫背景 + カラーアイコン(favicon) にクロスフェード
- * 3. カラーアイコンフェードアウト
+ * 3. Hero への合図(`opener-done`)と同時にカラーアイコンをフェードアウト
  * 4. 紫レイヤーがスライドアウト
+ *
+ * 各フェーズの尺は src/lib/motion.ts の OPENER_SEC に集約している。
+ * 合図の位置は tl.duration() からの逆算ではなくラベルで表すこと。
+ * 逆算はフェーズの尺を変えた瞬間に意味が壊れる。
  */
+
+/** Hero へ入場開始を伝える位置。以降の tween はすべてこのラベル基準で置く。 */
+const HERO_CUE = "heroCue";
+
 export function Opener() {
   const [showOpener, setShowOpener] = useState(true);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -21,7 +29,6 @@ export function Opener() {
   const iconWhiteRef = useRef<HTMLDivElement | null>(null);
   const iconColorRef = useRef<HTMLDivElement | null>(null);
   const ctxRef = useRef<gsap.Context | null>(null);
-  const pulseTlRef = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -62,22 +69,6 @@ export function Opener() {
         gsap.set(iconColorRef.current, { opacity: 0 });
         gsap.set(primaryLayerRef.current, { y: 0 });
 
-        // pulseアニメーション（ラッパーに適用）
-        const pulseTl = gsap.timeline({
-          repeat: -1,
-          yoyo: true,
-          paused: true,
-        });
-
-        pulseTl.to(iconWrapperRef.current, {
-          scale: 1.04,
-          duration: 1.5,
-          ease: "sine.inOut",
-          force3D: true,
-        });
-
-        pulseTlRef.current = pulseTl;
-
         // メインタイムライン
         const tl = gsap.timeline({
           paused: false,
@@ -87,31 +78,26 @@ export function Opener() {
           },
         });
 
-        // Phase 1: 白アイコンフェードイン (0.3s)
+        // Phase 1: 白アイコンフェードイン
         tl.to(iconWrapperRef.current, {
           opacity: 1,
           scale: 1,
-          duration: 0.3,
+          duration: OPENER_SEC.iconIn,
           ease: "power4.out",
-          onComplete: () => {
-            pulseTl.play();
-          },
+          force3D: true,
         });
 
-        // Phase 2: 待機 (0.2s)
-        tl.to({}, { duration: 0.2 });
-
-        // Phase 3: 白→カラー + 背景を濃い紫にクロスフェード (0.4s)
+        // Phase 2: 白→カラー + 背景を濃い紫にクロスフェード
         tl.to(iconWhiteRef.current, {
           opacity: 0,
-          duration: 0.4,
+          duration: OPENER_SEC.crossFade,
           ease: "power2.inOut",
         });
         tl.to(
           iconColorRef.current,
           {
             opacity: 1,
-            duration: 0.4,
+            duration: OPENER_SEC.crossFade,
             ease: "power2.inOut",
           },
           "<"
@@ -120,45 +106,62 @@ export function Opener() {
           primaryLayerRef.current,
           {
             backgroundColor: "#7B2D8E",
-            duration: 0.4,
+            duration: OPENER_SEC.crossFade,
             ease: "power2.inOut",
           },
           "<"
         );
 
-        // Phase 4: 待機 (0.2s)
-        tl.to({}, { duration: 0.2 });
+        // アイコンが去り始める瞬間 = Hero への合図。ここから先は末尾からの
+        // 逆算をせず、すべてこのラベル基準の絶対指定で置く。
+        tl.addLabel(HERO_CUE);
 
-        // Phase 5: カラーアイコンフェードアウト (0.3s)
-        tl.to(iconWrapperRef.current, {
-          opacity: 0,
-          scale: 1.1,
-          duration: 0.3,
-          ease: "power4.in",
-          onStart: () => {
-            pulseTl.kill();
-          },
-        });
-
-        // Phase 6: 紫レイヤースライドアウト (0.8s)
-        tl.to(
-          primaryLayerRef.current,
-          {
-            y: "100%",
-            duration: 1.2,
-            ease: "power4.inOut",
-          },
-          "-=0.2"
-        );
-
-        // Heroアニメーション開始トリガー（スライドアウト開始直前）
+        // Phase 3: Heroアニメーション開始トリガー
         tl.call(
           () => {
             window.dispatchEvent(new CustomEvent("opener-done"));
           },
           [],
-          tl.duration() - 1.4
+          HERO_CUE
         );
+
+        // Phase 3: カラーアイコンフェードアウト
+        tl.to(
+          iconWrapperRef.current,
+          {
+            opacity: 0,
+            scale: 1.1,
+            duration: OPENER_SEC.iconOut,
+            ease: "power4.in",
+          },
+          HERO_CUE
+        );
+
+        // Phase 4: 紫レイヤースライドアウト
+        tl.to(
+          primaryLayerRef.current,
+          {
+            y: "100%",
+            duration: OPENER_SEC.slideOut,
+            ease: "power4.inOut",
+          },
+          `${HERO_CUE}+=${OPENER_SEC.slideDelay}`
+        );
+
+        if (process.env.NODE_ENV !== "production") {
+          const actualTotal = Number(tl.duration().toFixed(3));
+          const actualCue = Number((tl.labels[HERO_CUE] ?? -1).toFixed(3));
+          if (
+            Math.abs(actualTotal - OPENER_TOTAL_SEC) > 0.001 ||
+            Math.abs(actualCue - OPENER_HERO_CUE_SEC) > 0.001
+          ) {
+            console.warn(
+              `[Opener] タイムライン実測（合計 ${actualTotal}s / 合図 ${actualCue}s）が ` +
+                `src/lib/motion.ts の定義（合計 ${OPENER_TOTAL_SEC}s / 合図 ${OPENER_HERO_CUE_SEC}s）` +
+                "と一致しません。OPENER_SAFETY_MS と各ページの OPENER_FAILSAFE_MS がずれます。"
+            );
+          }
+        }
       }, containerRef);
 
       ctxRef.current = ctx;
@@ -170,7 +173,6 @@ export function Opener() {
 
     return () => {
       clearTimeout(safetyTimeout);
-      pulseTlRef.current?.kill();
       ctxRef.current?.revert();
     };
   }, []);
