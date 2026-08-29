@@ -78,6 +78,15 @@ body {
 }
 
 @layer base {
+  /* 画像の意図しない持ち出し（デスクトップへの保存や別タブへのドロップ）を
+     サイト全体で抑止する。next/image・microCMS のリッチテキストを含め、
+     ページ内のすべての <img> が対象になる。
+     -webkit-user-drag は Chromium / WebKit 系にしか効かないため、
+     Firefox 向けには NoImageDrag が dragstart を打ち消して補完する */
+  img {
+    -webkit-user-drag: none;
+  }
+
   h1,
   h2,
   h3 {
