@@ -3,7 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
-import { OPENER_HERO_CUE_SEC, OPENER_SAFETY_MS, OPENER_SEC, OPENER_TOTAL_SEC } from "@/lib/motion";
+import {
+  markOpenerDone,
+  OPENER_HERO_CUE_SEC,
+  OPENER_SAFETY_MS,
+  OPENER_SEC,
+  OPENER_TOTAL_SEC,
+} from "@/lib/motion";
 
 /**
  * オープナーアニメーションコンポーネント（4フェーズ / 合計 約1.12秒）
@@ -42,6 +48,7 @@ export function Opener() {
     ) {
       const hideOpener = window.setTimeout(() => {
         setShowOpener(false);
+        markOpenerDone();
         window.dispatchEvent(new CustomEvent("opener-done"));
       }, 0);
       return () => window.clearTimeout(hideOpener);
@@ -49,6 +56,7 @@ export function Opener() {
 
     const safetyTimeout = setTimeout(() => {
       setShowOpener(false);
+      markOpenerDone();
       window.dispatchEvent(new CustomEvent("opener-done"));
     }, OPENER_SAFETY_MS);
 
@@ -119,6 +127,7 @@ export function Opener() {
         // Phase 3: Heroアニメーション開始トリガー
         tl.call(
           () => {
+            markOpenerDone();
             window.dispatchEvent(new CustomEvent("opener-done"));
           },
           [],

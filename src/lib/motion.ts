@@ -62,6 +62,31 @@ export const HERO_ENTRANCE = {
 } as const;
 
 /**
+ * `opener-done` を既に撃ち終えたかを記録するキー。
+ *
+ * このイベントはワンショットで、登録前に飛ぶと永久に失われる。そして実際に
+ * 取りこぼす。オープナーは `<body>` 直下ですぐ動き出すが、`{children}` 側は
+ * データ取得を挟んだストリーミングの後にハイドレートされるため、リスナー登録が
+ * 1秒以上遅れることがある（本番ビルド実測: オープナー 1243ms / ヒーロー 2773ms）。
+ *
+ * モジュールスコープの変数ではなく `window` に置くのは、このモジュールが
+ * 初期チャンクと遅延チャンクの両方から参照され、バンドラがインライン複製すると
+ * 別インスタンスになりうるため。
+ */
+const OPENER_DONE_KEY = "__setagayafesOpenerDone";
+
+/** オープナーが合図を撃ったことを記録する。`opener-done` の発火と必ず対で呼ぶ。 */
+export const markOpenerDone = () => {
+  if (typeof window === "undefined") return;
+  (window as unknown as Record<string, boolean>)[OPENER_DONE_KEY] = true;
+};
+
+/** 合図が既に撃たれたか。リスナーを張る前に必ず確認すること。 */
+export const hasOpenerFinished = () =>
+  typeof window !== "undefined" &&
+  (window as unknown as Record<string, boolean>)[OPENER_DONE_KEY] === true;
+
+/**
  * この閲覧環境でオープナーが走るか。OpenerLoader のロード条件と同一の述語。
  *
  * DOM の [data-opener-active] を見る方式では判定できない。Opener は

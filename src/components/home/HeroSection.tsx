@@ -6,7 +6,7 @@ import Link from "next/link";
 import { gsap } from "gsap";
 import { siteConfig } from "@/data/site";
 import { cn } from "@/lib/utils";
-import { HERO_ENTRANCE, OPENER_FAILSAFE_MS, willRunOpener } from "@/lib/motion";
+import { hasOpenerFinished, HERO_ENTRANCE, OPENER_FAILSAFE_MS, willRunOpener } from "@/lib/motion";
 import type { News, NewsType } from "@/types/news";
 
 /**
@@ -102,7 +102,11 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
     // [data-opener-active] を見る方式は、Opener が dynamic(ssr:false) のため
     // このエフェクトより後にしかマウントされず、初回表示では常に「居ない」と
     // 誤判定していた。結果、入場が覆いの裏で終わっていた。
-    const hasOpener = willRunOpener();
+    //
+    // ただし合図を待つのは「まだ撃たれていない」ときだけにする。このエフェクトは
+    // データ取得を挟んだストリーミングの後に走るため、オープナーより1秒以上
+    // 遅れることがあり、ワンショットの opener-done を取りこぼしうる。
+    const shouldWaitForOpener = willRunOpener() && !hasOpenerFinished();
 
     const runEntrance = () => {
       if (!sectionRef.current || ctxRef.current) return;
@@ -136,7 +140,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       ctxRef.current = ctx;
     };
 
-    if (!hasOpener) {
+    if (!shouldWaitForOpener) {
       // Opener完了済み/不在 → 即座にアニメーション実行
       runEntrance();
     } else {
