@@ -10,6 +10,7 @@
 | 第96回の退避先       | **`96th.setagayafes.org`**（さくらに残す）                    |
 | 旧URLの扱い          | `setagayafes.org/96th/*` → **301** → `96th.setagayafes.org/*` |
 | 旧委員会URLの扱い    | `setagayafes.org/sfa` → **301** → `setagayafes.org/about`     |
+| 告知用の旧URL        | `setagayafes.org/97th/about` → **302** → 著名人企画LP         |
 | `NEXT_PUBLIC_URL`    | `https://setagayafes.org`                                     |
 
 ## 現状
@@ -17,18 +18,19 @@
 > [!WARNING]
 > **移行作業は反映済み。** `setagayafes.org` はVercelの第97回サイト、`96th.setagayafes.org` はさくらの第96回WordPressを配信している。
 
-| 項目                            | 状態                                                                |
-| ------------------------------- | ------------------------------------------------------------------- |
-| Vercel のドメイン割当           | **完了**（`setagayafes.org` / `www.setagayafes.org` の両方）        |
-| `NEXT_PUBLIC_URL`               | **完了**（Vercel / GitHub Variables とも `setagayafes.org`）        |
-| `/96th/*` の 301                | **実装済み**（`src/proxy.ts` / `next.config.ts`）                   |
-| `/sfa` の 301                   | **実装済み**（`next.config.ts`、`/about`へ統合）                    |
-| `96th.setagayafes.org` の作成   | **完了**（さくら側、2026-08-24）                                    |
-| 第96回ファイルバックアップ      | **完了**（SnapUP、2026-08-24、正常終了）                            |
-| 第96回DBバックアップ            | **完了**（phpMyAdmin、2026-08-24、[検証台帳](./96th-db-backup.md)） |
-| 第96回サブドメインのSSL         | **完了**（Let's Encrypt、2026-08-24）                               |
-| WordPress の `siteurl` / `home` | **完了**（`https://96th.setagayafes.org`）                          |
-| `setagayafes.org` の DNS 切替   | **完了**（Vercel）                                                  |
+| 項目                             | 状態                                                                |
+| -------------------------------- | ------------------------------------------------------------------- |
+| Vercel のドメイン割当            | **完了**（`setagayafes.org` / `www.setagayafes.org` の両方）        |
+| `NEXT_PUBLIC_URL`                | **完了**（Vercel / GitHub Variables とも `setagayafes.org`）        |
+| `/96th/*` の 301                 | **実装済み**（`src/proxy.ts` / `next.config.ts`）                   |
+| `/sfa` の 301                    | **実装済み**（`next.config.ts`、`/about`へ統合）                    |
+| `/97th/about`・`/special` の 302 | **実装済み**（`next.config.ts`、著名人企画LPへ）                    |
+| `96th.setagayafes.org` の作成    | **完了**（さくら側、2026-08-24）                                    |
+| 第96回ファイルバックアップ       | **完了**（SnapUP、2026-08-24、正常終了）                            |
+| 第96回DBバックアップ             | **完了**（phpMyAdmin、2026-08-24、[検証台帳](./96th-db-backup.md)） |
+| 第96回サブドメインのSSL          | **完了**（Let's Encrypt、2026-08-24）                               |
+| WordPress の `siteurl` / `home`  | **完了**（`https://96th.setagayafes.org`）                          |
+| `setagayafes.org` の DNS 切替    | **完了**（Vercel）                                                  |
 
 ### 2026-08-24 の実施内容
 
@@ -62,6 +64,28 @@
 - 第97回の名称・開催日をdescriptionと `WebSite` JSON-LDで明示し、500×500のfaviconをmetadataから指定する。
 - Googlebotの大きな画像プレビューを許可し、トップと委員会紹介の代表画像をサイトマップへ追加する。
 - Production反映後、Search Consoleでトップ・`/about` のインデックス登録をリクエストし、`sitemap.xml` を再送信する。
+
+### 2026-08-29 の著名人企画への転送
+
+著名人企画（MON7A）の告知導線として、次の2本を `next.config.ts` の `redirects()` に追加した。
+
+| リクエスト    | ステータス | 転送先                                               |
+| ------------- | ---------- | ---------------------------------------------------- |
+| `/97th/about` | **302**    | `/special/<eventId>`（非公開時は `/special`）        |
+| `/special`    | **302**    | `/special/<eventId>`（`SPECIAL_VISIBLE` が真のとき） |
+
+いずれも末尾スラッシュ付き（`/97th/about/`）でも同じ1ホップで着地する。`source` は末尾スラッシュなしの1本だけでよい。
+
+**なぜ 301 ではなく 302 なのか。** `/96th`・`/sfa` の恒久移設と違い、これは会期限定の告知導線である。301 はブラウザが無期限にキャッシュするため、企画終了後に設定を外しても一度踏んだ端末では効き続ける。
+
+**なぜ `next.config.ts` なのか。** 理由は2つある。
+
+1. `/97th/about` は放置すると **404 ではなく 200 で `/about` の内容を返す**。`src/app/[locale]/about/page.tsx` の `[locale]` が `97th` をロケールとして飲み込むためで、`/foo/about` や `/hoge/access` でも同じ重複配信が起きる。`redirects()` は動的ルートの照合より先に走るため、ここで塞ぐのが確実である（`/97th` 以外の未知セグメントは未対応のまま残っている）。
+2. **ページ内の `redirect()` では代用できない。** ルート直下の `src/app/loading.tsx` によりストリーミングのシェルが先に送出され、ページのレンダリング中に投げた `redirect()` は HTTP ステータスに反映されず `<meta http-equiv="refresh" content="1;url=...">` へ格下げされる。`export const dynamic = "force-dynamic"` を足しても同じだった（実測）。**このアプリで本物の転送を返せるのは `next.config.ts` の `redirects()` と `src/proxy.ts` だけである。**
+
+転送先の企画IDは `src/data/special-banner.ts` の `eventId` を出典とする。トップページの告知セクションが参照しているものと同一で、設定側にベタ書きすると2箇所へ散るためである。非公開（`NEXT_PUBLIC_SPECIAL_VISIBLE` が真でない）の間は LP が `notFound()` を返すので、転送先を `/special` の準備中表示へ落とし、`/special` 自身の転送は出さない。
+
+**2組目の著名人企画が公開されたら `/special` のエントリを削除すること。** `src/app/special/page.tsx` の一覧表示がそのまま復帰する。`src/app/sitemap.ts` の `/special` 除外判定も併せて見直す。
 
 ## なぜ rewrite ではなく redirect なのか
 

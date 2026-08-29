@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 import { getEventsList, getSpecialEvents } from "@/lib/events";
 import { getNewsList } from "@/lib/news";
-import { siteConfig } from "@/data/site";
+import { siteConfig, SPECIAL_VISIBLE } from "@/data/site";
 
 /**
  * サイトマップ自動生成
@@ -140,5 +140,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Failed to fetch news for sitemap:", error);
   }
 
-  return [...staticPages, ...eventPages, ...specialPages, ...newsPages];
+  // SPECIAL_VISIBLE が true の間、/special は LP へ302転送される
+  // （next.config.ts の redirects()）。転送元をサイトマップに載せると
+  // Search Console が「リダイレクトあり」として除外するため、その間は落とす。
+  // 転送エントリを外して一覧へ戻したときは、この判定も併せて見直すこと。
+  const canonicalStaticPages = SPECIAL_VISIBLE
+    ? staticPages.filter((page) => page.url !== `${baseUrl}/special`)
+    : staticPages;
+
+  return [...canonicalStaticPages, ...eventPages, ...specialPages, ...newsPages];
 }
