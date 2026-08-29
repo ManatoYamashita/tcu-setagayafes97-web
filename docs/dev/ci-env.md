@@ -171,6 +171,8 @@ curl -s <deployment url>/special | grep -o '準備中'   # 何も出なければ
 | `db497f6`      | 2026-08-27 04:59     | 2026-08-27 05:00:16    | 約1分 |
 | `70db2dd`      | 2026-08-29 05:27:37  | 2026-08-29 05:28:23    | 46秒  |
 | `b95ef11`      | 2026-08-29 05:32:49  | 2026-08-29 05:33:42    | 53秒  |
+| `a950d40`      | 2026-08-29 09:35:14  | 2026-08-29 09:36:39    | 85秒  |
+| `5318b52`      | 2026-08-29 09:54:15  | 2026-08-29 09:55:00    | 45秒  |
 
 Production が作られるのは**マージコミットに対してだけ**です。そのマージに含まれる個々のコミット（`3530cd4` など）には Production デプロイは作られません。Vercel はブランチ先端をデプロイするためで、正常な挙動です。
 
@@ -220,6 +222,37 @@ done
 ```
 
 CSS チャンクは複数に分割され、**探している規則は1本にしか入っていません。** 1ファイルだけ見て「無い」と判断すると誤検証になります。
+
+#### 公開ドメインをポーリングしない
+
+> [!CAUTION]
+> **反映を待つつもりで `curl` を連続して叩かないでください。** Vercel の bot 対策が発動し、
+> `x-vercel-mitigated: challenge`（Vercel Security Checkpoint）が **403** で返るようになります。
+> **ヘッドレスブラウザでも JS challenge は通過できません**（`agent-browser` でもページタイトルが
+> `Vercel Security Checkpoint` のまま止まります）。**サイト障害と見分けがつかず、確認手段を失います。**
+
+2026-08-29、40 回ループで `curl https://setagayafes.org/` を叩いて実際に踏みました。
+上表のとおり Production 作成までは **45〜85 秒**です。**1〜2 分待って 1 回だけ**確認してください。
+
+踏んでしまった場合は、Production デプロイの直接 URL を使えば確認できます。
+challenge が掛かるのは独自ドメイン側だけです。
+
+```bash
+DEP=$(gh api "repos/ManatoYamashita/tcu-setagayafes97-web/deployments?environment=Production&per_page=1" --jq '.[0].id')
+URL=$(gh api "repos/ManatoYamashita/tcu-setagayafes97-web/deployments/$DEP/statuses" --jq '.[0].environment_url')
+curl -sL "$URL" | grep -o '<探しているマークアップ>'
+```
+
+独自ドメイン側の challenge も数分で自然に解除されます。
+
+> [!WARNING]
+> **本ファイルの登録状況の表と実例は、いずれも記載時点のスナップショットです。**
+> 「2026-08-17 実測」「実例：…の登録漏れ（2026-08-17）」を**現在の状態と読まないでください。**
+> フラグが今どうなっているかは、公開ドメインの実応答でしか確定しません。
+>
+> ```bash
+> curl -sL https://setagayafes.org/special | grep -c 準備中   # 0 なら公開済み
+> ```
 
 ### `vercel promote` は使わない
 
