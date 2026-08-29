@@ -271,14 +271,30 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
         <p className="text-xs md:text-sm tracking-[0.2em] text-primary-400/70 mt-2 md:mt-3">
           {siteConfig.openTime} - {siteConfig.closeTime}
         </p>
-        {/* モバイル用CTA（md以上では非表示） */}
-        <Link
-          href="/events"
-          prefetch={false}
-          className="inline-block bg-primary-600 text-white text-sm font-medium px-6 py-3 rounded-full hover:bg-primary-700 transition-colors mt-4 md:hidden"
-        >
-          企画を探す
-        </Link>
+        {/*
+          モバイル用CTA（md以上では非表示）
+
+          著名人企画は SPECIAL_VISIBLE で判定しない。未解禁でも /special は準備中ページ
+          として成立し、「今年も著名人企画がある」ことを伏せる必要はないため
+          （出演者名は出ない）。ヘッダーナビも同じ方針で常時表示している。
+          詳細は src/data/navigation.ts のコメントを参照。
+        */}
+        <div className="flex flex-wrap items-center gap-3 mt-4 md:hidden">
+          <Link
+            href="/events"
+            prefetch={false}
+            className="inline-block bg-primary-600 text-white text-sm font-medium px-6 py-3 rounded-full hover:bg-primary-700 transition-colors"
+          >
+            企画を探す
+          </Link>
+          <Link
+            href="/special"
+            prefetch={false}
+            className="inline-block bg-white/80 text-primary-700 border border-primary-600 text-sm font-medium px-6 py-3 rounded-full hover:bg-white transition-colors"
+          >
+            著名人企画
+          </Link>
+        </div>
       </div>
 
       {/* [z-30] 右下 最新ニュース（デスクトップのみ） */}
