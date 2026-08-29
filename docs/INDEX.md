@@ -172,6 +172,8 @@ docs/
   - LogoLoop の強制リフロー回避
   - 未使用CSS/JS、render-blocking CSS、AVIF画像配信の残存候補と次回対応方針
   - 初期ビューポート外の演出チャンクとNext.js route prefetchの遅延方針
+  - Tailwind のソース走査を `src/` へ限定（docs由来の未使用CSSは brotli 280 B で性能要因ではない）
+  - CSSチャンク3本の役割（本体85 KBのみ初期ブロック、フォント187 KBとLogoLoopは遅延）
   - 静的検査、ローカル本番ビルド、ブラウザ、Lighthouse の検証手順
 
 > [!NOTE]
