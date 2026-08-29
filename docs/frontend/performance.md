@@ -205,6 +205,14 @@ Lighthouse の「未使用CSS」は**そのページで使われていない規�
   実際に使う文字範囲だけをブラウザに取得させる。
 - 複数ウェイトを使う可変フォントは、静的ウェイトを列挙せず variable font を優先する。
 - ブランド上必要なフォントでも、使用ウェイトと preload 対象を最小限にする。
+- **文字数が固定の見出しは、その文字だけのサブセットを自前配信する。** ヒーローの
+  「第97回世田谷祭」8文字は `public/fonts/kaisei-opti-hero-700.woff2`（2,832バイト）として
+  持ち、`@font-face` を `globals.css` に直接書く。`next/font` で同じ Kaisei Opti を読むと
+  `@font-face` 369面 / CSS 94 KB のチャンクが増えるため、2桁の差が出る。
+  サブセットは Google Fonts の `&text=` で生成できる（手順は `globals.css` のコメント）。
+  **`unicode-range` を文字に固定するため、文言を変えたら woff2 を作り直すこと。**
+- **端末標準フォントで代替しない。** `Hiragino Maru Gothic ProN` などは macOS / iOS にしか
+  無く、Windows と Android では全く別の書体になる。ブランド要素には使わない。
 
 ## 検証
 
