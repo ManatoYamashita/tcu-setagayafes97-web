@@ -513,7 +513,7 @@ export const siteConfig = {
 | Safari         | 最新2バージョン |
 | Firefox        | 最新2バージョン |
 | Edge           | 最新2バージョン |
-| iOS Safari     | iOS 15以上      |
+| iOS Safari     | iOS 16.4以上    |
 | Android Chrome | 最新            |
 
 ### 7.5 Vercel Free Plan 制約

@@ -172,6 +172,8 @@ docs/
   - LogoLoop の強制リフロー回避
   - 未使用CSS/JS、render-blocking CSS、AVIF画像配信の残存候補と次回対応方針
   - 初期ビューポート外の演出チャンクとNext.js route prefetchの遅延方針
+  - Tailwind のソース走査を `src/` へ限定（docs由来の未使用CSSは brotli 280 B で性能要因ではない）
+  - CSSチャンク3本の役割（本体85 KBのみ初期ブロック、フォント187 KBとLogoLoopは遅延）
   - 静的検査、ローカル本番ビルド、ブラウザ、Lighthouse の検証手順
 
 > [!NOTE]
@@ -204,6 +206,8 @@ docs/
   - z-index管理とレイヤー構造（標準スケール: 10/20/30/40/60）
   - absolute/fixed/sticky使い分けガイド
   - レスポンシブ高さ計算（100vh vs 100svh、モバイルSafari対策）
+  - `--header-height` は2状態ヘッダー（上部107px / スクロール後77px）の近似値である
+  - 全画面ヒーローの実装は3箇所で統一する（sticky ヘッダーがフロー上に高さを占有するため素の `100svh` は使わない）
   - 部分幅ヒーロー画像の境界処理（mask-image とオーバーレイの分担）
 
 - **[i18n-page-structure.md](./frontend/i18n-page-structure.md)** - 多言語ページの構成パターン
@@ -241,4 +245,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-08-17
+**最終更新日**: 2026-08-29
