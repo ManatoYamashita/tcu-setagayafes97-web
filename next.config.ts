@@ -34,8 +34,18 @@ const withBundleAnalyzer = bundleAnalyzer({
 const ARCHIVE_96TH_ORIGIN = "https://96th.setagayafes.org";
 
 const nextConfig: NextConfig = {
+  // `/96th/` の専用301をNext.jsの自動308より先に処理するため、
+  // 末尾スラッシュの自動リダイレクトは proxy.ts で明示的に再現する。
+  skipTrailingSlashRedirect: true,
   async redirects() {
     return [
+      {
+        // 旧・実行委員会サイトのトップを、現在の委員会紹介へ統合する。
+        // サブページは内容が一致しないため一括転送せず、404のまま整理する。
+        source: "/sfa",
+        destination: "/about",
+        statusCode: 301,
+      },
       {
         source: "/96th/:path*",
         destination: `${ARCHIVE_96TH_ORIGIN}/:path*`,
@@ -50,6 +60,12 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
+    deviceSizes: [512, 640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [32, 48, 64, 96, 128, 256, 320, 384, 420],
+    qualities: [40, 60, 75],
+    // AVIF は同じ品質でも WebP より転送量を抑えられる画像を優先する。
+    // 未対応ブラウザには既存の WebP をフォールバックとして返す。
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "https",

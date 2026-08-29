@@ -17,6 +17,8 @@ docs/
 │   ├── git.md        # ブランチ戦略とCI/CDワークフロー
 │   ├── ci-env.md     # GitHub Actions 環境変数管理（Secrets/Variables）
 │   ├── domain-migration.md # setagayafes.org を第97回の正規ドメインにする手順
+│   ├── 96th-db-backup.md # 第96回 WordPress DBバックアップの検証情報と取扱い
+│   ├── seo-metadata.md # 共通metadata・canonicalとテストページ除外
 │   └── microcms.md   # microCMS API 制約と実装パターン
 ├── frontend/         # フロントエンド関連ドキュメント
 │   ├── design.md                  # デザインシステム（カラー・タイポグラフィトークン）
@@ -26,6 +28,7 @@ docs/
 │   ├── browser-verification-pitfalls.md # 検証手順そのものが誤る実例
 │   ├── layout-patterns.md         # レイアウトパターンと設計原則
 │   ├── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
+│   ├── performance.md             # Lighthouse基準値とフロントエンド性能ルール
 │   └── page-transition.md         # ページ遷移アニメーションとView Transitions API
 └── requires/         # 要件定義・仕様関連
     ├── require.md           # プロジェクト要件定義書
@@ -112,14 +115,27 @@ docs/
   - **`vercel promote` は使わない。** 再ビルドしないため Preview 環境変数の成果物が本番に出る（`MICROCMS_SERVICE_DOMAIN` は環境別）。`vercel redeploy --target production` を使う
   - **`Aliased:` 表示は DNS を保証しない。** 公開ドメインは `curl -sI` の `server` / `location` ヘッダで実応答を確認する。`NEXT_PUBLIC_URL` のホストが名前解決できるかも確認する
   - **`NEXT_PUBLIC_SPECIAL_VISIBLE` は `EVENTS_VISIBLE` と独立。** 4通りの組み合わせ表あり。著名人ページの先行公開には `getSpecialEvents()` を使う（`getEventsList()` は EVENTS_VISIBLE=false で常に空）
+  - **`NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` は物販だけを独立制御。** `SPECIAL_VISIBLE=true` のまま、`/special/[id]` のプロフィール・チケット・注意事項を維持して物販欄だけを非表示にできる
   - **公開フラグの登録先は4箇所**（`.env.example` / GitHub Variables / Vercel / 本ドキュメント）。**未設定はエラーにならず黙って非公開になるため、登録漏れが「仕様どおりの準備中表示」と区別できない。** 突き合わせコマンドと `SPECIAL_VISIBLE` 登録漏れの実例あり
   - **`EVENTS_VISIBLE=false` + `SPECIAL_VISIBLE=true` では `/events/[id]` → `/special/[id]` の誘導が効かない。** `getEventById()` が先に `null` を返し、リダイレクト判定へ到達しない
 
 - **[domain-migration.md](./dev/domain-migration.md)** - `setagayafes.org` を第97回の正規ドメインにする手順
   - 第96回（WordPress）は `96th.setagayafes.org` へ退避し、`/96th/*` は 301 で引き継ぐ
+  - 旧実行委員会トップ `/sfa` は現行の `/about` へ301で統合し、内容が一致しないサブページは404を維持する
   - **rewrite プロキシは採らない。** trailing-slash リダイレクトが rewrite より先に走るため無限ループになり、`skipTrailingSlashRedirect` で止めると canonical 未実装の現状で重複URLを生む
   - 手順の順序（WordPress の `siteurl` 変更 → 301 の本番反映 → DNS 切替）と各段階の検証コマンド
   - Vercel が要求する DNS レコード（`A 76.76.21.21` / `CNAME cname.vercel-dns.com`）
+
+- **[96th-db-backup.md](./dev/96th-db-backup.md)** - 第96回 WordPress DBバックアップの検証情報と安全な取扱い
+  - 取得日・サイズ・SHA-256による原本照合
+  - 機密な生ダンプをリポジトリ外で保管する理由と復元前チェック
+
+- **[seo-metadata.md](./dev/seo-metadata.md)** - 共通metadata・canonicalとテストページ除外
+  - ページごとのmetadata、canonical、Open Graph、Twitter Cardの生成方針
+  - 多言語ページのcanonicalとhreflang相当のalternate設定
+  - 年次切替後のfavicon・サイト主体/開催イベント構造化データ・画像サイトマップとSearch Console再送信の運用
+  - 第96回アーカイブをクロール可能なままnoindex化し、検索結果から恒久除外する運用
+  - `/api-test` と `/test-ui` を本番404にする運用
 
 - **[microcms.md](./dev/microcms.md)** - microCMS API 制約と実装パターン
   - limit 上限100件の制約と offset ページネーション実装
@@ -135,6 +151,7 @@ docs/
 - **[access-page-design.md](./frontend/access-page-design.md)** - Accessページの情報設計・UI実装方針
   - 会場所在地・推奨経路・注意事項の情報優先順位
   - 地図iframe、外部リンク、経路リストのアクセシビリティ要件
+  - 初期表示・スクロール連動アニメーションとモーション軽減時の表示方針
   - 交通情報の管理場所と公式情報の参照基準
 
 - **[design.md](./frontend/design.md)** - デザインシステム（カラー・タイポグラフィトークン）
@@ -143,8 +160,18 @@ docs/
   - アクセシビリティ（コントラスト比）ガイドライン
   - Kaisei Opti ブランドフォント仕様と使用制限
   - フォントスケール（モジュラースケール 1.25）
+  - Aboutページ開催概要のシンプルな2列情報リスト
   - CSS 変数まとめ
   - リッチテキスト（`prose`）の扱い — typography プラグイン未導入と `@layer` の選び方
+
+- **[performance.md](./frontend/performance.md)** - Lighthouse基準値とフロントエンド性能ルール
+  - トップページ desktop の基準値と LCP 内訳
+  - LCP、動画、レスポンシブ画像、無限ロゴ列、Webフォントの実装ルール
+  - `content-visibility` による初期描画遅延、フォントCSSの遅延配信、ScrollTriggerの遅延初期化
+  - LogoLoop の強制リフロー回避
+  - 未使用CSS/JS、render-blocking CSS、AVIF画像配信の残存候補と次回対応方針
+  - 初期ビューポート外の演出チャンクとNext.js route prefetchの遅延方針
+  - 静的検査、ローカル本番ビルド、ブラウザ、Lighthouse の検証手順
 
 > [!NOTE]
 > ブラウザ自動化の知見は3ファイルに分かれています。**手順は `agent-browser-workflow.md`、判断基準は `browser-observation-limits.md`、失敗例は `browser-verification-pitfalls.md`。**

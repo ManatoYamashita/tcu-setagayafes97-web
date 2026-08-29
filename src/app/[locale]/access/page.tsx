@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AccessPageView } from "@/components/access/AccessPageContent";
 import { accessPageContents } from "@/data/access";
 import { routing, type Locale } from "@/i18n/routing";
+import { createPageMetadata } from "@/lib/metadata";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -16,17 +17,13 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "access" });
 
-  return {
+  return createPageMetadata({
     title: t("meta.title"),
     description: t("meta.description"),
-    openGraph: {
-      title: t("meta.title"),
-      description: t("meta.description"),
-      type: "website",
-      locale:
-        locale === "ja" ? "ja_JP" : locale === "zh" ? "zh_CN" : locale === "ko" ? "ko_KR" : "en_US",
-    },
-  };
+    pathname: "/access",
+    locale: locale as Locale,
+    localized: true,
+  });
 }
 
 export default async function AccessPage({ params }: { params: Promise<{ locale: string }> }) {

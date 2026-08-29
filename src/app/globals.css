@@ -37,7 +37,9 @@
   --color-primary-dark: var(--color-primary-600);
 
   /* フォント設定 */
-  --font-sans: var(--font-noto-sans-jp), sans-serif;
+  --font-sans:
+    ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji";
   --font-serif: var(--font-kaisei-opti), serif;
   --font-heading: var(--font-kaisei-opti), serif;
 }
@@ -51,6 +53,13 @@
 body {
   color: var(--color-text); /* #212121 */
   background-color: #ffffff;
+}
+
+/* モバイルではLCPを覆うオープナーを表示せず、初期表示を遅らせない。 */
+@media (max-width: 767px) {
+  .opener-container {
+    display: none;
+  }
 }
 
 @layer base {
@@ -81,17 +90,14 @@ body {
   text-wrap: balance;
 }
 
-@utility font-display-mincho {
-  font-family:
-    var(--font-shippori-mincho, "Shippori Mincho"), "Hiragino Mincho ProN", "Yu Mincho", serif;
-}
-
 @utility animate-spin-slow {
   animation: spin 240s linear infinite;
 }
 
-@utility font-dela-gothic {
-  font-family: var(--font-dela-gothic-one, "Dela Gothic One"), sans-serif;
+@utility font-hero-display {
+  /* ヒーローのSVG文字はフォントCSSを追加取得せず、端末標準の丸ゴシックを使う。 */
+  font-family: "Hiragino Maru Gothic ProN", "Arial Rounded MT Bold", sans-serif;
+  font-weight: 900;
 }
 
 @utility animate-scroll-line {
@@ -141,6 +147,30 @@ body {
   /* Container Queries用のユーティリティ */
   .container-inline {
     container-type: inline-size;
+  }
+
+  /*
+   * Below-the-fold sections do not need style/layout/paint work during the
+   * first viewport. The intrinsic size approximates the section's content box
+   * until it enters the viewport, so the scroll range does not start at zero.
+   */
+  .deferred-section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 15rem;
+  }
+
+  .deferred-section--sponsors {
+    contain-intrinsic-size: auto 8rem;
+  }
+
+  .deferred-section--events {
+    contain-intrinsic-size: auto 32rem;
+  }
+
+  @media (min-width: 64rem) {
+    .deferred-section--events {
+      contain-intrinsic-size: auto 42rem;
+    }
   }
 
   /* CircularText 回転アニメーション */

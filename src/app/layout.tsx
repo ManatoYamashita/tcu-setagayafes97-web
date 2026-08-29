@@ -1,46 +1,15 @@
 import type { Metadata } from "next";
-import { Noto_Sans_JP, Kaisei_Opti, Shippori_Mincho, Dela_Gothic_One } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/data/site";
 import { Header } from "@/components/layout/Header";
 import { HtmlLangSync } from "@/components/layout/HtmlLangSync";
 import { Footer } from "@/components/layout/Footer";
-import { Opener } from "@/components/layout/Opener";
+import { OpenerLoader } from "@/components/layout/OpenerLoader";
 import { AgentationDevTool } from "@/components/dev/AgentationDevTool";
-
-const notoSansJP = Noto_Sans_JP({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-noto-sans-jp",
-  display: "swap",
-  preload: true,
-});
-
-const shipporiMincho = Shippori_Mincho({
-  subsets: ["latin"],
-  weight: ["400", "700", "800"],
-  variable: "--font-shippori-mincho",
-  display: "swap",
-  preload: false,
-});
-
-const delaGothicOne = Dela_Gothic_One({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-dela-gothic-one",
-  display: "swap",
-  preload: false,
-});
-
-const kaiseiOpti = Kaisei_Opti({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-kaisei-opti",
-  display: "swap",
-  preload: true,
-});
+import { DeferredKaiseiFontsLoader } from "@/components/layout/DeferredKaiseiFontsLoader";
 
 export const metadata: Metadata = {
+  applicationName: siteConfig.metadata.searchSiteName,
   title: {
     default: siteConfig.metadata.siteName,
     template: `%s | ${siteConfig.shortName}`,
@@ -50,7 +19,7 @@ export const metadata: Metadata = {
     title: siteConfig.metadata.siteName,
     description: siteConfig.description,
     url: siteConfig.metadata.siteUrl,
-    siteName: siteConfig.metadata.siteName,
+    siteName: siteConfig.metadata.searchSiteName,
     images: [
       {
         url: siteConfig.metadata.ogImage,
@@ -69,8 +38,38 @@ export const metadata: Metadata = {
     images: [siteConfig.metadata.ogImage],
   },
   metadataBase: new URL(siteConfig.metadata.siteUrl),
+  creator: siteConfig.organization.name,
+  publisher: siteConfig.organization.name,
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      {
+        url: "/images/brand/favicon.png",
+        type: "image/png",
+        sizes: "500x500",
+      },
+    ],
+    apple: [
+      {
+        url: "/images/brand/favicon.png",
+        type: "image/png",
+        sizes: "500x500",
+      },
+    ],
   },
 };
 
@@ -82,11 +81,10 @@ export default function RootLayout({
   return (
     // 初期値は既定ロケール。実際のロケールへは HtmlLangSync が同期する
     <html lang="ja">
-      <body
-        className={`${notoSansJP.variable} ${kaiseiOpti.variable} ${shipporiMincho.variable} ${delaGothicOne.variable} font-sans antialiased text-gray-900`}
-      >
+      <body className="font-sans antialiased text-gray-900">
         <HtmlLangSync />
-        <Opener />
+        <DeferredKaiseiFontsLoader />
+        <OpenerLoader />
         <Header />
         {children}
         <Footer />

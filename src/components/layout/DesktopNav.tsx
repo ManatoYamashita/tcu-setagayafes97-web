@@ -34,6 +34,7 @@ export function DesktopNav({ items }: DesktopNavProps) {
             ) : (
               <Link
                 href={item.href}
+                prefetch={false}
                 hrefLang={item.hrefLang}
                 className="text-gray-900/80 transition-colors hover:text-gray-900"
               >

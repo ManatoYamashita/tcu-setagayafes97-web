@@ -249,20 +249,32 @@ export const LogoLoop = memo(function LogoLoop({
   }, [speed, direction, isVertical]);
 
   const updateDimensions = useCallback(() => {
-    const containerWidth = containerRef.current?.clientWidth ?? 0;
-    const sequenceRect = seqRef.current?.getBoundingClientRect?.();
-    const sequenceWidth = sequenceRect?.width ?? 0;
-    const sequenceHeight = sequenceRect?.height ?? 0;
+    const container = containerRef.current;
+    const sequence = seqRef.current;
+    if (!container || !sequence) return;
+
+    // Keep all layout reads together. In particular, do not read clientHeight
+    // after writing the vertical container height: that ordering can force a
+    // synchronous layout on every ResizeObserver callback.
+    const containerWidth = container.clientWidth;
+    const sequenceRect = sequence.getBoundingClientRect();
+    const sequenceWidth = sequenceRect.width;
+    const sequenceHeight = sequenceRect.height;
+
     if (isVertical) {
-      const parentHeight = containerRef.current?.parentElement?.clientHeight ?? 0;
-      if (containerRef.current && parentHeight > 0) {
-        const targetHeight = Math.ceil(parentHeight);
-        if (containerRef.current.style.height !== `${targetHeight}px`)
-          containerRef.current.style.height = `${targetHeight}px`;
+      const currentHeight = container.clientHeight;
+      const parentHeight = container.parentElement?.clientHeight ?? 0;
+      const targetHeight = parentHeight > 0 ? Math.ceil(parentHeight) : 0;
+      const viewport = targetHeight || currentHeight || sequenceHeight;
+
+      if (targetHeight > 0) {
+        if (container.style.height !== `${targetHeight}px`) {
+          container.style.height = `${targetHeight}px`;
+        }
       }
+
       if (sequenceHeight > 0) {
         setSeqHeight(Math.ceil(sequenceHeight));
-        const viewport = containerRef.current?.clientHeight ?? parentHeight ?? sequenceHeight;
         const copiesNeeded = Math.ceil(viewport / sequenceHeight) + ANIMATION_CONFIG.COPY_HEADROOM;
         setCopyCount(Math.max(ANIMATION_CONFIG.MIN_COPIES, copiesNeeded));
       }

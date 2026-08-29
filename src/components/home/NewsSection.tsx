@@ -1,15 +1,6 @@
-"use client";
-
-import { useEffect, useRef } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { News } from "@/types/news";
 import { CircularText } from "@/components/ui/CircularText";
-import { NewsFilter } from "./NewsFilter";
-
-gsap.registerPlugin(ScrollTrigger);
+import { NewsSectionClientLoader } from "./NewsSectionClientLoader";
 
 interface NewsSectionProps {
   newsList: News[];
@@ -17,329 +8,39 @@ interface NewsSectionProps {
 }
 
 /**
- * お知らせセクション
- * 白シート + Type絞り込みタブ + 2段グリッド（Featured 2件 + Regular）+ 歯車装飾
- * ScrollTriggerによるエントランスアニメーション付き
+ * 非公開時はニュース用のクライアント実装を読み込まず、静的な案内だけを返す。
+ * GSAP、ScrollTrigger、フィルタは公開データがある場合にだけ必要になる。
  */
-export function NewsSection({ newsList, isVisible }: NewsSectionProps) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const heroImageRef = useRef<HTMLDivElement>(null);
-  const whiteSheetRef = useRef<HTMLDivElement>(null);
-  const ctaRef = useRef<HTMLDivElement>(null);
-  const gear1Ref = useRef<HTMLImageElement>(null);
-  const gear2Ref = useRef<HTMLImageElement>(null);
-  const ctxRef = useRef<gsap.Context | null>(null);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (ctxRef.current) return;
-
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (prefersReduced) {
-      // reduced-motion: 全要素を即座に表示
-      if (heroImageRef.current) {
-        heroImageRef.current.style.clipPath = "none";
-      }
-
-      const targets = [
-        whiteSheetRef.current,
-        ctaRef.current,
-        gear1Ref.current,
-        gear2Ref.current,
-      ].filter(Boolean) as HTMLElement[];
-
-      targets.forEach((el) => {
-        el.style.opacity = "1";
-        el.style.transform = "none";
-      });
-
-      const cards = sectionRef.current?.querySelectorAll(".news-card");
-      cards?.forEach((el) => {
-        (el as HTMLElement).style.opacity = "1";
-        (el as HTMLElement).style.transform = "none";
-      });
-      return;
-    }
-
-    const ctx = gsap.context(() => {
-      const scrollTriggerBase = {
-        trigger: sectionRef.current,
-        start: "top 80%",
-        once: true,
-      };
-
-      // 1. 背景画像: clipPathリヴィール（左→右）+ スケールダウン
-      if (heroImageRef.current) {
-        gsap.set(heroImageRef.current, {
-          clipPath: "inset(0% 100% 0% 0%)",
-          opacity: 1,
-        });
-        gsap.set(heroImageRef.current.querySelector("img"), {
-          scale: 1.3,
-        });
-
-        const revealTl = gsap.timeline({
-          scrollTrigger: scrollTriggerBase,
-        });
-
-        revealTl.to(heroImageRef.current, {
-          clipPath: "inset(0% 0% 0% 0%)",
-          duration: 1.2,
-          ease: "power4.inOut",
-          force3D: true,
-        });
-        revealTl.to(
-          heroImageRef.current.querySelector("img"),
-          {
-            scale: 1,
-            duration: 1.4,
-            ease: "power3.out",
-            force3D: true,
-          },
-          0.15
-        );
-      }
-
-      // 2. 白シート: スライドアップ + フェードイン
-      if (whiteSheetRef.current) {
-        gsap.set(whiteSheetRef.current, { opacity: 0, y: 40 });
-        gsap.to(whiteSheetRef.current, {
-          opacity: 1,
-          y: 0,
-          duration: 0.7,
-          ease: "power4.out",
-          force3D: true,
-          scrollTrigger: { ...scrollTriggerBase },
-        });
-      }
-
-      // 3. ヘッダー + タブ: staggerスライドアップ
-      const headerTargets = sectionRef.current?.querySelectorAll(".news-header, .news-tabs");
-      if (headerTargets && headerTargets.length > 0) {
-        gsap.set(headerTargets, { opacity: 0, y: 30 });
-        gsap.to(headerTargets, {
-          opacity: 1,
-          y: 0,
-          duration: 0.7,
-          ease: "power4.out",
-          stagger: 0.12,
-          force3D: true,
-          delay: 0.15,
-          scrollTrigger: { ...scrollTriggerBase },
-        });
-      }
-
-      // 4. カード群: staggerスライドアップ
-      const cards = sectionRef.current?.querySelectorAll(".news-card");
-      if (cards && cards.length > 0) {
-        gsap.set(cards, { opacity: 0, y: 30 });
-        gsap.to(cards, {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          ease: "power3.out",
-          stagger: 0.1,
-          force3D: true,
-          delay: 0.4,
-          scrollTrigger: {
-            ...scrollTriggerBase,
-            onEnter: () => {
-              // アニメーション完了後にinline styleをクリア（フィルター切替対応）
-              setTimeout(
-                () => {
-                  cards.forEach((card) => {
-                    gsap.set(card, { clearProps: "all" });
-                  });
-                },
-                600 + cards.length * 100 + 400
-              );
-            },
-          },
-        });
-      }
-
-      // 5. CTAボタン: スライドアップ + フェードイン
-      if (ctaRef.current) {
-        gsap.set(ctaRef.current, { opacity: 0, y: 20 });
-        gsap.to(ctaRef.current, {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          ease: "power3.out",
-          delay: 0.6,
-          force3D: true,
-          scrollTrigger: { ...scrollTriggerBase },
-        });
-      }
-
-      // 6. 歯車装飾: 回転 + フェードイン（AboutSectionパターン）
-      const gears = [gear1Ref.current, gear2Ref.current].filter(Boolean) as HTMLElement[];
-      if (gears.length > 0) {
-        gsap.set(gears, { opacity: 0, rotation: -45 });
-        gsap.to(gears, {
-          opacity: 1,
-          rotation: 0,
-          duration: 0.9,
-          ease: "power3.out",
-          force3D: true,
-          delay: 0.3,
-          stagger: 0.15,
-          scrollTrigger: { ...scrollTriggerBase },
-        });
-      }
-    }, sectionRef);
-
-    ctxRef.current = ctx;
-
-    return () => {
-      ctxRef.current?.revert();
-      ctxRef.current = null;
-    };
-  }, []);
-
-  // 非公開期間またはデータが取得できない場合の表示
-  if (!isVisible || newsList.length === 0) {
-    return (
-      <section className="relative bg-secondary py-32">
-        {/* CircularText装飾 */}
-        <CircularText
-          text="· SETAGAYA FES 97th · SETAGAYA FES 97th "
-          spinDuration={20}
-          className="pointer-events-none absolute right-0 top-32 z-0 w-72 -translate-y-1/2 translate-x-1/2 text-primary-400/60 md:w-80 lg:w-96"
-        />
-        <div className="container mx-auto px-4">
-          <div className="relative">
-            <div className="relative z-10 rounded-3xl bg-white px-6 py-12 sm:px-10 md:px-12 md:py-16 lg:px-16">
-              <div className="mb-12 flex items-center justify-between">
-                <h2 className="text-5xl font-bold md:text-6xl">NEWS</h2>
-              </div>
-              <div className="text-center text-gray-900/60">
-                {isVisible
-                  ? "現在、お知らせはありません。"
-                  : "現在、お知らせは準備中です。公開までもうしばらくお待ちください。"}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
+function NewsUnavailable({ isVisible }: { isVisible: boolean }) {
   return (
-    <section ref={sectionRef} className="relative bg-secondary">
-      {/* 背景画像: 画面幅いっぱい */}
-      <div
-        ref={heroImageRef}
-        className="relative h-[40vh] w-full overflow-hidden will-change-transform sm:h-[50vh] md:h-[60vh]"
-        style={{ clipPath: "inset(0% 100% 0% 0%)" }}
-      >
-        <Image
-          src="/images/photos/tcu-7.webp"
-          alt="キャンパス風景"
-          fill
-          className="object-cover will-change-transform"
-          style={{ transform: "scale(1.3)" }}
-          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-        />
-      </div>
-
-      {/* CircularText装飾 */}
+    <section className="deferred-section relative bg-secondary py-32">
       <CircularText
         text="· SETAGAYA FES 97th · SETAGAYA FES 97th "
         spinDuration={20}
         className="pointer-events-none absolute right-0 top-32 z-0 w-72 -translate-y-1/2 translate-x-1/2 text-primary-400/60 md:w-80 lg:w-96"
       />
-
-      {/* 白シートエリア: 画像に重なるように上にオフセット */}
-      <div className="relative z-10 -mt-20 pb-32 sm:-mt-28 md:-mt-36">
-        <div className="container mx-auto px-4">
-          <div className="relative">
-            {/* 白シート */}
-            <div
-              ref={whiteSheetRef}
-              className="relative z-10 rounded-3xl bg-white px-6 py-12 opacity-0 shadow-xl will-change-transform sm:px-10 md:px-12 md:py-16 lg:px-16"
-            >
-              {/* タブ絞り込み + ニュース一覧（2カラム） */}
-              <NewsFilter
-                newsList={newsList}
-                header={
-                  <div className="news-header">
-                    <h2 className="text-5xl font-bold md:text-6xl">NEWS</h2>
-                    <Link
-                      href="/info"
-                      className="mt-4 inline-flex items-center gap-2 font-semibold text-gray-900 transition-opacity hover:opacity-60"
-                    >
-                      <span>NEWS ALL</span>
-                      <svg
-                        className="h-5 w-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17 8l4 4m0 0l-4 4m4-4H3"
-                        />
-                      </svg>
-                    </Link>
-                  </div>
-                }
-              />
-
-              {/* CTA: お知らせ一覧へ */}
-              <div
-                ref={ctaRef}
-                className="mt-10 flex justify-center opacity-0 will-change-transform"
-              >
-                <Link
-                  href="/info"
-                  className="group inline-flex items-center gap-3 rounded-full border-2 border-gray-900 px-8 py-3 font-semibold text-gray-900 transition-all hover:bg-gray-900 hover:text-white"
-                >
-                  <span>お知らせ一覧を見る</span>
-                  <svg
-                    className="h-5 w-5 transition-transform group-hover:translate-x-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 8l4 4m0 0l-4 4m4-4H3"
-                    />
-                  </svg>
-                </Link>
-              </div>
+      <div className="container mx-auto px-4">
+        <div className="relative">
+          <div className="relative z-10 rounded-3xl bg-white px-6 py-12 sm:px-10 md:px-12 md:py-16 lg:px-16">
+            <div className="mb-12 flex items-center justify-between">
+              <h2 className="text-5xl font-bold md:text-6xl">NEWS</h2>
             </div>
-
-            {/* 歯車装飾: 右下（複数歯車） */}
-            <img
-              ref={gear1Ref}
-              src="/materials/geers.webp"
-              alt=""
-              aria-hidden="true"
-              className="pointer-events-none absolute -bottom-8 right-8 z-20 w-28 select-none opacity-0 will-change-transform md:w-40 lg:w-48"
-              loading="lazy"
-              draggable={false}
-            />
-
-            {/* 歯車装飾: 左下（単体歯車） */}
-            <img
-              ref={gear2Ref}
-              src="/materials/geer1.webp"
-              alt="歯車"
-              aria-hidden="true"
-              className="pointer-events-none absolute -bottom-6 left-12 z-20 w-14 select-none opacity-0 will-change-transform md:w-20 lg:w-24"
-              loading="lazy"
-              draggable={false}
-            />
+            <div className="text-center text-gray-900/60">
+              {isVisible
+                ? "現在、お知らせはありません。"
+                : "現在、お知らせは準備中です。公開までもうしばらくお待ちください。"}
+            </div>
           </div>
         </div>
       </div>
     </section>
   );
+}
+
+export function NewsSection({ newsList, isVisible }: NewsSectionProps) {
+  if (!isVisible || newsList.length === 0) {
+    return <NewsUnavailable isVisible={isVisible} />;
+  }
+
+  return <NewsSectionClientLoader newsList={newsList} />;
 }

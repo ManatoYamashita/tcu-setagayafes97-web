@@ -43,7 +43,8 @@ export function AboutHero() {
     if (typeof window === "undefined") return;
     if (ctxRef.current) return;
 
-    const hasOpener = !!document.querySelector(".opener-container");
+    // 遅延ローダーの空フォールバックは、実体のオープナーとして扱わない。
+    const hasOpener = !!document.querySelector("[data-opener-active]");
 
     const runEntrance = () => {
       if (!sectionRef.current || ctxRef.current) return;
@@ -173,11 +174,7 @@ export function AboutHero() {
         >
           {description}
         </p>
-        <h1
-          ref={titleRef}
-          className="leading-tight"
-          style={{ fontFamily: "var(--font-noto-sans-jp), sans-serif" }}
-        >
+        <h1 ref={titleRef} className="leading-tight" style={{ fontFamily: "var(--font-sans)" }}>
           <span className="block text-2xl font-semibold tracking-[0.08em] text-gray-900 sm:text-3xl lg:text-4xl">
             第
             <span

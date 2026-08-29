@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 
 /*
  * loading fallback は置かない。
@@ -19,6 +20,24 @@ const GearScene = dynamic(() => import("@/components/three/GearScene"), {
 });
 
 export function FeaturedGearScene() {
+  // モバイルでは歯車は装飾で、チルト操作も無効にしている。
+  // ここで描画を止めることで、R3F/Three.js の大きなチャンクを
+  // モバイルの初期ロードへ含めない。
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
+    const sync = () => setIsDesktop(mediaQuery.matches);
+
+    sync();
+    mediaQuery.addEventListener("change", sync);
+    return () => mediaQuery.removeEventListener("change", sync);
+  }, []);
+
+  if (!isDesktop) {
+    return null;
+  }
+
   return (
     <div className="w-full h-full">
       <GearScene />

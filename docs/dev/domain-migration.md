@@ -9,6 +9,7 @@
 | 第97回の正規ドメイン | **`setagayafes.org`**（apex）                                 |
 | 第96回の退避先       | **`96th.setagayafes.org`**（さくらに残す）                    |
 | 旧URLの扱い          | `setagayafes.org/96th/*` → **301** → `96th.setagayafes.org/*` |
+| 旧委員会URLの扱い    | `setagayafes.org/sfa` → **301** → `setagayafes.org/about`     |
 | `NEXT_PUBLIC_URL`    | `https://setagayafes.org`                                     |
 
 ## 現状
@@ -16,17 +17,18 @@
 > [!WARNING]
 > **移行作業は反映済み。** `setagayafes.org` はVercelの第97回サイト、`96th.setagayafes.org` はさくらの第96回WordPressを配信している。
 
-| 項目                            | 状態                                                         |
-| ------------------------------- | ------------------------------------------------------------ |
-| Vercel のドメイン割当           | **完了**（`setagayafes.org` / `www.setagayafes.org` の両方） |
-| `NEXT_PUBLIC_URL`               | **完了**（Vercel / GitHub Variables とも `setagayafes.org`） |
-| `/96th/*` の 301                | **実装済み**（`next.config.ts`）                             |
-| `96th.setagayafes.org` の作成   | **完了**（さくら側、2026-08-24）                             |
-| 第96回ファイルバックアップ      | **完了**（SnapUP、2026-08-24、正常終了）                     |
-| 第96回DBバックアップ            | **完了**（phpMyAdmin、2026-08-24）                           |
-| 第96回サブドメインのSSL         | **完了**（Let's Encrypt、2026-08-24）                        |
-| WordPress の `siteurl` / `home` | **完了**（`https://96th.setagayafes.org`）                   |
-| `setagayafes.org` の DNS 切替   | **完了**（Vercel）                                           |
+| 項目                            | 状態                                                                |
+| ------------------------------- | ------------------------------------------------------------------- |
+| Vercel のドメイン割当           | **完了**（`setagayafes.org` / `www.setagayafes.org` の両方）        |
+| `NEXT_PUBLIC_URL`               | **完了**（Vercel / GitHub Variables とも `setagayafes.org`）        |
+| `/96th/*` の 301                | **実装済み**（`src/proxy.ts` / `next.config.ts`）                   |
+| `/sfa` の 301                   | **実装済み**（`next.config.ts`、`/about`へ統合）                    |
+| `96th.setagayafes.org` の作成   | **完了**（さくら側、2026-08-24）                                    |
+| 第96回ファイルバックアップ      | **完了**（SnapUP、2026-08-24、正常終了）                            |
+| 第96回DBバックアップ            | **完了**（phpMyAdmin、2026-08-24、[検証台帳](./96th-db-backup.md)） |
+| 第96回サブドメインのSSL         | **完了**（Let's Encrypt、2026-08-24）                               |
+| WordPress の `siteurl` / `home` | **完了**（`https://96th.setagayafes.org`）                          |
+| `setagayafes.org` の DNS 切替   | **完了**（Vercel）                                                  |
 
 ### 2026-08-24 の実施内容
 
@@ -54,6 +56,13 @@
 - Vercel側のapexドメインに残っていた `setagayafes.org → www.setagayafes.org` リダイレクトを解除。`/96th/*` は `96th.setagayafes.org/*` へ301。
 - 96th本文には旧 `/96th/` および `/95th/` の画像URLが一部残るため、コンテンツ内リンクの整理は別作業として残す。
 
+### 2026-08-26 の追加SEO対応
+
+- 旧実行委員会トップ `/sfa` を、現行の実行委員会紹介 `/about` へ301で統合。内容が一致しない `/sfa/*` は一括転送せず404を維持する。
+- 第97回の名称・開催日をdescriptionと `WebSite` JSON-LDで明示し、500×500のfaviconをmetadataから指定する。
+- Googlebotの大きな画像プレビューを許可し、トップと委員会紹介の代表画像をサイトマップへ追加する。
+- Production反映後、Search Consoleでトップ・`/about` のインデックス登録をリクエストし、`sitemap.xml` を再送信する。
+
 ## なぜ rewrite ではなく redirect なのか
 
 当初は `setagayafes.org/96th/` の URL を保つため Vercel の rewrite でさくらへプロキシする方針だった。**アーカイブの実体が WordPress だと判明した時点で撤回した。**
@@ -66,7 +75,7 @@ Next.js の trailing-slash リダイレクトは **rewrite より先**に走る�
 /96th/  → Next が 308 → /96th  → rewrite → さくら 301 → /96th/  → …
 ```
 
-`skipTrailingSlashRedirect: true` で止められるが、サイト全体の trailing-slash 正規化が効かなくなる。本プロジェクトは `alternates.canonical` を実装していないため、`/events` と `/events/` の両方が 200 を返す重複URLが生まれる。
+`skipTrailingSlashRedirect: true` を設定し、`src/proxy.ts` で通常の末尾スラッシュ308を再現する。これによりサイト全体の正規化を維持したまま、旧アーカイブURLだけを直接301にできる。
 
 ### 理由2: Vercel の帯域を消費する
 
@@ -74,20 +83,20 @@ WordPress の全アセット（画像・CSS・JS）が Vercel を経由する。
 
 ## 301 の実測挙動
 
-Preview デプロイで確認した結果（`96th.setagayafes.org` はまだ存在しないため、最終ホップは名前解決に失敗する）。
+Previewおよび本番デプロイで確認した結果。
 
 | リクエスト      | ホップ | 最終到達先                            |
 | --------------- | ------ | ------------------------------------- |
 | `/96th`         | 1      | `https://96th.setagayafes.org/`       |
-| `/96th/`        | **2**  | `https://96th.setagayafes.org/`       |
-| `/96th/access/` | **2**  | `https://96th.setagayafes.org/access` |
-| `/96th/?q=1`    | **2**  | `https://96th.setagayafes.org/?q=1`   |
+| `/96th/`        | **1**  | `https://96th.setagayafes.org/`       |
+| `/96th/access/` | **1**  | `https://96th.setagayafes.org/access` |
+| `/96th/?q=1`    | **1**  | `https://96th.setagayafes.org/?q=1`   |
 
 パスもクエリも正しく引き継がれる。
 
-**末尾スラッシュつきのURLは 2 ホップになる。** `trailingSlash: false`（既定）のため Next.js がまず `/96th/` → `/96th` へ正規化し、そのあと 301 が走るためである。1 ホップにするにはサイト全体の `trailingSlash` 方針を変える必要があり、割に合わない。
+`/96th/` は `src/proxy.ts` で直接301を返す。その他の末尾スラッシュ付きURLは `src/proxy.ts` が従来どおり308で正規化するため、サイト全体の `trailingSlash` 方針は変わらない。
 
-また `/96th/access/` は `/access`（末尾スラッシュなし）へ引き継がれるため、移行先の WordPress が `/access` → `/access/` へ 301 する場合は合計 3 ホップになる。実用上の問題はない。
+また `/96th/access/` は `/access`（末尾スラッシュなし）へ引き継がれるため、移行先の WordPress が `/access` → `/access/` へ 301 する場合は合計 2 ホップになる。実用上の問題はない。
 
 > [!NOTE]
 > `permanent: true` は **308** を返す。本プロジェクトは `statusCode: 301` を明示している。308 の検索エンジンでの扱いは 301 と同等だが、古いクローラやリンクチェッカには 301 のほうが確実に伝わるためである。アーカイブへの GET 導線に method 保持（308 の利点）は不要。

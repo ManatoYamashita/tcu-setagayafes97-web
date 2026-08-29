@@ -17,6 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 1.0,
+      images: [`${baseUrl}/ogp.webp`],
     },
     {
       url: `${baseUrl}/events`,
@@ -71,6 +72,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.5,
+      images: [`${baseUrl}/images/photos/setagayafe97-image.webp`],
     },
     {
       url: `${baseUrl}/about/sponsors`,

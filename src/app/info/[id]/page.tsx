@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getNewsById, getNewsList } from "@/lib/news";
 import { Badge } from "@/components/ui/Badge";
+import { createPageMetadata } from "@/lib/metadata";
 
 interface NewsPageProps {
   params: Promise<{ id: string }>;
@@ -33,36 +34,27 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
   const news = await getNewsById(id);
 
   if (!news) {
-    return {
-      title: "お知らせが見つかりません | 東京都市大学 第97回 世田谷祭",
-    };
+    return createPageMetadata({
+      title: "お知らせが見つかりません",
+      description: "お探しのお知らせは見つかりませんでした。",
+      pathname: `/info/${id}`,
+    });
   }
 
-  return {
-    title: `${news.title} | 東京都市大学 第97回 世田谷祭`,
+  return createPageMetadata({
+    title: news.title,
     description: news.description || news.title,
-    openGraph: {
-      title: `${news.title} | 東京都市大学 第97回 世田谷祭`,
-      description: news.description || news.title,
-      type: "article",
-      images: news.thumbnail
-        ? [
-            {
-              url: news.thumbnail.url,
-              width: news.thumbnail.width,
-              height: news.thumbnail.height,
-              alt: news.title,
-            },
-          ]
-        : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${news.title} | 東京都市大学 第97回 世田谷祭`,
-      description: news.description || news.title,
-      images: news.thumbnail ? [news.thumbnail.url] : undefined,
-    },
-  };
+    pathname: `/info/${id}`,
+    type: "article",
+    image: news.thumbnail
+      ? {
+          url: news.thumbnail.url,
+          width: news.thumbnail.width,
+          height: news.thumbnail.height,
+          alt: news.title,
+        }
+      : undefined,
+  });
 }
 
 /**

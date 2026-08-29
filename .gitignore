@@ -61,3 +61,6 @@ stagewise.json
 # 個人情報を含む本番用契約書類（PII: 連絡先・氏名等を含むためリポジトリ外管理）
 docs/requires/contract-individual-v97.md
 .env*
+
+# 第96回 WordPress DBダンプ（認証情報・トークン・PIIを含むためリポジトリ外管理）
+96th-wordpress-db-backup-*.sql

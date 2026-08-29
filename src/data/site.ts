@@ -12,7 +12,7 @@ export const siteConfig = {
 
   // サイト説明
   description:
-    "東京都市大学 世田谷キャンパスで開催される学園祭の公式Webサイト。企画情報、タイムテーブル、キャンパスマップ、アクセス情報などを掲載しています。",
+    "東京都市大学 第97回 世田谷祭の公式Webサイト。2026年10月31日・11月1日の開催情報、企画、タイムテーブル、キャンパスマップ、アクセス情報をご案内します。",
 
   // 開催日程
   dates: {
@@ -33,14 +33,21 @@ export const siteConfig = {
 
   // SNS
   sns: {
-    twitter: "https://x.com/setagayafes_tcu?s=11",
-    instagram: "https://www.instagram.com/setagayafes_sfa?igsh=bWpzYWpqOGozZ3Nr&utm_source=qr",
-    youtube: "https://youtube.com/@setagayafes?si=WvB8ya5RrqvHg0Vj",
+    twitter: "https://x.com/setagayafes_tcu",
+    instagram: "https://www.instagram.com/setagayafes_sfa/",
+    youtube: "https://www.youtube.com/@setagayafes",
+  },
+
+  // 主催組織（構造化データと発行者情報で共通利用）
+  organization: {
+    name: "東京都市大学 世田谷祭実行委員会",
+    currentName: "第97回東京都市大学世田谷祭実行委員会",
   },
 
   // メタデータ
   metadata: {
     siteName: "東京都市大学 第97回 世田谷祭",
+    searchSiteName: "世田谷祭",
     siteUrl: process.env.NEXT_PUBLIC_URL || "https://setagayafes.org",
     ogImage: "/ogp.webp",
   },
@@ -98,3 +105,12 @@ export const NEWS_VISIBLE: boolean = process.env.NEXT_PUBLIC_NEWS_VISIBLE === "t
  * microCMS 側を下書きにするだけで済ませず、必ずこのフラグでも塞ぐこと。
  */
 export const SPECIAL_VISIBLE: boolean = process.env.NEXT_PUBLIC_SPECIAL_VISIBLE === "true";
+
+/**
+ * 著名人企画の物販表示フラグ
+ * 環境変数 NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE を "true" に設定した場合のみ、
+ * /special/[id] の物販情報を表示する。未設定・それ以外は非表示。
+ * SPECIAL_VISIBLE とは独立しており、プロフィール・出演情報・チケット等は維持する。
+ */
+export const SPECIAL_GOODS_VISIBLE: boolean =
+  process.env.NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE === "true";

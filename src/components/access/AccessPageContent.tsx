@@ -11,6 +11,7 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { AccessDirectionsTabs } from "@/components/access/AccessDirectionsTabs";
+import { AccessPageMotion } from "@/components/access/AccessPageMotion";
 import { AccessRouteMedia } from "@/components/access/AccessRouteMedia";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
 import {
@@ -43,12 +44,13 @@ export function AccessPageView({ content, locale }: AccessPageContentProps) {
 
   return (
     <PageSheetLayout hero={hero}>
+      <AccessPageMotion />
       <div className="space-y-16 pb-8 sm:space-y-20">
         <section
           aria-labelledby="location-heading"
           className="grid overflow-hidden border-y border-gray-200 bg-white lg:grid-cols-[minmax(0,1.55fr)_minmax(19rem,0.65fr)]"
         >
-          <div className="min-h-80 bg-gray-100 lg:min-h-[31rem]">
+          <div className="min-h-80 bg-gray-100 lg:min-h-[31rem]" data-access-reveal="left">
             <iframe
               src={accessConfig.googleMapsEmbedUrl}
               className="h-full min-h-80 w-full border-0 lg:min-h-[31rem]"
@@ -59,7 +61,7 @@ export function AccessPageView({ content, locale }: AccessPageContentProps) {
             />
           </div>
 
-          <div className="p-6 sm:p-8 lg:px-10 lg:py-12">
+          <div className="p-6 sm:p-8 lg:px-10 lg:py-12" data-access-reveal="right">
             <h2 id="location-heading" className="text-2xl font-bold text-gray-900">
               {content.location.title}
             </h2>
@@ -107,7 +109,10 @@ export function AccessPageView({ content, locale }: AccessPageContentProps) {
         </section>
 
         <section aria-labelledby="directions-heading">
-          <div className="mb-10 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.55fr)] lg:items-end">
+          <div
+            className="mb-10 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.55fr)] lg:items-end"
+            data-access-reveal="up"
+          >
             <div>
               <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-primary-700">
                 {content.directions.label}
@@ -123,18 +128,26 @@ export function AccessPageView({ content, locale }: AccessPageContentProps) {
           </div>
 
           {/* 経路の全体像を示す路線図イラスト（装飾）。素材と同じ16:9でトリミングを避ける */}
-          <div className="relative mx-auto mb-10 aspect-video w-full max-w-3xl overflow-hidden bg-gray-100">
+          <div
+            className="relative mx-auto mb-10 aspect-video w-full max-w-3xl overflow-hidden bg-gray-100"
+            data-access-reveal="scale"
+          >
             <AccessRouteMedia />
           </div>
 
-          <AccessDirectionsTabs
-            content={content.directions}
-            venue={content.location.venue}
-            trainRoutes={resolveTrainRoutes(locale)}
-            busRoutes={resolveBusRoutes(locale)}
-          />
+          <div data-access-reveal="up">
+            <AccessDirectionsTabs
+              content={content.directions}
+              venue={content.location.venue}
+              trainRoutes={resolveTrainRoutes(locale)}
+              busRoutes={resolveBusRoutes(locale)}
+            />
+          </div>
 
-          <p className="mt-6 flex items-start gap-2 text-sm leading-6 text-gray-600">
+          <p
+            className="mt-6 flex items-start gap-2 text-sm leading-6 text-gray-600"
+            data-access-reveal="up"
+          >
             <TriangleAlert aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
             {content.directions.congestionNote}
           </p>
@@ -144,7 +157,7 @@ export function AccessPageView({ content, locale }: AccessPageContentProps) {
           aria-labelledby="visit-notes-heading"
           className="rounded-3xl bg-gray-900 px-6 py-10 text-white sm:px-8 lg:px-10"
         >
-          <div className="mb-8 max-w-2xl">
+          <div className="mb-8 max-w-2xl" data-access-reveal="up">
             <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-primary-200">
               {content.visitNotes.label}
             </p>
@@ -153,7 +166,7 @@ export function AccessPageView({ content, locale }: AccessPageContentProps) {
             </h2>
           </div>
 
-          <ul className="grid gap-4 md:grid-cols-3" role="list">
+          <ul className="grid gap-4 md:grid-cols-3" role="list" data-access-stagger>
             {content.visitNotes.items.map((item, index) => {
               const Icon = index === 0 ? Car : index === 1 ? Bike : Clock3;
 
@@ -171,6 +184,7 @@ export function AccessPageView({ content, locale }: AccessPageContentProps) {
         <section
           aria-labelledby="campus-map-heading"
           className="grid gap-6 rounded-3xl border border-primary-200 bg-primary-50 p-6 sm:p-8 md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center"
+          data-access-reveal="scale"
         >
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-primary-700 shadow-sm">
             <Map aria-hidden="true" className="h-7 w-7" />

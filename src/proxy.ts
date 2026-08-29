@@ -1,6 +1,10 @@
+import { NextRequest, NextResponse } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { LOCALIZED_PATHNAMES } from "./i18n/localized-pathnames";
 import { routing } from "./i18n/routing";
+
+const intlProxy = createMiddleware(routing);
+const ARCHIVE_96TH_ORIGIN = "https://96th.setagayafes.org";
 
 /**
  * next-intl Proxy (旧: Middleware)
@@ -10,7 +14,24 @@ import { routing } from "./i18n/routing";
  *
  * @see https://next-intl.dev/docs/routing/middleware
  */
-export default createMiddleware(routing);
+export default function proxy(request: NextRequest) {
+  const { pathname, search } = request.nextUrl;
+
+  // 旧アーカイブURLは、Next.jsの末尾スラッシュ正規化を経由せず直接301する。
+  if (pathname === "/96th/" || pathname.startsWith("/96th/")) {
+    const archivePath = pathname.slice("/96th".length) || "/";
+    return NextResponse.redirect(`${ARCHIVE_96TH_ORIGIN}${archivePath}${search}`, 301);
+  }
+
+  // Next.jsの既定動作（末尾スラッシュを308で除去）を維持する。
+  if (pathname !== "/" && pathname.endsWith("/") && !request.headers.has("x-nextjs-data")) {
+    const normalizedUrl = new URL(request.url);
+    normalizedUrl.pathname = pathname.replace(/\/+$/, "");
+    return NextResponse.redirect(normalizedUrl, 308);
+  }
+
+  return intlProxy(request);
+}
 
 /**
  * マッチャー設定
@@ -45,6 +66,10 @@ export default createMiddleware(routing);
  */
 export const config = {
   matcher: [
+    // Next.jsの自動末尾スラッシュ正規化を proxy.ts で再現する。
+    "/:path+/",
+    "/96th/:path*",
+
     // ja 接頭辞つきURLは一律で接頭辞なしへ307リダイレクトする。
     // localePrefix: "as-needed" のため日本語の正規URLは接頭辞なし側であり、
     // /ja/access のような重複URLを残さない。多言語非対応ページ

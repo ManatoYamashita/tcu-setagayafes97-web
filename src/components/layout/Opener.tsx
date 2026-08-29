@@ -25,6 +25,20 @@ export function Opener() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    // モバイルではオープナーがLCP対象のヒーロー画像を覆い、低速回線で
+    // 初期表示を約1〜2秒遅らせる。演出はデスクトップに残し、モバイルは
+    // 本文をすぐ操作できる状態にする。
+    if (
+      window.matchMedia("(max-width: 767px)").matches ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      const hideOpener = window.setTimeout(() => {
+        setShowOpener(false);
+        window.dispatchEvent(new CustomEvent("opener-done"));
+      }, 0);
+      return () => window.clearTimeout(hideOpener);
+    }
+
     const safetyTimeout = setTimeout(() => {
       setShowOpener(false);
       window.dispatchEvent(new CustomEvent("opener-done"));
@@ -149,15 +163,12 @@ export function Opener() {
       ctxRef.current = ctx;
     };
 
-    if (document.readyState === "complete") {
-      startAnimation();
-    } else {
-      window.addEventListener("load", startAnimation);
-    }
+    // 全画像・動画の load を待つと、オープナー自体が表示完了を数秒遅らせる。
+    // useEffect 時点で参照は揃っているため、ハイドレーション直後に開始する。
+    startAnimation();
 
     return () => {
       clearTimeout(safetyTimeout);
-      window.removeEventListener("load", startAnimation);
       pulseTlRef.current?.kill();
       ctxRef.current?.revert();
     };
@@ -168,7 +179,7 @@ export function Opener() {
   }
 
   return (
-    <div ref={containerRef} className="opener-container">
+    <div ref={containerRef} className="opener-container" data-opener-active="true">
       {/* 紫レイヤー（初期: 薄ピンク → 濃い紫にフェード） */}
       <div
         ref={primaryLayerRef}
@@ -184,8 +195,10 @@ export function Opener() {
               src="/images/brand/favicon-white.webp"
               alt="世田谷祭ロゴ"
               fill
-              priority
               sizes="256px"
+              loading="lazy"
+              fetchPriority="low"
+              quality={60}
               className="object-contain"
             />
           </div>
@@ -195,8 +208,10 @@ export function Opener() {
               src="/images/brand/favicon.webp"
               alt="世田谷祭ロゴ"
               fill
-              priority
               sizes="256px"
+              loading="lazy"
+              fetchPriority="low"
+              quality={60}
               className="object-contain"
             />
           </div>

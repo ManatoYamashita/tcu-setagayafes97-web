@@ -1,7 +1,12 @@
+import dynamic from "next/dynamic";
 import { getFeaturedEvents } from "@/lib/events";
 import { EVENTS_VISIBLE } from "@/data/site";
-import { FeaturedCarousel } from "./FeaturedCarousel";
 import { FeaturedGearScene } from "./FeaturedGearScene";
+
+// 初期ビューポート外のカルーセルをトップページ初期JSから分離する。
+const FeaturedCarousel = dynamic(() =>
+  import("./FeaturedCarousel").then((module) => module.FeaturedCarousel)
+);
 
 /**
  * おすすめ企画セクション
@@ -22,7 +27,7 @@ export async function FeaturedEvents() {
   const featured = events.slice(0, 6);
 
   return (
-    <section className="relative overflow-hidden bg-secondary py-24 lg:py-32">
+    <section className="deferred-section deferred-section--events relative overflow-hidden bg-secondary py-24 lg:py-32">
       {/*
         3D歯車（装飾）。セクション左下から画面外へはみ出させ、本文の背面に敷く。
         セクションの overflow-hidden で切り取られるため、はみ出し量は自由に取れる。

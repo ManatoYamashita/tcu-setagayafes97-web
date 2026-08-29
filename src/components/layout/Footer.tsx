@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { siteConfig } from "@/data/site";
 import { FooterNav } from "@/components/layout/FooterNav";
 import { SocialIcons } from "@/components/ui/SocialIcons";
@@ -18,7 +19,15 @@ export function Footer() {
         <div className="container mx-auto px-4 py-8">
           {/* ロゴ: 左上 */}
           <div className="mb-6">
-            <img src="/images/brand/logo-white.webp" alt={siteConfig.shortName} className="w-48" />
+            <Image
+              src="/images/brand/logo-white.webp"
+              alt={siteConfig.shortName}
+              width={192}
+              height={77}
+              sizes="192px"
+              quality={60}
+              className="h-auto w-48"
+            />
           </div>
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
@@ -31,17 +40,21 @@ export function Footer() {
                 layout="horizontal"
                 size="md"
                 showLabel={false}
-                variant="circle"
-                className="text-white/70"
+                variant="minimal"
+                className="text-white/85"
               />
             </div>
           </div>
 
-          <div className="mt-8 border-t border-white/20 pt-8 flex flex-col items-center text-white/60">
-            <img
+          <div className="mt-8 flex flex-col items-center border-t border-white/20 pt-8 text-white/85">
+            <Image
               src="/images/brand/logo-white.webp"
               alt={siteConfig.shortName}
-              className="mb-3 w-12"
+              width={48}
+              height={19}
+              sizes="48px"
+              quality={60}
+              className="mb-3 h-auto w-12"
             />
             <p className="mb-2">{siteConfig.name}</p>
             <p className="text-sm">
