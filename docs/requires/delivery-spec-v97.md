@@ -25,7 +25,7 @@ WEB担当長　沖山美羽　様
 
 世田谷祭公式ホームページ全体（PC版およびスマートフォン版）
 
-- 対応ブラウザ：Chrome／Safari／Firefox／Edge（最新2バージョン）、iOS Safari（iOS 15以上）、Android Chrome（最新）
+- 対応ブラウザ：Chrome／Safari／Firefox／Edge（最新2バージョン）、iOS Safari（iOS 16.4以上）、Android Chrome（最新）
 - ホスティング：Vercel（Free Plan）
 
 ## 3. 業務内容
@@ -101,4 +101,4 @@ WEB担当長　沖山美羽　様
 
 ---
 
-**最終更新日**: 2026-07-04
+**最終更新日**: 2026-08-29
