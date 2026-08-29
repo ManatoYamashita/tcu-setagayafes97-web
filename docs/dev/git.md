@@ -54,7 +54,8 @@ refactor/<refactor-target>   # リファクタリング
 2. **作業**: コミットを積み重ねる
 
    ```bash
-   git add .
+   git status --short              # 意図しないファイルが無いか確認
+   git add <パスを明示>            # git add . / git add -A は禁止（後述）
    git commit -m "PREFIX: Commit message"
    git push origin feature/your-feature
    ```
