@@ -98,3 +98,13 @@ export const willRunOpener = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(min-width: 768px)").matches &&
   !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/**
+ * 入場アニメーションが `opener-done` を待つべきか。
+ *
+ * 入場を持つページはすべてこれを使うこと。「オープナーが走る環境か」と
+ * 「合図が既に撃たれたか」の両方を見る必要があり、片方だけの判定は必ず壊れる。
+ * - 環境だけ見る → 合図の後にハイドレートされたページが永久に待つ
+ * - DOM マーカーだけ見る → Opener が dynamic(ssr:false) のため常に「居ない」
+ */
+export const shouldWaitForOpener = () => willRunOpener() && !hasOpenerFinished();

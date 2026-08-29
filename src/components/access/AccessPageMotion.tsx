@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { OPENER_FAILSAFE_MS, shouldWaitForOpener } from "@/lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -34,114 +35,131 @@ export function AccessPageMotion() {
     if (!root || ctxRef.current) return;
     if (window.matchMedia(REDUCED_MOTION_QUERY).matches) return;
 
-    const ctx = gsap.context(() => {
-      const heroImage = root.querySelector<HTMLElement>("[data-page-hero-image]");
-      const heroImageElement = heroImage?.querySelector("img");
-      const heroCopy = root.querySelector<HTMLElement>("[data-page-hero-copy]");
-      const heroCopyItems = heroCopy ? Array.from(heroCopy.children) : [];
+    const runEntrance = () => {
+      if (ctxRef.current) return;
 
-      const entrance = gsap.timeline({
-        defaults: { ease: "power3.out", force3D: true },
-      });
+      const ctx = gsap.context(() => {
+        const heroImage = root.querySelector<HTMLElement>("[data-page-hero-image]");
+        const heroImageElement = heroImage?.querySelector("img");
+        const heroCopy = root.querySelector<HTMLElement>("[data-page-hero-copy]");
+        const heroCopyItems = heroCopy ? Array.from(heroCopy.children) : [];
 
-      if (heroImage) {
-        entrance.from(
-          heroImage,
-          {
+        const entrance = gsap.timeline({
+          defaults: { ease: "power3.out", force3D: true },
+        });
+
+        if (heroImage) {
+          entrance.from(
+            heroImage,
+            {
+              autoAlpha: 0,
+              duration: 0.9,
+              clearProps: "opacity,visibility,transform",
+            },
+            0
+          );
+        }
+
+        if (heroImageElement) {
+          entrance.from(
+            heroImageElement,
+            {
+              scale: 1.08,
+              duration: 1.35,
+              clearProps: "transform",
+            },
+            0
+          );
+        }
+
+        if (heroCopyItems.length > 0) {
+          entrance.from(
+            heroCopyItems,
+            {
+              autoAlpha: 0,
+              y: 28,
+              duration: 0.75,
+              stagger: 0.1,
+              clearProps: "opacity,visibility,transform",
+            },
+            0.18
+          );
+        }
+
+        if (pageSheet) {
+          entrance.from(
+            pageSheet,
+            {
+              y: 48,
+              duration: 0.9,
+              clearProps: "transform",
+            },
+            0.48
+          );
+        }
+
+        const revealTargets = gsap.utils.toArray<HTMLElement>("[data-access-reveal]", root);
+
+        revealTargets.forEach((target) => {
+          const variant = (target.dataset.accessReveal || "up") as RevealVariant;
+
+          gsap.from(target, {
             autoAlpha: 0,
-            duration: 0.9,
+            duration: variant === "scale" ? 0.85 : 0.72,
+            ease: "power3.out",
+            force3D: true,
             clearProps: "opacity,visibility,transform",
-          },
-          0
-        );
-      }
+            ...revealOffsets[variant],
+            scrollTrigger: {
+              trigger: target,
+              start: "top 86%",
+              once: true,
+            },
+          });
+        });
 
-      if (heroImageElement) {
-        entrance.from(
-          heroImageElement,
-          {
-            scale: 1.08,
-            duration: 1.35,
-            clearProps: "transform",
-          },
-          0
-        );
-      }
+        const staggerGroups = gsap.utils.toArray<HTMLElement>("[data-access-stagger]", root);
 
-      if (heroCopyItems.length > 0) {
-        entrance.from(
-          heroCopyItems,
-          {
+        staggerGroups.forEach((group) => {
+          const items = Array.from(group.children);
+
+          if (items.length === 0) return;
+
+          gsap.from(items, {
             autoAlpha: 0,
-            y: 28,
-            duration: 0.75,
+            y: 24,
+            duration: 0.64,
+            ease: "power3.out",
             stagger: 0.1,
+            force3D: true,
             clearProps: "opacity,visibility,transform",
-          },
-          0.18
-        );
-      }
-
-      if (pageSheet) {
-        entrance.from(
-          pageSheet,
-          {
-            y: 48,
-            duration: 0.9,
-            clearProps: "transform",
-          },
-          0.48
-        );
-      }
-
-      const revealTargets = gsap.utils.toArray<HTMLElement>("[data-access-reveal]", root);
-
-      revealTargets.forEach((target) => {
-        const variant = (target.dataset.accessReveal || "up") as RevealVariant;
-
-        gsap.from(target, {
-          autoAlpha: 0,
-          duration: variant === "scale" ? 0.85 : 0.72,
-          ease: "power3.out",
-          force3D: true,
-          clearProps: "opacity,visibility,transform",
-          ...revealOffsets[variant],
-          scrollTrigger: {
-            trigger: target,
-            start: "top 86%",
-            once: true,
-          },
+            scrollTrigger: {
+              trigger: group,
+              start: "top 84%",
+              once: true,
+            },
+          });
         });
-      });
+      }, root);
 
-      const staggerGroups = gsap.utils.toArray<HTMLElement>("[data-access-stagger]", root);
+      ctxRef.current = ctx;
+      ScrollTrigger.refresh();
+    };
 
-      staggerGroups.forEach((group) => {
-        const items = Array.from(group.children);
+    // オープナーが画面を覆っている間に入場が終わらないよう、合図を待つ。
+    // SpecialPageMotion と同じ理由だが、こちらだけ待機が欠けていた。
+    let failsafeId: number | undefined;
 
-        if (items.length === 0) return;
-
-        gsap.from(items, {
-          autoAlpha: 0,
-          y: 24,
-          duration: 0.64,
-          ease: "power3.out",
-          stagger: 0.1,
-          force3D: true,
-          clearProps: "opacity,visibility,transform",
-          scrollTrigger: {
-            trigger: group,
-            start: "top 84%",
-            once: true,
-          },
-        });
-      });
-    }, root);
-
-    ctxRef.current = ctx;
-    ScrollTrigger.refresh();
+    if (shouldWaitForOpener()) {
+      window.addEventListener("opener-done", runEntrance);
+      failsafeId = window.setTimeout(runEntrance, OPENER_FAILSAFE_MS);
+    } else {
+      runEntrance();
+    }
 
     return () => {
+      window.removeEventListener("opener-done", runEntrance);
+      if (failsafeId !== undefined) window.clearTimeout(failsafeId);
       ctxRef.current?.revert();
       ctxRef.current = null;
     };

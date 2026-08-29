@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { OPENER_FAILSAFE_MS } from "@/lib/motion";
+import { OPENER_FAILSAFE_MS, shouldWaitForOpener } from "@/lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -172,11 +172,9 @@ export function SpecialPageMotion() {
       });
     };
 
-    // 遅延ローダーの空フォールバックは、実体のオープナーとして扱わない。
-    const hasOpener = !!document.querySelector("[data-opener-active]");
     let failsafeId: number | undefined;
 
-    if (hasOpener) {
+    if (shouldWaitForOpener()) {
       window.addEventListener("opener-done", runEntrance);
       failsafeId = window.setTimeout(runEntrance, OPENER_FAILSAFE_MS);
     } else {
