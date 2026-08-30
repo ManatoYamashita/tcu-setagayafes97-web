@@ -4,6 +4,20 @@ import { getNewsList } from "@/lib/news";
 import { siteConfig, SPECIAL_VISIBLE } from "@/data/site";
 
 /**
+ * 再検証間隔（Webhook 障害時のフォールバック）
+ *
+ * 主系は microCMS Webhook によるオンデマンド再検証（`src/app/api/revalidate/route.ts`）で、
+ * こちらは通知を取りこぼしたときの保険である。microCMS の Webhook は失敗しても再送されない。
+ *
+ * **この宣言を外すと新規コンテンツが永久に sitemap へ出なくなる。**
+ * 宣言が無い間、`.next/prerender-manifest.json` の `/sitemap.xml` は
+ * `initialRevalidateSeconds: false`（＝時間経過では再生成されない）だった。
+ * このファイルは events / news の両方を読むため、再デプロイするまで新規企画も
+ * 新規お知らせも sitemap に載らない状態になる。
+ */
+export const revalidate = 3600;
+
+/**
  * サイトマップ自動生成
  * Next.js 14+ の sitemap.ts ファイルで動的生成
  */

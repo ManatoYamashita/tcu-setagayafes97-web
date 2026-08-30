@@ -184,9 +184,10 @@ microCMS 管理画面のフィールド種類選択ダイアログは、**実マ
 
 ## 関連ドキュメント
 
+- [docs/dev/content-revalidation.md](./content-revalidation.md) — Webhook によるオンデマンド再検証と運用手順
 - [.claude/CLAUDE.md](../../.claude/CLAUDE.md) — microCMS API 設計（フィールド定義）
 - [docs/requires/require.md](../requires/require.md) — 要件定義書
 
 ---
 
-**最終更新日**: 2026-08-16
+**最終更新日**: 2026-08-30

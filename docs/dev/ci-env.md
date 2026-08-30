@@ -41,6 +41,32 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 > CI（`feature-ci.yml`）は Lint / Format / Build の検証だけなので、公開フラグが未登録でも **`false` としてビルドが通る**。
 > **つまり CI が緑でも、公開状態のページがビルドできることは何も検証していない。**
 
+### Vercel のみに登録する変数（GitHub には登録しない）
+
+| 変数名                    | 内容                                      | 登録先                                         |
+| ------------------------- | ----------------------------------------- | ---------------------------------------------- |
+| `MICROCMS_WEBHOOK_SECRET` | microCMS Webhook の署名検証用シークレット | `.env.example` / Vercel（Production・Preview） |
+
+> [!IMPORTANT]
+> **`MICROCMS_WEBHOOK_SECRET` を GitHub Secrets と `feature-ci.yml` に登録してはいけない。**
+> `src/app/api/revalidate/route.ts` がリクエスト受信時にしか読まないため、ビルドには一切不要である。
+> 未設定でもビルドは通る（実行時に 500 を返す fail closed 設計）。
+> **これは登録漏れではなく意図的な除外である。** 後から「他の microCMS 変数と揃っていない」と
+> 判断して追加しないこと。CI に秘密情報を増やす理由がない。
+
+> [!WARNING]
+> **Vercel への登録は、microCMS 側で Webhook を作成する「前」に済ませること。**
+> 順序を逆にすると、シークレット未設定の間の入稿が 500 で拒否される。
+> **microCMS の Webhook は失敗しても再送されないため、その入稿の再検証は永久に失われる。**
+> 詳細は [content-revalidation.md](./content-revalidation.md)。
+
+### フラグ以外の変数を追加したときの判断基準
+
+| 読むタイミング                   | 登録先                                                             |
+| -------------------------------- | ------------------------------------------------------------------ |
+| ビルド時（`NEXT_PUBLIC_*` 等）   | `.env.example` / GitHub Variables or Secrets / Vercel / 本ファイル |
+| リクエスト時（Route Handler 内） | `.env.example` / Vercel / 本ファイル（GitHub は不要）              |
+
 ## ワークフローでの参照例
 
 ```yaml
