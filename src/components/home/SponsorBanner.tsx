@@ -21,6 +21,3 @@ export async function SponsorBanner() {
     </section>
   );
 }
-
-// ISR設定: 24時間ごとに再検証
-export const revalidate = 86400;

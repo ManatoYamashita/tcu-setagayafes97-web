@@ -46,5 +46,11 @@ export default async function Home() {
   );
 }
 
-// ISR設定: 1時間ごとに再検証
+/**
+ * ISR設定: 1時間ごとに再検証。
+ *
+ * Route Segment Config が有効なのは page / layout / route の3種のみである。
+ * このページが描画するコンポーネント側に `export const revalidate` を書いても
+ * Next.js は読み取らないため、配下のデータ取得はすべてこの値で再検証される。
+ */
 export const revalidate = 3600;
