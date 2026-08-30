@@ -50,9 +50,14 @@
 
 | 項目             | 内容                      |
 | ---------------- | ------------------------- |
-| テーマカラー     | `#CD79EE`（紫）           |
+| テーマカラー     | `#bf73e3`（紫）※1         |
 | レスポンシブ対応 | モバイルファースト設計    |
 | 参考サイト       | https://sumitomoexpo.com/ |
+
+※1 デザイン仕様上のブランドカラーは HLC H319 / L64 / C70 で、HEX に直すと `#CD79EE`。
+ただし実装は `@theme` で oklch 定義しており、Lightning CSS が sRGB へ変換した結果
+**実際に配信されるのは `#bf73e3`** である。コントラスト検証は必ず実配信値で行うこと
+（`docs/frontend/design.md`「ブランドカラー」）。
 
 ### 2.3 開発方針
 
@@ -424,7 +429,7 @@ export const siteConfig = {
   openTime: "10:00",
   closeTime: "18:00",
   venue: "東京都市大学 世田谷キャンパス",
-  themeColor: "#CD79EE",
+  themeColor: "#bf73e3",
   sns: {
     twitter: "https://twitter.com/xxxxx",
     instagram: "https://instagram.com/xxxxx",

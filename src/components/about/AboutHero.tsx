@@ -135,11 +135,18 @@ export function AboutHero() {
       ref={sectionRef}
       className="relative flex h-[calc(100svh-var(--header-height))] w-full items-center justify-center overflow-hidden"
     >
-      {/* Layer 0: Grainient 背景 */}
+      {/*
+        Layer 0: Grainient 背景
+
+        Grainient は色を WebGL シェーダの uniform へ渡すため、CSS 変数を解決できない。
+        ここだけは実配信 HEX の直書きが必要である。color2 は --color-primary-400 の
+        実配信値であり、@theme を変更したら手で追従させること。
+        color1 / color3 はトークン外の演出色で、どのスケールにも属さない。
+      */}
       <div className="absolute inset-0 z-0">
         <Grainient
           color1="#F9F0FD"
-          color2="#CD79EE"
+          color2="#bf73e3"
           color3="#5227FF"
           timeSpeed={1}
           grainAmount={0.15}

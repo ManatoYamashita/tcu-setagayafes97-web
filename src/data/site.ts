@@ -28,8 +28,12 @@ export const siteConfig = {
   venue: "東京都市大学 世田谷キャンパス",
   address: "〒158-8557 東京都世田谷区玉堤1-28-1",
 
-  // テーマカラー
-  themeColor: "#CD79EE",
+  // テーマカラー（--color-primary-400 の実配信値）
+  //
+  // NOTE: 現在この値はどこからも読まれていない。`export const viewport` も
+  // <meta name="theme-color"> も存在しないため、ブラウザへは配信されていない。
+  // 実際に出す場合は @theme の primary-400 と手で同期させること。
+  themeColor: "#bf73e3",
 
   // SNS
   sns: {
