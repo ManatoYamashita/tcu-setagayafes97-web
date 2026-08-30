@@ -19,7 +19,8 @@ docs/
 │   ├── domain-migration.md # setagayafes.org を第97回の正規ドメインにする手順
 │   ├── 96th-db-backup.md # 第96回 WordPress DBバックアップの検証情報と取扱い
 │   ├── seo-metadata.md # 共通metadata・canonicalとテストページ除外
-│   └── microcms.md   # microCMS API 制約と実装パターン
+│   ├── microcms.md   # microCMS API 制約と実装パターン
+│   └── content-revalidation.md # microCMS Webhook によるオンデマンド再検証と運用手順
 ├── frontend/         # フロントエンド関連ドキュメント
 │   ├── design.md                  # デザインシステム（カラー・タイポグラフィトークン）
 │   ├── access-page-design.md      # Accessページの情報設計・UI実装方針
@@ -148,6 +149,14 @@ docs/
   - カスタムフィールドのネスト制約と作成順序（子から親へ）。API をまたいだ参照は不可
   - **管理画面はブラウザ自動操作で編集できない。** 種類選択が実マウスイベントに依存し、スクリプトでは別の行へ適用される
   - **下書きコンテンツで動作確認はできない。** `draftKey` は保存のたびに変わり失効する。表示確認はダミーを直接渡す一時ページで行う
+
+- **[content-revalidation.md](./dev/content-revalidation.md)** - コンテンツ反映の仕組み（オンデマンド再検証）
+  - microCMS Webhook（`POST /api/revalidate`）を主系、時間ベース ISR を保険とする二段構え
+  - **`revalidatePath` はパスの API ではなくタグの API。** `/about` や `type` 無しの動的ルートは、エラーにならず静かに何もしない
+  - microCMS 側の設定手順。**削除・公開終了の通知タイミングは既定 OFF** で、ONにしないと「消したのに残る」が直らない
+  - **`pnpm dev` ではキャッシュ挙動を検証できない。** dev は全エントリを常に stale 扱いにする
+  - 障害切り分け表（Webhook 実行履歴 → Vercel ログ → `x-vercel-cache`）
+  - microCMS を読むページを増やしたときの対応表更新手順
 
 ### フロントエンド関連（frontend/）
 

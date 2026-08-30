@@ -181,6 +181,34 @@ push 時は head をそのまま、PR 時は head を base へマージした結
   - `select` の値は `day1 : 10月31日（土）` のように **`値 : ラベル`** 形式。コード側は `split(":")` で先頭を取り出す
 - **Informations API**: `category` (sponsor/faq/other), `title`, `description`, `image`, `url`, `priority`
 
+### データ反映の仕組み（オンデマンド再検証）
+
+microCMS の入稿は **Webhook 経由で数秒以内**に本番へ反映される。詳細と運用手順は
+[`docs/dev/content-revalidation.md`](../docs/dev/content-revalidation.md) を参照。
+
+| 系統 | 手段                                                                  | 反映まで               |
+| ---- | --------------------------------------------------------------------- | ---------------------- |
+| 主系 | microCMS Webhook → `POST /api/revalidate` → `revalidatePath()`        | 数秒                   |
+| 保険 | 各ページの `export const revalidate`（3600 / `/special/[id]` は 600） | 最大1時間＋1リクエスト |
+
+**microCMS の Webhook は失敗しても再送されない。** 時間ベース ISR はその取りこぼしを拾う保険であり、
+`revalidate` 宣言を消してはいけない。
+
+> [!IMPORTANT]
+> **microCMS を読むページを増やしたら、[`src/lib/revalidate-targets.ts`](../src/lib/revalidate-targets.ts)
+> の対応表も同じコミットで更新すること。** 漏れてもエラーにはならず、そのページだけ静かに古いまま残る。
+> ページ本体の import だけでなく、**そのページが描画する Server Component が読むデータも数える**
+> （`/` の `SponsorBanner` や `FeaturedEvents` がその例）。
+
+`revalidatePath` はパスの API ではなく**タグの API** である。次の3つはエラーにならず静かに no-op になる。
+
+- `revalidatePath("/about")` — 実体は `/ja/about`。`["/[locale]/about", "page"]` と書く
+- `revalidatePath("/events/[id]")` — 動的ルートには `type` が要る
+- `revalidatePath("/sitemap.xml", "page")` — メタデータルートの派生タグは `/route`。`type` を付けない
+
+**公開フラグ `NEXT_PUBLIC_*_VISIBLE` はビルド時評価であり、Webhook では切り替わらない。**
+解禁作業には従来どおり再デプロイが要る。
+
 ### パフォーマンス最適化
 
 **Vercel Free Plan 制約を考慮:**

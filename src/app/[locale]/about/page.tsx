@@ -8,6 +8,20 @@ import { SponsorBanner } from "@/components/home/SponsorBanner";
 import { createPageMetadata } from "@/lib/metadata";
 
 /**
+ * 再検証間隔（Webhook 障害時のフォールバック）
+ *
+ * このページは末尾で `<SponsorBanner />` を描画しており、その中で microCMS の
+ * `informations` を読んでいる。主系は Webhook によるオンデマンド再検証
+ * （`src/app/api/revalidate/route.ts`）で、こちらは通知を取りこぼしたときの保険である。
+ *
+ * **この宣言を外すと新規協賛が永久に反映されなくなる。**
+ * 宣言が無い間、`/{ja,en,zh,ko}/about` は `initialRevalidateSeconds: false` であり、
+ * 同じ `informations` を `revalidate = 3600` で描画している `/about/sponsors` と
+ * 食い違っていた。値を揃えてある。
+ */
+export const revalidate = 3600;
+
+/**
  * 静的パラメータ生成
  */
 export function generateStaticParams() {
