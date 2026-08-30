@@ -59,5 +59,3 @@ export async function FeaturedEvents() {
     </section>
   );
 }
-
-export const revalidate = 3600;
