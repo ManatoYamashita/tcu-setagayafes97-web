@@ -7,27 +7,29 @@
 
 @theme {
   /* ===== Primary Scale (デザインドキュメント準拠) ===== */
-  --color-primary-50: oklch(95% 0.035 314deg); /* #F9F0FD */
-  --color-primary-100: oklch(88% 0.07 314deg); /* #F0DAFA */
-  --color-primary-200: oklch(80% 0.11 314deg); /* #E3C0F7 */
-  --color-primary-300: oklch(74% 0.14 314deg); /* #DAA7F3 */
-  --color-primary-400: oklch(68% 0.175 314deg); /* #CD79EE - ブランドカラー */
-  --color-primary-500: oklch(57% 0.175 314deg); /* #B04FD6 */
-  --color-primary-600: oklch(47% 0.165 314deg); /* #8E3AB0 */
-  --color-primary-700: oklch(37% 0.14 314deg); /* #6B2588 */
-  --color-primary-900: oklch(18% 0.075 314deg); /* #2D0D40 */
+  --color-primary-50: oklch(95% 0.035 314deg); /* 実配信 #f7e8ff */
+  --color-primary-100: oklch(88% 0.07 314deg); /* 実配信 #e9caf8 */
+  --color-primary-200: oklch(80% 0.11 314deg); /* 実配信 #d8a8f0 */
+  --color-primary-300: oklch(74% 0.14 314deg); /* 実配信 #cb8fe8 */
+  --color-primary-400: oklch(
+    68% 0.175 314deg
+  ); /* 実配信 #bf73e3 — ブランドカラー（仕様値 #CD79EE） */
+  --color-primary-500: oklch(57% 0.175 314deg); /* 実配信 #9c50be */
+  --color-primary-600: oklch(47% 0.165 314deg); /* 実配信 #7b359a */
+  --color-primary-700: oklch(37% 0.14 314deg); /* 実配信 #592072 */
+  --color-primary-900: oklch(18% 0.075 314deg); /* 実配信 #1d0428 */
 
   /* ===== Secondary Brand Color (新規追加) ===== */
-  --color-secondary: oklch(79.5% 0.108 314deg); /* #E1C0EE - 背景用 */
+  --color-secondary: oklch(79.5% 0.108 314deg); /* 実配信 #d5a7ed — 背景用（仕様値 #E1C0EE） */
 
   /* ===== Neutral Scale ===== */
-  --color-gray-50: oklch(97% 0 0deg); /* #F7F7F7 */
-  --color-gray-100: oklch(93% 0 0deg); /* #EDEDED */
-  --color-gray-200: oklch(86% 0 0deg); /* #DBDBDB */
-  --color-gray-400: oklch(65% 0 0deg); /* #A3A3A3 */
-  --color-gray-600: oklch(45% 0 0deg); /* #737373 */
-  --color-gray-700: oklch(35% 0 0deg); /* #525252 */
-  --color-gray-900: oklch(13% 0 0deg); /* #212121 */
+  --color-gray-50: oklch(97% 0 0deg); /* 実配信 #f5f5f5 */
+  --color-gray-100: oklch(93% 0 0deg); /* 実配信 #e8e8e8 */
+  --color-gray-200: oklch(86% 0 0deg); /* 実配信 #d1d1d1 */
+  --color-gray-400: oklch(65% 0 0deg); /* 実配信 #8f8f8f */
+  --color-gray-600: oklch(45% 0 0deg); /* 実配信 #555555 */
+  --color-gray-700: oklch(35% 0 0deg); /* 実配信 #3a3a3a */
+  --color-gray-900: oklch(13% 0 0deg); /* 実配信 #070707 */
 
   /* ===== Semantic Colors ===== */
   --color-bg: var(--color-secondary); /* ページ背景: 淡い紫 */
@@ -42,8 +44,8 @@
      コントラストは 1.23:1、白10%を重ねたカードでも 1.32:1 しかなく、ほぼ同色になる。
      暗色背景時代の名残であり、淡紫背景の現行デザインでは装飾用途に限る。
      淡紫背景上のテキストは --color-primary-700(5.64:1) を使うこと（docs/frontend/design.md）。
-     比率は出力CSSの実配信値で算出している。上の各行の HEX コメントは Lightning CSS が
-     oklch から変換した実値とずれるため、コントラストの根拠に使わないこと */
+     比率も上の各行の HEX も、Lightning CSS が oklch から変換した出力CSSの実配信値である。
+     デザイン仕様の HEX（ブランドカラー #CD79EE 等）とは別の値なので混同しないこと */
   --color-primary-light: var(--color-primary-300);
   /* 白背景では 7.45:1 だが、淡紫背景では 3.75:1 で AA に届かない。背景で使い分けること */
   --color-primary-dark: var(--color-primary-600);
@@ -78,7 +80,7 @@
 }
 
 body {
-  color: var(--color-text); /* #212121 */
+  color: var(--color-text); /* 実配信 #070707 */
   background-color: #ffffff;
 }
 
@@ -114,9 +116,9 @@ body {
      Preflight の a { color: inherit } には詳細度で勝ち、
      個別に当てた text-* ユーティリティには負ける優先順位になる */
   .prose a {
-    /* Primary(#CD79EE) は白背景の通常テキストでコントラスト約2.8:1 となり
-       WCAG AA を満たさない。本文中のインラインリンクには 6.2:1 の
-       primary-dark(#8E3AB0) を使う。詳細は docs/frontend/design.md */
+    /* Primary(実配信 #bf73e3) は白背景の通常テキストでコントラスト 3.10:1 となり
+       WCAG AA を満たさない。本文中のインラインリンクには 7.45:1 の
+       primary-dark(実配信 #7b359a) を使う。詳細は docs/frontend/design.md */
     color: var(--color-primary-dark);
     text-decoration: none;
     text-underline-offset: 2px;

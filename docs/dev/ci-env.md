@@ -156,6 +156,27 @@ vercel env ls | grep VISIBLE           # environments 列に Production があ�
 curl -s <deployment url>/special | grep -o '準備中'   # 何も出なければ公開されている
 ```
 
+#### 実例：`.env.local` 内の二重定義（2026-08-30）
+
+同じ `.env.local` に `NEXT_PUBLIC_SPECIAL_VISIBLE` が2回書かれていた。
+
+```
+NEXT_PUBLIC_SPECIAL_VISIBLE=false      # フラグをまとめたブロック内
+...
+# 著名人企画LPのローカル確認用（#70 / #71）
+NEXT_PUBLIC_SPECIAL_VISIBLE=true       # ファイル末尾に後から追記
+```
+
+**dotenv も Next.js の env ローダーも後勝ちなので、実効値は `true`。前の行は黙って死ぬ。** 警告もエラーも出ない。
+上のブロックだけを見た人は「非公開のはず」と読み、実際には公開されている状態を見落とす。前節の登録漏れと逆向きの、同じ種類の事故である。
+
+一時的にフラグを切り替えたいときは、**既存の行の値を書き換える**こと。末尾に追記して上書きしない。
+
+```bash
+# 二重定義の検出（同じキーが2回以上出たら重複）
+grep -oE "^[A-Z0-9_]+" .env.local | sort | uniq -d
+```
+
 ## Vercel の本番反映
 
 > [!IMPORTANT]

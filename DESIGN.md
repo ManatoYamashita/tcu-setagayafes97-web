@@ -15,44 +15,47 @@
 
 ## 2. Color Palette & Roles
 
-カラーはすべて **oklch()** で一次定義。HEX は近似値として併記。
+カラーはすべて **oklch()** で一次定義。HEX は Lightning CSS が出力する**実配信値**を併記する（デザイン仕様の HEX とは別の値。差分は `docs/frontend/design.md` のブランドカラー属性表を参照）。
 
 ### Primary — Wisteria（藤）
 
 世田谷祭のテーマカラー。CTA ボタン、リンク、強調要素に使用。
 
-| Token                     | oklch                         | HEX 近似      | 用途                       |
+デザイン仕様上のブランドカラーは `#CD79EE`（HLC H319 / L64 / C70）。ただし `@theme` の oklch 定義から Lightning CSS が出力するのは `#bf73e3` で、**実際に画面へ出るのはこちら**。表の HEX は全て実配信値である。
+
+| Token                     | oklch                         | 実配信 HEX    | 用途                       |
 | ------------------------- | ----------------------------- | ------------- | -------------------------- |
-| `--color-primary-50`      | `oklch(95% 0.035 314deg)`     | `#F9F0FD`     | 極薄背景、ホバー状態       |
-| `--color-primary-100`     | `oklch(88% 0.07 314deg)`      | `#F0DAFA`     | 薄い背景、タグ背景         |
-| `--color-primary-200`     | `oklch(80% 0.11 314deg)`      | `#E3C0F7`     | 淡いアクセント             |
-| `--color-primary-300`     | `oklch(74% 0.14 314deg)`      | `#DAA7F3`     | 補助的なアクセント         |
-| **`--color-primary-400`** | **`oklch(68% 0.175 314deg)`** | **`#CD79EE`** | **ブランドカラー（基準）** |
-| `--color-primary-500`     | `oklch(57% 0.175 314deg)`     | `#B04FD6`     | ホバー・フォーカス         |
-| `--color-primary-600`     | `oklch(47% 0.165 314deg)`     | `#8E3AB0`     | ダークアクセント           |
-| `--color-primary-700`     | `oklch(37% 0.14 314deg)`      | `#6B2588`     | ダークテキスト用           |
-| `--color-primary-900`     | `oklch(18% 0.075 314deg)`     | `#2D0D40`     | 最暗（ほぼ黒紫）           |
+| `--color-primary-50`      | `oklch(95% 0.035 314deg)`     | `#f7e8ff`     | 極薄背景、ホバー状態       |
+| `--color-primary-100`     | `oklch(88% 0.07 314deg)`      | `#e9caf8`     | 薄い背景、タグ背景         |
+| `--color-primary-200`     | `oklch(80% 0.11 314deg)`      | `#d8a8f0`     | 淡いアクセント             |
+| `--color-primary-300`     | `oklch(74% 0.14 314deg)`      | `#cb8fe8`     | 補助的なアクセント         |
+| **`--color-primary-400`** | **`oklch(68% 0.175 314deg)`** | **`#bf73e3`** | **ブランドカラー（基準）** |
+| `--color-primary-500`     | `oklch(57% 0.175 314deg)`     | `#9c50be`     | ホバー・フォーカス         |
+| `--color-primary-600`     | `oklch(47% 0.165 314deg)`     | `#7b359a`     | ダークアクセント           |
+| `--color-primary-700`     | `oklch(37% 0.14 314deg)`      | `#592072`     | ダークテキスト用           |
+| `--color-primary-900`     | `oklch(18% 0.075 314deg)`     | `#1d0428`     | 最暗（ほぼ黒紫）           |
 
 ### Secondary — Lavender Mist（ラベンダーミスト）
 
 ページ全体の背景色。Primary より明度が高く、テキストとのコントラストを確保しやすい。
 
-| 属性  | 値                          |
-| ----- | --------------------------- |
-| oklch | `oklch(79.5% 0.108 314deg)` |
-| HEX   | `#E1C0EE`                   |
+| 属性       | 値                          |
+| ---------- | --------------------------- |
+| oklch      | `oklch(79.5% 0.108 314deg)` |
+| 実配信 HEX | `#d5a7ed`                   |
+| 仕様 HEX   | `#E1C0EE`                   |
 
 ### Neutral（グレースケール）
 
-| Token              | oklch               | HEX       | 用途                     |
+| Token              | oklch               | 実配信HEX | 用途                     |
 | ------------------ | ------------------- | --------- | ------------------------ |
-| `--color-gray-50`  | `oklch(97% 0 0deg)` | `#F7F7F7` | ページ背景（白系）       |
-| `--color-gray-100` | `oklch(93% 0 0deg)` | `#EDEDED` | カード背景、区切り線     |
-| `--color-gray-200` | `oklch(86% 0 0deg)` | `#DBDBDB` | ボーダー                 |
-| `--color-gray-400` | `oklch(65% 0 0deg)` | `#A3A3A3` | プレースホルダー、ラベル |
-| `--color-gray-600` | `oklch(45% 0 0deg)` | `#737373` | サブテキスト             |
-| `--color-gray-700` | `oklch(35% 0 0deg)` | `#525252` | 本文テキスト             |
-| `--color-gray-900` | `oklch(13% 0 0deg)` | `#212121` | 見出しテキスト           |
+| `--color-gray-50`  | `oklch(97% 0 0deg)` | `#f5f5f5` | ページ背景（白系）       |
+| `--color-gray-100` | `oklch(93% 0 0deg)` | `#e8e8e8` | カード背景、区切り線     |
+| `--color-gray-200` | `oklch(86% 0 0deg)` | `#d1d1d1` | ボーダー                 |
+| `--color-gray-400` | `oklch(65% 0 0deg)` | `#8f8f8f` | プレースホルダー、ラベル |
+| `--color-gray-600` | `oklch(45% 0 0deg)` | `#555555` | サブテキスト             |
+| `--color-gray-700` | `oklch(35% 0 0deg)` | `#3a3a3a` | 本文テキスト             |
+| `--color-gray-900` | `oklch(13% 0 0deg)` | `#070707` | 見出しテキスト           |
 
 ### Semantic（意味的マッピング）
 
@@ -66,15 +69,18 @@
 
 ### アクセシビリティ（WCAG コントラスト比）
 
-| 組み合わせ                         | コントラスト比 | 判定                 |
-| ---------------------------------- | -------------- | -------------------- |
-| `#212121` on `#E1C0EE`（淡紫背景） | **7.5:1**      | WCAG AA 適合（推奨） |
-| `#212121` on `#FFFFFF`（白背景）   | 16.1:1         | WCAG AAA 適合        |
-| `#525252` on `#FFFFFF`             | 7.4:1          | WCAG AA 適合         |
-| `#CD79EE` on `#FFFFFF`（白背景）   | 約 3.0:1       | 大テキスト・UI のみ  |
-| `#FFFFFF` on `#CD79EE`（紫背景）   | 約 3.0:1       | 大テキストのみ       |
+実配信値で算出している。
 
-> **重要**: Primary 紫 `#CD79EE` を白背景の通常テキストに使用禁止（コントラスト不足）。CTA・装飾的見出し・アクセントに限定。
+| 組み合わせ                                   | コントラスト比 | 判定                    |
+| -------------------------------------------- | -------------- | ----------------------- |
+| gray-900 `#070707` on Secondary `#d5a7ed`    | **10.2:1**     | WCAG AAA 適合（推奨）   |
+| gray-900 `#070707` on `#FFFFFF`（白背景）    | 20.1:1         | WCAG AAA 適合           |
+| gray-700 `#3a3a3a` on `#FFFFFF`              | 11.4:1         | WCAG AAA 適合           |
+| primary-400 `#bf73e3` on `#FFFFFF`（白背景） | 3.1:1          | 大テキスト・UI のみ     |
+| `#FFFFFF` on primary-400 `#bf73e3`（紫背景） | 3.1:1          | 大テキストのみ          |
+| `#FFFFFF` on Secondary `#d5a7ed`（淡紫背景） | **2.0:1**      | ❌ 前景色として使用禁止 |
+
+> **重要**: Primary 紫（primary-400）を白背景の通常テキストに使用禁止（コントラスト不足）。CTA・装飾的見出し・アクセントに限定。淡紫背景の上に白テキストも置かない（2.0:1）。
 
 ---
 
@@ -183,21 +189,21 @@ PICKUP ラベル等の装飾テキストで使用。
 **Primary**
 
 - Background: `bg-white`（`#FFFFFF`）
-- Text: `text-primary`（`#CD79EE`）
+- Text: `text-primary`（実配信 `#bf73e3`）
 - Hover: `hover:opacity-90`
 - Focus Ring: `focus:ring-white`
 
 **Secondary**
 
 - Background: `bg-white/20`（白 20% 透過）
-- Text: `text-gray-900`（`#212121`）
+- Text: `text-gray-900`（実配信 `#070707`）
 - Hover: `hover:opacity-90`
 
 **Outline**
 
 - Background: `transparent`
-- Text: `text-gray-900`（`#212121`）
-- Border: `border-2 border-gray-200`（`#DBDBDB`）
+- Text: `text-gray-900`（実配信 `#070707`）
+- Border: `border-2 border-gray-200`（実配信 `#d1d1d1`）
 - Hover: `hover:bg-white hover:text-primary`
 
 **サイズ:**
@@ -312,14 +318,14 @@ PICKUP ラベル等の装飾テキストで使用。
 - コンポーネントの余白は Spacing Scale に従う
 - Kaisei Opti は 30px 以上の見出しに限定する
 - z-index は 10 刻みの標準スケールのみ使用する
-- Primary 紫（`#CD79EE`）は CTA・リンク・装飾に限定する
+- Primary 紫（primary-400）は CTA・リンク・装飾に限定する
 
 ### Don't（禁止）
 
 - `font-family` に和文フォント1つだけを指定しない（環境依存になる）
 - 日本語本文に `line-height: 1.2` 以下を使わない
 - 全角・半角スペースを混在させない
-- テキスト色に純粋な `#000000` を使わない（`#212121` を使用）
+- テキスト色に純粋な `#000000` を使わない（`text-gray-900` を使用）
 - Kaisei Opti を本文（16px 以下）・英語・数字・UIラベルに使わない
 - Primary 紫を白背景の通常テキスト色に使わない（コントラスト不足）
 - `z-[45]` 等のアドホックな z-index 値を使わない
@@ -363,12 +369,14 @@ PICKUP ラベル等の装飾テキストで使用。
 ### クイックリファレンス
 
 ```
-Primary Color:    #CD79EE / oklch(68% 0.175 314deg)
-Secondary Color:  #E1C0EE / oklch(79.5% 0.108 314deg)
-Text Color:       #212121 / oklch(13% 0 0deg)
-Text Muted:       #737373 / oklch(45% 0 0deg)
-Background:       #E1C0EE (紫) or #FFFFFF (白)
-Border:           #DBDBDB / oklch(86% 0 0deg)
+HEX は実配信値（Lightning CSS の出力）
+
+Primary Color:    oklch(68% 0.175 314deg)   -> #bf73e3
+Secondary Color:  oklch(79.5% 0.108 314deg) -> #d5a7ed
+Text Color:       oklch(13% 0 0deg)         -> #070707
+Text Muted:       oklch(45% 0 0deg)         -> #555555
+Background:       Secondary (紫) or #FFFFFF (白)
+Border:           oklch(86% 0 0deg)         -> #d1d1d1
 
 Body Font:    var(--font-noto-sans-jp), sans-serif
 Heading Font: var(--font-kaisei-opti), serif
@@ -380,13 +388,13 @@ Line Height:  1.75
 
 ```
 このサイトのデザインシステムに従って、○○コンポーネントを作成してください。
-- プライマリカラー: #CD79EE（oklch(68% 0.175 314deg)）
+- プライマリカラー: oklch(68% 0.175 314deg)（実配信 #bf73e3）
 - 本文フォント: Noto Sans JP, sans-serif
 - 見出しフォント: Kaisei Opti, serif（30px以上のみ）
 - 行間: 本文は line-height: 1.75
 - カード背景: bg-white/10, rounded-2xl
 - ボーダー: border-gray-200/20
-- テキスト色: #212121
+- テキスト色: text-gray-900（実配信 #070707）
 ```
 
 ---
@@ -552,7 +560,7 @@ JS 側は各コンポーネントで `window.matchMedia("(prefers-reduced-motion
     to bottom,
     #ffffff 20%,
     var(--color-primary-200) 35%,
-    /* #E3C0F7 */ var(--color-secondary) 50% /* #E1C0EE */
+    /* 実配信 #d8a8f0 */ var(--color-secondary) 50% /* 実配信 #d5a7ed */
   );
 }
 
