@@ -418,7 +418,7 @@ Line Height:  1.75
 > `border-l-*`（0,1,0）に詳細度で勝って左辺まで塗り替えるため、`hover:border-l-*` も明示すること。
 >
 > 実装例は `src/components/timetable/` 配下。どのページが白いシートかは
-> `PageSheetLayout` の利用箇所で判断する。
+> `PageSheetLayout` の利用箇所で判断する。**白いシート上の取りこぼしは #149 で追跡している。**
 > 比率の根拠は `docs/frontend/design.md`「コントラスト比」（すべて実配信値）。
 
 #### 白いシート上の値（早見表）
