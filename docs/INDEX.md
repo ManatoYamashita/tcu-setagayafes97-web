@@ -167,9 +167,13 @@ docs/
 >   IntersectionObserver で遅延取得する際の `rootMargin` の向き
 > - `.claude/CLAUDE.md` デザイン仕様 — トップの `.hero-about-bg` グラデーションの
 >   停止位置を `%` へ戻してはいけない理由（実測値つき）
+> - `DESIGN.md` §9 — `bg-white/10` と `border-gray-200/20` は淡紫背景専用で、
+>   `PageSheetLayout` の白いシート上では消える（1.08:1）。白いシート上のカード枠と
+>   ホバー時の `hover:border-l-*` 明示ルール
 
 - **[design.md](./frontend/design.md)** - デザインシステム（カラー・タイポグラフィトークン）
-  - ブランドカラー `#CD79EE` の HLC 定義（H319 / L64 / C70）と oklch CSS 実装
+  - ブランドカラーの HLC 定義（H319 / L64 / C70）と oklch CSS 実装。仕様 HEX `#CD79EE` に対し
+    実配信は `#bf73e3`（コントラスト検証は必ず実配信値で行う）
   - Primary スケール・Neutral スケール・Semantic カラートークン
   - アクセシビリティ（コントラスト比）ガイドライン
   - Kaisei Opti ブランドフォント仕様と使用制限
@@ -261,4 +265,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-08-29
+**最終更新日**: 2026-08-30

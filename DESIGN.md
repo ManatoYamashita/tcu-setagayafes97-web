@@ -392,10 +392,24 @@ Line Height:  1.75
 - 本文フォント: Noto Sans JP, sans-serif
 - 見出しフォント: Kaisei Opti, serif（30px以上のみ）
 - 行間: 本文は line-height: 1.75
-- カード背景: bg-white/10, rounded-2xl
-- ボーダー: border-gray-200/20
+- カード背景: 淡紫背景のページは bg-white/10, rounded-2xl / 白いシート上は bg-white
+- ボーダー: 淡紫背景のページは border-gray-200/20 / 白いシート上は border-gray-200
 - テキスト色: text-gray-900（実配信 #070707）
 ```
+
+> [!IMPORTANT]
+> **`bg-white/10` と `border-gray-200/20` は淡紫のページ背景（`bg-secondary`）を前提にした値である。**
+> `PageSheetLayout` の白いシート（`bg-white`）の上では、`bg-white/10` は純白になって下地と分離せず、
+> `border-gray-200/20` は白地に対して **1.08:1** となって消える。
+>
+> 白いシート上のカードは不透明な `border-gray-200`（1.53:1）を使い、境界の識別は
+> `border-l-4 border-l-primary-600`（7.45:1）のアクセントラインで担保する。
+> ホバーで枠色を変えるときは、`hover:border-*`（詳細度 0,2,0）が非ホバーの
+> `border-l-*`（0,1,0）に詳細度で勝って左辺まで塗り替えるため、`hover:border-l-*` も明示すること。
+>
+> 実装例は `src/components/timetable/TimetableEventCard.tsx`。どのページが白いシートかは
+> `PageSheetLayout` の利用箇所で判断する。既存コンポーネントの取りこぼしは #144 で追跡している。
+> 比率の根拠は `docs/frontend/design.md`「コントラスト比」（すべて実配信値）。
 
 ---
 
@@ -629,4 +643,4 @@ border-gray-200/20               → 薄いボーダー
 
 ---
 
-**最終更新日**: 2026-04-11
+**最終更新日**: 2026-08-30
