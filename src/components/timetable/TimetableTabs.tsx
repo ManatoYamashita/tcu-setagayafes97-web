@@ -2,12 +2,16 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import type { EventDate } from "@/types/events";
-import { stages, getStageName } from "@/data/stages";
+import type { StageOption } from "@/lib/timetable";
 
 interface TimetableTabsProps {
   selectedDate: EventDate;
   selectedStage: string;
-  availableStages: string[];
+  /**
+   * タブに出すステージ。`listStageTabs()` の並び順（stages の宣言順 → その他）を
+   * そのまま使う。「その他」を含むため `stages` 配列には無いIDも来る。
+   */
+  availableStages: StageOption[];
 }
 
 // このページは PageSheetLayout の白いシート（bg-white）の上に載る。
@@ -15,7 +19,7 @@ interface TimetableTabsProps {
 // 白地では未選択タブが純白（枠は 1.08:1）になり、下地と分離しなかった。
 // 選択タブも bg-white + text-primary で、面が消えたうえに文字が 3.10:1 しかなく AA を満たさない。
 //
-// 白いシート上の基準は DESIGN.md §9 に従う。比率は出力CSSの実配信値で算出している。
+// 白いシート上の基準は docs/frontend/design.md「コントラスト比（アクセシビリティ）」に従う。比率は出力CSSの実配信値で算出している。
 // - 未選択: border-gray-200（#d1d1d1 / 1.53:1）の枠 + 白面。hover で gray-400（3.23:1）へ
 // - 選択:   bg-primary-600（#7b359a）に白文字で 7.45:1
 // 状態を色だけで伝えないよう aria-pressed を併記する。
@@ -88,18 +92,20 @@ export function TimetableTabs({
           >
             すべて
           </button>
-          {stages
-            .filter((stage) => availableStages.includes(stage.id))
-            .map((stage) => (
-              <button
-                key={stage.id}
-                onClick={() => handleStageChange(stage.id)}
-                aria-pressed={selectedStage === stage.id}
-                className={tabClass(selectedStage === stage.id)}
-              >
-                {getStageName(stage.id)}
-              </button>
-            ))}
+          {/*
+            親配列は availableStages 側。stages 配列を親にして filter すると、
+            そこに存在しない「その他」のタブが永久に出せない
+          */}
+          {availableStages.map((stage) => (
+            <button
+              key={stage.id}
+              onClick={() => handleStageChange(stage.id)}
+              aria-pressed={selectedStage === stage.id}
+              className={tabClass(selectedStage === stage.id)}
+            >
+              {stage.name}
+            </button>
+          ))}
         </div>
       </div>
     </div>
