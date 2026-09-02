@@ -28,6 +28,7 @@ docs/
 │   ├── browser-observation-limits.md  # ブラウザ観測の前提と限界（何が測れるか）
 │   ├── browser-verification-pitfalls.md # 検証手順そのものが誤る実例
 │   ├── layout-patterns.md         # レイアウトパターンと設計原則
+│   ├── timetable-gantt.md         # タイムテーブル盤面（ガントチャート）の設計
 │   ├── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
 │   ├── performance.md             # Lighthouse基準値とフロントエンド性能ルール
 │   └── page-transition.md         # ページ遷移アニメーションとView Transitions API
@@ -228,7 +229,7 @@ docs/
 - **[browser-verification-pitfalls.md](./frontend/browser-verification-pitfalls.md)** - 検証手順そのものが誤る実例
   - **Tailwind の任意値を `grep` するときは `-F`。** `[...]` が文字クラスになり、存在するのに0件と出る
   - **CSS のカスタムクラスが効かないときは `.next` を丸ごと削除する。** HMR でも `.next/cache` 削除でも復旧しないことがある
-  - **`resize_window` は viewport を変えない。** レスポンシブ検証は agent-browser の `--viewport` かコンテナ幅を直接絞る方法で行う（メディアクエリの切り替わりは実機確認）
+  - **`resize_window` は viewport を変えない。** レスポンシブ検証は `agent-browser set viewport <w> <h>` で行う（`open --viewport` は効かない実測あり。メディアクエリの切り替わりはコンテナ幅を絞る方法では再現できない）
   - **外部SPAの管理画面は「操作」に使わない。** 観測用であり、設定投入の自動化は失敗が本番に残る（[dev/microcms.md](./dev/microcms.md) に実例）
   - 誤診の実例は [page-transition.md](./frontend/page-transition.md) も参照
 
@@ -240,6 +241,14 @@ docs/
   - `--header-height` は2状態ヘッダー（上部107px / スクロール後77px）の近似値である
   - 全画面ヒーローの実装は3箇所で統一する（sticky ヘッダーがフロー上に高さを占有するため素の `100svh` は使わない）
   - 部分幅ヒーロー画像の境界処理（mask-image とオーバーレイの分担）
+
+- **[timetable-gantt.md](./frontend/timetable-gantt.md)** - タイムテーブル盤面（ガントチャート）の設計
+  - **縦方向の寸法は必ず px で持つ。** `height: %` は親の高さが確定しているときしか解決されず、`min-height` しか持たない親の下では 0px に潰れる（#148 の事故そのもの）
+  - `overflow-x: auto` は `overflow-y` の使用値も `auto` にする。中の要素をページに対して `sticky top-0` にはできず、はみ出しは縦スクロールバーを生む
+  - `sticky left-0` はスクローラの `padding-left` を無視する。余白は外側の要素が持つ
+  - **絞り込みとグループ化は必ず同じ `resolveStageId()` を通す。** 片方だけ `extractStageId()`（null を返す）に戻すと「その他」タブが常に空になる
+  - 時間レンジは企画から算出し、全ステージ列で共有する（ステージ絞り込み後から作るとタブ切替でスケールが動く）
+  - 盤面と縦スタックの DOM 2枚持ちは、インラインスタイルにレスポンシブバリアントが無いことによる意図的な例外
 
 - **[i18n-page-structure.md](./frontend/i18n-page-structure.md)** - 多言語ページの構成パターン
   - メッセージの二分割（ページ本文 `messages/` と ヘッダー・フッター `messages/chrome/`）

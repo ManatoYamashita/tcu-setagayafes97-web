@@ -49,11 +49,16 @@ Bounds must be at least 50% within visible screen space.
 
 **レスポンシブ検証には使えない。** 代わりに次のどちらかを使う。
 
-### A. agent-browser の `--viewport`（推奨）
+### A. agent-browser の `set viewport`（推奨）
 
 ```bash
-agent-browser screenshot /tmp/mobile.png --viewport 375x812
+agent-browser set viewport 375 812
 ```
+
+**`open <url> --viewport 375x812` は効かない**（2026-09-02 実測。`agent-browser close` を
+挟んでも `window.innerWidth` は 1280 のままだった）。`screenshot` に付ける形も同様に信用しない。
+サブコマンドの `set viewport <w> <h>` は確実に反映される（実測: `innerWidth` が 375 になり、
+`lg:hidden` / `hidden lg:block` の切り替わりも追随した）。
 
 ### B. コンテナ幅を直接絞る
 
