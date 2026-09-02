@@ -61,7 +61,7 @@ export function TimetableContent({ initialEvents }: TimetableContentProps) {
           )
         ) : (
           // 企画が見つからない場合
-          <div className="rounded-lg bg-white/10 p-12 text-center">
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-12 text-center">
             <p className="text-lg text-gray-900/80">
               選択した条件に該当するステージ企画が見つかりませんでした。
             </p>

@@ -10,6 +10,24 @@ interface TimetableTabsProps {
   availableStages: string[];
 }
 
+// このページは PageSheetLayout の白いシート（bg-white）の上に載る。
+// 旧実装は淡紫のページ背景を前提にした bg-white/10 + border-gray-200/20 で、
+// 白地では未選択タブが純白（枠は 1.08:1）になり、下地と分離しなかった。
+// 選択タブも bg-white + text-primary で、面が消えたうえに文字が 3.10:1 しかなく AA を満たさない。
+//
+// 白いシート上の基準は DESIGN.md §9 に従う。比率は出力CSSの実配信値で算出している。
+// - 未選択: border-gray-200（#d1d1d1 / 1.53:1）の枠 + 白面。hover で gray-400（3.23:1）へ
+// - 選択:   bg-primary-600（#7b359a）に白文字で 7.45:1
+// 状態を色だけで伝えないよう aria-pressed を併記する。
+const TAB_BASE = "rounded-lg px-6 py-3 font-medium transition-colors";
+const TAB_SELECTED = "bg-primary-600 text-white";
+const TAB_UNSELECTED =
+  "border border-gray-200 bg-white text-gray-900 hover:border-gray-400 hover:bg-gray-50";
+
+function tabClass(isSelected: boolean) {
+  return `${TAB_BASE} ${isSelected ? TAB_SELECTED : TAB_UNSELECTED}`;
+}
+
 /**
  * タイムテーブルタブコンポーネント
  * 日程タブとステージタブを表示
@@ -44,21 +62,15 @@ export function TimetableTabs({
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => handleDateChange("day1")}
-            className={`rounded-lg px-6 py-3 font-medium transition-all ${
-              selectedDate === "day1"
-                ? "bg-white text-primary"
-                : "bg-white/10 text-gray-900/90 hover:bg-white/10 border border-gray-200/20"
-            }`}
+            aria-pressed={selectedDate === "day1"}
+            className={tabClass(selectedDate === "day1")}
           >
             Day 1（10/31）
           </button>
           <button
             onClick={() => handleDateChange("day2")}
-            className={`rounded-lg px-6 py-3 font-medium transition-all ${
-              selectedDate === "day2"
-                ? "bg-white text-primary"
-                : "bg-white/10 text-gray-900/90 hover:bg-white/10 border border-gray-200/20"
-            }`}
+            aria-pressed={selectedDate === "day2"}
+            className={tabClass(selectedDate === "day2")}
           >
             Day 2（11/1）
           </button>
@@ -71,11 +83,8 @@ export function TimetableTabs({
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => handleStageChange("all")}
-            className={`rounded-lg px-6 py-3 font-medium transition-all ${
-              selectedStage === "all"
-                ? "bg-white text-primary"
-                : "bg-white/10 text-gray-900/90 hover:bg-white/10 border border-gray-200/20"
-            }`}
+            aria-pressed={selectedStage === "all"}
+            className={tabClass(selectedStage === "all")}
           >
             すべて
           </button>
@@ -85,11 +94,8 @@ export function TimetableTabs({
               <button
                 key={stage.id}
                 onClick={() => handleStageChange(stage.id)}
-                className={`rounded-lg px-6 py-3 font-medium transition-all ${
-                  selectedStage === stage.id
-                    ? "bg-white text-primary"
-                    : "bg-white/10 text-gray-900/90 hover:bg-white/10 border border-gray-200/20"
-                }`}
+                aria-pressed={selectedStage === stage.id}
+                className={tabClass(selectedStage === stage.id)}
               >
                 {getStageName(stage.id)}
               </button>

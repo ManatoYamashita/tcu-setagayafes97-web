@@ -17,10 +17,12 @@ export function TimetableEventCard({ event }: TimetableEventCardProps) {
   // 装飾線としても読めない（docs/frontend/design.md「アクセントラインは primary-600」）。
   // hover:border-* は border-color を全辺へ当てて border-left-color を上書きするため、
   // ホバー時の左色も明示している。
+  // 面も bg-white で不透明に持つ。bg-white/10 は白いシート上では結果的に同じ色になるが、
+  // 淡紫背景を前提にしたトークンであり、下地が変わったときに黙って崩れる。
   return (
     <Link
       href={href}
-      className="block h-full rounded-lg bg-white/10 p-3 border border-gray-200 transition-colors hover:border-gray-400 border-l-4 border-l-primary-600 hover:border-l-primary-700"
+      className="block h-full rounded-lg bg-white p-3 border border-gray-200 transition-colors hover:border-gray-400 border-l-4 border-l-primary-600 hover:border-l-primary-700"
     >
       {/* タイトル */}
       <h3 className="mb-1 text-sm font-bold text-gray-900 line-clamp-2">{event.title}</h3>

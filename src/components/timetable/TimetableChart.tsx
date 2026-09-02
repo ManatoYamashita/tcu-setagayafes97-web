@@ -10,18 +10,22 @@ interface TimetableChartProps {
 /**
  * タイムテーブルチャートコンポーネント
  * ガントチャート形式でイベントを表示
+ *
+ * このコンポーネントは PageSheetLayout の白いシート（bg-white）の上に載る。
+ * 面は不透明色で持ち、bg-white/10 は使わない（白地では純白になり下地と分離しない）。
+ * 枠は border-gray-200（#d1d1d1 / 1.53:1）。判断基準は DESIGN.md §9 を参照。
  */
 export function TimetableChart({ events }: TimetableChartProps) {
   if (!events || events.length === 0) {
     return (
-      <div className="rounded-lg bg-white/10 p-8 text-center">
+      <div className="rounded-lg border border-gray-200 bg-gray-50 p-8 text-center">
         <p className="text-gray-900/80">企画が見つかりませんでした。</p>
       </div>
     );
   }
 
   return (
-    <div className="relative overflow-hidden rounded-lg border border-gray-200/20 bg-white/10 p-6">
+    <div className="relative overflow-hidden rounded-lg border border-gray-200 bg-white p-6">
       {/* デスクトップ: ガントチャート */}
       <div className="hidden md:block">
         <div className="relative" style={{ minHeight: "600px" }}>
