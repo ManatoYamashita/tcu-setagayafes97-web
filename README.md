@@ -72,6 +72,7 @@ cp .env.example .env.local
 | `pnpm build`        | プロダクションビルド       |
 | `pnpm start`        | プロダクションサーバー起動 |
 | `pnpm lint`         | ESLint チェック            |
+| `pnpm type-check`   | TypeScript 型チェック      |
 | `pnpm format`       | Prettier 自動修正          |
 | `pnpm format:check` | フォーマットチェック       |
 | `pnpm analyze`      | バンドル分析               |

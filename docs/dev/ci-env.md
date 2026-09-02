@@ -38,7 +38,7 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 
 > [!NOTE]
 > **この表は「登録すべきもの」であって、現状の登録一覧ではない。** `gh variable list` で確認できるのは `NEXT_PUBLIC_URL` のみ。
-> CI（`feature-ci.yml`）は Lint / Format / Build の検証だけなので、公開フラグが未登録でも **`false` としてビルドが通る**。
+> CI（`feature-ci.yml`）は Lint / Format / 型 / Build の検証だけなので、公開フラグが未登録でも **`false` としてビルドが通る**。
 > **つまり CI が緑でも、公開状態のページがビルドできることは何も検証していない。**
 
 ### Vercel のみに登録する変数（GitHub には登録しない）
@@ -446,9 +446,9 @@ curl -s https://<production deployment url>/robots.txt | grep Sitemap
 ## 関連ドキュメント
 
 - [docs/dev/git.md](./git.md) — ブランチ戦略と CI/CD ワークフロー
-- `.github/workflows/feature-ci.yml` — Lint / Format / Build の検証
+- `.github/workflows/feature-ci.yml` — Static Checks（Lint / Format / 型）と Build Check
 - `.github/workflows/production-deploy-guard.yml` — `main` への push で Production デプロイの作成を確認
 
 ---
 
-**最終更新日**: 2026-09-02
+**最終更新日**: 2026-09-03

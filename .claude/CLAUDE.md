@@ -69,6 +69,9 @@ pnpm start
 # Lintチェック
 pnpm lint
 
+# 型チェック（next typegen で .next/types を作り直してから tsc --noEmit）
+pnpm type-check
+
 # フォーマットチェック
 pnpm format:check
 
@@ -101,7 +104,7 @@ refactor/<refactor-target> # リファクタリング
 
 **CI のカバー範囲:**
 
-`.github/workflows/feature-ci.yml`（Lint & Format Check / Build Check）は次の場合に走る。**上記5つの命名規則から外れたブランチ名を使うと、push 時のチェックが一切走らない。**
+`.github/workflows/feature-ci.yml`（Static Checks / Build Check）は次の場合に走る。**上記5つの命名規則から外れたブランチ名を使うと、push 時のチェックが一切走らない。**
 
 | イベント       | 対象                                                             |
 | -------------- | ---------------------------------------------------------------- |
@@ -109,6 +112,18 @@ refactor/<refactor-target> # リファクタリング
 | `pull_request` | base が `main` または `dev`                                      |
 
 push 時は head をそのまま、PR 時は head を base へマージした結果を検証する。**両方走る場合、それは重複ではなく別種の検証である。**
+
+`Static Checks` は **`pnpm install` だけで完結する検査**（lint / format / 型）を束ねたジョブである。
+secrets もビルド成果物も要求しないため、**fork からの PR でも結果が出る**（`Build Check` は
+microCMS の secrets を要求するので fork PR では必ず落ちる）。ここへ検査を足すときは、
+「install 以外に何も要求しないか」を基準に判断すること。要求するなら別ジョブにする。
+
+`pnpm type-check` が `next typegen` を前置しているのは、**`.next/types/validator.ts` が
+`.d.ts` ではなく `.ts` だから**である。`skipLibCheck: true` はこのファイルを守らないため、
+ルートを消したり改名したりした後に古い `validator.ts` が残っていると、
+`tsc` が生成物の中で `TS2307` を出して落ちる（2026-09-03 実測）。typegen が作り直せば消える。
+CI はクリーンチェックアウトなので陳腐化しないが、**ローカルと CI で同じコマンドを使うために
+スクリプト側へ入れてある。**
 
 もう1本、`.github/workflows/production-deploy-guard.yml` が `main` への push で走る。
 そのコミットの Vercel Production デプロイが作られたかを最大5分間確認し、現れなければ失敗する。
