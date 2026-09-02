@@ -1,0 +1,74 @@
+# main へのマージに対して Vercel の Production デプロイが作られたことを確認する。
+#
+# 2026-08-30、マージ（ee1c9fb / PR #147）に対する Production デプロイが作られず、
+# 本番だけが古いまま取り残された。GitHub 上は CI 緑・マージ済みで、Vercel 側にも
+# 「失敗したデプロイ」ではなく記録そのものが無かったため、異常を示すものが何も無かった。
+# 発覚したのは、たまたま本番の応答を curl で確かめたからである。
+#
+# この事象の危険は頻度ではなく沈黙にある。過去7件のマージのうち落ちたのは1件だけで、
+# 設定不良ではなく webhook 配信の単発失敗と見られる（Issue #152）。直す対象が
+# 存在しない以上、検知できるようにするのが唯一の対策になる。
+name: Production Deploy Guard
+
+on:
+  push:
+    branches:
+      - main
+
+# デプロイ一覧の参照のみ。書き込み権限は与えない。
+permissions:
+  contents: read
+  deployments: read
+
+jobs:
+  verify:
+    name: Production デプロイの作成を確認
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: このコミットの Production デプロイを待つ
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          # 正常時はマージから45〜85秒で作られる（docs/dev/ci-env.md の実測表）。
+          # 15秒間隔で20回＝最大5分待つ。実測の最長85秒に対して十分な余裕がある。
+          for attempt in $(seq 1 20); do
+            id=$(gh api "repos/$REPO/deployments?environment=Production&per_page=30" \
+              --jq "[.[] | select(.sha == \"$SHA\")] | .[0].id // empty")
+
+            if [ -n "$id" ]; then
+              echo "Production デプロイを確認しました（deployment id=$id / 経過 $((attempt * 15 - 15))秒）"
+              exit 0
+            fi
+
+            echo "まだ作られていません。15秒後に再確認します（$attempt/20）"
+            sleep 15
+          done
+
+          echo "::error title=Production デプロイが作られていません::$SHA に対する Production デプロイが5分経っても作られませんでした。Vercel の git 連携が push を取りこぼした可能性があります（Issue #152）。本番は古いままです。"
+
+          cat <<'RECOVERY'
+
+          ────────────────────────────────────────────────────────────
+          復旧手順（手元のマシンで実行する）
+
+            TMP=$(mktemp -d)
+            git fetch origin main
+            git worktree add --detach "$TMP" origin/main
+            cp -R .vercel "$TMP/.vercel"
+            vercel deploy --prod --yes --cwd "$TMP"
+            git worktree remove --force "$TMP"
+
+          `vercel redeploy` は使わないこと。既存デプロイのソースを焼き直すだけで、
+          デプロイが存在しないこのケースでは新しいコミットを本番へ持って行けない。
+
+          詳細: docs/dev/ci-env.md の「Vercel の本番反映」
+          ────────────────────────────────────────────────────────────
+          RECOVERY
+
+          exit 1
