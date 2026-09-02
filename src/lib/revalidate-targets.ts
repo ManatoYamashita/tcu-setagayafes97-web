@@ -68,7 +68,7 @@ export interface RevalidateTarget {
  * （`/` の `SponsorBanner` や `FeaturedEvents` がその例）。
  *
  * `Record<MicrocmsApi, ...>` にしてあるので、`MICROCMS_APIS` へ4つ目を足すと
- * ここを埋めるまでビルドが通らない。テストの無いこのリポジトリで唯一のドリフト検知になっている。
+ * ここを埋めるまでビルドが通らない。ユニットテストの届かない対応表を、型がドリフトから守っている。
  */
 export const REVALIDATE_TARGETS: Record<MicrocmsApi, readonly RevalidateTarget[]> = {
   // getNewsList / getLatestHeroNews / getNewsById

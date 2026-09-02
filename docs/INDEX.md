@@ -16,6 +16,7 @@ docs/
 ├── dev/              # 開発関連ドキュメント
 │   ├── git.md        # ブランチ戦略とCI/CDワークフロー
 │   ├── ci-env.md     # GitHub Actions 環境変数管理（Secrets/Variables）
+│   ├── testing.md    # テスト方針（何をテストし、何をしないか）
 │   ├── domain-migration.md # setagayafes.org を第97回の正規ドメインにする手順
 │   ├── 96th-db-backup.md # 第96回 WordPress DBバックアップの検証情報と取扱い
 │   ├── seo-metadata.md # 共通metadata・canonicalとテストページ除外
@@ -102,12 +103,21 @@ docs/
 ### 開発関連（dev/）
 
 - **[git.md](./dev/git.md)** - ブランチ運用戦略とGitHub ActionsによるCI/CDワークフローのテンプレート
+  - **CI のジョブを分ける基準は「`pnpm install` 以外に何を要求するか」。** install だけで済む検査（lint / format / 型 / テスト）は `Static Checks` に束ねる
   - ブランチ命名規則とライフサイクル
   - GitHub Actionsワークフローの設定例
   - コミットメッセージ規約
   - **`git add -A` / `git add .` は禁止。** 複数エージェントが同じ作業ツリーを触るため、別作業の未コミット変更を無差別に取り込む。巻き込み時の復旧手順あり
   - **マージ前は `merge-tree` で「消えるファイル」を確認する。** GitHub の `CLEAN` は競合が無いことしか意味せず、マージでファイルが消えないことは保証しない。worktree での実動確認手順あり
   - 運用フロー例とトラブルシューティング
+
+- **[testing.md](./dev/testing.md)** - テスト方針（#157）
+  - **算術で表せる不変条件はユニットテスト、盤面が 0px でないことなど DOM が要るものは実ブラウザ**という切り分け
+  - **jsdom / happy-dom を入れてはいけない。** レイアウトエンジンが無く `getBoundingClientRect()` が常に 0 を返すため #148 を原理的に検出できない
+  - `warnOnce` のモジュール状態は `vi.resetModules()` + 動的 import で捨てる。**動的 import で得た値は同一参照の検証に使えない**
+  - `process.env.NODE_ENV` への直接代入は `readonly` 宣言により TS2540 になる。`vi.stubEnv()` を使う
+  - **テストの価値は「落ちること」でしか測れない。** #157 の退行8種を実際に注入した結果を記録
+  - テストは「いまのデータ」ではなく「不変条件」を固定する（第98回の年次更新で無関係な赤を出さないため）
 
 - **[ci-env.md](./dev/ci-env.md)** - GitHub Actions 環境変数管理
   - Repository Secrets / Variables の使い分け基準
@@ -256,6 +266,7 @@ docs/
   - **カードの密度判定は「枠」ではなく「カード実寸」（枠 − `CARD_GAP_PX`）で行う。** 枠のまま比べると収まらない密度が選ばれる
   - 選択中のステージは当日0件でもタブに残す（残さないとどのタブも `aria-pressed` にならず、絞り込みが画面から読めない）
   - 盤面と縦スタックの DOM 2枚持ちは、インラインスタイルにレスポンシブバリアントが無いことによる意図的な例外
+  - **検証は2層。** 算術で表せる不変条件は `pnpm test` が固定し、盤面が実際に 0px でないことは実ブラウザでしか測れない（[dev/testing.md](./dev/testing.md)）
 
 - **[i18n-page-structure.md](./frontend/i18n-page-structure.md)** - 多言語ページの構成パターン
   - メッセージの二分割（ページ本文 `messages/` と ヘッダー・フッター `messages/chrome/`）
@@ -292,4 +303,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-08-30
+**最終更新日**: 2026-09-03
