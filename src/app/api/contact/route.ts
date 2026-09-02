@@ -115,6 +115,9 @@ ${data.message}
 このメールは自動送信されています。
   `.trim();
 
+  // メールクライアントは CSS 変数を解決しないため、色は HEX を直書きする。
+  // #bf73e3 は --color-primary-400 の実配信値（@theme を変更したら手で追従させること）。
+  // #9b59b6 はグラデーションの終端としてここだけで使う色で、カラースケールには属さない。
   const html = `
 <!DOCTYPE html>
 <html lang="ja">
@@ -124,7 +127,7 @@ ${data.message}
   <title>お問い合わせ</title>
 </head>
 <body style="font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background: linear-gradient(135deg, #CD79EE 0%, #9b59b6 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0;">
+  <div style="background: linear-gradient(135deg, #bf73e3 0%, #9b59b6 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0;">
     <h1 style="margin: 0; font-size: 20px;">東京都市大学 第97回 世田谷祭</h1>
     <p style="margin: 5px 0 0 0; opacity: 0.9;">お問い合わせフォームからのメッセージ</p>
   </div>
@@ -141,7 +144,7 @@ ${data.message}
       </tr>
       <tr>
         <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; color: #666;">メールアドレス</td>
-        <td style="padding: 10px; border-bottom: 1px solid #eee;"><a href="mailto:${data.email}" style="color: #CD79EE;">${data.email}</a></td>
+        <td style="padding: 10px; border-bottom: 1px solid #eee;"><a href="mailto:${data.email}" style="color: #bf73e3;">${data.email}</a></td>
       </tr>
       <tr>
         <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; color: #666;">電話番号</td>

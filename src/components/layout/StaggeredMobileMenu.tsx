@@ -29,8 +29,13 @@ const socialItems: SocialItem[] = [
   { label: "YouTube", link: siteConfig.sns.youtube },
 ];
 
-const PRE_COLORS = ["#E1C0EE", "#CD79EE"];
-const ACCENT_COLOR = "#CD79EE";
+// 直書きの HEX（#E1C0EE / #CD79EE）はデザイン仕様値であり、@theme の oklch から
+// Lightning CSS が実際に出力する色（#d5a7ed / #bf73e3）とは別物だった。
+// ここだけ仕様値を配信していたため、同一画面に2つの紫が並んでいた（#143）。
+// どちらも style 属性へ渡す純CSSの文脈で、GSAP は transform しか触らないため、
+// var() 参照で問題なくトークンへ追従する。
+const PRE_COLORS = ["var(--color-secondary)", "var(--color-primary-400)"];
+const ACCENT_COLOR = "var(--color-primary-400)";
 
 interface StaggeredMobileMenuProps {
   isOpen: boolean;
@@ -418,7 +423,7 @@ export function StaggeredMobileMenu({
   right: 0;
 }
 .sm-scope .sm-panel-item:hover {
-  color: var(--sm-accent, #CD79EE);
+  color: var(--sm-accent, var(--color-primary-400));
 }
 .sm-scope .sm-panel-list[data-numbering] {
   counter-reset: smItem;
@@ -431,7 +436,7 @@ export function StaggeredMobileMenu({
   right: 0;
   font-size: 14px;
   font-weight: 400;
-  color: var(--sm-accent, #CD79EE);
+  color: var(--sm-accent, var(--color-primary-400));
   letter-spacing: 0;
   pointer-events: none;
   user-select: none;
@@ -441,10 +446,10 @@ export function StaggeredMobileMenu({
   opacity: 0.35;
 }
 .sm-scope .sm-socials-link:hover {
-  color: var(--sm-accent, #CD79EE);
+  color: var(--sm-accent, var(--color-primary-400));
 }
 .sm-scope .sm-socials-link:focus-visible {
-  outline: 2px solid var(--sm-accent, #CD79EE);
+  outline: 2px solid var(--sm-accent, var(--color-primary-400));
   outline-offset: 3px;
 }
       `}</style>

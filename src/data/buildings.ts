@@ -55,7 +55,7 @@ export const buildingsConfig = [
     name: "7号館",
     floors: 7,
     description: "ステージ・ホール",
-    color: "#CD79EE",
+    color: "#bf73e3",
     position: { x: 0, y: 0, z: 100 },
   },
   {

@@ -13,7 +13,7 @@
   --color-primary-300: oklch(74% 0.14 314deg); /* 実配信 #cb8fe8 */
   --color-primary-400: oklch(
     68% 0.175 314deg
-  ); /* 実配信 #bf73e3 — ブランドカラー（仕様値 #CD79EE） */
+  ); /* 実配信 #bf73e3 — ブランドカラー。この行が唯一の定義元である（#143） */
   --color-primary-500: oklch(57% 0.175 314deg); /* 実配信 #9c50be */
   --color-primary-600: oklch(47% 0.165 314deg); /* 実配信 #7b359a */
   --color-primary-700: oklch(37% 0.14 314deg); /* 実配信 #592072 */
@@ -45,7 +45,12 @@
      暗色背景時代の名残であり、淡紫背景の現行デザインでは装飾用途に限る。
      淡紫背景上のテキストは --color-primary-700(5.64:1) を使うこと（docs/frontend/design.md）。
      比率も上の各行の HEX も、Lightning CSS が oklch から変換した出力CSSの実配信値である。
-     デザイン仕様の HEX（ブランドカラー #CD79EE 等）とは別の値なので混同しないこと */
+
+     ブランドカラーの一次定義はこのファイルだけで、配信されるのは #bf73e3 である。
+     デザイン仕様書に載る #CD79EE（HLC H319 / L64 / C70）はその由来であり、
+     画面には出ない。CSS が効かない文脈（メールHTML・WebGL シェーダ）へ色を
+     渡す箇所は実配信 HEX を直書きしており、@theme を変更したら手で追従させること。
+     一覧は docs/frontend/design.md「ブランドカラー」を参照（#143） */
   --color-primary-light: var(--color-primary-300);
   /* 白背景では 7.45:1 だが、淡紫背景では 3.75:1 で AA に届かない。背景で使い分けること */
   --color-primary-dark: var(--color-primary-600);
