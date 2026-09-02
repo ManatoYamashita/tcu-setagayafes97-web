@@ -158,7 +158,17 @@ Production デプロイの完成を待つ（マージから実測45〜85秒）�
    curl -sS -o /dev/null -D - https://setagayafes.org/ | grep -iE '^(age|x-vercel-cache)'
    ```
 
-   `x-vercel-cache: MISS` / `age: 0` かつ更新内容が出ていれば成功。`STALE` なら失敗。
+   **`x-vercel-cache: REVALIDATED` / `age: 0` なら成功。**
+
+   > [!IMPORTANT]
+   > **Vercel の成功値は `MISS` ではなく `REVALIDATED` である。** ローカルの `pnpm start` は
+   > `x-nextjs-cache: MISS` を返すが、Vercel は別の値を使う。`MISS` だけを合格条件にすると
+   > 成功を見落とす（2026-08-30 実測）。
+   >
+   > **2回目に `STALE`（大きな `age`）が返っても失敗ではない。** 別のエッジがまだ旧コピーを
+   > 持っているだけで、数秒で `HIT` へ収束する。実測値:
+   > `REVALIDATED(age 0)` → `STALE(age 2223)` → `HIT(age 13)`。
+   > **判定に使うのは発火直後の1回目だけである。**
 
    > [!CAUTION]
    > **連続ポーリング禁止。** Vercel の bot 対策が発動して `x-vercel-mitigated: challenge` の 403 が
@@ -167,8 +177,54 @@ Production デプロイの完成を待つ（マージから実測45〜85秒）�
 
 3. Vercel の Functions ログに `[revalidate] api=news ... paths=...` が出ていることを確認
 4. microCMS の Webhook 実行履歴でステータス 200 を確認
-5. **削除の検証（本丸）**: テスト用の企画を1件削除し、`/events` から消えることを確認。
-   ここが通らなければ通知タイミングの「公開中コンテンツの削除時」が OFF のまま
+
+### 本番を汚さない導通確認（推奨）
+
+**表示に出ないテスト項目を使えば、公開サイトへ何も出さずに Webhook の導通を確認できる。**
+
+`informations` の `category` を `other : その他` にすると、`getSponsorsList()`（`sponsor` 抽出）にも
+`getFAQList()`（`faq` 抽出）にも掛からないため、**どのページにも sitemap にも現れない。**
+それでも Webhook は発火するので、キャッシュ破棄だけを観測できる。
+
+```bash
+set -a; . ./.env.local; set +a
+B="https://$MICROCMS_SERVICE_DOMAIN.microcms.io/api/v1"
+H="X-MICROCMS-API-KEY: $MICROCMS_API_KEY"
+U=https://setagayafes.org/about/sponsors
+
+# 1. 基準をつくる（HIT になるまで数回叩く）
+curl -sS -o /dev/null -D - "$U" | grep -iE '^(age|x-vercel-cache)'
+
+# 2. 不可視のテスト項目を作る（「公開（APIによる操作）」が発火する）
+curl -sS -X PUT "$B/informations/zz-revalidate-test" -H "$H" -H 'Content-Type: application/json' \
+  -d '{"category":["other : その他"],"title":"[導通確認] 表示されません"}'
+
+# 3. REVALIDATED になっていれば発火している
+curl -sS -o /dev/null -D - "$U" | grep -iE '^(age|x-vercel-cache)'
+
+# 4. 露出していないことの確認（すべて 0 になる）
+for path in /about/sponsors / /info/faq /about /sitemap.xml; do
+  printf '%s: ' "$path"; curl -sSL "https://setagayafes.org$path" | grep -c 導通確認
+done
+```
+
+> [!WARNING]
+> **API キーでは削除できない。** POST / PUT は通るが、`DELETE` と `PATCH` は
+> `400 {"message":"DELETE is forbidden."}` を返す。
+> **削除タイミングの検証と後片付けには管理画面が要る。** 作ったテスト項目を消し忘れないこと。
+
+### 削除タイミングの検証結果（2026-09-02 実施済み）
+
+Issue #141 の実害1「削除したのに本番に残る」が塞がったことを、上記の手順で確認した。
+
+| 段階                         | `/about/sponsors`            | CMS                                 |
+| ---------------------------- | ---------------------------- | ----------------------------------- |
+| 削除前                       | `HIT` / `age: 597`           | `totalCount: 4`                     |
+| **管理画面から削除した直後** | **`REVALIDATED` / `age: 0`** | 直接 GET が `404` / `totalCount: 3` |
+| 数秒後                       | `HIT` / `age: 13`            | —                                   |
+
+**「公開中コンテンツの削除時」は正しく配線されている。** 既定 OFF の項目なので、
+Webhook を作り直すときは必ずこの検証まで通すこと。
 
 ## 障害切り分け
 
@@ -181,6 +237,38 @@ Production デプロイの完成を待つ（マージから実測45〜85秒）�
 | 3   | Vercel の Functions ログ           | `[revalidate]` の行が無い → Webhook の URL が誤っている                                                                                               |
 | 4   | 同上の `paths=`                    | **そのページが並んでいない** → `src/lib/revalidate-targets.ts` の対応表に漏れがある                                                                   |
 | 5   | `curl -sS -o /dev/null -D - <URL>` | `x-vercel-cache: HIT` のまま変わらない → タグが一致していない。`.meta` の実測タグと突き合わせる                                                       |
+
+### シークレットの一致を確かめる
+
+**Vercel も microCMS も、登録済みの値を読み返せない。**
+
+- `vercel env pull` は Production / Preview の暗号化済みの値を返さない（`KEY=""` になる）。
+  読めるのは Development だけである
+- microCMS は保存後の読み戻しで**マスク値**を返す。入力欄は64文字のままだが中身は別物で、
+  sha256 指紋が変わる（実測: `b4967030` → `4ac5b103`）
+
+したがって**「両者の値を見比べる」検証は成立しない。** 手元の値で署名を作り、本番が受け取るかで判定する。
+
+```bash
+BODY='{"service":"setagayafes97","api":"informations","id":"probe","type":"edit"}'
+SIG=$(pbpaste | node -e '
+  const c = require("node:crypto");
+  let s = "";
+  process.stdin.on("data", d => s += d).on("end", () => {
+    process.stdout.write(c.createHmac("sha256", s.trim()).update(process.argv[1]).digest("hex"));
+  });' "$BODY")
+
+curl -sS -w '\n%{http_code}\n' -X POST https://setagayafes.org/api/revalidate \
+  -H 'content-type: application/json' -H "x-microcms-signature: $SIG" --data-raw "$BODY"
+# 200 = 一致 / 401 = 不一致
+```
+
+署名は導出値なので、**シークレットそのものを画面にもログにも出さずに済む。**
+
+> [!WARNING]
+> **クリップボードは他の作業で上書きされる。** 使う直前に `pbpaste | wc -c` で長さを確かめること。
+> 2026-08-30、64バイトのつもりが50バイトへ変わっており、**誤って「シークレット不一致」と
+> 判定しかけた。** 検証が失敗したときは、まず検証手順そのものを疑う。
 
 ## Webhook では解決しないこと
 
@@ -213,4 +301,4 @@ grep -rn 'from "@/lib/\(events\|news\|informations\)"' src/
 
 ---
 
-**最終更新日**: 2026-08-30
+**最終更新日**: 2026-09-02

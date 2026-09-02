@@ -155,6 +155,10 @@ docs/
   - **`revalidatePath` はパスの API ではなくタグの API。** `/about` や `type` 無しの動的ルートは、エラーにならず静かに何もしない
   - microCMS 側の設定手順。**削除・公開終了の通知タイミングは既定 OFF** で、ONにしないと「消したのに残る」が直らない
   - **`pnpm dev` ではキャッシュ挙動を検証できない。** dev は全エントリを常に stale 扱いにする
+  - **Vercel の成功値は `MISS` ではなく `REVALIDATED`。** 直後の `STALE` は CDN 伝播であって失敗ではない
+  - **本番を汚さない導通確認**: `informations` に `category = other` のテスト項目を作れば、どのページにも sitemap にも出ないまま Webhook を試せる
+  - **API キーでは削除できない**（`DELETE is forbidden.`）。削除タイミングの検証は管理画面が要る
+  - シークレットは Vercel も microCMS も読み返せない。一致確認は「手元の値で署名を作って本番へ POST し 200 か」で行う
   - 障害切り分け表（Webhook 実行履歴 → Vercel ログ → `x-vercel-cache`）
   - microCMS を読むページを増やしたときの対応表更新手順
 
