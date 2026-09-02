@@ -3,6 +3,7 @@ import {
   stages,
   extractStageId,
   resolveStageId,
+  isKnownStageId,
   OTHER_STAGE_ID,
   getStageName,
 } from "@/data/stages";
@@ -119,6 +120,45 @@ export function groupEventsByStage(events: Event[]): StageGroup[] {
         (a.startTime ?? "").localeCompare(b.startTime ?? "")
       ),
     }));
+}
+
+/** タブへ出すステージ。`StageGroup` から企画本体を落としたもの */
+export type StageOption = Pick<StageGroup, "id" | "name">;
+
+/**
+ * ステージタブの一覧を作る
+ *
+ * 基本は「表示中の日程に企画があるステージ」です。**ステージで絞り込む前**の集合を
+ * 渡してください。絞り込み後から作ると、7A を選んだ瞬間に他のタブが消えて
+ * 「すべて」を経由しないと移動できなくなります。
+ *
+ * それに加えて、選択中のステージは当日0件でも必ず含めます。含めないと、その日に
+ * 企画が無いステージIDをURLで直接開いたときタブが一覧から落ち、「すべて」も含めて
+ * どのタブも `aria-pressed` にならず、何で絞り込まれているのか画面から読めなくなります
+ * （#154 のレビュー指摘）。
+ *
+ * 実在しないステージIDは無視します。`getStageName()` は未知のIDをそのまま返すため、
+ * 素通しにするとURLの任意の文字列がタブのラベルとして表示されます。
+ */
+export function listStageTabs(events: Event[], selectedStageId: string): StageOption[] {
+  const withEvents: StageOption[] = groupEventsByStage(events).map(({ id, name }) => ({
+    id,
+    name,
+  }));
+
+  if (
+    selectedStageId === "all" ||
+    !isKnownStageId(selectedStageId) ||
+    withEvents.some((stage) => stage.id === selectedStageId)
+  ) {
+    return withEvents;
+  }
+
+  // 差し込んだあとも `groupEventsByStage()` と同じ並び（stages の宣言順 → その他）にする
+  const order = [...stages.map((stage) => stage.id), OTHER_STAGE_ID];
+  return [...withEvents, { id: selectedStageId, name: getStageName(selectedStageId) }].sort(
+    (a, b) => order.indexOf(a.id) - order.indexOf(b.id)
+  );
 }
 
 /**

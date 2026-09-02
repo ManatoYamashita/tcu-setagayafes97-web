@@ -7,6 +7,7 @@ import {
   filterEventsByDate,
   filterEventsByStage,
   groupEventsByStage,
+  listStageTabs,
   warnUnresolvedStagePlaces,
 } from "@/lib/timetable";
 import { calculateTimeRange } from "@/lib/timetable-layout";
@@ -38,12 +39,11 @@ export function TimetableContent({ initialEvents }: TimetableContentProps) {
   // タブを切り替えるたびに縦のスケールが動いてステージ間の比較ができなくなる
   const range = useMemo(() => calculateTimeRange(dateEvents), [dateEvents]);
 
-  // タブに出すステージ。**ステージ絞り込み前**の集合から作ること。
-  // 絞り込み後から作ると、7A を選んだ瞬間に他のステージタブが消えて
-  // 「すべて」を経由しないと移動できなくなる
+  // タブに出すステージ。**ステージ絞り込み前**の集合を渡すこと（理由は listStageTabs 側）。
+  // 選択中のステージは当日0件でも一覧へ残るため、どのタブも未選択になる状態は起きない
   const availableStages = useMemo(
-    () => groupEventsByStage(dateEvents).map((group) => ({ id: group.id, name: group.name })),
-    [dateEvents]
+    () => listStageTabs(dateEvents, selectedStage),
+    [dateEvents, selectedStage]
   );
 
   const groups = useMemo(

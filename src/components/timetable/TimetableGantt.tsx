@@ -1,5 +1,6 @@
 import type { StageGroup } from "@/lib/timetable";
 import {
+  CARD_GAP_PX,
   HOUR_HEIGHT_PX,
   MIN_STAGE_COL_WIDTH_PX,
   TIME_COL_WIDTH_PX,
@@ -80,11 +81,13 @@ export function TimetableGantt({ groups, range }: TimetableGanttProps) {
                 <div
                   key={positioned.event.id}
                   data-timetable-event
-                  // px-1 / pb-1 が隣り合うカードの間隔になる。幾何計算側では余白を扱わない
-                  className="absolute px-1 pb-1"
+                  // px-1 が隣り合う列の間隔。下の余白は密度判定が引く値と同一でなければ
+                  // ならないため、Tailwind の pb-1 ではなく CARD_GAP_PX を直接載せている
+                  className="absolute px-1"
                   style={{
                     top: positioned.topPx,
                     height: positioned.heightPx,
+                    paddingBottom: CARD_GAP_PX,
                     left: `${(positioned.laneIndex / positioned.laneCount) * 100}%`,
                     width: `${100 / positioned.laneCount}%`,
                   }}

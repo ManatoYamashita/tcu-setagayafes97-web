@@ -42,9 +42,12 @@ export const stages: Stage[] = [
 /**
  * どのステージにも一致しなかった企画の受け皿
  *
- * `stages` 配列には加えません。この配列はキャンパスマップや企画一覧など
- * タイムテーブル以外からも参照されるため、実在しない会場を混ぜると
- * 「その他」というステージがあるかのように漏れ出します。
+ * `stages` 配列には加えません。あの配列は「実在する会場」の定義であり、「その他」は
+ * 会場ではなく振り分け先の名前だからです。混ぜると、会場一覧として読む箇所へ
+ * 実在しない会場が漏れます。
+ *
+ * 現時点で `stages` を読むのは `src/lib/timetable.ts` だけですが、キャンパスマップや
+ * 企画一覧が会場一覧として参照し始めたときに黙って壊れないよう、定数を分けてあります。
  */
 export const OTHER_STAGE_ID = "other";
 export const OTHER_STAGE_NAME = "その他";
@@ -77,6 +80,16 @@ export function extractStageId(place: string): string | null {
   if (partialMatch) return partialMatch.id;
 
   return null;
+}
+
+/**
+ * 実在するステージID（`stages` の定義、または「その他」）かどうか
+ *
+ * URL のクエリなど外部由来の文字列を、そのままステージとして扱ってよいかの判定に使います。
+ * 素通しにすると、任意の文字列が `getStageName()` を経由してタブのラベルとして表示されます。
+ */
+export function isKnownStageId(stageId: string): boolean {
+  return stageId === OTHER_STAGE_ID || stages.some((stage) => stage.id === stageId);
 }
 
 /**

@@ -71,9 +71,13 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
     );
   }
 
+  // 縦の余白が `px-3` と揃わないのは、60分企画（カード実寸 92px）へ
+  // タイトル2行 + 時刻 + 場所（計 75px）を余白ごと収めるため。
+  // `py-3` に戻すと必要高が 101px になり、`getCardDensity` の閾値も連動して上がるため、
+  // 1時間企画が compact へ落ちて場所が表示されなくなる。
   if (density === "full") {
     return (
-      <Link href={href} aria-label={label} className={`${base} p-3`}>
+      <Link href={href} aria-label={label} className={`${base} px-3 py-1.5`}>
         <p className="mb-1 text-sm font-bold leading-tight text-gray-900 line-clamp-2">
           {event.title}
         </p>

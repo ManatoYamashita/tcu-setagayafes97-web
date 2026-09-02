@@ -2,21 +2,16 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import type { EventDate } from "@/types/events";
-
-/** タブに出すステージ。「その他」を含むため `stages` 配列には無いIDも来る */
-export interface StageTab {
-  id: string;
-  name: string;
-}
+import type { StageOption } from "@/lib/timetable";
 
 interface TimetableTabsProps {
   selectedDate: EventDate;
   selectedStage: string;
   /**
-   * 表示中の日程に企画があるステージ。`groupEventsByStage()` の並び順
-   * （stages の宣言順 → その他）をそのまま使う。
+   * タブに出すステージ。`listStageTabs()` の並び順（stages の宣言順 → その他）を
+   * そのまま使う。「その他」を含むため `stages` 配列には無いIDも来る。
    */
-  availableStages: StageTab[];
+  availableStages: StageOption[];
 }
 
 // このページは PageSheetLayout の白いシート（bg-white）の上に載る。

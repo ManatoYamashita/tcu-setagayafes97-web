@@ -23,15 +23,31 @@ import { siteConfig } from "@/data/site";
 export const HOUR_HEIGHT_PX = 96;
 
 /**
+ * レーンに割り当てた高さ（枠）とカード実寸の差（px）
+ *
+ * 枠はカードどうしの間隔を含みます。
+ * **カードに何が収まるかを判断するときは、必ず枠からこの値を引くこと。**
+ * 枠の高さのまま判断すると、収まらない密度を選んで内容がカードから溢れます。
+ *
+ * この値は `TimetableGantt` のラッパへ `paddingBottom` として直接渡しています。
+ * Tailwind の `pb-1` に戻さないでください。定数とDOMが別々に動けるようになり、
+ * 片方だけ変えたときに黙って同じ事故が起きます。
+ */
+export const CARD_GAP_PX = 4;
+
+/** カードの上下ボーダーの合計（px）。`TimetableEventCard` の `border` */
+const CARD_BORDER_PX = 2;
+
+/**
  * カードの下限高さ（px）
  *
  * 15分企画は本来 24px になりますが、それではリンクとして押しづらくなります。
- * カード内側の余白（4px）を引いた実寸が 24px を下回らないよう 28px を下限にしています
+ * 枠から `CARD_GAP_PX` を引いたカード実寸が 24px を下回らないよう下限を設けています
  * （WCAG 2.5.8 ターゲットサイズ AA の 24×24）。
  * **この値は描画にのみ使い、重なり判定には使わないこと。** クランプ後の高さで重なりを見ると、
  * 隣接しているだけの短時間企画が偽の重なりとして検出されます。
  */
-export const MIN_EVENT_HEIGHT_PX = 28;
+export const MIN_EVENT_HEIGHT_PX = 24 + CARD_GAP_PX;
 
 /** 時間軸カラムの幅（px） */
 export const TIME_COL_WIDTH_PX = 72;
@@ -270,16 +286,42 @@ export function generateTimeAxis(range: TimeRange): string[] {
 export type EventCardDensity = "full" | "compact" | "minimal";
 
 /**
- * カードの高さから表示密度を決める
+ * 密度ごとに必要な「カード実寸」の高さ（px / border-box）
  *
- * 30分企画は 48px しかなく、タイトル・時刻・場所・主催の4行は入りません。
- * 溢れさせて切るのではなく、優先度の低い情報から落とします。
+ * 内訳は `TimetableEventCard` の実装から積んでいます（Tailwind v4 の既定トークン。
+ * `text-sm` 14px × `leading-tight` 1.25 = 17.5px、`text-xs` 12px の行送りは 16px）。
+ *
+ * | 密度    | border | padding        | 内容                                          | 計 |
+ * | ------- | ------ | -------------- | --------------------------------------------- | -- |
+ * | full    | 2      | 12（`py-1.5`） | タイトル2行 35 + 4 + 時刻 16 + 4 + 場所 16 = 75 | 89 |
+ * | compact | 2      | 8（`py-1`）    | タイトル1行 17.5 + 時刻 16 = 33.5               | 44 |
+ *
+ * **余白ごと収まる高さを閾値にしています。** 「文字が切れない下限」（上側の padding だけ数える）で
+ * 判定すると、下余白が 0 まで潰れたカードが出ます。
  */
-export function getCardDensity(heightPx: number): EventCardDensity {
-  // 閾値は実際に収まる行数から決めている。
-  // full    = 内側余白 24 + タイトル2行 36 + 時刻 15 + 場所 15 = 90px
-  // compact = 内側余白  8 + タイトル1行 18 + 時刻 15          = 41px
-  if (heightPx >= 92) return "full";
-  if (heightPx >= 44) return "compact";
+const DENSITY_MIN_CARD_HEIGHT_PX = {
+  full: 75 + 12 + CARD_BORDER_PX,
+  compact: 33.5 + 8 + CARD_BORDER_PX,
+} as const;
+
+/**
+ * 枠の高さから表示密度を決める
+ *
+ * @param slotHeightPx レーンに割り当てた高さ。カード実寸は `slotHeightPx - CARD_GAP_PX`
+ *
+ * 30分企画はカード実寸が 44px しかなく、タイトル・時刻・場所・主催の4行は入りません。
+ * 溢れさせて切るのではなく、優先度の低い情報から落とします。
+ *
+ * **判定は枠ではなくカード実寸で行うこと。** 枠のまま比べると `CARD_GAP_PX` のぶんだけ
+ * 楽観的になり、60分前後の企画で下余白が消えます（#154 のレビュー指摘）。
+ *
+ * `minimal` は下限であり、`MIN_EVENT_HEIGHT_PX` が作る 24px のカードでは下余白が 1px 詰まります。
+ * 24px は WCAG 2.5.8 の下限で動かせないため、ここだけは許容しています（文字は切れません）。
+ */
+export function getCardDensity(slotHeightPx: number): EventCardDensity {
+  const cardHeightPx = slotHeightPx - CARD_GAP_PX;
+
+  if (cardHeightPx >= DENSITY_MIN_CARD_HEIGHT_PX.full) return "full";
+  if (cardHeightPx >= DENSITY_MIN_CARD_HEIGHT_PX.compact) return "compact";
   return "minimal";
 }
