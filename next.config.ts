@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import bundleAnalyzer from "@next/bundle-analyzer";
 import { specialBanner } from "./src/data/special-banner";
+import { ARCHIVE_96TH_ORIGIN } from "./src/data/legacy-hosts";
 
 const withNextIntl = createNextIntlPlugin();
 const withBundleAnalyzer = bundleAnalyzer({
@@ -32,7 +33,6 @@ const withBundleAnalyzer = bundleAnalyzer({
  *
  * 手順と検証は docs/dev/domain-migration.md を参照。
  */
-const ARCHIVE_96TH_ORIGIN = "https://96th.setagayafes.org";
 
 /**
  * 著名人企画LPへの転送先。
