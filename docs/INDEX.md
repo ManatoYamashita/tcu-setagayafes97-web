@@ -19,7 +19,8 @@ docs/
 │   ├── testing.md    # テスト方針（何をテストし、何をしないか）
 │   ├── domain-migration.md # setagayafes.org を第97回の正規ドメインにする手順
 │   ├── 96th-db-backup.md # 第96回 WordPress DBバックアップの検証情報と取扱い
-│   ├── seo-metadata.md # 共通metadata・canonicalとテストページ除外
+│   ├── seo-metadata.md # 共通metadata・canonical・構造化データ・sitemap の方針
+│   ├── legacy-site-deindex.md # 過去回サイト群を検索結果から恒久除外する運用手順
 │   ├── microcms.md   # microCMS API 制約と実装パターン
 │   └── content-revalidation.md # microCMS Webhook によるオンデマンド再検証と運用手順
 ├── frontend/         # フロントエンド関連ドキュメント
@@ -146,12 +147,31 @@ docs/
   - 取得日・サイズ・SHA-256による原本照合
   - 機密な生ダンプをリポジトリ外で保管する理由と復元前チェック
 
-- **[seo-metadata.md](./dev/seo-metadata.md)** - 共通metadata・canonicalとテストページ除外
+- **[seo-metadata.md](./dev/seo-metadata.md)** - 共通metadata・canonical・構造化データ・sitemap の方針
   - ページごとのmetadata、canonical、Open Graph、Twitter Cardの生成方針
   - 多言語ページのcanonicalとhreflang相当のalternate設定
   - 年次切替後のfavicon・サイト主体/開催イベント構造化データ・画像サイトマップとSearch Console再送信の運用
-  - 第96回アーカイブをクロール可能なままnoindex化し、検索結果から恒久除外する運用
+  - **`@id` で参照したノードの実体は同じ `@graph` に含める。** 含めないと参照が宙に浮き、エンティティの結合が起きない
+  - **JSON-LD は必ず `serializeJsonLd()` を通す。** CMS 文字列に `</script>` が入ると script 要素が閉じる
+  - **`BreadcrumbList` は視覚的パンくずが実在するページにだけ出す。** 中間項目は必ず URL を持たせる（`item` の省略を許されるのは末尾だけ）
+  - **SearchAction / FAQPage / keywords は入れない。** いずれも Google 側で廃止・無視されており、保守対象だけが増える
+  - **sitemap の `lastModified` に `new Date()` を使わない。** 全件が同一値だと Google は lastmod をまるごと無視する
+  - **sitemap の hreflang は自分自身を含める。** Next.js の直列化は自己参照を補完しない
+  - **不在ページは `noindex` に加えて canonical も出さない。** `loading.tsx` により `notFound()` がステータスへ反映されず 200 が返るため、自己参照 canonical は「このURLが正規版」の宣言になる
   - `/api-test` と `/test-ui` を本番404にする運用
+
+- **[legacy-site-deindex.md](./dev/legacy-site-deindex.md)** - 過去回サイト群を検索結果から恒久除外する運用手順（さくら + Search Console）
+  - 対象は `96th` / `about` / `archive` / `blog` / `form` / `link` の6サブドメイン。**閲覧は残し、検索結果だけを第97回へ一本化する**
+  - **`todorokifes.setagayafes.org` は対象外。** 第13回等々力祭の公式サイトであり、一括設定をすると巻き添えで消える
+  - **`robots.txt` でブロックしてはいけない。** クロール不能なURLは `X-Robots-Tag: noindex` を読まれず、URLだけの検索結果として恒久的に残る
+  - **WordPress の「検索エンジンでの表示」を使ってはいけない。** 仮想 robots.txt が `Disallow: /` になり上と同じ罠になる（`about` は物理 robots.txt が無いため直撃）
+  - **`.htaccess` は `# BEGIN WordPress` の外側に書く。** パーマリンク保存だけで内側は消える
+  - **`<FilesMatch>` で HTML に絞らない。** 無条件の `Header always set` が PDF・画像・XML・404 まで covers する（96th で実証済み）
+  - **削除ツールは約6ヶ月の目隠しであって削除ではない。** noindex とセットでしか意味がなく、単独運用は期限切れで全復活する（かつ6ヶ月間は気づけない）
+  - **`https://setagayafes.org/` をプレフィックス削除申請してはいけない。** 第97回サイト全体が6ヶ月消える
+  - **サイトマップの「削除」は Search Console の送信一覧から消すこと。** ファイルと生成機能は再クロール導線として残す
+  - `archive` に第96回の**静的コピー**があり、`96th.setagayafes.org` の WordPress とは別実体
+  - 実施順序、curl 検証マトリクス、削除期限1ヶ月前（M+5）の再確認手順
 
 - **[microcms.md](./dev/microcms.md)** - microCMS API 制約と実装パターン
   - limit 上限100件の制約と offset ページネーション実装

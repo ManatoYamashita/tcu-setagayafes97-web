@@ -152,6 +152,21 @@ it("…", async () => {
 | `filterEvents` の `date` 判定に `both` を足す | date を厳密一致で扱い、両日開催を1日目に含めない      |
 | `generatePageNumbers` の窓幅を 7 から 5 へ    | 上記4つの不変条件を検査するプロパティテストを含む6件  |
 
+SEO シグナル（`metadata.ts` / `structured-data.ts` / `sitemap-entries.ts`）にも同じ手順を
+踏んだ（2026-09-03、#164）。ここで直した欠陥は**すべて `lint` / `type-check` / `build` /
+`format:check` を通過していた**もので、#148 と同じ形をしている。
+
+| 退行させた内容                                           | 落ちたテスト                             |
+| -------------------------------------------------------- | ---------------------------------------- |
+| `buildLocalePath` がデフォルトロケールにも接頭辞を付ける | デフォルトロケールには接頭辞を付けない   |
+| `x-default` を非デフォルトロケールのURLにする            | x-default はデフォルトロケールと一致する |
+| `noindex` のときも canonical を出す                      | noindex のとき canonical を出さない      |
+| `serializeJsonLd` のエスケープを外す                     | `<` を退避して script 要素を閉じさせない |
+| `/about` の `@graph` から WebSite ノードを落とす         | 宙に浮いた `@id` 参照が無い              |
+| sitemap の hreflang から自己参照を落とす                 | 自分自身を含む（相互参照）               |
+| sitemap の `lastModified` を全件ビルド時刻へ戻す         | 全件が同一値ではない                     |
+| パンくずの `position` を 0 起点にする                    | position は 1 起点の連番である           |
+
 **新しくテストを足すときも同じ手順を踏むこと。** 壊しても赤くならないなら、
 そのテストは何も固定していない。
 
@@ -163,6 +178,9 @@ it("…", async () => {
 | ----------------------------------------------------------------------------- | -------------- |
 | `src/lib/timetable-layout.ts` / `src/lib/timetable.ts` / `src/data/stages.ts` | 導入済み       |
 | `src/lib/filters.ts`                                                          | 導入済み       |
+| `src/lib/metadata.ts`                                                         | 導入済み       |
+| `src/lib/structured-data.ts`                                                  | 導入済み       |
+| `src/lib/sitemap-entries.ts`                                                  | 導入済み       |
 | `src/lib/revalidate-targets.ts`                                               | 型が守っている |
 | `src/lib/utils.ts`（`cn`）                                                    | 不要           |
 | `sessionStorage` / `window` に依存するもの（`motion.ts` 等）                  | 実ブラウザ側   |

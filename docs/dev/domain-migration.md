@@ -18,19 +18,29 @@
 > [!WARNING]
 > **移行作業は反映済み。** `setagayafes.org` はVercelの第97回サイト、`96th.setagayafes.org` はさくらの第96回WordPressを配信している。
 
-| 項目                             | 状態                                                                |
-| -------------------------------- | ------------------------------------------------------------------- |
-| Vercel のドメイン割当            | **完了**（`setagayafes.org` / `www.setagayafes.org` の両方）        |
-| `NEXT_PUBLIC_URL`                | **完了**（Vercel / GitHub Variables とも `setagayafes.org`）        |
-| `/96th/*` の 301                 | **実装済み**（`src/proxy.ts` / `next.config.ts`）                   |
-| `/sfa` の 301                    | **実装済み**（`next.config.ts`、`/about`へ統合）                    |
-| `/97th/about`・`/special` の 302 | **実装済み**（`next.config.ts`、著名人企画LPへ）                    |
-| `96th.setagayafes.org` の作成    | **完了**（さくら側、2026-08-24）                                    |
-| 第96回ファイルバックアップ       | **完了**（SnapUP、2026-08-24、正常終了）                            |
-| 第96回DBバックアップ             | **完了**（phpMyAdmin、2026-08-24、[検証台帳](./96th-db-backup.md)） |
-| 第96回サブドメインのSSL          | **完了**（Let's Encrypt、2026-08-24）                               |
-| WordPress の `siteurl` / `home`  | **完了**（`https://96th.setagayafes.org`）                          |
-| `setagayafes.org` の DNS 切替    | **完了**（Vercel）                                                  |
+> [!IMPORTANT]
+> **`setagayafes.org` 配下には9ホストが実在する**（証明書の透明性ログで確認、2026-09-03）。
+> `96th.` のほかに `about.`（実行委員会サイト）、`archive.`（第75〜95回）、`blog.`、
+> `form.`、`link.`、そして**世田谷祭とは別の学園祭である `todorokifes.`（第13回等々力祭）**
+> がある。検索除外の対象と非対象は [`legacy-site-deindex.md`](./legacy-site-deindex.md) を参照。
+
+| 項目                                                   | 状態                                                                |
+| ------------------------------------------------------ | ------------------------------------------------------------------- |
+| Vercel のドメイン割当                                  | **完了**（`setagayafes.org` / `www.setagayafes.org` の両方）        |
+| `NEXT_PUBLIC_URL`                                      | **完了**（Vercel / GitHub Variables とも `setagayafes.org`）        |
+| `/96th/*` の 301                                       | **実装済み**（`src/proxy.ts` / `next.config.ts`）                   |
+| `/sfa` の 301                                          | **実装済み**（`next.config.ts`、`/about`へ統合）                    |
+| `/97th/about`・`/special` の 302                       | **実装済み**（`next.config.ts`、著名人企画LPへ）                    |
+| `96th.setagayafes.org` の作成                          | **完了**（さくら側、2026-08-24）                                    |
+| 第96回ファイルバックアップ                             | **完了**（SnapUP、2026-08-24、正常終了）                            |
+| 第96回DBバックアップ                                   | **完了**（phpMyAdmin、2026-08-24、[検証台帳](./96th-db-backup.md)） |
+| 第96回サブドメインのSSL                                | **完了**（Let's Encrypt、2026-08-24）                               |
+| WordPress の `siteurl` / `home`                        | **完了**（`https://96th.setagayafes.org`）                          |
+| `setagayafes.org` の DNS 切替                          | **完了**（Vercel）                                                  |
+| `96th.` の `X-Robots-Tag`                              | **完了**（2026-08-27、#111。静的画像・CSS・404 にも付与を実測）     |
+| `about.` `archive.` `blog.` `form.` `link.` の noindex | **未実施**（#164、[手順](./legacy-site-deindex.md)）                |
+| `archive.` に第96回の静的コピー                        | **確認**（2026-09-03、`/96th/` が 200。WordPress 版とは別実体）     |
+| 96th 本文の `/96th/` `/95th/` 画像URL残存              | **未対応**（apex は Vercel のため 403。画像切れ。下記「残作業」）   |
 
 ### 2026-08-24 の実施内容
 
