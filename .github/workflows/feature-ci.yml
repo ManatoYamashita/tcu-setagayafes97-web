@@ -18,8 +18,10 @@ on:
       - dev
 
 jobs:
-  lint-and-format:
-    name: Lint & Format Check
+  # pnpm install だけで完結する検査をここへ束ねる。
+  # secrets もビルド成果物も要求しないため、fork からの PR でも結果が出る。
+  static-checks:
+    name: Static Checks
     runs-on: ubuntu-latest
 
     steps:
@@ -45,6 +47,12 @@ jobs:
 
       - name: Run Prettier check
         run: pnpm run format:check
+
+      # next build も型エラーで落ちる（ignoreBuildErrors 未設定）が、この検査は
+      # 別に置く。secrets から独立していて数十秒で落ちること、そして
+      # ignoreBuildErrors: true を1行足せば build 側の型検査だけは消せてしまうため。
+      - name: Run type check
+        run: pnpm run type-check
 
   build:
     name: Build Check

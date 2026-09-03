@@ -103,6 +103,10 @@ feature ブランチへの push 時に自動実行される品質チェック：
   - コードフォーマット規約準拠確認
   - インデント、改行、引用符などの統一性検証
 
+- **型チェック**
+  - 型定義の整合性検証
+  - ビルドと重複しても、secrets を要求せず短時間で落ちる検査として価値がある
+
 - **ビルドチェック**
   - ビルド成功確認
   - ビルドサイズ計測（必要に応じて）
@@ -116,9 +120,19 @@ feature ブランチへの push 時に自動実行される品質チェック：
 - name: Run format check
   run: npm run format:check
 
+- name: Run type check
+  run: npm run type-check
+
 - name: Run build
   run: npm run build
 ```
+
+> [!NOTE]
+> **本リポジトリの実装は上記テンプレートとは異なる。** `feature-ci.yml` は
+> `Static Checks`（lint / format / 型）と `Build Check` の2ジョブで、PR の自動作成は行わない。
+> ジョブを分ける基準は「`pnpm install` 以外に何を要求するか」である。
+> install だけで済む検査は `Static Checks` に束ね、secrets やビルド成果物、
+> ブラウザを要求する検査は別ジョブにする。
 
 #### 2. Create Pull Request Job
 
@@ -540,3 +554,4 @@ git push origin feature-add-gtm
 - 2026-08-16: `.github/workflows/` の push が拒否される場合の回避手順を追加
 - 2026-08-29: 「ステージングの規約」を追加（`git add -A` / `git add .` の禁止、コミット前チェックリスト、巻き込み時の復旧手順）
 - 2026-08-29: 「マージ前の検証」を追加（`merge-tree` で消えるファイルを確認、worktree での実動確認、マージ前チェックリスト）
+- 2026-09-03: `feature-ci.yml` に型チェックを追加し、`lint-and-format` を `static-checks` へ改名（#157 段階1）
