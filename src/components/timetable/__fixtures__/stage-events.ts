@@ -23,6 +23,10 @@ import type { Event } from "@/types/events";
  * | 【TEST】テストステージ | 「その他」列 + 開発時の console.warn           |
  * | startTime が "1000"    | 形式不正が filterStageEvents で落ちること       |
  * | date: "both"           | Day1 / Day2 の両方に出ること                   |
+ *
+ * **ユニットテストからも読まれます**（`src/lib/timetable.test.ts` ほか）。
+ * 上の表の各行は、対応するテストが実際に検証しています。件数や時刻を変更すると
+ * テストの期待値が動くため、変更時は `pnpm test` を通してください。
  */
 
 const BASE = {
@@ -34,7 +38,7 @@ const BASE = {
   content: "<p>検証用のダミー企画です。</p>",
 } as const;
 
-function fixture(
+export function fixture(
   id: string,
   overrides: Pick<Event, "date" | "type" | "place" | "title" | "organizer"> &
     Partial<Pick<Event, "startTime" | "endTime" | "building">>

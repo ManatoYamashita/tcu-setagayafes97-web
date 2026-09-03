@@ -54,6 +54,11 @@ jobs:
       - name: Run type check
         run: pnpm run type-check
 
+      # 純粋関数のユニットテスト。DOM もネットワークも要求しないため、
+      # このジョブの「install だけで完結する」性質を崩さない。
+      - name: Run unit tests
+        run: pnpm run test
+
   build:
     name: Build Check
     runs-on: ubuntu-latest

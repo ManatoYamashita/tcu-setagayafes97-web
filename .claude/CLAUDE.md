@@ -72,6 +72,12 @@ pnpm lint
 # 型チェック（next typegen で .next/types を作り直してから tsc --noEmit）
 pnpm type-check
 
+# ユニットテスト（純粋関数のみ。方針は docs/dev/testing.md）
+pnpm test
+
+# ユニットテスト（watch）
+pnpm test:watch
+
 # フォーマットチェック
 pnpm format:check
 
@@ -113,7 +119,7 @@ refactor/<refactor-target> # リファクタリング
 
 push 時は head をそのまま、PR 時は head を base へマージした結果を検証する。**両方走る場合、それは重複ではなく別種の検証である。**
 
-`Static Checks` は **`pnpm install` だけで完結する検査**（lint / format / 型）を束ねたジョブである。
+`Static Checks` は **`pnpm install` だけで完結する検査**（lint / format / 型 / ユニットテスト）を束ねたジョブである。
 secrets もビルド成果物も要求しないため、**fork からの PR でも結果が出る**（`Build Check` は
 microCMS の secrets を要求するので fork PR では必ず落ちる）。ここへ検査を足すときは、
 「install 以外に何も要求しないか」を基準に判断すること。要求するなら別ジョブにする。
