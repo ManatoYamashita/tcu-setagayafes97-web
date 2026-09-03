@@ -230,12 +230,13 @@ WCAG 1.4.11（非テキストコントラスト）の 3:1 を満たす必要が�
 検証は2層に分かれます。**算術で表せる不変条件はユニットテストが固定し、
 DOM が要るものだけを実ブラウザで実測します。**
 
-| 層                           | 対象                                                      |
-| ---------------------------- | --------------------------------------------------------- |
-| `pnpm test`（Vitest / node） | 高さ・座標・レーン分割・密度・ステージ解決の**算術**      |
-| 実ブラウザ                   | **盤面が実際に 0px でないこと**など、レイアウトの解決結果 |
+| 層                            | 対象                                                      |
+| ----------------------------- | --------------------------------------------------------- |
+| `pnpm test`（Vitest / node）  | 高さ・座標・レーン分割・密度・ステージ解決の**算術**      |
+| `pnpm test:e2e`（Playwright） | **盤面が実際に 0px でないこと**など、レイアウトの解決結果 |
 
-方針とテストの書き方は [`docs/dev/testing.md`](../dev/testing.md) を参照。
+ユニットテストの方針は [`docs/dev/testing.md`](../dev/testing.md)、
+実ブラウザ側の設計は [`layout-e2e.md`](./layout-e2e.md) を参照。
 
 ### ユニットテストが固定している不変条件
 
@@ -265,6 +266,24 @@ NEXT_PUBLIC_EVENTS_VISIBLE=true NEXT_PUBLIC_TIMETABLE_FIXTURE=1 pnpm dev
 動的 import のチャンクごと落ちます（実測: `.next/server` `.next/static` の JS に出現しない）。
 
 ### 実測アサーション
+
+**以下は `e2e/timetable/` が自動化済みです**（[layout-e2e.md](./layout-e2e.md)）。
+原本として残してあるのは、手で再実行して確かめる価値が消えないためです。
+
+| スニペット           | 対応する spec                |
+| -------------------- | ---------------------------- |
+| 盤面が 0px でない    | `board-geometry.spec.ts`     |
+| 同一座標に重ならない | `board-geometry.spec.ts`     |
+| カード実寸 24px 以上 | `card-density.spec.ts`       |
+| 内容が溢れていない   | `card-density.spec.ts`       |
+| `aria-pressed` が2つ | `tabs-and-filtering.spec.ts` |
+| 横スクロールの完結   | `scroll-containment.spec.ts` |
+
+> [!WARNING]
+> **盤面の `height` を `min-height` へ変えるだけでは、どのテストも落ちません。**
+> px の高さが列そのものに載っているため、`min-height` でも同じ used height が出るからです。
+> #148 を再現するには `h-full` の中間ラッパが要ります。詳細は
+> [layout-e2e.md](./layout-e2e.md)「テストが実際に何を捕まえるか」。
 
 ```js
 // 盤面が 0px でないこと（#148 本体）
