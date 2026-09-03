@@ -4,6 +4,9 @@ name: Feature Branch CI
 # push は作業ブランチへの直接の変更を、pull_request は base へマージした結果を検証する。
 # 両方が走るケースでは検証対象が異なる（前者は head、後者は head を base へマージしたもの）ため、
 # 重複ではなく別種の検証として扱う。
+#
+# paths フィルタは置かない。format:check が docs/ の .md も検査対象にしているため、
+# ドキュメントだけの変更でも走らせる必要がある。
 on:
   push:
     branches:
@@ -17,6 +20,15 @@ on:
       - main
       - dev
 
+permissions:
+  contents: read
+
+# 同じ ref へ続けて push したとき、古い run を捨てる。
+# E2E がブラウザを起動するようになったので、無駄な並走を止める価値が出た。
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # pnpm install だけで完結する検査をここへ束ねる。
   # secrets もビルド成果物も要求しないため、fork からの PR でも結果が出る。
@@ -28,19 +40,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: "pnpm"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup
+        uses: ./.github/actions/setup
 
       - name: Run ESLint
         run: pnpm run lint
@@ -59,6 +60,45 @@ jobs:
       - name: Run unit tests
         run: pnpm run test
 
+  # 実ブラウザでのレイアウト実測。#148（盤面が 0px に潰れる）の再発防止装置。
+  # CSS の百分率高さが解決されるかはレイアウトエンジンの仕事なので、
+  # 型でもユニットテストでも表現できない。
+  layout-e2e:
+    name: Layout E2E (Timetable)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      # headless 実行しかしないので full Chromium（+約100MB）は落とさない。
+      # ブラウザバイナリのキャッシュは入れていない。Playwright 公式が
+      # 「復元がダウンロードとほぼ同じ時間で、Linux では OS 依存パッケージを
+      # キャッシュできない」として非推奨としているため。実測を見てから判断する。
+      - name: Install Chromium (headless shell only)
+        run: pnpm exec playwright install --with-deps --only-shell chromium
+
+      # env を渡さないのは意図的である。フィクスチャ経路は getEventsList() を
+      # 呼ばないため microCMS のシークレットが要らない。**このジョブだけは
+      # fork からの PR でも緑赤が出る**（build ジョブは secrets 不達で必ず落ちる）。
+      - name: Run layout assertions
+        run: pnpm run test:e2e
+
+      - name: Upload report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_attempt }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
   build:
     name: Build Check
     runs-on: ubuntu-latest
@@ -67,19 +107,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: "pnpm"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup
+        uses: ./.github/actions/setup
 
       - name: Build project
         run: pnpm run build
