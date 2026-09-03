@@ -159,3 +159,206 @@ export const aboutConfig = {
  * About情報の型定義
  */
 export type AboutConfig = typeof aboutConfig;
+
+/**
+ * 「世田谷祭とは」セクションの表示文言
+ *
+ * 開催日・会場・主催は `siteConfig` から描画側で組み立てる。ここにはラベルと
+ * 本文だけを置き、事実の一次定義を二重に持たない。
+ *
+ * `accessPageContent` / `accessPageContents` と同じ `Record<Locale, Content>`
+ * パターンで4言語を持つ。`/about` の既存セクション（AboutHero・
+ * ChairpersonSection・EventOverviewTable）は4ロケールとも日本語本文を配信して
+ * おり、hreflang だけが相互宣言されている状態にある（2026-09-03 実測）。
+ * 新設分で同じ状態を増やさないため、最初から翻訳を持たせる。
+ */
+export interface FestivalIntroContent {
+  label: string;
+  heading: string;
+  /** 定義文。検索結果のスニペットに抜かれることを想定した1文で書く */
+  lead: string;
+  paragraphs: readonly string[];
+  factsHeading: string;
+  factLabels: {
+    name: string;
+    date: string;
+    venue: string;
+    admission: string;
+    organizer: string;
+  };
+  admissionValue: string;
+  /**
+   * 固有名詞のロケール別表記
+   *
+   * `siteConfig` は日本語のみを持つ。省略したロケールは `siteConfig` の値を
+   * そのまま使う（＝日本語ロケールでは書かない）。
+   */
+  festivalName?: string;
+  venueName?: string;
+  venueAddress?: string;
+  organizerName?: string;
+  committeeHeading: string;
+  committeeParagraphs: readonly string[];
+  departmentsLabel: string;
+  departments: readonly string[];
+  linksHeading: string;
+  links: readonly { label: string; href: string }[];
+}
+
+export const festivalIntroContent = {
+  label: "About the Festival",
+  heading: "世田谷祭とは",
+  lead: "世田谷祭（せたがやさい）は、東京都市大学 世田谷キャンパスで毎年秋に開催される学園祭です。",
+  paragraphs: [
+    // TODO(委員会確認): 「1929年に創立された武蔵高等工科学校の時代から続く」は
+    // 第96回サイトの掲載文をそのまま引き継いだ表現。1929年は学校の創立年であって
+    // 第1回の開催年ではないため、第1回開催年を書き足す場合は必ず事実確認すること。
+    "1929年に創立された武蔵高等工科学校の時代から続く伝統ある学園祭で、今回で第97回を迎えます。",
+    "学生団体による教室企画や模擬店、体育館・講堂ホールでのステージ企画、著名人をお招きするスペシャル企画まで、キャンパス全体が会場になります。在学生や卒業生はもちろん、地域の皆様、ご家族連れ、受験生の方まで、どなたでもご来場いただけます。",
+  ],
+  factsHeading: "開催情報",
+  factLabels: {
+    name: "名称",
+    date: "会期",
+    venue: "会場",
+    admission: "入場料",
+    organizer: "主催",
+  },
+  admissionValue: "無料",
+  committeeHeading: "世田谷祭実行委員会とは",
+  committeeParagraphs: [
+    "世田谷祭実行委員会は、東京都市大学の学生によって組織され、世田谷祭の企画・運営を行う団体です。学生の自主性と創造性を育み、地域社会との交流を深めることを目的に、1年をかけて準備を進めています。",
+  ],
+  departmentsLabel: "組織構成",
+  departments: aboutConfig.committee.departments,
+  linksHeading: "関連ページ",
+  links: [
+    { label: "会場とアクセス", href: "/access" },
+    { label: "ご来場の方へ", href: "/info/guide" },
+    { label: "よくある質問", href: "/info/faq" },
+  ],
+} as const satisfies FestivalIntroContent;
+
+export const festivalIntroContents = {
+  ja: festivalIntroContent,
+  en: {
+    label: "About the Festival",
+    heading: "What is Setagaya Festival?",
+    lead: "Setagaya Festival (Setagaya-sai) is the annual autumn campus festival held at Tokyo City University Setagaya Campus.",
+    paragraphs: [
+      "It is a long-standing festival whose roots go back to Musashi High School of Technology, founded in 1929. This year marks the 97th edition.",
+      "Classroom projects and food stalls run by student groups, stage programmes in the gymnasium and the auditorium hall, and a special programme with an invited guest artist take place across the whole campus. Students, alumni, local residents, families and prospective students are all welcome.",
+    ],
+    factsHeading: "Event information",
+    factLabels: {
+      name: "Name",
+      date: "Dates",
+      venue: "Venue",
+      admission: "Admission",
+      organizer: "Organizer",
+    },
+    admissionValue: "Free",
+    festivalName: "The 97th Setagaya Festival, Tokyo City University",
+    venueName: "Tokyo City University Setagaya Campus",
+    venueAddress: "1-28-1 Tamatsutsumi, Setagaya-ku, Tokyo 158-8557, Japan",
+    organizerName: "The 97th Tokyo City University Setagaya Festival Organizing Committee",
+    committeeHeading: "About the organizing committee",
+    committeeParagraphs: [
+      "The Setagaya Festival Organizing Committee is a student body of Tokyo City University that plans and runs the festival. It prepares throughout the year with the aim of fostering student initiative and creativity while deepening ties with the local community.",
+    ],
+    departmentsLabel: "Departments",
+    departments: [
+      "General Affairs",
+      "External Relations",
+      "Programme Planning",
+      "Public Relations",
+      "Production",
+      "Venue",
+      "Stage",
+      "Systems",
+    ],
+    linksHeading: "Related pages",
+    links: [
+      { label: "Venue and access", href: "/access" },
+      { label: "Visitor guide", href: "/info/guide" },
+      { label: "FAQ", href: "/info/faq" },
+    ],
+  },
+  zh: {
+    label: "About the Festival",
+    heading: "什么是世田谷祭",
+    lead: "世田谷祭是东京都市大学世田谷校区每年秋季举办的校园文化节。",
+    paragraphs: [
+      "它承袭自1929年创立的武藏高等工科学校时代，是一项历史悠久的校园文化节，本届为第97届。",
+      "从学生团体的教室企划与美食摊位，到体育馆和礼堂舞台的演出企划，再到邀请知名人士参与的特别企划，整个校区都是会场。无论是在校生、毕业生，还是当地居民、亲子家庭与考生，都欢迎前来参观。",
+    ],
+    factsHeading: "举办信息",
+    factLabels: {
+      name: "名称",
+      date: "会期",
+      venue: "会场",
+      admission: "入场费",
+      organizer: "主办",
+    },
+    admissionValue: "免费",
+    festivalName: "东京都市大学 第97届 世田谷祭",
+    venueName: "东京都市大学 世田谷校区",
+    venueAddress: "〒158-8557 东京都世田谷区玉堤1-28-1",
+    organizerName: "第97届东京都市大学世田谷祭执行委员会",
+    committeeHeading: "关于世田谷祭执行委员会",
+    committeeParagraphs: [
+      "世田谷祭执行委员会由东京都市大学的学生组成，负责本文化节的策划与运营。以培养学生的自主性与创造力、加深与当地社会的交流为目标，用一整年的时间进行筹备。",
+    ],
+    departmentsLabel: "组织构成",
+    departments: ["总务局", "涉外局", "企划局", "宣传局", "制作局", "会场局", "舞台局", "系统局"],
+    linksHeading: "相关页面",
+    links: [
+      { label: "会场与交通", href: "/access" },
+      { label: "参观指南", href: "/info/guide" },
+      { label: "常见问题", href: "/info/faq" },
+    ],
+  },
+  ko: {
+    label: "About the Festival",
+    heading: "세타가야사이란",
+    lead: "세타가야사이는 도쿄도시대학 세타가야 캠퍼스에서 매년 가을에 열리는 대학 축제입니다.",
+    paragraphs: [
+      "1929년에 창립된 무사시고등공과학교 시절부터 이어져 온 전통 있는 축제로, 이번이 제97회입니다.",
+      "학생 단체의 교실 기획과 먹거리 부스, 체육관과 강당 홀의 무대 기획, 유명인을 초청하는 스페셜 기획까지 캠퍼스 전체가 행사장이 됩니다. 재학생과 졸업생은 물론 지역 주민, 가족 단위 방문객, 수험생까지 누구나 방문하실 수 있습니다.",
+    ],
+    factsHeading: "개최 정보",
+    factLabels: {
+      name: "명칭",
+      date: "회기",
+      venue: "장소",
+      admission: "입장료",
+      organizer: "주최",
+    },
+    admissionValue: "무료",
+    festivalName: "도쿄도시대학 제97회 세타가야사이",
+    venueName: "도쿄도시대학 세타가야 캠퍼스",
+    venueAddress: "〒158-8557 도쿄도 세타가야구 다마쓰쓰미 1-28-1",
+    organizerName: "제97회 도쿄도시대학 세타가야사이 실행위원회",
+    committeeHeading: "세타가야사이 실행위원회란",
+    committeeParagraphs: [
+      "세타가야사이 실행위원회는 도쿄도시대학 학생들로 구성되어 축제의 기획과 운영을 담당하는 단체입니다. 학생의 자주성과 창의성을 기르고 지역 사회와의 교류를 넓히는 것을 목표로 1년에 걸쳐 준비를 진행합니다.",
+    ],
+    departmentsLabel: "조직 구성",
+    departments: [
+      "총무국",
+      "섭외국",
+      "기획국",
+      "홍보국",
+      "제작국",
+      "회장국",
+      "스테이지국",
+      "시스템국",
+    ],
+    linksHeading: "관련 페이지",
+    links: [
+      { label: "장소와 오시는 길", href: "/access" },
+      { label: "방문객 안내", href: "/info/guide" },
+      { label: "자주 묻는 질문", href: "/info/faq" },
+    ],
+  },
+} as const satisfies Record<string, FestivalIntroContent>;

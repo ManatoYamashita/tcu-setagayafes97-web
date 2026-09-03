@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { AboutHero } from "@/components/about/AboutHero";
+import { FestivalIntroSection } from "@/components/about/FestivalIntroSection";
 import { ChairpersonSection } from "@/components/about/ChairpersonSection";
 import { EventOverviewTable } from "@/components/about/EventOverviewTable";
 import { SponsorBanner } from "@/components/home/SponsorBanner";
+import { type Locale } from "@/i18n/routing";
 import { createPageMetadata } from "@/lib/metadata";
 
 /**
@@ -58,6 +60,14 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   return (
     <div className="min-h-screen bg-secondary">
       <AboutHero />
+
+      {/* 世田谷祭とは */}
+      {/*
+        AboutHero と ChairpersonSection の間に置く。AboutHero の上下マスクが
+        bg-gray-50、ChairpersonSection のルートが from-gray-50 の縦グラデーション
+        なので、同色のセクションを挟むと継ぎ目が見えない。
+      */}
+      <FestivalIntroSection locale={locale as Locale} />
 
       {/* 委員長挨拶 */}
       {/*
