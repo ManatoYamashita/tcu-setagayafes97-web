@@ -12,7 +12,7 @@ import { SpecialPageMotion } from "@/components/special/SpecialPageMotion";
 import { SNSLinks } from "@/components/events/SNSLinks";
 import { siteConfig, SPECIAL_GOODS_VISIBLE, SPECIAL_VISIBLE } from "@/data/site";
 import { createPageMetadata } from "@/lib/metadata";
-import { serializeJsonLd } from "@/lib/structured-data";
+import { createBreadcrumbStructuredData, serializeJsonLd } from "@/lib/structured-data";
 
 interface SpecialPageProps {
   params: Promise<{ id: string }>;
@@ -141,6 +141,28 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
+
+      {/*
+        パンくずの構造化データ。この直下の nav に視覚的なパンくずが実在するため
+        宣言してよい（画面に無い階層を宣言するとガイドライン違反になる）。
+      */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(
+            createBreadcrumbStructuredData([
+              { name: "トップ", pathname: "/" },
+              /*
+               * 画面上の「著名人企画」はリンクではなく素のラベルであり、対応する
+               * URL が無い。Google が item の省略を許すのは末尾の項目だけなので、
+               * 中間階層としては宣言しない。/special を充てると SPECIAL_VISIBLE が
+               * 真の間は このLP自身へ 302 転送されるため循環する。
+               */
+              { name: event.title },
+            ])
+          ),
+        }}
       />
 
       <div className="min-h-screen bg-secondary">

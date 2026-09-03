@@ -8,6 +8,7 @@ import { EventOverviewTable } from "@/components/about/EventOverviewTable";
 import { SponsorBanner } from "@/components/home/SponsorBanner";
 import { type Locale } from "@/i18n/routing";
 import { createPageMetadata } from "@/lib/metadata";
+import { createAboutStructuredData, serializeJsonLd } from "@/lib/structured-data";
 
 /**
  * 再検証間隔（Webhook 障害時のフォールバック）
@@ -59,6 +60,17 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 
   return (
     <div className="min-h-screen bg-secondary">
+      {/*
+        Organization と Event はトップページと同じ @id を使う。Google は同一 @id の
+        ノードを結合するため、重複ではなくエンティティの補強になる。
+      */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(createAboutStructuredData(locale as Locale)),
+        }}
+      />
+
       <AboutHero />
 
       {/* 世田谷祭とは */}
