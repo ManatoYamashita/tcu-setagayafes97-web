@@ -23,6 +23,7 @@ export function TimeAxisColumn({ range, hourHeightPx }: TimeAxisProps) {
   // #148 と同じ「親が min-height しか持たず 0px に潰れる」経路が復活する。
   return (
     <div
+      data-timetable-time-axis
       className="relative"
       style={{ height: calculateBoardHeight(range, hourHeightPx) }}
       aria-hidden="true"
