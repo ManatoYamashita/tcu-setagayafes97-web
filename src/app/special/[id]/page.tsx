@@ -12,6 +12,7 @@ import { SpecialPageMotion } from "@/components/special/SpecialPageMotion";
 import { SNSLinks } from "@/components/events/SNSLinks";
 import { siteConfig, SPECIAL_GOODS_VISIBLE, SPECIAL_VISIBLE } from "@/data/site";
 import { createPageMetadata } from "@/lib/metadata";
+import { serializeJsonLd } from "@/lib/structured-data";
 
 interface SpecialPageProps {
   params: Promise<{ id: string }>;
@@ -44,6 +45,8 @@ export async function generateMetadata({ params }: SpecialPageProps): Promise<Me
       title: "ページが見つかりません",
       description: "お探しのページは見つかりませんでした。",
       pathname: `/special/${id}`,
+      // 実在しないIDでも200が返るため、canonical を出さず noindex にする（詳細は createPageMetadata）。
+      noindex: true,
     });
   }
 
@@ -137,7 +140,7 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
 
       <div className="min-h-screen bg-secondary">

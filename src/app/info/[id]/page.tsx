@@ -5,6 +5,7 @@ import Image from "next/image";
 import { getNewsById, getNewsList } from "@/lib/news";
 import { Badge } from "@/components/ui/Badge";
 import { createPageMetadata } from "@/lib/metadata";
+import { serializeJsonLd } from "@/lib/structured-data";
 
 interface NewsPageProps {
   params: Promise<{ id: string }>;
@@ -38,6 +39,8 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
       title: "お知らせが見つかりません",
       description: "お探しのお知らせは見つかりませんでした。",
       pathname: `/info/${id}`,
+      // 実在しないIDでも200が返るため、canonical を出さず noindex にする（詳細は createPageMetadata）。
+      noindex: true,
     });
   }
 
@@ -99,7 +102,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
       {/* 構造化データ */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
 
       <div className="min-h-screen bg-secondary">

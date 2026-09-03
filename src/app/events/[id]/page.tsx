@@ -6,6 +6,7 @@ import { SPECIAL_VISIBLE } from "@/data/site";
 import { EventDetail } from "@/components/events/EventDetail";
 import { RelatedEvents } from "@/components/events/RelatedEvents";
 import { createPageMetadata } from "@/lib/metadata";
+import { serializeJsonLd } from "@/lib/structured-data";
 interface EventPageProps {
   params: Promise<{ id: string }>;
 }
@@ -41,6 +42,8 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
       title: "企画が見つかりません",
       description: "お探しの企画は見つかりませんでした。",
       pathname: `/events/${id}`,
+      // 実在しないIDでも200が返るため、canonical を出さず noindex にする（詳細は createPageMetadata）。
+      noindex: true,
     });
   }
 
@@ -115,7 +118,7 @@ export default async function EventPage({ params }: EventPageProps) {
       {/* 構造化データ */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
 
       <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary">
