@@ -63,7 +63,12 @@ export function TimetableTabs({
       {/* 日程タブ */}
       <div>
         <h2 className="mb-3 text-sm font-semibold text-gray-900/90">日程</h2>
-        <div className="flex flex-wrap gap-2">
+        {/*
+          data-* は E2E がタブ群にスコープするための目印。開発サーバでは
+          AgentationDevTool がオーバーレイを差し込むため、aria-pressed を
+          ページ全体から素で数えると壊れる（docs/frontend/layout-e2e.md）
+        */}
+        <div data-timetable-date-tabs className="flex flex-wrap gap-2">
           <button
             onClick={() => handleDateChange("day1")}
             aria-pressed={selectedDate === "day1"}
@@ -84,7 +89,7 @@ export function TimetableTabs({
       {/* ステージタブ */}
       <div>
         <h2 className="mb-3 text-sm font-semibold text-gray-900/90">ステージ</h2>
-        <div className="flex flex-wrap gap-2">
+        <div data-timetable-stage-tabs className="flex flex-wrap gap-2">
           <button
             onClick={() => handleStageChange("all")}
             aria-pressed={selectedStage === "all"}

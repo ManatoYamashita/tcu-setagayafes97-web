@@ -78,6 +78,9 @@ pnpm test
 # ユニットテスト（watch）
 pnpm test:watch
 
+# レイアウトの実測（実ブラウザ。初回のみ pnpm exec playwright install --only-shell chromium）
+pnpm test:e2e
+
 # フォーマットチェック
 pnpm format:check
 
@@ -110,7 +113,7 @@ refactor/<refactor-target> # リファクタリング
 
 **CI のカバー範囲:**
 
-`.github/workflows/feature-ci.yml`（Static Checks / Build Check）は次の場合に走る。**上記5つの命名規則から外れたブランチ名を使うと、push 時のチェックが一切走らない。**
+`.github/workflows/feature-ci.yml`（Static Checks / Layout E2E / Build Check）は次の場合に走る。**上記5つの命名規則から外れたブランチ名を使うと、push 時のチェックが一切走らない。**
 
 | イベント       | 対象                                                             |
 | -------------- | ---------------------------------------------------------------- |
@@ -120,6 +123,10 @@ refactor/<refactor-target> # リファクタリング
 push 時は head をそのまま、PR 時は head を base へマージした結果を検証する。**両方走る場合、それは重複ではなく別種の検証である。**
 
 `Static Checks` は **`pnpm install` だけで完結する検査**（lint / format / 型 / ユニットテスト）を束ねたジョブである。
+`Layout E2E` は実ブラウザで `/timetable` の盤面を測る（#148 の再発防止装置）。
+**このジョブは secrets を要求しないため、fork からの PR でも緑赤が出る唯一のジョブである**
+（`Build Check` は microCMS の secrets 不達で fork PR では必ず落ちる）。
+設計は [`docs/frontend/layout-e2e.md`](../docs/frontend/layout-e2e.md) を参照。
 secrets もビルド成果物も要求しないため、**fork からの PR でも結果が出る**（`Build Check` は
 microCMS の secrets を要求するので fork PR では必ず落ちる）。ここへ検査を足すときは、
 「install 以外に何も要求しないか」を基準に判断すること。要求するなら別ジョブにする。

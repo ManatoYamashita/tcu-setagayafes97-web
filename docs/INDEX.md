@@ -30,6 +30,7 @@ docs/
 │   ├── browser-verification-pitfalls.md # 検証手順そのものが誤る実例
 │   ├── layout-patterns.md         # レイアウトパターンと設計原則
 │   ├── timetable-gantt.md         # タイムテーブル盤面（ガントチャート）の設計
+│   ├── layout-e2e.md              # レイアウトの実測アサーション（Playwright）
 │   ├── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
 │   ├── performance.md             # Lighthouse基準値とフロントエンド性能ルール
 │   └── page-transition.md         # ページ遷移アニメーションとView Transitions API
@@ -267,6 +268,14 @@ docs/
   - 選択中のステージは当日0件でもタブに残す（残さないとどのタブも `aria-pressed` にならず、絞り込みが画面から読めない）
   - 盤面と縦スタックの DOM 2枚持ちは、インラインスタイルにレスポンシブバリアントが無いことによる意図的な例外
   - **検証は2層。** 算術で表せる不変条件は `pnpm test` が固定し、盤面が実際に 0px でないことは実ブラウザでしか測れない（[dev/testing.md](./dev/testing.md)）
+
+- **[layout-e2e.md](./frontend/layout-e2e.md)** - レイアウトの実測アサーション（Playwright / #157）
+  - **jsdom も Vitest Browser Mode も #148 を検出できない。** 前者はレイアウトエンジンが無く、後者は祖先の連鎖が本物と別物になる
+  - **`pnpm build && pnpm start` は原理的に使えない。** フィクスチャ分岐が `NODE_ENV !== "production"` に閉じており、本番ビルドではチャンクごと落ちる
+  - **secrets を要求しない唯一のジョブ。** フィクスチャ経路は `getEventsList()` を呼ばないため fork PR でも走る
+  - **測ろうとしている値そのものを待たない。** 盤面の高さを `waitForFunction` で待つと #148 は「検出できない」に化ける
+  - **列の `height` を `minHeight` へ変えるだけでは落ちない。** #148 の再現には `h-full` の中間ラッパが要る（実測記録あり）
+  - 1024px 未満は盤面が `display:none` になり全アサーションが偽陰性。共通フィクスチャが測定条件を先に検査する
 
 - **[i18n-page-structure.md](./frontend/i18n-page-structure.md)** - 多言語ページの構成パターン
   - メッセージの二分割（ページ本文 `messages/` と ヘッダー・フッター `messages/chrome/`）

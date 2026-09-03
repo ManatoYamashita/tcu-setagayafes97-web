@@ -1,0 +1,23 @@
+name: "Setup pnpm and Node.js"
+description: "pnpm と Node.js を用意して依存をインストールする（全ジョブ共通）"
+
+# ジョブが3本になった時点で切り出した。それまでは同じ4ステップが各ジョブへ
+# 丸写しされており、ジョブを増やすたびに複製が増える状態だった。
+# checkout はジョブ側に残す（何を取得するかはジョブごとに変わりうるため）。
+runs:
+  using: "composite"
+  steps:
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "24"
+        cache: "pnpm"
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+      shell: bash

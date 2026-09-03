@@ -66,18 +66,19 @@ cp .env.example .env.local
 
 ### 開発コマンド
 
-| コマンド            | 説明                       |
-| ------------------- | -------------------------- |
-| `pnpm dev`          | 開発サーバー起動           |
-| `pnpm build`        | プロダクションビルド       |
-| `pnpm start`        | プロダクションサーバー起動 |
-| `pnpm lint`         | ESLint チェック            |
-| `pnpm type-check`   | TypeScript 型チェック      |
-| `pnpm test`         | ユニットテスト             |
-| `pnpm test:watch`   | ユニットテスト（watch）    |
-| `pnpm format`       | Prettier 自動修正          |
-| `pnpm format:check` | フォーマットチェック       |
-| `pnpm analyze`      | バンドル分析               |
+| コマンド            | 説明                           |
+| ------------------- | ------------------------------ |
+| `pnpm dev`          | 開発サーバー起動               |
+| `pnpm build`        | プロダクションビルド           |
+| `pnpm start`        | プロダクションサーバー起動     |
+| `pnpm lint`         | ESLint チェック                |
+| `pnpm type-check`   | TypeScript 型チェック          |
+| `pnpm test`         | ユニットテスト                 |
+| `pnpm test:watch`   | ユニットテスト（watch）        |
+| `pnpm test:e2e`     | レイアウトの実測（実ブラウザ） |
+| `pnpm format`       | Prettier 自動修正              |
+| `pnpm format:check` | フォーマットチェック           |
+| `pnpm analyze`      | バンドル分析                   |
 
 ---
 
