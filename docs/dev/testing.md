@@ -102,6 +102,16 @@ it("…", async () => {
 `vi.stubEnv("NODE_ENV", "production")` を使うこと。
 `vitest.config.mts` の `unstubEnvs: true` がテストごとに巻き戻す。
 
+### 似た名前の関数でも契約が違うことがある
+
+`src/lib/filters.ts` の `filterEvents()` は `date` を**厳密一致**で扱い、`"day1"` の絞り込みに
+`date: "both"` の企画を含めない。`src/lib/timetable.ts` の `filterEventsByDate()` は
+**含める。** どちらも正しい。
+
+`/events` は `dateFilterOptions` に「両日開催」を独立した選択肢として持つのに対し、
+`/timetable` は Day1 / Day2 のタブしか無いためである。**片方に揃えると、もう片方の UI が壊れる。**
+両方をテストで固定してあるので、揃えようとすると赤くなる。
+
 ### `vitest.config.mts` の拡張子は `.ts` ではない
 
 `.ts` にすると Vite が「CommonJS として読んだファイルに ESM 構文がある」と警告し、
@@ -133,6 +143,15 @@ it("…", async () => {
 | 選択中ステージをタブから落とす             | 選択中のステージを当日0件でも残す                            |
 | レンジの最低1時間を外す                    | 同一の正時に収まる企画でも最低1時間を確保する                |
 
+`src/lib/filters.ts` にも同じ手順を踏んだ（2026-09-03、#162）。
+
+| 退行させた内容                                | 落ちたテスト                                          |
+| --------------------------------------------- | ----------------------------------------------------- |
+| `paginateEvents` の1未満クランプを削除        | 1未満のページは空配列を返す／小数のページを切り捨てる |
+| `Math.floor` による小数の切り捨てをやめる     | 小数のページを切り捨てる                              |
+| `filterEvents` の `date` 判定に `both` を足す | date を厳密一致で扱い、両日開催を1日目に含めない      |
+| `generatePageNumbers` の窓幅を 7 から 5 へ    | 上記4つの不変条件を検査するプロパティテストを含む6件  |
+
 **新しくテストを足すときも同じ手順を踏むこと。** 壊しても赤くならないなら、
 そのテストは何も固定していない。
 
@@ -143,7 +162,7 @@ it("…", async () => {
 | 対象                                                                          | 判断           |
 | ----------------------------------------------------------------------------- | -------------- |
 | `src/lib/timetable-layout.ts` / `src/lib/timetable.ts` / `src/data/stages.ts` | 導入済み       |
-| `src/lib/filters.ts`（`generatePageNumbers` の窓計算）                        | 足す価値がある |
+| `src/lib/filters.ts`                                                          | 導入済み       |
 | `src/lib/revalidate-targets.ts`                                               | 型が守っている |
 | `src/lib/utils.ts`（`cn`）                                                    | 不要           |
 | `sessionStorage` / `window` に依存するもの（`motion.ts` 等）                  | 実ブラウザ側   |
