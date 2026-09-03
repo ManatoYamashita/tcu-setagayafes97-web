@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildEventsQuery,
+  DEFAULT_EVENT_FILTERS,
+  eventsHref,
   filterEvents,
   generatePageNumbers,
   getTotalPages,
   paginateEvents,
+  parseEventFilters,
+  parseEventPage,
   type FilterParams,
 } from "@/lib/filters";
 import { fixture } from "@/components/timetable/__fixtures__/stage-events";
@@ -228,5 +233,102 @@ describe("generatePageNumbers", () => {
         ).toBe(true);
       }
     }
+  });
+});
+
+/**
+ * クエリの読み書き
+ *
+ * `EventFilters` / `Pagination` から `useSearchParams()` を外した際に、URL の組み立てを
+ * この純粋関数へ移した（#156）。以前は「現在URLのクエリ文字列を起点に足し引きする」実装
+ * だったため、**props から組み直しても等価であること**がこの関数の契約になる。
+ */
+describe("parseEventFilters", () => {
+  it("未指定の項目を既定値で埋める", () => {
+    expect(parseEventFilters(new URLSearchParams())).toEqual(DEFAULT_EVENT_FILTERS);
+  });
+
+  it("指定された項目をそのまま読む", () => {
+    const params = new URLSearchParams("date=day1&type=stage&building=7号館&keyword=軽音");
+
+    expect(parseEventFilters(params)).toEqual({
+      date: "day1",
+      type: "stage",
+      building: "7号館",
+      keyword: "軽音",
+    });
+  });
+});
+
+describe("parseEventPage", () => {
+  it("未指定なら1", () => {
+    expect(parseEventPage(new URLSearchParams())).toBe(1);
+  });
+
+  it("数値として読めない値なら1", () => {
+    expect(parseEventPage(new URLSearchParams("page=abc"))).toBe(1);
+    expect(parseEventPage(new URLSearchParams("page="))).toBe(1);
+  });
+
+  it("範囲の検証はしない（paginateEvents の担当）", () => {
+    expect(parseEventPage(new URLSearchParams("page=-1"))).toBe(-1);
+    expect(parseEventPage(new URLSearchParams("page=999"))).toBe(999);
+  });
+});
+
+describe("buildEventsQuery", () => {
+  it("既定値だけなら空文字（/events を正規URLに保つ）", () => {
+    expect(buildEventsQuery(DEFAULT_EVENT_FILTERS)).toBe("");
+    expect(buildEventsQuery({})).toBe("");
+  });
+
+  it("既定値の項目を落とす", () => {
+    expect(buildEventsQuery({ date: "all", type: "stage", building: "all", keyword: "" })).toBe(
+      "type=stage"
+    );
+  });
+
+  it("複数の絞り込みを保つ", () => {
+    // パーセントエンコードの綴りではなく、値と並び順を検証する
+    const query = buildEventsQuery({
+      date: "day1",
+      type: "stage",
+      building: "7号館",
+      keyword: "軽音",
+    });
+
+    expect([...new URLSearchParams(query)]).toEqual([
+      ["date", "day1"],
+      ["type", "stage"],
+      ["building", "7号館"],
+      ["keyword", "軽音"],
+    ]);
+  });
+
+  it("1ページ目はクエリに出さない", () => {
+    expect(buildEventsQuery({ type: "stage" }, 1)).toBe("type=stage");
+    expect(buildEventsQuery({ type: "stage" }, 2)).toBe("type=stage&page=2");
+  });
+
+  it("往復してもフィルターが変わらない", () => {
+    const filters: FilterParams = {
+      date: "both",
+      type: "room",
+      building: "体育館",
+      keyword: "展示",
+    };
+
+    expect(parseEventFilters(new URLSearchParams(buildEventsQuery(filters, 3)))).toEqual(filters);
+    expect(parseEventPage(new URLSearchParams(buildEventsQuery(filters, 3)))).toBe(3);
+  });
+});
+
+describe("eventsHref", () => {
+  it("既定値だけならクエリを付けない", () => {
+    expect(eventsHref(DEFAULT_EVENT_FILTERS)).toBe("/events");
+  });
+
+  it("クエリがあれば ? を付ける", () => {
+    expect(eventsHref({ type: "stage" }, 2)).toBe("/events?type=stage&page=2");
   });
 });
