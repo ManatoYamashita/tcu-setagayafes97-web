@@ -277,6 +277,14 @@ docs/
   - **列の `height` を `minHeight` へ変えるだけでは落ちない。** #148 の再現には `h-full` の中間ラッパが要る（実測記録あり）
   - 1024px 未満は盤面が `display:none` になり全アサーションが偽陰性。共通フィクスチャが測定条件を先に検査する
 
+- **[static-html-and-search-params.md](./frontend/static-html-and-search-params.md)** - `useSearchParams()` と静的HTML（#156）
+  - **境界を書かないとエラーにならず、いちばん近い `loading.tsx` が代役になる。** `/events` を捕まえていたのはルートではなく `src/app/events/loading.tsx`
+  - **境界を足すだけでは中身は静的HTMLに戻らない。** bailout は境界の内側を落とすものであり、戻すものではない
+  - **fallback はサーバーで描かれてHTMLに出る。** そこへ既定状態の完成形を置くと企画カードのリンクが載る
+  - **fallback の中で `useSearchParams()` を呼んではいけない**（それ以上落ちる先が無い）。下位からは props へ引き上げる
+  - 判定は `data-page-hero="true"` の綴りで行う。`grep -c` と属性名だけの grep はどちらも誤読する（flight ペイロードに別綴りで入っている）
+  - 実測: 静的HTMLの企画リンク 0 → 11本。転送量は brotli で +4.2KB。差し替えは約390ms、CLS 0
+
 - **[i18n-page-structure.md](./frontend/i18n-page-structure.md)** - 多言語ページの構成パターン
   - メッセージの二分割（ページ本文 `messages/` と ヘッダー・フッター `messages/chrome/`）
   - ページビューの置き場所（同名ルートの二重実装がデッドコード化する罠）

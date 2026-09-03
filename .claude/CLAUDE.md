@@ -343,6 +343,13 @@ microCMS の入稿は **Webhook 経由で数秒以内**に本番へ反映され�
 
 現在の転送一覧と設計判断は [`docs/dev/domain-migration.md`](../docs/dev/domain-migration.md) を参照。
 
+> [!IMPORTANT]
+> **同じ `loading.tsx` の境界は `useSearchParams()` の bailout も飲み込む。** 境界を書き忘れた
+> Client Component があると、エラーにならないまま**ページ本体が静的HTMLから丸ごと消える**
+> （#148 = `/timetable`、#156 = `/events`）。`/events` を捕まえていたのはルートではなく
+> `src/app/events/loading.tsx` である。判定方法・fallback の設計・実測値は
+> [`docs/frontend/static-html-and-search-params.md`](../docs/frontend/static-html-and-search-params.md) を参照。
+
 > [!WARNING]
 > `src/app/events/[id]/page.tsx` の `type=special` → `/special/[id]` 誘導は
 > ページ内 `redirect()` のままであり、上記のとおり 200 + meta refresh になっている。
