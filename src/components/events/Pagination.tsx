@@ -1,9 +1,11 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { generatePageNumbers } from "@/lib/filters";
+import { useRouter } from "next/navigation";
+import { eventsHref, generatePageNumbers, type FilterParams } from "@/lib/filters";
 
 interface PaginationProps {
+  /** 現在のフィルター。ページを移動しても絞り込みを保つために要る */
+  filters: FilterParams;
   currentPage: number;
   totalPages: number;
 }
@@ -11,24 +13,20 @@ interface PaginationProps {
 /**
  * ページネーションコンポーネント
  * URL Search Params で状態管理
+ *
+ * **現在のクエリは `useSearchParams()` ではなく props で受け取ります。** 理由は
+ * `EventFilters` と同じで、`<Suspense>` の fallback に描かれても bailout しないためです（#156）。
  */
-export function Pagination({ currentPage, totalPages }: PaginationProps) {
+export function Pagination({ filters, currentPage, totalPages }: PaginationProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   /**
    * ページ変更ハンドラー
+   *
+   * `page === 1` はクエリから落ちる（`eventsHref` の仕様）。
    */
   const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (page === 1) {
-      params.delete("page");
-    } else {
-      params.set("page", page.toString());
-    }
-
-    router.push(`/events?${params.toString()}`);
+    router.push(eventsHref(filters, page));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 

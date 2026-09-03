@@ -1,7 +1,15 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getEventsList } from "@/lib/events";
+import {
+  paginateEvents,
+  getTotalPages,
+  DEFAULT_EVENT_FILTERS,
+  EVENTS_PER_PAGE,
+} from "@/lib/filters";
 import { EventsContent } from "@/components/events/EventsContent";
+import { EventsView } from "@/components/events/EventsView";
 import { ComingSoon } from "@/components/common/ComingSoon";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
 import { SpecialGuestSection } from "@/components/special/SpecialGuestSection";
@@ -97,8 +105,36 @@ export default async function EventsPage() {
         </Link>
       )}
 
-      {/* 企画一覧コンテンツ */}
-      <EventsContent initialEvents={events} />
+      {/*
+        企画一覧コンテンツ
+
+        EventsContent は useSearchParams() を使うため <Suspense> 境界が要る。
+        境界が無いと、src/app/events/loading.tsx が代役を務めてしまい、
+        ページ全体（ヒーローと白いシートを含む）がクライアントレンダリングへ落ちる。
+
+        fallback はただのプレースホルダではなく「クエリ無しで来たときの完成形」である。
+        bailout した境界の fallback はサーバーで描かれて静的HTMLに残るため、ここへ既定の
+        ビューを置くと企画カードのリンクがHTMLに載り、/events がクロール経路として機能する。
+        クエリ無しなら本描画と同一マークアップになるので、差し替わっても見た目は動かない。
+
+        DEFAULT_EVENT_FILTERS は絞り込み無しなので filterEvents() は恒等写像になる。
+        呼ばずに events をそのまま渡している。
+
+        詳細は docs/frontend/static-html-and-search-params.md を参照。
+      */}
+      <Suspense
+        fallback={
+          <EventsView
+            events={paginateEvents(events, 1, EVENTS_PER_PAGE)}
+            filters={DEFAULT_EVENT_FILTERS}
+            totalCount={events.length}
+            currentPage={1}
+            totalPages={getTotalPages(events.length, EVENTS_PER_PAGE)}
+          />
+        }
+      >
+        <EventsContent initialEvents={events} />
+      </Suspense>
 
       {/* 一覧を見終えた来場者をもう一度 LP へ送る。上部の細いリンクとは粒度が違うので併存させる */}
       {specialGuestSection}

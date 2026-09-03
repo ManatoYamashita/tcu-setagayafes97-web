@@ -1,37 +1,39 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { eventsHref, type FilterParams } from "@/lib/filters";
 import { dateFilterOptions, typeFilterOptions, buildingFilterOptions } from "@/data/filter-options";
+
+interface EventFiltersProps {
+  /** 現在のフィルター。遷移先URLの組み立てと選択状態の表示に使う */
+  filters: FilterParams;
+}
 
 /**
  * 企画フィルターコンポーネント
  * URL Search Params で状態管理
+ *
+ * **現在値は `useSearchParams()` ではなく props で受け取ります。** このコンポーネントは
+ * `EventsView` 経由で `<Suspense>` の fallback にも描かれるため、ここでクエリを読むと
+ * fallback 自身が bailout し、ページ本体が静的HTMLから消えます（#156）。
+ * `useRouter()` は bailout を起こさないのでそのまま使えます。
  */
-export function EventFilters() {
+export function EventFilters({ filters }: EventFiltersProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const currentDate = searchParams.get("date") || "all";
-  const currentType = searchParams.get("type") || "all";
-  const currentBuilding = searchParams.get("building") || "all";
-  const currentKeyword = searchParams.get("keyword") || "";
+  const currentDate = filters.date ?? "all";
+  const currentType = filters.type ?? "all";
+  const currentBuilding = filters.building ?? "all";
+  const currentKeyword = filters.keyword ?? "";
 
   /**
    * フィルター変更ハンドラー
+   *
+   * ページ番号は引き継ぎません（絞り込みを変えたら1ページ目へ戻す）。
+   * "all" と空文字は `eventsHref` がクエリから落とします。
    */
-  const handleFilterChange = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (value === "" || value === "all") {
-      params.delete(key);
-    } else {
-      params.set(key, value);
-    }
-
-    // ページネーションをリセット
-    params.delete("page");
-
-    router.push(`/events?${params.toString()}`);
+  const handleFilterChange = (patch: Partial<FilterParams>) => {
+    router.push(eventsHref({ ...filters, ...patch }));
   };
 
   /**
@@ -62,7 +64,7 @@ export function EventFilters() {
             {dateFilterOptions.map((option) => (
               <button
                 key={option.value}
-                onClick={() => handleFilterChange("date", option.value)}
+                onClick={() => handleFilterChange({ date: option.value })}
                 className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${
                   currentDate === option.value
                     ? "border-gray-200 bg-white text-primary"
@@ -83,7 +85,7 @@ export function EventFilters() {
             {typeFilterOptions.map((option) => (
               <button
                 key={option.value}
-                onClick={() => handleFilterChange("type", option.value)}
+                onClick={() => handleFilterChange({ type: option.value })}
                 className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${
                   currentType === option.value
                     ? "border-gray-200 bg-white text-primary"
@@ -108,7 +110,7 @@ export function EventFilters() {
           <select
             id="building-filter"
             value={currentBuilding}
-            onChange={(e) => handleFilterChange("building", e.target.value)}
+            onChange={(e) => handleFilterChange({ building: e.target.value })}
             className="w-full rounded-lg border border-gray-200/30 bg-white/10 px-4 py-2 text-sm text-gray-900 focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-white/20"
           >
             {buildingFilterOptions.map((option) => (
@@ -132,7 +134,7 @@ export function EventFilters() {
             id="keyword-search"
             placeholder="企画名、団体名などで検索"
             value={currentKeyword}
-            onChange={(e) => handleFilterChange("keyword", e.target.value)}
+            onChange={(e) => handleFilterChange({ keyword: e.target.value })}
             className="w-full rounded-lg border border-gray-200/30 bg-white/10 px-4 py-2 text-sm text-gray-900 placeholder-white/50 focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-white/20"
           />
         </div>
