@@ -41,7 +41,7 @@ const BASE = {
 export function fixture(
   id: string,
   overrides: Pick<Event, "date" | "type" | "place" | "title" | "organizer"> &
-    Partial<Pick<Event, "startTime" | "endTime" | "building">>
+    Partial<Pick<Event, "startTime" | "endTime" | "building" | "description">>
 ): Event {
   return { ...BASE, id, ...overrides };
 }

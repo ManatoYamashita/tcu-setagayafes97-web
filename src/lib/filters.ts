@@ -55,10 +55,21 @@ export function filterEvents(events: Event[], filters: FilterParams): Event[] {
  * @param events 企画の配列
  * @param page 現在のページ番号（1から開始）
  * @param perPage 1ページあたりの表示件数
- * @returns ページネーションされた企画の配列
+ * @returns ページネーションされた企画の配列。存在しないページなら空配列
+ *
+ * **1未満のページを弾くこと。** `page` は URL のクエリから検証なしに入ります
+ * （`EventsContent` の `Number(searchParams.get("page")) || 1`。`-1` は truthy なので
+ * `|| 1` を素通りします）。始点が負のまま `slice()` へ渡すと末尾からの相対位置として
+ * 解釈され、**空でも1ページ目でもない「別のページ」が返ります**（#162）。
+ *
+ * 範囲外を空にするのは、`page > 総ページ数` が既にそうなっているのと揃えるためです。
  */
 export function paginateEvents(events: Event[], page: number, perPage: number): Event[] {
-  const startIndex = (page - 1) * perPage;
+  // 小数は切り捨てる。?page=1.5 が slice(6, 18) という半端な窓を返さないように
+  const safePage = Math.floor(page);
+  if (safePage < 1) return [];
+
+  const startIndex = (safePage - 1) * perPage;
   const endIndex = startIndex + perPage;
   return events.slice(startIndex, endIndex);
 }
