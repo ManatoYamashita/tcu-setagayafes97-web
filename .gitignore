@@ -64,3 +64,9 @@ docs/requires/contract-individual-v97.md
 
 # 第96回 WordPress DBダンプ（認証情報・トークン・PIIを含むためリポジトリ外管理）
 96th-wordpress-db-backup-*.sql
+
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
