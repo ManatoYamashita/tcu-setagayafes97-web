@@ -2,6 +2,7 @@ import { MetadataRoute } from "next";
 import { getEventsList, getSpecialEvents } from "@/lib/events";
 import { getNewsList } from "@/lib/news";
 import { siteConfig, SPECIAL_VISIBLE } from "@/data/site";
+import { buildStaticSitemapEntries } from "@/lib/sitemap-entries";
 
 /**
  * 再検証間隔（Webhook 障害時のフォールバック）
@@ -17,113 +18,43 @@ import { siteConfig, SPECIAL_VISIBLE } from "@/data/site";
  */
 export const revalidate = 3600;
 
+/** 一覧の最終更新日時のうち最も新しいもの。空なら undefined */
+function latestUpdate(items: readonly { updatedAt?: string; publishedAt?: string }[]) {
+  const times = items
+    .map((item) => item.updatedAt || item.publishedAt)
+    .filter((value): value is string => Boolean(value))
+    .map((value) => new Date(value).getTime())
+    .filter((time) => Number.isFinite(time));
+
+  return times.length > 0 ? new Date(Math.max(...times)) : undefined;
+}
+
 /**
  * サイトマップ自動生成
- * Next.js 14+ の sitemap.ts ファイルで動的生成
+ *
+ * 静的ページの組み立ては `src/lib/sitemap-entries.ts` にある。
+ * `src/app/` 配下にはテストを置けない（ルートとして解釈される）ため、
+ * ここには microCMS の取得と連結だけを残す。
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteConfig.metadata.siteUrl;
 
-  // 静的ページ
-  const staticPages: MetadataRoute.Sitemap = [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 1.0,
-      images: [`${baseUrl}/ogp.webp`],
-    },
-    {
-      url: `${baseUrl}/events`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/special`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/timetable`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/access`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/info`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/info/guide`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/info/faq`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/info/pamphlet`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/about`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.5,
-      images: [`${baseUrl}/images/photos/setagayafe97-image.webp`],
-    },
-    {
-      url: `${baseUrl}/about/sponsors`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/info/contact`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/about/privacy`,
-      lastModified: new Date(),
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-  ];
-
   // 動的ページ: 企画詳細
-  let eventPages: MetadataRoute.Sitemap = [];
+  let events: Awaited<ReturnType<typeof getEventsList>> = [];
   try {
-    const events = await getEventsList(200);
-    // 著名人企画の /events/[id] は /special/[id] へリダイレクトするため載せない
-    eventPages = events
-      .filter((event) => event.type !== "special")
-      .map((event) => ({
-        url: `${baseUrl}/events/${event.id}`,
-        lastModified: new Date(event.updatedAt || event.publishedAt || Date.now()),
-        changeFrequency: "daily" as const,
-        priority: 0.7,
-      }));
+    events = await getEventsList(200);
   } catch (error) {
     console.error("Failed to fetch events for sitemap:", error);
   }
+  // 著名人企画の /events/[id] は /special/[id] へリダイレクトするため載せない
+  const eventPages: MetadataRoute.Sitemap = events
+    .filter((event) => event.type !== "special")
+    .map((event) => ({
+      url: `${baseUrl}/events/${event.id}`,
+      lastModified: new Date(event.updatedAt || event.publishedAt || Date.now()),
+      changeFrequency: "daily" as const,
+      priority: 0.7,
+    }));
 
   // 動的ページ: 著名人企画LP
   // SPECIAL_VISIBLE が false の間は getSpecialEvents() が空を返すため、URLは出力されない
@@ -141,26 +72,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // 動的ページ: お知らせ詳細
-  let newsPages: MetadataRoute.Sitemap = [];
+  let newsList: Awaited<ReturnType<typeof getNewsList>> = [];
   try {
-    const newsList = await getNewsList(100);
-    newsPages = newsList.map((news) => ({
-      url: `${baseUrl}/info/${news.id}`,
-      lastModified: new Date(news.updatedAt || news.publishedAt || Date.now()),
-      changeFrequency: "weekly" as const,
-      priority: 0.6,
-    }));
+    newsList = await getNewsList(100);
   } catch (error) {
     console.error("Failed to fetch news for sitemap:", error);
   }
+  const newsPages: MetadataRoute.Sitemap = newsList.map((news) => ({
+    url: `${baseUrl}/info/${news.id}`,
+    lastModified: new Date(news.updatedAt || news.publishedAt || Date.now()),
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  }));
 
-  // SPECIAL_VISIBLE が true の間、/special は LP へ302転送される
-  // （next.config.ts の redirects()）。転送元をサイトマップに載せると
-  // Search Console が「リダイレクトあり」として除外するため、その間は落とす。
-  // 転送エントリを外して一覧へ戻したときは、この判定も併せて見直すこと。
-  const canonicalStaticPages = SPECIAL_VISIBLE
-    ? staticPages.filter((page) => page.url !== `${baseUrl}/special`)
-    : staticPages;
+  /*
+   * CMS を読む一覧ページの lastmod は、載っている記事の最新更新日時から導く。
+   * 取得に失敗して一覧が空のときは undefined になり、lastmod ごと省かれる。
+   * 誤った lastmod より、無いほうがよい。
+   */
+  const newsUpdatedAt = latestUpdate(newsList);
+  const eventsUpdatedAt = latestUpdate(events);
+  const homeUpdatedAt = latestUpdate([
+    ...(newsUpdatedAt ? [{ updatedAt: newsUpdatedAt.toISOString() }] : []),
+    ...(eventsUpdatedAt ? [{ updatedAt: eventsUpdatedAt.toISOString() }] : []),
+  ]);
 
-  return [...canonicalStaticPages, ...eventPages, ...specialPages, ...newsPages];
+  const staticPages = buildStaticSitemapEntries({
+    specialVisible: SPECIAL_VISIBLE,
+    cmsLastModified: {
+      ...(homeUpdatedAt ? { "/": homeUpdatedAt } : {}),
+      ...(newsUpdatedAt ? { "/info": newsUpdatedAt } : {}),
+      ...(eventsUpdatedAt ? { "/events": eventsUpdatedAt } : {}),
+    },
+  });
+
+  return [...staticPages, ...eventPages, ...specialPages, ...newsPages];
 }

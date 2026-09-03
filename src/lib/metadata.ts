@@ -26,6 +26,20 @@ interface PageMetadataOptions {
   localized?: boolean;
   type?: "website" | "article";
   image?: MetadataImage;
+  /**
+   * 検索エンジンからの除外
+   *
+   * コンテンツが見つからないときの詳細ページ（`/events/[id]` など）で使う。
+   * このアプリはルート直下の `src/app/loading.tsx` によりストリーミングのシェルが
+   * 先に送出されるため、ページ本体で投げた `notFound()` が HTTP ステータスへ
+   * 反映されない。実測（2026-09-03）では `/events/__no_such_id__` が
+   * **200 を返し、自分自身を canonical に指定していた**。
+   * つまり任意の文字列で薄いURLを無限に生成できる状態だった。
+   *
+   * `noindex: true` のときは canonical も出さない。存在しないURLに
+   * 自己参照 canonical を与えると、Google にその URL を正規版として宣言してしまう。
+   */
+  noindex?: boolean;
 }
 
 function normalizePathname(pathname: string): string {
@@ -33,7 +47,7 @@ function normalizePathname(pathname: string): string {
   return pathname.startsWith("/") ? pathname : `/${pathname}`;
 }
 
-function buildLocalePath(pathname: string, locale: Locale): string {
+export function buildLocalePath(pathname: string, locale: Locale): string {
   const normalized = normalizePathname(pathname);
   return locale === routing.defaultLocale ? normalized || "/" : `/${locale}${normalized}`;
 }
@@ -122,6 +136,7 @@ export function createPageMetadata({
   localized = false,
   type = "website",
   image,
+  noindex = false,
 }: PageMetadataOptions): Metadata {
   const siteName = siteConfig.metadata.siteName;
   const fullTitle = title === siteName ? siteName : `${title} | ${siteName}`;
@@ -132,22 +147,26 @@ export function createPageMetadata({
   return {
     title: { absolute: fullTitle },
     description,
-    alternates: {
-      canonical: canonicalUrl,
-      ...(localized
-        ? {
-            languages: {
-              ...Object.fromEntries(
-                routing.locales.map((targetLocale) => [
-                  targetLocale,
-                  absoluteUrl(buildLocalePath(pathname, targetLocale)),
-                ])
-              ),
-              "x-default": absoluteUrl(buildLocalePath(pathname, routing.defaultLocale)),
-            },
-          }
-        : {}),
-    },
+    ...(noindex ? { robots: { index: false, follow: true } } : {}),
+    alternates: noindex
+      ? // 継承した canonical を打ち消す。`null` は Next.js の型でも許容される。
+        { canonical: null }
+      : {
+          canonical: canonicalUrl,
+          ...(localized
+            ? {
+                languages: {
+                  ...Object.fromEntries(
+                    routing.locales.map((targetLocale) => [
+                      targetLocale,
+                      absoluteUrl(buildLocalePath(pathname, targetLocale)),
+                    ])
+                  ),
+                  "x-default": absoluteUrl(buildLocalePath(pathname, routing.defaultLocale)),
+                },
+              }
+            : {}),
+        },
     openGraph: {
       title: fullTitle,
       description,

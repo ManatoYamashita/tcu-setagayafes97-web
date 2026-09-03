@@ -5,6 +5,13 @@ import Image from "next/image";
 import { getNewsById, getNewsList } from "@/lib/news";
 import { Badge } from "@/components/ui/Badge";
 import { createPageMetadata } from "@/lib/metadata";
+import {
+  absoluteSiteUrl,
+  createBreadcrumbStructuredData,
+  createOrganizationNode,
+  organizationId,
+  serializeJsonLd,
+} from "@/lib/structured-data";
 
 interface NewsPageProps {
   params: Promise<{ id: string }>;
@@ -38,6 +45,8 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
       title: "お知らせが見つかりません",
       description: "お探しのお知らせは見つかりませんでした。",
       pathname: `/info/${id}`,
+      // 実在しないIDでも200が返るため、canonical を出さず noindex にする（詳細は createPageMetadata）。
+      noindex: true,
     });
   }
 
@@ -76,22 +85,32 @@ export default async function NewsPage({ params }: NewsPageProps) {
   });
 
   // 構造化データ（JSON-LD）
-  const jsonLd = {
-    "@context": "https://schema.org",
+  const newsArticle = {
     "@type": "NewsArticle",
     headline: news.title,
     description: news.description || news.title,
     datePublished: news.publishedAt || news.createdAt,
     dateModified: news.updatedAt,
-    author: {
-      "@type": "Organization",
-      name: "東京都市大学 第97回 世田谷祭 実行委員会",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "東京都市大学 第97回 世田谷祭",
+    /*
+     * 著者と発行者はトップページの Organization ノードと同一実体である。
+     * 名前をベタ書きしていたため siteConfig.organization.name と食い違い、
+     * publisher に logo も無かった（Google は publisher.logo を要求する）。
+     * @id 参照にして、ノードの定義を1箇所へ寄せる。
+     */
+    author: { "@id": organizationId },
+    publisher: { "@id": organizationId },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": absoluteSiteUrl(`/info/${id}`),
     },
     image: news.thumbnail?.url,
+  };
+
+  // @id で参照する Organization の実体を同じ @graph に含める。
+  // 参照先が無いと Google はノードを解決できない。
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [newsArticle, createOrganizationNode()],
   };
 
   return (
@@ -99,7 +118,24 @@ export default async function NewsPage({ params }: NewsPageProps) {
       {/* 構造化データ */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
+
+      {/*
+        パンくずの構造化データ。この直下の nav に視覚的なパンくずが実在するため
+        宣言してよい（画面に無い階層を宣言するとガイドライン違反になる）。
+      */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(
+            createBreadcrumbStructuredData([
+              { name: "トップ", pathname: "/" },
+              { name: "お知らせ一覧", pathname: "/info" },
+              { name: news.title },
+            ])
+          ),
+        }}
       />
 
       <div className="min-h-screen bg-secondary">

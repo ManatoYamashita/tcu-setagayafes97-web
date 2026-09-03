@@ -6,6 +6,7 @@ import { SPECIAL_VISIBLE } from "@/data/site";
 import { EventDetail } from "@/components/events/EventDetail";
 import { RelatedEvents } from "@/components/events/RelatedEvents";
 import { createPageMetadata } from "@/lib/metadata";
+import { createBreadcrumbStructuredData, serializeJsonLd } from "@/lib/structured-data";
 interface EventPageProps {
   params: Promise<{ id: string }>;
 }
@@ -41,6 +42,8 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
       title: "企画が見つかりません",
       description: "お探しの企画は見つかりませんでした。",
       pathname: `/events/${id}`,
+      // 実在しないIDでも200が返るため、canonical を出さず noindex にする（詳細は createPageMetadata）。
+      noindex: true,
     });
   }
 
@@ -115,7 +118,24 @@ export default async function EventPage({ params }: EventPageProps) {
       {/* 構造化データ */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
+
+      {/*
+        パンくずの構造化データ。この直下の nav に視覚的なパンくずが実在するため
+        宣言してよい（画面に無い階層を宣言するとガイドライン違反になる）。
+      */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(
+            createBreadcrumbStructuredData([
+              { name: "トップ", pathname: "/" },
+              { name: "企画を探す", pathname: "/events" },
+              { name: event.title },
+            ])
+          ),
+        }}
       />
 
       <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary">

@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { LOCALIZED_PATHNAMES } from "./i18n/localized-pathnames";
 import { routing } from "./i18n/routing";
+import { ARCHIVE_96TH_ORIGIN } from "./data/legacy-hosts";
 
 const intlProxy = createMiddleware(routing);
-const ARCHIVE_96TH_ORIGIN = "https://96th.setagayafes.org";
 
 /**
  * next-intl Proxy (旧: Middleware)
