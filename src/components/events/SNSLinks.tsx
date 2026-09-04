@@ -14,16 +14,18 @@ export function SNSLinks({ sns }: SNSLinksProps) {
   }
 
   return (
-    <div className="rounded-lg border border-gray-200/20 bg-white/10 p-6">
-      <h3 className="mb-4 text-lg font-bold text-gray-900">SNS・関連リンク</h3>
-      <div className="flex flex-wrap gap-3">
+    <section className="border-t border-gray-200 pt-10" aria-labelledby="event-links-heading">
+      <h3 id="event-links-heading" className="text-2xl font-bold tracking-tight text-gray-900">
+        SNS・関連リンク
+      </h3>
+      <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3">
         {/* Twitter */}
         {sns.twitter && (
           <a
             href={sns.twitter}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-lg border border-gray-200/30 bg-white/10 px-4 py-2 text-sm font-medium text-gray-900 transition-all hover:border-[#1DA1F2] hover:bg-[#1DA1F2] hover:text-gray-900"
+            className="inline-flex min-h-11 items-center gap-2 border-b border-gray-300 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-[#1DA1F2] hover:text-gray-900 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#1DA1F2]"
             aria-label="Twitterで開く"
           >
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -39,7 +41,7 @@ export function SNSLinks({ sns }: SNSLinksProps) {
             href={sns.instagram}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-lg border border-gray-200/30 bg-white/10 px-4 py-2 text-sm font-medium text-gray-900 transition-all hover:border-[#E4405F] hover:bg-[#E4405F] hover:text-gray-900"
+            className="inline-flex min-h-11 items-center gap-2 border-b border-gray-300 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-[#E4405F] hover:text-gray-900 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#E4405F]"
             aria-label="Instagramで開く"
           >
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -59,7 +61,7 @@ export function SNSLinks({ sns }: SNSLinksProps) {
             href={sns.website}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-lg border border-gray-200/30 bg-white/10 px-4 py-2 text-sm font-medium text-gray-900 transition-all hover:border-primary-light hover:bg-primary-200"
+            className="inline-flex min-h-11 items-center gap-2 border-b border-gray-300 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-primary-600 hover:text-primary-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
             aria-label="公式サイトを開く"
           >
             <svg
@@ -80,6 +82,6 @@ export function SNSLinks({ sns }: SNSLinksProps) {
           </a>
         )}
       </div>
-    </div>
+    </section>
   );
 }

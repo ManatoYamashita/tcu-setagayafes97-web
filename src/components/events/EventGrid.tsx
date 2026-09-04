@@ -3,7 +3,7 @@ import { EventCard } from "./EventCard";
 
 interface EventGridProps {
   events: Event[];
-  variant?: "default" | "featured";
+  variant?: "default" | "featured" | "compact";
 }
 
 /**
@@ -36,7 +36,9 @@ export function EventGrid({ events, variant = "default" }: EventGridProps) {
   }
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div
+      className={`grid ${variant === "compact" ? "gap-4" : "gap-6"} sm:grid-cols-2 lg:grid-cols-3`}
+    >
       {events.map((event) => (
         <EventCard key={event.id} event={event} variant={variant} />
       ))}

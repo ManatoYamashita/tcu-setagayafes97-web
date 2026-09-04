@@ -7,171 +7,186 @@ interface EventDetailProps {
   event: Event;
 }
 
+interface EventFactProps {
+  label: string;
+  value: string;
+}
+
+const dateLabels: Record<Event["date"], string> = {
+  day1: "1日目（10月31日）",
+  day2: "2日目（11月1日）",
+  both: "両日開催",
+  other: "その他",
+};
+
+const dateBadgeLabels: Record<Event["date"], string> = {
+  day1: "1日目",
+  day2: "2日目",
+  both: "両日",
+  other: "その他",
+};
+
+const typeLabels: Record<Event["type"], string> = {
+  room: "教室企画",
+  stage: "ステージ企画",
+  special: "スペシャル企画",
+  other: "その他",
+};
+
+const SQUARE_IMAGE_TOLERANCE = 0.05;
+
+function EventFact({ label, value }: EventFactProps) {
+  return (
+    <div className="border-t border-gray-200 pt-4 first:border-t-0 first:pt-0 sm:border-t-0 sm:pt-0">
+      <dt className="text-sm font-semibold text-gray-600">{label}</dt>
+      <dd className="mt-1 text-base font-semibold leading-relaxed text-gray-900">{value}</dd>
+    </div>
+  );
+}
+
 /**
  * 企画詳細コンポーネント
- * 企画の詳細情報を表示
+ * 企画の主役である画像・タイトルと、来場に必要な情報を優先して表示する。
  */
 export function EventDetail({ event }: EventDetailProps) {
+  const venue = [event.building, event.place].filter(Boolean).join(" ") || "会場未定";
+  const thumbnailWidth = event.thumbnail?.width ?? 0;
+  const thumbnailHeight = event.thumbnail?.height ?? 0;
+  const isIconThumbnail =
+    event.thumbnail !== undefined &&
+    thumbnailWidth > 0 &&
+    thumbnailHeight > 0 &&
+    Math.abs(thumbnailWidth - thumbnailHeight) / Math.max(thumbnailWidth, thumbnailHeight) <=
+      SQUARE_IMAGE_TOLERANCE;
+  const time =
+    event.startTime && event.endTime
+      ? `${event.startTime} 〜 ${event.endTime}`
+      : event.startTime
+        ? `${event.startTime}〜`
+        : "時間未定";
+
   return (
-    <div className="space-y-8">
-      {/* サムネイル画像 */}
-      {event.thumbnail && (
-        <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-gray-200/20">
-          <Image
-            src={event.thumbnail.url}
-            alt={event.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1000px"
-            priority
-          />
-        </div>
-      )}
-
-      {/* タイトルセクション */}
-      <div>
-        {/* バッジ */}
-        <div className="mb-4 flex flex-wrap gap-2">
-          <Badge variant={event.date} label={event.date} />
-          <Badge variant={event.type} label={event.type} />
-        </div>
-
-        {/* タイトル */}
-        <h1 className="mb-3 text-3xl font-bold text-gray-900 md:text-4xl">{event.title}</h1>
-
-        {/* 主催団体 */}
-        <p className="text-xl font-semibold text-primary-700">{event.organizer}</p>
-      </div>
-
-      {/* メタ情報 */}
-      <div className="rounded-lg border border-gray-200/20 bg-white/10 p-6">
-        <h2 className="mb-4 text-lg font-bold text-gray-900">開催情報</h2>
-        <dl className="space-y-3">
-          {/* 開催日 */}
-          <div className="flex items-start gap-3">
-            <dt className="flex items-center gap-2 text-sm font-semibold text-gray-900/90">
-              <svg
-                className="h-5 w-5 text-primary-700"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+    <article className="mx-auto max-w-5xl space-y-12">
+      {/* 企画ヘッダー */}
+      <div
+        className={`grid ${isIconThumbnail ? "gap-4" : "gap-8"} lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.75fr)] lg:items-center lg:gap-12`}
+      >
+        {event.thumbnail && (
+          <div
+            className={`event-detail-entrance-media relative overflow-hidden ${isIconThumbnail ? "flex h-72 items-center justify-center rounded-2xl sm:h-80 lg:h-96" : "-mx-4 -mt-10 aspect-[4/3] max-h-[32rem] rounded-t-2xl rounded-b-none sm:-mx-6 lg:-mx-8 lg:-mt-16"}`}
+          >
+            {isIconThumbnail ? (
+              <div className="relative h-36 w-36 sm:h-44 sm:w-44 lg:h-52 lg:w-52">
+                <Image
+                  src={event.thumbnail.url}
+                  alt={event.title}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 1024px) 60vw, 33vw"
+                  priority
                 />
-              </svg>
-              開催日
-            </dt>
-            <dd className="text-sm text-gray-900">
-              {event.date === "day1" && "1日目（10月31日）"}
-              {event.date === "day2" && "2日目（11月1日）"}
-              {event.date === "both" && "両日開催"}
-              {event.date === "other" && "その他"}
-            </dd>
+              </div>
+            ) : (
+              <Image
+                src={event.thumbnail.url}
+                alt={event.title}
+                fill
+                className="object-cover object-center"
+                sizes="(max-width: 1024px) 100vw, 55vw"
+                priority
+              />
+            )}
+          </div>
+        )}
+
+        <header
+          className={`event-detail-entrance-copy ${event.thumbnail ? "lg:py-6" : "lg:col-span-2 lg:py-6"}`}
+        >
+          <div className="flex flex-wrap gap-2">
+            <Badge variant={event.date} label={dateBadgeLabels[event.date]} tone="soft" />
+            <Badge
+              variant={event.type}
+              label={
+                event.type === "room"
+                  ? "教室"
+                  : event.type === "stage"
+                    ? "ステージ"
+                    : typeLabels[event.type]
+              }
+              tone="soft"
+            />
           </div>
 
-          {/* 開催時間 */}
-          {event.startTime && event.endTime && (
-            <div className="flex items-start gap-3">
-              <dt className="flex items-center gap-2 text-sm font-semibold text-gray-900/90">
-                <svg
-                  className="h-5 w-5 text-primary-700"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                開催時間
-              </dt>
-              <dd className="text-sm text-gray-900">
-                {event.startTime} 〜 {event.endTime}
-              </dd>
+          <h1 className="mt-5 text-3xl font-bold leading-[1.2] tracking-tight text-gray-900 sm:text-5xl">
+            {event.title}
+          </h1>
+
+          {event.organizer && (
+            <div className="mt-6 border-t border-gray-200 pt-5">
+              <p className="text-xs font-semibold text-gray-600">主催</p>
+              <p className="mt-1 text-base font-semibold text-gray-900">{event.organizer}</p>
             </div>
           )}
-
-          {/* 場所 */}
-          <div className="flex items-start gap-3">
-            <dt className="flex items-center gap-2 text-sm font-semibold text-gray-900/90">
-              <svg
-                className="h-5 w-5 text-primary-700"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-              </svg>
-              場所
-            </dt>
-            <dd className="text-sm text-gray-900">
-              {event.building} {event.place}
-            </dd>
-          </div>
-
-          {/* 企画種別 */}
-          <div className="flex items-start gap-3">
-            <dt className="flex items-center gap-2 text-sm font-semibold text-gray-900/90">
-              <svg
-                className="h-5 w-5 text-primary-700"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                />
-              </svg>
-              種別
-            </dt>
-            <dd className="text-sm text-gray-900">
-              {event.type === "room" && "教室企画"}
-              {event.type === "stage" && "ステージ企画"}
-              {event.type === "special" && "スペシャル企画"}
-              {event.type === "other" && "その他"}
-            </dd>
-          </div>
-        </dl>
+        </header>
       </div>
+
+      {/* 開催情報 */}
+      <section
+        aria-labelledby="event-information-heading"
+        className="event-detail-entrance-section border-y border-gray-200 py-8"
+      >
+        <h2
+          id="event-information-heading"
+          className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl"
+        >
+          開催情報
+        </h2>
+
+        <dl className="mt-6 grid gap-x-8 gap-y-6 sm:grid-cols-2">
+          <EventFact label="開催日" value={dateLabels[event.date]} />
+          <EventFact label="開催時間" value={time} />
+          <EventFact label="会場" value={venue} />
+          <EventFact label="企画種別" value={typeLabels[event.type]} />
+        </dl>
+      </section>
 
       {/* 企画概要 */}
-      <div className="rounded-lg border border-gray-200/20 bg-white/10 p-6">
-        <h2 className="mb-4 text-lg font-bold text-gray-900">企画概要</h2>
-        <p className="whitespace-pre-wrap text-gray-900/90">{event.description}</p>
-      </div>
+      <section
+        aria-labelledby="event-summary-heading"
+        className="event-detail-entrance-section max-w-3xl"
+      >
+        <h2
+          id="event-summary-heading"
+          className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl"
+        >
+          企画概要
+        </h2>
+        <p className="mt-5 whitespace-pre-wrap text-base leading-8 text-gray-700">
+          {event.description}
+        </p>
+      </section>
 
       {/* 詳細説明（リッチテキスト） */}
       {event.content && (
-        <div className="rounded-lg border border-gray-200/20 bg-white/10 p-6">
-          <h2 className="mb-4 text-lg font-bold text-gray-900">詳細</h2>
+        <section
+          aria-labelledby="event-content-heading"
+          className="event-detail-entrance-section max-w-3xl border-t border-gray-200 pt-8"
+        >
+          <h2
+            id="event-content-heading"
+            className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl"
+          >
+            詳細
+          </h2>
           <div
-            className="prose prose-invert max-w-none"
+            className="mt-5 text-base leading-8 text-gray-700 [&_a]:font-semibold [&_a]:text-primary-700 [&_a]:underline [&_h2]:mt-8 [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:mt-6 [&_h3]:font-serif [&_h3]:text-xl [&_h3]:font-bold [&_li]:ml-5 [&_li]:list-disc [&_ol]:space-y-2 [&_p+p]:mt-4 [&_ul]:space-y-2"
             dangerouslySetInnerHTML={{ __html: event.content }}
           />
-        </div>
+        </section>
       )}
 
       {/* SNSリンク */}
       <SNSLinks sns={event.sns} />
-    </div>
+    </article>
   );
 }
