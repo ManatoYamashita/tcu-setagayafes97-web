@@ -149,6 +149,7 @@ docs/
 
 - **[seo-metadata.md](./dev/seo-metadata.md)** - 共通metadata・canonical・構造化データ・sitemap の方針
   - ページごとのmetadata、canonical、Open Graph、Twitter Cardの生成方針
+  - OGP画像とGoogle検索結果用の正方形サムネイルを分け、JSON-LD・画像サイトマップから同じ候補画像を示す方針
   - 多言語ページのcanonicalとhreflang相当のalternate設定
   - 年次切替後のfavicon・サイト主体/開催イベント構造化データ・画像サイトマップとSearch Console再送信の運用
   - **`@id` で参照したノードの実体は同じ `@graph` に含める。** 含めないと参照が宙に浮き、エンティティの結合が起きない

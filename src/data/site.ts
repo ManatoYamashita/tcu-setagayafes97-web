@@ -54,6 +54,7 @@ export const siteConfig = {
     searchSiteName: "世田谷祭",
     siteUrl: process.env.NEXT_PUBLIC_URL || "https://setagayafes.org",
     ogImage: "/ogp.webp",
+    searchThumbnail: "/images/brand/search-thumbnail-97.webp",
   },
 
   // 想定来場者数

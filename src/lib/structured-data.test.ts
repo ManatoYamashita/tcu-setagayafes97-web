@@ -79,6 +79,18 @@ describe("createHomeStructuredData", () => {
     };
     expect(new Date(event.startDate).getTime()).toBeLessThan(new Date(event.endDate).getTime());
   });
+
+  it("検索結果用の正方形画像をページの代表画像として宣言する", () => {
+    const graph = createHomeStructuredData()["@graph"];
+    const page = graph.find((node) => node["@type"] === "WebPage") as {
+      primaryImageOfPage: { url: string; contentUrl: string; width: number; height: number };
+    };
+
+    expect(page.primaryImageOfPage.url).toMatch(/\/images\/brand\/search-thumbnail-97\.webp$/);
+    expect(page.primaryImageOfPage.contentUrl).toBe(page.primaryImageOfPage.url);
+    expect(page.primaryImageOfPage.width).toBe(1200);
+    expect(page.primaryImageOfPage.height).toBe(1200);
+  });
 });
 
 describe("createAboutStructuredData", () => {
@@ -109,6 +121,17 @@ describe("createAboutStructuredData", () => {
       .map((node) => (node as { "@id": string })["@id"]);
 
     expect(aboutIds.every((id) => homeIds.has(id))).toBe(true);
+  });
+
+  it("どのロケールでも検索結果用画像をページの代表画像として宣言する", () => {
+    for (const locale of routing.locales) {
+      const page = createAboutStructuredData(locale)["@graph"][0] as {
+        primaryImageOfPage: { url: string; width: number; height: number };
+      };
+      expect(page.primaryImageOfPage.url).toMatch(/\/images\/brand\/search-thumbnail-97\.webp$/);
+      expect(page.primaryImageOfPage.width).toBe(1200);
+      expect(page.primaryImageOfPage.height).toBe(1200);
+    }
   });
 });
 

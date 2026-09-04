@@ -19,6 +19,19 @@ export function serializeJsonLd(value: unknown): string {
   return JSON.stringify(value).replace(/</g, "\\u003c");
 }
 
+function createSearchThumbnailNode() {
+  const imageUrl = absoluteSiteUrl(siteConfig.metadata.searchThumbnail);
+
+  return {
+    "@type": "ImageObject",
+    url: imageUrl,
+    contentUrl: imageUrl,
+    width: 1200,
+    height: 1200,
+    caption: `${siteConfig.metadata.siteName} 検索結果用サムネイル`,
+  };
+}
+
 /**
  * 検索での呼ばれ方
  *
@@ -108,7 +121,22 @@ export function createFestivalEventNode() {
 export function createHomeStructuredData() {
   return {
     "@context": "https://schema.org",
-    "@graph": [createWebSiteNode(), createOrganizationNode(), createFestivalEventNode()],
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${siteUrl}#webpage`,
+        url: siteUrl,
+        name: siteConfig.metadata.siteName,
+        description: siteConfig.description,
+        inLanguage: "ja",
+        isPartOf: { "@id": websiteId },
+        about: { "@id": festivalId },
+        primaryImageOfPage: createSearchThumbnailNode(),
+      },
+      createWebSiteNode(),
+      createOrganizationNode(),
+      createFestivalEventNode(),
+    ],
   };
 }
 
@@ -136,10 +164,7 @@ export function createAboutStructuredData(locale: Locale) {
         isPartOf: { "@id": websiteId },
         about: [{ "@id": festivalId }, { "@id": organizationId }],
         mainEntity: { "@id": organizationId },
-        primaryImageOfPage: {
-          "@type": "ImageObject",
-          url: absoluteSiteUrl("/images/photos/setagayafe97-image.webp"),
-        },
+        primaryImageOfPage: createSearchThumbnailNode(),
       },
       createWebSiteNode(),
       createOrganizationNode(),

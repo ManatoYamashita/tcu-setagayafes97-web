@@ -7,6 +7,7 @@
 - canonical は実際に公開するURLへ統一し、末尾スラッシュの有無による重複を作らない。
 - 多言語ページは各ロケールURLを canonical とし、`alternates.languages` に `ja`、`en`、`zh`、`ko`、`x-default` を出力する。
 - ページ固有のOG画像がない場合は `/ogp.webp`（1200×630）を使用する。microCMS画像を使用する場合は絶対URLへ変換する。
+- Google検索結果の正方形サムネイル候補には `/images/brand/search-thumbnail-97.webp`（1200×1200）を使用する。トップページと `/about` の `primaryImageOfPage` および画像サイトマップから同じURLを示す。OGP／Discover向けの `/ogp.webp` とは用途を分け、置き換えない。
 - トップページは `WebSite` のJSON-LDで第97回の名称・説明・正規URLを明示する。
 - トップページのJSON-LDは `WebSite`、主催 `Organization`、祭全体の `Event` を `@graph` で接続する。サイト名は年次をまたいで一貫する簡潔な「世田谷祭」、第97回の正式名称は `alternateName` とページタイトルで示す。
 - faviconはクロール可能な500×500 PNG（`/images/brand/favicon.png`）を安定URLで配信する。
@@ -20,7 +21,7 @@
 4. Search Consoleの「サイトマップ」で `sitemap.xml` を再送信する。
 5. 反映まで数日以上かかる場合があるため、検索結果を継続観測する。
 
-`og:image` はSNS共有向けの指定であり、Google検索結果のサムネイルを直接固定するものではない。
+`og:image` や `primaryImageOfPage` はGoogle検索結果のサムネイルを直接固定するものではない。採用画像と反映時期はGoogle側が決定する。
 
 ## 過去回サイト群の検索除外
 
