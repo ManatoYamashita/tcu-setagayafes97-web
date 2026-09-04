@@ -41,7 +41,7 @@ export interface StaticPageEntry {
  * 呼び出し側が一覧の `updatedAt` の最大値を渡す。
  */
 export const STATIC_PAGE_LAST_MODIFIED: Readonly<Record<string, string>> = {
-  "/about": "2026-09-03",
+  "/about": "2026-09-04",
   "/about/privacy": "2026-02-01",
   "/access": "2026-08-09",
   "/info/guide": "2026-08-15",
@@ -53,7 +53,12 @@ export const STATIC_PAGE_LAST_MODIFIED: Readonly<Record<string, string>> = {
 };
 
 export const STATIC_PAGES: readonly StaticPageEntry[] = [
-  { pathname: "/", changeFrequency: "daily", priority: 1.0, images: ["/ogp.webp"] },
+  {
+    pathname: "/",
+    changeFrequency: "daily",
+    priority: 1.0,
+    images: ["/ogp.webp", siteConfig.metadata.searchThumbnail],
+  },
   { pathname: "/events", changeFrequency: "daily", priority: 0.9 },
   { pathname: "/special", changeFrequency: "daily", priority: 0.8 },
   { pathname: "/timetable", changeFrequency: "daily", priority: 0.8 },
@@ -66,7 +71,7 @@ export const STATIC_PAGES: readonly StaticPageEntry[] = [
     pathname: "/about",
     changeFrequency: "monthly",
     priority: 0.5,
-    images: ["/images/photos/setagayafe97-image.webp"],
+    images: [siteConfig.metadata.searchThumbnail],
     localized: true,
   },
   { pathname: "/about/sponsors", changeFrequency: "weekly", priority: 0.6 },

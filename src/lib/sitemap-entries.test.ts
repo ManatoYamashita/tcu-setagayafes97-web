@@ -137,4 +137,22 @@ describe("STATIC_PAGES", () => {
       expect(page.priority).toBeLessThanOrEqual(1);
     }
   });
+
+  it("トップページはOGP画像と検索結果用画像をサイトマップへ載せる", () => {
+    const home = entries.find((entry) => entry.url === "https://setagayafes.org");
+    expect(home?.images).toEqual([
+      "https://setagayafes.org/ogp.webp",
+      "https://setagayafes.org/images/brand/search-thumbnail-97.webp",
+    ]);
+  });
+
+  it("全ロケールのaboutページは検索結果用画像をサイトマップへ載せる", () => {
+    const aboutEntries = entries.filter((entry) => entry.url.endsWith("/about"));
+    expect(aboutEntries).toHaveLength(routing.locales.length);
+    for (const entry of aboutEntries) {
+      expect(entry.images).toEqual([
+        "https://setagayafes.org/images/brand/search-thumbnail-97.webp",
+      ]);
+    }
+  });
 });
