@@ -11,9 +11,12 @@ export type BadgeVariant =
   | "stage"
   | "special";
 
+export type BadgeTone = "default" | "soft";
+
 export interface BadgeProps {
   variant: BadgeVariant;
   label: string;
+  tone?: BadgeTone;
   className?: string;
 }
 
@@ -21,7 +24,7 @@ export interface BadgeProps {
  * バッジコンポーネント
  * カテゴリやタイプを視覚的に表示
  */
-export function Badge({ variant, label, className }: BadgeProps) {
+export function Badge({ variant, label, tone = "default", className }: BadgeProps) {
   const baseStyles = "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold";
 
   const variantStyles: Record<BadgeVariant, string> = {
@@ -36,5 +39,7 @@ export function Badge({ variant, label, className }: BadgeProps) {
     special: "bg-pink-500 text-gray-900",
   };
 
-  return <span className={cn(baseStyles, variantStyles[variant], className)}>{label}</span>;
+  const colorStyles = tone === "soft" ? "bg-primary-100 text-primary-700" : variantStyles[variant];
+
+  return <span className={cn(baseStyles, colorStyles, className)}>{label}</span>;
 }

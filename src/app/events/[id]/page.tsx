@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { getEventById, getEventsList } from "@/lib/events";
 import { SPECIAL_VISIBLE } from "@/data/site";
 import { EventDetail } from "@/components/events/EventDetail";
@@ -138,10 +139,10 @@ export default async function EventPage({ params }: EventPageProps) {
         }}
       />
 
-      <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary">
+      <div className="min-h-screen bg-gradient-to-b from-white via-primary-50 to-secondary pb-20">
         {/* パンくずリスト */}
-        <nav className="border-b border-gray-200/20 bg-white/10 py-4" aria-label="パンくずリスト">
-          <div className="container mx-auto px-4">
+        <nav className="event-detail-entrance-nav bg-white py-4" aria-label="パンくずリスト">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-900/80">
               <li>
                 <Link href="/" className="hover:text-gray-900 hover:underline">
@@ -185,7 +186,10 @@ export default async function EventPage({ params }: EventPageProps) {
                   />
                 </svg>
               </li>
-              <li className="font-semibold text-gray-900" aria-current="page">
+              <li
+                className="min-w-0 max-w-[45vw] truncate font-semibold text-gray-900 sm:max-w-md"
+                aria-current="page"
+              >
                 {event.title}
               </li>
             </ol>
@@ -193,35 +197,25 @@ export default async function EventPage({ params }: EventPageProps) {
         </nav>
 
         {/* メインコンテンツ */}
-        <div className="container mx-auto px-4 py-12">
-          <div className="mx-auto max-w-4xl">
+        <main className="event-detail-entrance-sheet relative z-10 mx-4 mt-0 overflow-hidden rounded-[2rem] bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] sm:mx-6 md:-mt-6 lg:mx-8">
+          <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
             <EventDetail event={event} />
-          </div>
 
-          {/* 戻るボタン */}
-          <div className="mx-auto mt-12 max-w-4xl">
-            <Link
-              href="/events"
-              className="inline-flex items-center gap-2 text-primary-700 hover:underline"
-            >
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
+            {/* 戻るボタン */}
+            <div className="mt-14 border-t border-gray-200 pt-8">
+              <Link
+                href="/events"
+                className="group inline-flex items-center gap-2 text-sm font-semibold text-primary-700 underline-offset-4 transition-colors hover:text-primary-900 hover:underline focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-primary-600"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
+                <ArrowLeft
+                  className="h-4 w-4 transition-transform group-hover:-translate-x-0.5"
+                  aria-hidden="true"
                 />
-              </svg>
-              <span>企画一覧に戻る</span>
-            </Link>
+                <span>企画一覧に戻る</span>
+              </Link>
+            </div>
           </div>
-        </div>
+        </main>
 
         {/* 関連企画 */}
         <RelatedEvents currentEvent={event} />

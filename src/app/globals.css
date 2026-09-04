@@ -434,6 +434,76 @@ body {
   }
 }
 
+/* ===== Event detail entrance ===== */
+
+/*
+ * イベント詳細の初期表示だけに使う控えめな入場。
+ * 画像は LCP 候補のため透明化せず、移動・拡大率だけを変える。
+ */
+.event-detail-entrance-nav {
+  animation: event-detail-nav-in 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.event-detail-entrance-sheet {
+  animation: event-detail-sheet-in 0.62s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.event-detail-entrance-media {
+  animation: event-detail-media-in 0.76s cubic-bezier(0.2, 0.8, 0.2, 1) 0.12s both;
+}
+
+.event-detail-entrance-copy {
+  animation: event-detail-content-in 0.52s cubic-bezier(0.2, 0.8, 0.2, 1) 0.18s both;
+}
+
+.event-detail-entrance-section {
+  animation: event-detail-content-in 0.52s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both;
+}
+
+.event-detail-entrance-related {
+  animation: event-detail-content-in 0.62s cubic-bezier(0.2, 0.8, 0.2, 1) 0.42s both;
+}
+
+@keyframes event-detail-nav-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes event-detail-sheet-in {
+  from {
+    transform: translateY(14px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes event-detail-media-in {
+  from {
+    transform: scale(0.985);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes event-detail-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Blob浮遊アニメーション（2パターンでずらして有機的な動きに） */
 @keyframes blob-drift-1 {
   0%,
@@ -654,6 +724,14 @@ body {
     animation: none !important;
   }
   .page-transition-wrapper.page-enter-history {
+    animation: none !important;
+  }
+  .event-detail-entrance-nav,
+  .event-detail-entrance-sheet,
+  .event-detail-entrance-media,
+  .event-detail-entrance-copy,
+  .event-detail-entrance-section,
+  .event-detail-entrance-related {
     animation: none !important;
   }
   [class*="animate-blob"] {
