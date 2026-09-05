@@ -185,8 +185,44 @@ const EVENTS_FALLBACK_TREE = [
 瞬間から検査を始める。** 解禁のタイミングで誰かが検査を「足す」必要は無い。
 スキップ時も準備中ページが実際に描かれていることは確認するので、素通りではない。
 
-Vercel Preview は既に `EVENTS_VISIBLE=true` なので（[../dev/ci-env.md](../dev/ci-env.md)）、
+Vercel Preview は `EVENTS_VISIBLE=true` なので（[../dev/ci-env.md](../dev/ci-env.md) の
+Vercel 環境変数表。2026-09-05 に `vercel env ls` で再確認。**Production には登録が無い**）、
 **解禁を待たず現時点から Preview デプロイのゲートとして稼働している。**
+PR #173 の Preview ビルドログでも `pnpm run build` → アサーションの `OK` 行まで確認済み。
+
+### フラグは `next build` と同じ手順で読む
+
+> [!IMPORTANT]
+> **素の `process.env` を読んではいけない。** `next build` は `@next/env` を通して
+> `.env.production.local` → `.env.local` → `.env.production` → `.env` の順に解決するが、
+> `node scripts/...` はそのどれも読まない。**同じ `pnpm build` の中で、ページとアサーションが
+> 違うフラグ値を見ることになる。**
+
+`.env.example` は `NEXT_PUBLIC_EVENTS_VISIBLE=false` を含んだまま `.env.local` へコピーさせる
+運用なので、**解禁のリハーサルで `.env.local` を `true` にした瞬間に踏む。** そのとき
+`next build` は公開状態のページを描き、アサーションはフラグを `undefined` と見て
+「準備中の文言がありません」と、**事実と正反対のメッセージで exit 1 する。**
+
+対処として、スクリプト冒頭で `next` 本体と同じローダーを呼んでいる。
+
+```js
+import nextEnv from "@next/env"; // CommonJS のため .mjs からは default 経由で取り出す
+const { loadEnvConfig } = nextEnv;
+
+loadEnvConfig(process.cwd(), false); // 第2引数 false = 本番モード（.env.production 側を読む）
+```
+
+`@next/env` は `next` が内部で使っているパッケージそのもので、**バージョンを `next` と
+揃えて devDependencies へ固定してある**（lockfile には `importers` の参照が1つ増えるだけで、
+新しいパッケージは入らない）。シェルや CI が渡した値を `.env` ファイルより優先する挙動まで
+`next build` と同じになる。
+
+| 状況                                       | `next build` | アサーション（修正前）    | アサーション（修正後） |
+| ------------------------------------------ | ------------ | ------------------------- | ---------------------- |
+| `.env.local` に `true`                     | 公開で描画   | **false と誤認 → 落ちる** | true                   |
+| `.env.production` に `true`                | 公開で描画   | **false と誤認 → 落ちる** | true                   |
+| シェルで `true`（CI・Vercel）              | 公開で描画   | true                      | true                   |
+| シェルで `false` ＋ `.env.local` に `true` | 非公開で描画 | false                     | false（シェルが優先）  |
 
 ### 何を見ているか
 

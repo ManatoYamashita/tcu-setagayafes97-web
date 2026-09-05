@@ -129,6 +129,11 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 > 落ちたときの原因と手順は
 > [`../frontend/static-html-and-search-params.md`](../frontend/static-html-and-search-params.md)
 > 「再発防止装置 その2」を参照（#156）。
+>
+> **このスクリプトは `@next/env` でフラグを解決する。** `next build` と同じ順序で
+> `.env.production.local` → `.env.local` → `.env.production` → `.env` を読むため、
+> 下表の「ローカル (.env.local)」でフラグを `true` にしても、ページとアサーションが
+> 食い違うことはない。**素の `process.env` へ戻してはいけない。**
 
 ### EVENTS_VISIBLE と SPECIAL_VISIBLE の組み合わせ
 
@@ -373,13 +378,13 @@ curl -sL "$URL" | grep -o '<探しているマークアップ>'
 
 本プロジェクトは同名の環境変数を環境ごとに別値で登録しています。`vercel env ls` の `environments` 列で確認できます。
 
-| 変数                          | 登録状況                                     |
-| ----------------------------- | -------------------------------------------- |
-| `MICROCMS_SERVICE_DOMAIN`     | **Production と Preview で別行＝別値**       |
-| `MICROCMS_API_KEY`            | Production, Preview で共有／Development は別 |
-| `NEXT_PUBLIC_EVENTS_VISIBLE`  | Production, Preview で共有                   |
-| `NEXT_PUBLIC_NEWS_VISIBLE`    | Production, Preview で共有                   |
-| `NEXT_PUBLIC_SPECIAL_VISIBLE` | Production, Preview で共有                   |
+| 変数                          | 登録状況                                           |
+| ----------------------------- | -------------------------------------------------- |
+| `MICROCMS_SERVICE_DOMAIN`     | **Production と Preview で別行＝別値**             |
+| `MICROCMS_API_KEY`            | Production, Preview で共有／Development は別       |
+| `NEXT_PUBLIC_EVENTS_VISIBLE`  | **Preview のみ登録**（Production は未登録＝false） |
+| `NEXT_PUBLIC_NEWS_VISIBLE`    | Production, Preview で共有                         |
+| `NEXT_PUBLIC_SPECIAL_VISIBLE` | Production, Preview で共有                         |
 
 `MICROCMS_SERVICE_DOMAIN` が環境別なので、`promote` すると **Preview の microCMS サービスから取得したコンテンツが本番に出ます。** 正しい操作は Production 環境変数での再ビルドです。
 
