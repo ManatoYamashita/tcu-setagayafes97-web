@@ -73,7 +73,7 @@ export function EventDetail({ event }: EventDetailProps) {
       >
         {event.thumbnail && (
           <div
-            className={`event-detail-entrance-media relative overflow-hidden ${isIconThumbnail ? "flex h-72 items-center justify-center rounded-2xl sm:h-80 lg:h-96 lg:justify-start" : "-mx-4 -mt-10 aspect-[4/3] rounded-t-2xl rounded-b-none sm:-mx-6 sm:aspect-[16/9] lg:mx-0 lg:mt-0 lg:aspect-[4/3] lg:rounded-b-2xl"}`}
+            className={`event-detail-entrance-media relative overflow-hidden ${isIconThumbnail ? "flex h-72 items-center justify-center rounded-2xl sm:h-80 lg:h-96" : "-mx-4 -mt-10 aspect-[4/3] rounded-t-2xl rounded-b-none sm:-mx-6 sm:aspect-[16/9] lg:mx-0 lg:mt-0 lg:aspect-[4/3] lg:rounded-b-2xl"}`}
           >
             {isIconThumbnail ? (
               <div className="relative h-36 w-36 sm:h-44 sm:w-44 lg:h-52 lg:w-52">
