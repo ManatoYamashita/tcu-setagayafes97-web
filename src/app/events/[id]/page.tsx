@@ -197,8 +197,8 @@ export default async function EventPage({ params }: EventPageProps) {
         </nav>
 
         {/* メインコンテンツ */}
-        <main className="event-detail-entrance-sheet relative z-10 mx-4 mt-0 overflow-hidden rounded-[2rem] bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] sm:mx-6 md:-mt-6 lg:mx-8">
-          <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
+        <main className="event-detail-entrance-sheet relative z-10 mx-4 mt-0 overflow-hidden rounded-[2rem] bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] sm:mx-6 lg:mx-8">
+          <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
             <EventDetail event={event} />
 
             {/* 戻るボタン */}

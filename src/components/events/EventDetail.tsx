@@ -66,14 +66,14 @@ export function EventDetail({ event }: EventDetailProps) {
         : "時間未定";
 
   return (
-    <article className="mx-auto max-w-5xl space-y-12">
+    <article className="space-y-12">
       {/* 企画ヘッダー */}
       <div
-        className={`grid ${isIconThumbnail ? "gap-4" : "gap-8"} lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.75fr)] lg:items-center lg:gap-12`}
+        className={`grid ${isIconThumbnail ? "gap-4 lg:items-center" : "gap-8 lg:items-start"} lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.75fr)] lg:gap-12`}
       >
         {event.thumbnail && (
           <div
-            className={`event-detail-entrance-media relative overflow-hidden ${isIconThumbnail ? "flex h-72 items-center justify-center rounded-2xl sm:h-80 lg:h-96" : "-mx-4 -mt-10 aspect-[4/3] max-h-[32rem] rounded-t-2xl rounded-b-none sm:-mx-6 lg:-mx-8 lg:-mt-16"}`}
+            className={`event-detail-entrance-media relative overflow-hidden ${isIconThumbnail ? "flex h-72 items-center justify-center rounded-2xl sm:h-80 lg:h-96 lg:justify-start" : "-mx-4 -mt-10 aspect-[4/3] rounded-t-2xl rounded-b-none sm:-mx-6 sm:aspect-[16/9] lg:mx-0 lg:mt-0 lg:aspect-[4/3] lg:rounded-b-2xl"}`}
           >
             {isIconThumbnail ? (
               <div className="relative h-36 w-36 sm:h-44 sm:w-44 lg:h-52 lg:w-52">
@@ -82,7 +82,7 @@ export function EventDetail({ event }: EventDetailProps) {
                   alt={event.title}
                   fill
                   className="object-contain"
-                  sizes="(max-width: 1024px) 60vw, 33vw"
+                  sizes="(min-width: 64rem) 208px, (min-width: 40rem) 176px, 144px"
                   priority
                 />
               </div>
@@ -92,7 +92,7 @@ export function EventDetail({ event }: EventDetailProps) {
                 alt={event.title}
                 fill
                 className="object-cover object-center"
-                sizes="(max-width: 1024px) 100vw, 55vw"
+                sizes="(min-width: 84rem) 668px, (min-width: 64rem) 50vw, 100vw"
                 priority
               />
             )}
@@ -117,7 +117,7 @@ export function EventDetail({ event }: EventDetailProps) {
             />
           </div>
 
-          <h1 className="mt-5 text-3xl font-bold leading-[1.2] tracking-tight text-gray-900 sm:text-5xl">
+          <h1 className="mt-5 text-3xl font-bold leading-[1.2] tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
             {event.title}
           </h1>
 
@@ -142,7 +142,7 @@ export function EventDetail({ event }: EventDetailProps) {
           開催情報
         </h2>
 
-        <dl className="mt-6 grid gap-x-8 gap-y-6 sm:grid-cols-2">
+        <dl className="mt-6 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
           <EventFact label="開催日" value={dateLabels[event.date]} />
           <EventFact label="開催時間" value={time} />
           <EventFact label="会場" value={venue} />

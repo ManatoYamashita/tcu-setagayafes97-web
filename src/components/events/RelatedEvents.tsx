@@ -46,8 +46,8 @@ export async function RelatedEvents({ currentEvent }: RelatedEventsProps) {
   }
 
   return (
-    <section className="event-detail-entrance-related bg-transparent px-4 py-16 sm:py-20">
-      <div className="mx-auto max-w-7xl sm:px-2 lg:px-4">
+    <section className="event-detail-entrance-related mx-4 bg-transparent py-16 sm:mx-6 sm:py-20 lg:mx-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-end">
           <div>
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
