@@ -69,14 +69,14 @@ export function EventDetail({ event }: EventDetailProps) {
     <article className="space-y-12">
       {/* 企画ヘッダー */}
       <div
-        className={`grid ${isIconThumbnail ? "gap-4 lg:items-center" : "gap-8 lg:items-start"} lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.75fr)] lg:gap-12`}
+        className={`grid gap-8 lg:gap-12 ${isIconThumbnail ? "lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-center" : "lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.75fr)] lg:items-start"}`}
       >
         {event.thumbnail && (
           <div
-            className={`event-detail-entrance-media relative overflow-hidden ${isIconThumbnail ? "flex h-72 items-center justify-center rounded-2xl sm:h-80 lg:h-96" : "-mx-4 -mt-10 aspect-[4/3] rounded-t-2xl rounded-b-none sm:-mx-6 sm:aspect-[16/9] lg:mx-0 lg:mt-0 lg:aspect-[4/3] lg:rounded-b-2xl"}`}
+            className={`event-detail-entrance-media relative overflow-hidden ${isIconThumbnail ? "mx-auto flex aspect-square w-full max-w-52 items-center justify-center rounded-2xl border border-primary-100 bg-primary-50 sm:max-w-64 lg:max-w-72" : "-mx-4 -mt-10 aspect-[4/3] rounded-t-2xl rounded-b-none sm:-mx-6 sm:aspect-[16/9] lg:mx-0 lg:mt-0 lg:aspect-[4/3] lg:rounded-b-2xl"}`}
           >
             {isIconThumbnail ? (
-              <div className="relative h-36 w-36 sm:h-44 sm:w-44 lg:h-52 lg:w-52">
+              <div className="relative h-36 w-36 overflow-hidden rounded-xl sm:h-44 sm:w-44 lg:h-52 lg:w-52">
                 <Image
                   src={event.thumbnail.url}
                   alt={event.title}
