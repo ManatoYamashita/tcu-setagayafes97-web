@@ -44,12 +44,12 @@ export function EventFilters({ filters }: EventFiltersProps) {
   };
 
   return (
-    <div className="rounded-lg border border-gray-200/20 bg-white/10 p-6">
+    <div className="rounded-lg border border-gray-200 bg-white p-6">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-bold text-gray-900">絞り込み</h2>
         <button
           onClick={handleReset}
-          className="text-sm text-gray-900 underline hover:text-gray-900/80"
+          className="text-sm text-gray-900 underline hover:text-gray-900/80 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
           aria-label="フィルターをリセット"
         >
           リセット
@@ -65,10 +65,10 @@ export function EventFilters({ filters }: EventFiltersProps) {
               <button
                 key={option.value}
                 onClick={() => handleFilterChange({ date: option.value })}
-                className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${
+                className={`rounded-full border px-4 py-2 text-sm font-medium transition-all focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 ${
                   currentDate === option.value
-                    ? "border-gray-200 bg-white text-primary"
-                    : "border-gray-200/30 bg-white/10 text-gray-900 hover:border-gray-200 hover:bg-white/20"
+                    ? "border-primary-600 bg-primary-600 text-white"
+                    : "border-gray-200 bg-gray-50 text-gray-700 hoverable:hover:border-gray-400 hoverable:hover:bg-white"
                 }`}
                 aria-pressed={currentDate === option.value}
               >
@@ -86,10 +86,10 @@ export function EventFilters({ filters }: EventFiltersProps) {
               <button
                 key={option.value}
                 onClick={() => handleFilterChange({ type: option.value })}
-                className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${
+                className={`rounded-full border px-4 py-2 text-sm font-medium transition-all focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 ${
                   currentType === option.value
-                    ? "border-gray-200 bg-white text-primary"
-                    : "border-gray-200/30 bg-white/10 text-gray-900 hover:border-gray-200 hover:bg-white/20"
+                    ? "border-primary-600 bg-primary-600 text-white"
+                    : "border-gray-200 bg-gray-50 text-gray-700 hoverable:hover:border-gray-400 hoverable:hover:bg-white"
                 }`}
                 aria-pressed={currentType === option.value}
               >
@@ -111,7 +111,7 @@ export function EventFilters({ filters }: EventFiltersProps) {
             id="building-filter"
             value={currentBuilding}
             onChange={(e) => handleFilterChange({ building: e.target.value })}
-            className="w-full rounded-lg border border-gray-200/30 bg-white/10 px-4 py-2 text-sm text-gray-900 focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-white/20"
+            className="w-full rounded-lg border border-gray-400 bg-white px-4 py-2 text-sm text-gray-900 focus:border-gray-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
           >
             {buildingFilterOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -135,7 +135,7 @@ export function EventFilters({ filters }: EventFiltersProps) {
             placeholder="企画名、団体名などで検索"
             value={currentKeyword}
             onChange={(e) => handleFilterChange({ keyword: e.target.value })}
-            className="w-full rounded-lg border border-gray-200/30 bg-white/10 px-4 py-2 text-sm text-gray-900 placeholder-white/50 focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-white/20"
+            className="w-full rounded-lg border border-gray-400 bg-white px-4 py-2 text-sm text-gray-900 placeholder-gray-600 focus:border-gray-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
           />
         </div>
       </div>

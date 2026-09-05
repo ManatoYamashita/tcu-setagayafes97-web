@@ -108,7 +108,7 @@ export function ContactForm() {
           <select
             id="type"
             {...register("type")}
-            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
           >
             {(Object.keys(contactTypeLabels) as ContactType[]).map((type) => (
               <option key={type} value={type}>
@@ -129,7 +129,7 @@ export function ContactForm() {
             type="text"
             {...register("name")}
             placeholder="山田 太郎"
-            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
           />
           {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
         </div>
@@ -144,7 +144,7 @@ export function ContactForm() {
             type="email"
             {...register("email")}
             placeholder="example@example.com"
-            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
           />
           {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
         </div>
@@ -159,7 +159,7 @@ export function ContactForm() {
             type="tel"
             {...register("phone")}
             placeholder="090-1234-5678"
-            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
           />
           {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>}
         </div>
@@ -174,7 +174,7 @@ export function ContactForm() {
             type="text"
             {...register("subject")}
             placeholder="企画について"
-            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
           />
           {errors.subject && <p className="mt-1 text-sm text-red-600">{errors.subject.message}</p>}
         </div>
@@ -189,7 +189,7 @@ export function ContactForm() {
             {...register("message")}
             rows={8}
             placeholder="お問い合わせ内容を入力してください（10文字以上）"
-            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
           />
           {errors.message && <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>}
         </div>
@@ -200,7 +200,7 @@ export function ContactForm() {
             <input
               type="checkbox"
               {...register("agreeToPrivacyPolicy")}
-              className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary/20"
+              className="mt-1 h-4 w-4 rounded border-gray-300 text-primary-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
             />
             <span className="text-sm text-gray-900/90">
               <Link href="/about/privacy" className="text-primary hover:underline">

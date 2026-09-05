@@ -14,6 +14,7 @@
 
 ## UIルール
 
+- キーボードフォーカスは `focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600` を基本とし、`ring-white` や低コントラストの半透明リングは使わない。マウス操作時に不要なリングを表示しないため、`focus-visible:` を使う。
 - Heroは他セクションページ（`/events`・`/timetable`・`/info`など）と共通の`PageSheetLayout`（内部で`PageHero`を描画）を使用し、Access専用のHeroコンポーネントは持たない。
 - 初期表示ではHero画像、Heroコピー、本文シートの順に入場させる。本文は地図、経路案内、注意事項、キャンパスマップの各要素がビューポートへ入った時に一度だけ発火する。
 - Accessページの入場モーションは`AccessPageMotion`へ集約し、Server Componentの本文側は`data-access-reveal` / `data-access-stagger`だけで演出対象を宣言する。

@@ -43,7 +43,7 @@ export function Pagination({ filters, currentPage, totalPages }: PaginationProps
       <button
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200/30 bg-white/10 text-gray-900 transition-all hover:border-gray-200 hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-gray-200/30 disabled:hover:bg-white/10"
+        className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-gray-700 transition-all hoverable:hover:border-gray-400 hoverable:hover:bg-white focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-gray-200 disabled:hover:bg-gray-50"
         aria-label="前のページへ"
       >
         <svg
@@ -62,10 +62,10 @@ export function Pagination({ filters, currentPage, totalPages }: PaginationProps
         <button
           key={pageNum}
           onClick={() => handlePageChange(pageNum)}
-          className={`flex h-10 min-w-[2.5rem] items-center justify-center rounded-lg border px-3 font-medium transition-all ${
+          className={`flex h-10 min-w-[2.5rem] items-center justify-center rounded-lg border px-3 font-medium transition-all focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 ${
             currentPage === pageNum
-              ? "border-gray-200 bg-white text-primary"
-              : "border-gray-200/30 bg-white/10 text-gray-900 hover:border-gray-200 hover:bg-white/20"
+              ? "border-primary-600 bg-primary-600 text-white"
+              : "border-gray-200 bg-gray-50 text-gray-700 hoverable:hover:border-gray-400 hoverable:hover:bg-white"
           }`}
           aria-current={currentPage === pageNum ? "page" : undefined}
           aria-label={`ページ ${pageNum}`}
@@ -78,7 +78,7 @@ export function Pagination({ filters, currentPage, totalPages }: PaginationProps
       <button
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200/30 bg-white/10 text-gray-900 transition-all hover:border-gray-200 hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-gray-200/30 disabled:hover:bg-white/10"
+        className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-gray-700 transition-all hoverable:hover:border-gray-400 hoverable:hover:bg-white focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-gray-200 disabled:hover:bg-gray-50"
         aria-label="次のページへ"
       >
         <svg

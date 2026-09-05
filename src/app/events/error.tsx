@@ -57,7 +57,7 @@ export default function EventsError({
             </Button>
             <Link
               href="/"
-              className="inline-flex items-center justify-center rounded-lg bg-white/10 px-6 py-3 text-base font-semibold text-gray-900 shadow-md transition-all duration-200 hover:bg-white/20 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
+              className="inline-flex items-center justify-center rounded-lg bg-white/10 px-6 py-3 text-base font-semibold text-gray-900 shadow-md transition-all duration-200 hover:bg-white/20 hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-white"
             >
               トップページへ戻る
             </Link>

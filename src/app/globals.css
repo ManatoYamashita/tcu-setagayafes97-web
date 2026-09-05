@@ -5,6 +5,8 @@
 @import "tailwindcss" source(none);
 @source "../../src";
 
+@custom-variant hoverable (@media (hover: hover) and (pointer: fine));
+
 @theme {
   /* ===== Primary Scale (デザインドキュメント準拠) ===== */
   --color-primary-50: oklch(95% 0.035 314deg); /* 実配信 #f7e8ff */

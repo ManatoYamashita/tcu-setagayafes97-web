@@ -125,6 +125,16 @@ Primary を起点に L・C を調整して生成したスケール。
 | `--color-gray-700` | L35 / C0 | `oklch(35% 0 0deg)` | `#3a3a3a` | 本文テキスト             |
 | `--color-gray-900` | L13 / C0 | `oklch(13% 0 0deg)` | `#070707` | 見出しテキスト           |
 
+### 操作要素のホバー
+
+タッチ端末でタップ後の `:hover` が残り、選択状態と誤認される操作要素には、Tailwind CSS v4 のカスタムvariantを使う。
+
+```css
+@custom-variant hoverable (@media (hover: hover) and (pointer: fine));
+```
+
+`EventFilters`、`Pagination`、ニュース・FAQの絞り込み、案内ページ内ナビゲーションのように状態表示と競合する操作要素は `hoverable:hover:` でゲートする。画像拡大やカードの装飾など、タッチ端末で残っても選択状態と誤認しにくい視覚効果は対象外とし、機械的に全 `hover:` を置換しない。
+
 #### Semantic Color
 
 | Token                | 参照先                | 用途                         |

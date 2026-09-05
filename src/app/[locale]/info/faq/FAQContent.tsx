@@ -154,7 +154,7 @@ export function FAQContent({ initialFAQ }: FAQContentProps) {
           placeholder={t("search.placeholder")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-12 pr-4 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-purple-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-100"
+          className="w-full rounded-xl border border-gray-400 bg-gray-50 py-3 pl-12 pr-4 text-sm text-gray-900 placeholder-gray-500 transition-colors focus:border-gray-600 focus:bg-white focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
         />
       </div>
 
@@ -247,10 +247,10 @@ function FilterButton({ label, isActive, onClick, count }: FilterButtonProps) {
       type="button"
       onClick={onClick}
       aria-pressed={isActive}
-      className={`rounded-full border px-5 py-2 text-sm font-semibold transition-all ${
+      className={`rounded-full border px-5 py-2 text-sm font-semibold transition-all focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 ${
         isActive
-          ? "border-primary-300 bg-white text-primary shadow-md"
-          : "border-gray-200 bg-gray-50 text-gray-700 hover:border-primary-200 hover:bg-white"
+          ? "border-primary-600 bg-primary-600 text-white shadow-md"
+          : "border-gray-200 bg-gray-50 text-gray-700 hoverable:hover:border-gray-400 hoverable:hover:bg-white"
       }`}
     >
       {label} <span className="ml-1 opacity-75">({count})</span>
