@@ -346,8 +346,11 @@ microCMS の入稿は **Webhook 経由で数秒以内**に本番へ反映され�
 > [!IMPORTANT]
 > **同じ `loading.tsx` の境界は `useSearchParams()` の bailout も飲み込む。** 境界を書き忘れた
 > Client Component があると、エラーにならないまま**ページ本体が静的HTMLから丸ごと消える**
-> （#148 = `/timetable`、#156 = `/events`）。`/events` を捕まえていたのはルートではなく
-> `src/app/events/loading.tsx` である。判定方法・fallback の設計・実測値は
+> （`/timetable` は #154、`/events` は #156）。**#148 は同じ `/timetable` でも別件**で、
+> `height: 100%` が `0px` に解決される CSS の不具合であり bailout とは無関係である。
+> `/events` を捕まえていたのはルートではなく `src/app/events/loading.tsx` である。
+> **再発は `eslint.config.mjs` の `no-restricted-imports` が止める**（fallback ツリーの5ファイルが
+> `useSearchParams` を import できない）。判定方法・fallback の設計・実測値は
 > [`docs/frontend/static-html-and-search-params.md`](../docs/frontend/static-html-and-search-params.md) を参照。
 
 > [!WARNING]

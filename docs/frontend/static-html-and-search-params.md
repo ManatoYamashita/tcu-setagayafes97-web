@@ -1,7 +1,12 @@
 # `useSearchParams()` と静的HTML
 
 `useSearchParams()` を使う Client Component は、**書き方を1つ間違えるとページ本体を静的HTMLから
-丸ごと消します。** #148 / #154（`/timetable`）と #156（`/events`）で2回起きました。
+丸ごと消します。** #154（`/timetable`）と #156（`/events`）で2回起きました。
+
+> [!NOTE]
+> **#148 は無関係です。** 同じ `/timetable` の事故ですが、中身は `height: 100%` が `0px` に
+> 解決される CSS の不具合であり、bailout には一切触れていません。`/timetable` の `<Suspense>`
+> 欠落を実際に埋めたのは、#148 を閉じた PR #154 の 943fec3 です。
 
 関連: [performance.md](./performance.md)（Lighthouse基準） /
 [layout-e2e.md](./layout-e2e.md)（実ブラウザでの実測） /
@@ -128,6 +133,46 @@ CLS が 0 なのは、スクロール位置0の視界をヒーローが占めて
 
 ---
 
+## 再発防止装置 — `no-restricted-imports`
+
+この事故は**エラーにならない。** lint / format / 型 / ユニットテスト / build / Layout E2E の
+すべてを通過したまま、`/events` のクロール経路だけが静かに失われる。
+#154 は同じ不変条件を JSDoc とドキュメントで守ろうとしたが、それらは人間が読まなければ
+効かない（[../dev/testing.md](../dev/testing.md)「なぜ入れたか」）。
+
+`eslint.config.mjs` が、**fallback として描かれる5ファイルに `useSearchParams` の import を
+禁じている。**
+
+```js
+const EVENTS_FALLBACK_TREE = [
+  "src/components/events/EventsView.tsx",
+  "src/components/events/EventFilters.tsx",
+  "src/components/events/Pagination.tsx",
+  "src/components/events/EventGrid.tsx",
+  "src/components/events/EventCard.tsx",
+];
+```
+
+`EventsContent.tsx` は境界の**内側**にいるので対象外である。クエリを読むのはここだけに保つ。
+`useRouter()` は bailout を起こさないため制限していない。
+
+退行を注入して赤くなることを確認済み（2026-09-05 実測）。
+
+| 状態                                         | `pnpm run lint` |
+| -------------------------------------------- | --------------- |
+| 現状                                         | exit 0          |
+| `EventFilters` へ `useSearchParams` を戻した | **exit 1**      |
+
+> [!WARNING]
+> **このルールが守るのは「クエリを読む場所」だけである。** `src/app/events/page.tsx` から
+> `<Suspense>` 境界そのものを外す変更は、ESLint では止められない。境界の有無は
+> ビルド生成物を読むしかなく、その検査には microCMS の secrets と
+> `NEXT_PUBLIC_EVENTS_VISIBLE=true` が要る（`Build Check` は `vars` を参照しており、
+> 解禁前は `true` にならないため現時点では検査が空振りする）。
+> **`page.tsx` を触るときは、下記の grep を手で通すこと。**
+
+---
+
 ## 新しく `useSearchParams()` を使うとき
 
 1. そのルートに `loading.tsx` があるか確認する（あればそれが暗黙の境界になる）
@@ -137,3 +182,5 @@ CLS が 0 なのは、スクロール位置0の視界をヒーローが占めて
    そのために下位コンポーネントから `useSearchParams()` を props へ引き上げる
 4. ビルドして上記の grep を通す。**通ることは何も証明しません。** 境界を一時的に外して
    数字が 0 に戻ることまで確かめること（[layout-e2e.md](./layout-e2e.md) と同じ作法）
+5. **その制約を機械で検査する手段を同じPRで用意する。** 散文コメントは装置ではない。
+   最低でも `eslint.config.mjs` の `no-restricted-imports` へ対象ファイルを足すこと
