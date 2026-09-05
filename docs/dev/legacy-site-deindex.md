@@ -304,10 +304,68 @@ https://setagayafes.org/sfa/
 
 ## 実施記録
 
-| 日付       | 実施者 | 内容                                   | 削除リクエストの期限 |
-| ---------- | ------ | -------------------------------------- | -------------------- |
-| 2026-08-27 | —      | `96th.` へ `X-Robots-Tag` 付与（#111） | —                    |
-|            |        |                                        |                      |
+| 日付       | 実施者                       | 内容                                                                               | 削除リクエストの期限 |
+| ---------- | ---------------------------- | ---------------------------------------------------------------------------------- | -------------------- |
+| 2026-08-27 | —                            | `96th.` へ `X-Robots-Tag` 付与（#111）                                             | —                    |
+| 2026-09-04 | 別セッション（エージェント） | `about.` `archive.` `blog.` `form.` `link.` の5ホストへ `.htaccess` で付与（#164） | —                    |
+| 2026-09-05 | —                            | 上記の検証。全項目通過（下記「検証ログ」）                                         | —                    |
+| 未実施     | —                            | **Search Console のフェーズ3（削除申請・サイトマップ整理・インデックス登録）**     | —                    |
+
+### 2026-09-05 の検証ログ
+
+`.htaccess` の記述は5ホストとも `# BEGIN setagayafes-noindex` マーカーで統一され、
+`<IfModule mod_headers.c>` + `Header always set X-Robots-Tag "noindex, noimageindex"` の形。
+96th（`~/www/top/96th/.htaccess`、`# BEGIN 96TH SEARCH ARCHIVE NOINDEX`）と同じ流儀で、
+いずれも WordPress のマーカーブロックの外側に置かれている。
+
+| 検証項目                                                       | 結果                                            |
+| -------------------------------------------------------------- | ----------------------------------------------- |
+| 6ホスト（`96th` `about` `archive` `blog` `form` `link`）のHTML | 全て `noindex, noimageindex`                    |
+| 静的アセット（`.webp`）・XMLサイトマップ・**404応答**          | 全て付与。`<FilesMatch>` で絞る失敗をしていない |
+| `todorokifes.setagayafes.org` / `todorokifes.com`              | **付いていない**（巻き添えなし）                |
+| `setagayafes.org`（第97回）                                    | **付いていない**                                |
+| 全ホストの `robots.txt`                                        | `Disallow: /` なし。クロールは止まっていない    |
+
+### 公開フォルダの実測（2026-09-05、コントロールパネルのドメイン一覧）
+
+**`link.setagayafes.org` の公開フォルダは `~/www/linklist` であり、サブドメイン名と一致しない。**
+ドメイン一覧で確認せずにフォルダ名を推測すると外す。
+
+| ドメイン                                          | 公開フォルダ                                                                     |
+| ------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `96th.setagayafes.org`                            | `~/www/top/96th`                                                                 |
+| `about.setagayafes.org`                           | `~/www/about`                                                                    |
+| `archive.setagayafes.org`                         | `~/www/archive`                                                                  |
+| `blog.setagayafes.org`                            | `~/www/blog`                                                                     |
+| `form.setagayafes.org`                            | `~/www/form`（`/home/setagayafes/laravel/exment/public` へのシンボリックリンク） |
+| `link.setagayafes.org`                            | **`~/www/linklist`**                                                             |
+| `todorokifes.setagayafes.org` / `todorokifes.com` | `~/www/todoroki`（**触らない**）                                                 |
+| `setagayafes.org`                                 | `~/www/top`（現在は Vercel 配信のため未使用）                                    |
+| `setagayafes.sakura.ne.jp`（初期）                | `~/www/`（**全サブディレクトリの親。ここへ置くと todoroki まで巻き添えになる**） |
+
+> [!WARNING]
+> **`~/www/` 直下に `.htaccess` を置いてはいけない。** 初期ドメインの公開フォルダであり、
+> `todoroki` を含む全ディレクトリへ継承される。既存の `~/www/.htaccess` は
+> ErrorDocument 宣言とリライトのみで `Header` を持たない（2026-09-05 実測）。
+
+## Search Console のプロパティ所在（2026-09-05 実測）
+
+**フェーズ3に着手できるアカウントの特定が先決である。** 世田谷祭の Search Console は
+複数アカウントに分散しており、少なくとも次の4つの所有権確認が存在する。
+
+| 場所                            | トークン    | 種別                     |
+| ------------------------------- | ----------- | ------------------------ |
+| `setagayafes.org` の DNS TXT    | `ymxLhbWU…` | ドメインプロパティ       |
+| `setagayafes.org` の DNS TXT    | `nSsVtw-1…` | ドメインプロパティ（別） |
+| `96th.setagayafes.org` の HTML  | `JrvP5GCu…` | URLプレフィックス        |
+| `about.setagayafes.org` の HTML | `fDBW4OIc…` | URLプレフィックス        |
+
+**第97回サイト（`setagayafes.org`）の HTML には `google-site-verification` が無い。**
+DNS TXT の2本がどのアカウントのものかは、そのアカウントにログインしないと分からない。
+
+実行委員は毎年交代する。**プロパティの所有者を引き継げないと、翌年の担当者は
+検索の状況を一切観測できなくなる。** 誰が所有者かを本ファイルへ記録し、
+新しい担当者を「ユーザーを追加」で登録しておくこと。
 
 ## 採用しなかった選択肢
 
