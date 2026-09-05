@@ -29,6 +29,13 @@
 
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
+/*
+ * `@next/env` は CommonJS のため、`.mjs` から名前付き import できない
+ * （Node 20 が `Named export 'loadEnvConfig' not found` で落ちる）。default 経由で取り出す。
+ */
+import nextEnv from "@next/env";
+
+const { loadEnvConfig } = nextEnv;
 
 /** `next build` が `/events` を事前描画した成果物 */
 const HTML_PATH = path.resolve(process.cwd(), ".next/server/app/events.html");
@@ -41,7 +48,13 @@ const HTML_PATH = path.resolve(process.cwd(), ".next/server/app/events.html");
  */
 const EVENTS_UI_MARKER = 'id="keyword-search"';
 
-/** `ComingSoon` の見出し。フラグが false のときに出る */
+/**
+ * `ComingSoon` の見出し。フラグが false のときに出る
+ *
+ * これは `src/app/events/page.tsx` が `<ComingSoon title="..." />` へ渡している文言の複製である。
+ * 文言を直すときは本ファイルも同時に直すこと。**現在フラグは false なので、この複製が外れると
+ * 落ちるのは CI の `Build Check` と本番ビルドである**（`EVENTS_UI_MARKER` 側とは落ちる環境が違う）。
+ */
 const COMING_SOON_MARKER = "企画情報は準備中です";
 
 /** 参考値としてだけ数える。件数は入稿状況で変わるので合否条件にしない */
@@ -54,6 +67,28 @@ function fail(message, hint) {
   if (hint) console.error(hint);
   process.exit(1);
 }
+
+/*
+ * フラグは `next build` と同じ手順で解決する。
+ *
+ * 素の `process.env` だけを見てはいけない。`next build` は `@next/env` を通して
+ * `.env.production.local` → `.env.local` → `.env.production` → `.env` の順に読み込むため、
+ * `.env.local` へ `NEXT_PUBLIC_EVENTS_VISIBLE=true` を置いた手元のビルドでは
+ * **ページだけが公開状態で描かれ、このスクリプトは undefined を見る**という食い違いが起きる。
+ * その状態では正しく描かれたHTMLに対して「準備中の文言がありません」と、事実と正反対の
+ * メッセージで exit 1 する（`.env.example` はこのフラグを含んだまま `.env.local` へ
+ * コピーさせる運用なので、解禁のリハーサルで確実に踏む）。
+ *
+ * `loadEnvConfig` は next 本体が使っているローダーそのものであり、シェルや CI が渡した
+ * 値を `.env` ファイルより優先する点まで同じ挙動になる。第2引数の `false` は本番モード
+ * （`.env.development` ではなく `.env.production` を読む）を意味する。
+ *
+ * 読み込んだファイルの一覧は `next build` が既に出力しているため、ここでは黙らせる。
+ */
+loadEnvConfig(process.cwd(), false, {
+  info: () => {},
+  error: (...args) => console.error(LABEL, ...args),
+});
 
 const eventsVisible = process.env.NEXT_PUBLIC_EVENTS_VISIBLE === "true";
 
@@ -75,16 +110,25 @@ const hasEventsUi = html.includes(EVENTS_UI_MARKER);
 if (!eventsVisible) {
   // 検査対象そのものが存在しない状態。ただし「スキップした」で終わらせず、
   // 準備中ページが実際に描かれていることまでは確かめる。
-  if (!html.includes(COMING_SOON_MARKER)) {
-    fail(
-      `NEXT_PUBLIC_EVENTS_VISIBLE が "true" ではないのに、準備中の文言（${COMING_SOON_MARKER}）がHTMLにありません。`,
-      "  /events の静的HTMLが期待どおりに描かれていません。フラグの値とページの分岐を確認してください。"
-    );
-  }
+  //
+  // 漏洩の検査を先に置く。ページが公開状態で描かれていると2つの条件が同時に成立するが、
+  // 「非公開のはずの企画情報が配信されている」ほうが具体的で、事故としても重い。
+  // 順序を逆にすると、実際に情報が漏れているときに「準備中の文言がありません」という
+  // 弱いメッセージだけが出て、読んだ人間が原因へ辿り着けない。
   if (hasEventsUi) {
     fail(
       `NEXT_PUBLIC_EVENTS_VISIBLE が "true" ではないのに、企画一覧のUI（${EVENTS_UI_MARKER}）がHTMLに出ています。`,
       "  非公開のはずの企画情報が配信されています。EVENTS_VISIBLE の分岐を確認してください。"
+    );
+  }
+  if (!html.includes(COMING_SOON_MARKER)) {
+    fail(
+      `NEXT_PUBLIC_EVENTS_VISIBLE が "true" ではないのに、準備中の文言（${COMING_SOON_MARKER}）がHTMLにありません。`,
+      [
+        "  /events の静的HTMLが期待どおりに描かれていません。次の順で確認してください。",
+        `    1. ${COMING_SOON_MARKER} を書き換えていないか（この文言は src/app/events/page.tsx と本ファイルの2箇所にある）`,
+        "    2. EVENTS_VISIBLE の分岐そのものが変わっていないか",
+      ].join("\n")
     );
   }
   console.log(
