@@ -5,6 +5,10 @@
  * 2カラムのヒーローまで一致させないと、スケルトンから本体へ切り替わる瞬間に
  * レイアウトが飛ぶ。本体の幅やブレークポイントを変えたら、ここも同じコミットで追従させること。
  *
+ * ヒーローは**アイコン分岐の骨格**（正方形カード + 18rem トラック）で描く。
+ * スケルトンの時点ではデータが無く写真／アイコンを判別できないため、実データの多数派に賭けている
+ * （2026-09-05 時点で 11 件中 10 件がアイコン分岐）。写真分岐が多数派になったら反転させること。
+ *
  * 入場アニメーション（`event-detail-entrance-*`）は本体側だけに置く。
  * スケルトンにも付けると、切り替え時に同じ演出が二度走る。
  */
@@ -31,8 +35,8 @@ export default function EventDetailLoading() {
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
           <div className="space-y-12">
             {/* ヒーロー（画像 + 見出し） */}
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.75fr)] lg:items-start lg:gap-12">
-              <div className="-mx-4 -mt-10 aspect-[4/3] animate-pulse rounded-t-2xl rounded-b-none bg-gray-200 sm:-mx-6 sm:aspect-[16/9] lg:mx-0 lg:mt-0 lg:aspect-[4/3] lg:rounded-b-2xl" />
+            <div className="grid gap-8 lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-center lg:gap-12">
+              <div className="mx-auto aspect-square w-full max-w-52 animate-pulse rounded-2xl bg-gray-200 sm:max-w-64 lg:max-w-72" />
 
               <div className="lg:py-6">
                 <div className="flex flex-wrap gap-2">
