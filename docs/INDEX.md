@@ -312,7 +312,9 @@ docs/
   - **fallback の中で `useSearchParams()` を呼んではいけない**（それ以上落ちる先が無い）。下位からは props へ引き上げる
   - 判定は `data-page-hero="true"` の綴りで行う。`grep -c` と属性名だけの grep はどちらも誤読する（flight ペイロードに別綴りで入っている）
   - 実測: 静的HTMLの企画リンク 0 → 11本。転送量は brotli で +4.2KB。差し替えは約390ms、CLS 0
-  - **再発防止は `eslint.config.mjs` の `no-restricted-imports`。** fallback ツリーの5ファイルへ `useSearchParams` の import を禁じている（境界そのものの削除は止められない）
+  - **再発防止装置は2つ。** `eslint.config.mjs` の `no-restricted-imports`（fallback ツリーがクエリを読み始めるのを止める）と、`scripts/assert-events-static-html.mjs`（境界の消失・fallback の格下げを `pnpm build` で落とす）
+  - **アサーションはフラグ false の間スキップし、`EVENTS_VISIBLE=true` になった瞬間に自動で有効化する。** 解禁時に足す作業は要らない
+  - **フラグは `@next/env` の `loadEnvConfig()` で読む。** 素の `process.env` は `.env.local` を読まないため、`next build` とアサーションが違う値を見て「事実と正反対のメッセージで落ちる」
 
 - **[i18n-page-structure.md](./frontend/i18n-page-structure.md)** - 多言語ページの構成パターン
   - メッセージの二分割（ページ本文 `messages/` と ヘッダー・フッター `messages/chrome/`）

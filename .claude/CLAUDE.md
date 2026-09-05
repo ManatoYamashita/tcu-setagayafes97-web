@@ -349,8 +349,11 @@ microCMS の入稿は **Webhook 経由で数秒以内**に本番へ反映され�
 > （`/timetable` は #154、`/events` は #156）。**#148 は同じ `/timetable` でも別件**で、
 > `height: 100%` が `0px` に解決される CSS の不具合であり bailout とは無関係である。
 > `/events` を捕まえていたのはルートではなく `src/app/events/loading.tsx` である。
-> **再発は `eslint.config.mjs` の `no-restricted-imports` が止める**（fallback ツリーの5ファイルが
-> `useSearchParams` を import できない）。判定方法・fallback の設計・実測値は
+> **再発防止装置は2つある。** `eslint.config.mjs` の `no-restricted-imports`（fallback ツリーの
+> 5ファイルが `useSearchParams` を import できない）と、`pnpm build` の末尾へ連結した
+> `scripts/assert-events-static-html.mjs`（`<Suspense>` 境界の消失と fallback の格下げを落とす。
+> **`EVENTS_VISIBLE` が false の間はスキップし、true になると自動で有効化する**）。
+> 判定方法・fallback の設計・実測値は
 > [`docs/frontend/static-html-and-search-params.md`](../docs/frontend/static-html-and-search-params.md) を参照。
 
 > [!WARNING]

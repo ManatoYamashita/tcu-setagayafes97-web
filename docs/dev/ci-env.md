@@ -119,6 +119,22 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 - いずれも `true` の場合のみ公開する。未設定または `true` 以外は安全側として非公開になる。
 - ビルド時に評価されるため、値を変更した後は再ビルド・再デプロイが必要。
 
+> [!IMPORTANT]
+> **`NEXT_PUBLIC_EVENTS_VISIBLE` を `true` にすると、`/events` の静的HTML検査が自動で有効になる。**
+> `scripts/assert-events-static-html.mjs`（`pnpm build` の末尾に連結）がフラグを見て分岐しており、
+> `false` の間はスキップ、`true` になった瞬間から `pnpm build` の合否条件になる。
+> **解禁作業のときに検査を足す必要は無い。**
+>
+> 逆に言えば、**解禁後は `/events` のページ本体が静的HTMLから消えるとデプロイが落ちる。**
+> 落ちたときの原因と手順は
+> [`../frontend/static-html-and-search-params.md`](../frontend/static-html-and-search-params.md)
+> 「再発防止装置 その2」を参照（#156）。
+>
+> **このスクリプトは `@next/env` でフラグを解決する。** `next build` と同じ順序で
+> `.env.production.local` → `.env.local` → `.env.production` → `.env` を読むため、
+> 下表の「ローカル (.env.local)」でフラグを `true` にしても、ページとアサーションが
+> 食い違うことはない。**素の `process.env` へ戻してはいけない。**
+
 ### EVENTS_VISIBLE と SPECIAL_VISIBLE の組み合わせ
 
 **この2つは独立している。** 著名人の発表はチケット販売と紐づき、一般企画一覧の公開より先行することがあるため、別のフラグに分けている。
@@ -362,13 +378,13 @@ curl -sL "$URL" | grep -o '<探しているマークアップ>'
 
 本プロジェクトは同名の環境変数を環境ごとに別値で登録しています。`vercel env ls` の `environments` 列で確認できます。
 
-| 変数                          | 登録状況                                     |
-| ----------------------------- | -------------------------------------------- |
-| `MICROCMS_SERVICE_DOMAIN`     | **Production と Preview で別行＝別値**       |
-| `MICROCMS_API_KEY`            | Production, Preview で共有／Development は別 |
-| `NEXT_PUBLIC_EVENTS_VISIBLE`  | Production, Preview で共有                   |
-| `NEXT_PUBLIC_NEWS_VISIBLE`    | Production, Preview で共有                   |
-| `NEXT_PUBLIC_SPECIAL_VISIBLE` | Production, Preview で共有                   |
+| 変数                          | 登録状況                                           |
+| ----------------------------- | -------------------------------------------------- |
+| `MICROCMS_SERVICE_DOMAIN`     | **Production と Preview で別行＝別値**             |
+| `MICROCMS_API_KEY`            | Production, Preview で共有／Development は別       |
+| `NEXT_PUBLIC_EVENTS_VISIBLE`  | **Preview のみ登録**（Production は未登録＝false） |
+| `NEXT_PUBLIC_NEWS_VISIBLE`    | Production, Preview で共有                         |
+| `NEXT_PUBLIC_SPECIAL_VISIBLE` | Production, Preview で共有                         |
 
 `MICROCMS_SERVICE_DOMAIN` が環境別なので、`promote` すると **Preview の microCMS サービスから取得したコンテンツが本番に出ます。** 正しい操作は Production 環境変数での再ビルドです。
 

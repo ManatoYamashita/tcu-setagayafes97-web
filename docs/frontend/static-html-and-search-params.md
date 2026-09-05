@@ -163,13 +163,96 @@ const EVENTS_FALLBACK_TREE = [
 | 現状                                         | exit 0          |
 | `EventFilters` へ `useSearchParams` を戻した | **exit 1**      |
 
-> [!WARNING]
-> **このルールが守るのは「クエリを読む場所」だけである。** `src/app/events/page.tsx` から
-> `<Suspense>` 境界そのものを外す変更は、ESLint では止められない。境界の有無は
-> ビルド生成物を読むしかなく、その検査には microCMS の secrets と
-> `NEXT_PUBLIC_EVENTS_VISIBLE=true` が要る（`Build Check` は `vars` を参照しており、
-> 解禁前は `true` にならないため現時点では検査が空振りする）。
-> **`page.tsx` を触るときは、下記の grep を手で通すこと。**
+**このルールが守るのは「クエリを読む場所」だけである。** `src/app/events/page.tsx` から
+`<Suspense>` 境界そのものを外す変更は、ESLint では止められない。そちらは次の装置が受け持つ。
+
+---
+
+## 再発防止装置 その2 — ビルド生成物のアサーション
+
+`scripts/assert-events-static-html.mjs` を `pnpm build` の末尾へ連結してある。
+
+```json
+"build": "next build && node scripts/assert-events-static-html.mjs"
+```
+
+`postbuild` にしていないのは、pnpm の `enable-pre-post-scripts` に依存させないため。
+既定値が変わったり `.npmrc` へ一行足されたりすると、**装置が黙って死ぬ。**
+
+### フラグが false の間も置いておいてよい
+
+**`NEXT_PUBLIC_EVENTS_VISIBLE` が `"true"` でなければ自動でスキップし、`true` になった
+瞬間から検査を始める。** 解禁のタイミングで誰かが検査を「足す」必要は無い。
+スキップ時も準備中ページが実際に描かれていることは確認するので、素通りではない。
+
+Vercel Preview は `EVENTS_VISIBLE=true` なので（[../dev/ci-env.md](../dev/ci-env.md) の
+Vercel 環境変数表。2026-09-05 に `vercel env ls` で再確認。**Production には登録が無い**）、
+**解禁を待たず現時点から Preview デプロイのゲートとして稼働している。**
+PR #173 の Preview ビルドログでも `pnpm run build` → アサーションの `OK` 行まで確認済み。
+
+### フラグは `next build` と同じ手順で読む
+
+> [!IMPORTANT]
+> **素の `process.env` を読んではいけない。** `next build` は `@next/env` を通して
+> `.env.production.local` → `.env.local` → `.env.production` → `.env` の順に解決するが、
+> `node scripts/...` はそのどれも読まない。**同じ `pnpm build` の中で、ページとアサーションが
+> 違うフラグ値を見ることになる。**
+
+`.env.example` は `NEXT_PUBLIC_EVENTS_VISIBLE=false` を含んだまま `.env.local` へコピーさせる
+運用なので、**解禁のリハーサルで `.env.local` を `true` にした瞬間に踏む。** そのとき
+`next build` は公開状態のページを描き、アサーションはフラグを `undefined` と見て
+「準備中の文言がありません」と、**事実と正反対のメッセージで exit 1 する。**
+
+対処として、スクリプト冒頭で `next` 本体と同じローダーを呼んでいる。
+
+```js
+import nextEnv from "@next/env"; // CommonJS のため .mjs からは default 経由で取り出す
+const { loadEnvConfig } = nextEnv;
+
+loadEnvConfig(process.cwd(), false); // 第2引数 false = 本番モード（.env.production 側を読む）
+```
+
+`@next/env` は `next` が内部で使っているパッケージそのもので、**バージョンを `next` と
+揃えて devDependencies へ固定してある**（lockfile には `importers` の参照が1つ増えるだけで、
+新しいパッケージは入らない）。シェルや CI が渡した値を `.env` ファイルより優先する挙動まで
+`next build` と同じになる。
+
+| 状況                                       | `next build` | アサーション（修正前）    | アサーション（修正後） |
+| ------------------------------------------ | ------------ | ------------------------- | ---------------------- |
+| `.env.local` に `true`                     | 公開で描画   | **false と誤認 → 落ちる** | true                   |
+| `.env.production` に `true`                | 公開で描画   | **false と誤認 → 落ちる** | true                   |
+| シェルで `true`（CI・Vercel）              | 公開で描画   | true                      | true                   |
+| シェルで `false` ＋ `.env.local` に `true` | 非公開で描画 | false                     | false（シェルが優先）  |
+
+### 何を見ているか
+
+`EventFilters` が描くキーワード入力欄の `id="keyword-search"` を見る。
+
+- `EventsView` ツリーがサーバー描画されたことの証拠になる
+- **企画が0件でも描かれる**（`EventGrid` が空状態を出すだけでフィルターUIは残る）。
+  したがって microCMS が一時的に空を返しても誤検知しない。
+  **件数に依存する指標を合否条件にしてはいけない**（企画詳細リンクの本数は参考値として
+  ログに出すだけ）
+
+> [!IMPORTANT]
+> **`data-page-hero` と `data-page-sheet` は判定に使えない。** `ComingSoon` も
+> `PageSheetLayout` を通るため、フラグが false の本番でも 1 件ずつ出る（2026-09-05 実測）。
+> #156 の表にある「0 → 1」は「境界なし かつ `EVENTS_VISIBLE=true`」限定の比較値である。
+
+### 退行注入で実測（2026-09-05 / `NEXT_PUBLIC_EVENTS_VISIBLE=true pnpm build`）
+
+| 状態                                                | `pnpm build` | 企画リンク |
+| --------------------------------------------------- | ------------ | ---------- |
+| 現状                                                | exit 0       | 11本       |
+| `page.tsx` から `<Suspense>` 境界を削除             | **exit 1**   | 0本        |
+| fallback を `EventsView` からプレースホルダへ格下げ | **exit 1**   | 0本        |
+
+**2つ目と3つ目は ESLint では捕まらない。** 2つの装置は役割が違う。
+
+| 装置                                    | 捕まえるもの                          |
+| --------------------------------------- | ------------------------------------- |
+| `eslint.config.mjs`                     | fallback ツリーがクエリを読み始めた   |
+| `scripts/assert-events-static-html.mjs` | 境界の消失・fallback の格下げ・その他 |
 
 ---
 
@@ -183,4 +266,7 @@ const EVENTS_FALLBACK_TREE = [
 4. ビルドして上記の grep を通す。**通ることは何も証明しません。** 境界を一時的に外して
    数字が 0 に戻ることまで確かめること（[layout-e2e.md](./layout-e2e.md) と同じ作法）
 5. **その制約を機械で検査する手段を同じPRで用意する。** 散文コメントは装置ではない。
-   最低でも `eslint.config.mjs` の `no-restricted-imports` へ対象ファイルを足すこと
+   `eslint.config.mjs` の `no-restricted-imports` へ対象ファイルを足し、fallback を
+   既定状態の完成形にしたなら `scripts/assert-events-static-html.mjs` に倣って
+   ビルド生成物のアサーションも置く。**フラグで隠れているページでも、フラグを見て
+   スキップする形にすれば今すぐ置ける**（解禁時に足す約束は必ず忘れられる）
