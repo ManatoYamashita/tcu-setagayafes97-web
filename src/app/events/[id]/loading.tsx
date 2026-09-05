@@ -19,8 +19,10 @@ export default function EventDetailLoading() {
 
       {/* パンくずリストスケルトン */}
       <nav className="bg-white py-4">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="h-5 w-64 animate-pulse rounded bg-gray-200" />
+        <div className="mx-4 sm:mx-6 lg:mx-8">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="h-5 w-64 animate-pulse rounded bg-gray-200" />
+          </div>
         </div>
       </nav>
 

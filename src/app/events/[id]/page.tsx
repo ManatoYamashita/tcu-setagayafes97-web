@@ -141,58 +141,65 @@ export default async function EventPage({ params }: EventPageProps) {
 
       <div className="min-h-screen bg-gradient-to-b from-white via-primary-50 to-secondary pb-20">
         {/* パンくずリスト */}
+        {/*
+          白帯は全幅のまま敷きたいので、背景を持つ <nav> と幅を決める層を分ける。
+          内側の mx-* はシート（<main>）と同じ値でなければ左端が揃わない。
+          詳細は docs/frontend/layout-patterns.md「全幅の背景を持つ節」を参照。
+        */}
         <nav className="event-detail-entrance-nav bg-white py-4" aria-label="パンくずリスト">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-900/80">
-              <li>
-                <Link href="/" className="hover:text-gray-900 hover:underline">
-                  トップ
-                </Link>
-              </li>
-              <li>
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
+          <div className="mx-4 sm:mx-6 lg:mx-8">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-900/80">
+                <li>
+                  <Link href="/" className="hover:text-gray-900 hover:underline">
+                    トップ
+                  </Link>
+                </li>
+                <li>
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </li>
+                <li>
+                  <Link href="/events" className="hover:text-gray-900 hover:underline">
+                    企画を探す
+                  </Link>
+                </li>
+                <li>
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </li>
+                <li
+                  className="min-w-0 max-w-[45vw] truncate font-semibold text-gray-900 sm:max-w-md"
+                  aria-current="page"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </li>
-              <li>
-                <Link href="/events" className="hover:text-gray-900 hover:underline">
-                  企画を探す
-                </Link>
-              </li>
-              <li>
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </li>
-              <li
-                className="min-w-0 max-w-[45vw] truncate font-semibold text-gray-900 sm:max-w-md"
-                aria-current="page"
-              >
-                {event.title}
-              </li>
-            </ol>
+                  {event.title}
+                </li>
+              </ol>
+            </div>
           </div>
         </nav>
 
