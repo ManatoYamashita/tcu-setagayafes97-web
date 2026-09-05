@@ -24,7 +24,7 @@ export function ComingSoon({
 }: ComingSoonProps) {
   return (
     <section aria-label={title} className="container mx-auto px-4 py-12">
-      <div className="relative flex min-h-[40vh] flex-col items-center justify-center gap-6 overflow-hidden rounded-2xl border border-gray-200/20 bg-white/10 px-6 py-16 text-center shadow-sm backdrop-blur-sm md:py-20">
+      <div className="relative flex min-h-[40vh] flex-col items-center justify-center gap-6 overflow-hidden rounded-2xl border border-gray-200 bg-white px-6 py-16 text-center shadow-sm md:py-20">
         {/* 背景の薄い歯車装飾 */}
         <div
           aria-hidden="true"

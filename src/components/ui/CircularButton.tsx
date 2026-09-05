@@ -20,20 +20,19 @@ export function CircularButton({
   };
 
   return (
-    <Link href={href}>
-      <div
-        className={`
-          ${sizeClasses[size]}
-          flex flex-col items-center justify-center
-          rounded-full bg-white/10 border border-gray-200/30
-          hover:bg-white/20
-          focus:outline-none focus:ring-4 focus:ring-white focus:ring-offset-2
-          ${className}
-        `}
-      >
-        <span className="font-semibold uppercase tracking-wider text-gray-900">{text}</span>
-        <ArrowRight className="mt-2 h-5 w-5 text-gray-900" />
-      </div>
+    <Link
+      href={href}
+      className={`
+        ${sizeClasses[size]}
+        flex flex-col items-center justify-center
+        rounded-full border border-gray-200/30 bg-white/10
+        transition-colors hover:bg-white/20
+        focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-white
+        ${className}
+      `}
+    >
+      <span className="font-semibold uppercase tracking-wider text-gray-900">{text}</span>
+      <ArrowRight className="mt-2 h-5 w-5 text-gray-900" />
     </Link>
   );
 }

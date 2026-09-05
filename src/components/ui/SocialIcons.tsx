@@ -28,7 +28,7 @@ export function SocialIcons({
   };
 
   const linkBase =
-    "inline-flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 rounded-full";
+    "inline-flex items-center justify-center rounded-full focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-white";
   const iconWrapperVariants = {
     minimal: "",
     circle: "w-10 h-10 text-gray-900/70 group-hover:text-gray-900",
