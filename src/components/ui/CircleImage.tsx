@@ -18,9 +18,18 @@ export function CircleImage({ src, alt, size = "md" }: CircleImageProps) {
     xl: "h-40 w-40",
   };
 
+  // レスポンシブ可変を持たない固定pxのボックスなので、ブレークポイント無しの
+  // 単一値で十分。ボックスの実測px（Tailwindのスペーシングスケール由来）と揃える。
+  const sizePx = {
+    sm: 64,
+    md: 96,
+    lg: 128,
+    xl: 160,
+  };
+
   return (
     <div className={`relative overflow-hidden rounded-full ${sizeClasses[size]}`}>
-      <Image src={src} alt={alt} fill className="object-cover" />
+      <Image src={src} alt={alt} fill sizes={`${sizePx[size]}px`} className="object-cover" />
     </div>
   );
 }
