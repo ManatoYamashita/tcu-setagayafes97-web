@@ -29,11 +29,28 @@
  * 追跡集合で判定することは、#209 が直した形（`.gitignore` 対象へのリンク）を落とすためにも要る。
  * その種のリンク先は手元には存在するので、`existsSync` では原理的に検出できない。
  *
- * ## 対応していないもの（意図的）
+ * ## 検査するもの
  *
- * - **`#anchor` の存在検証**。フラグメントは落として judgement に使わない
+ * - インラインリンク `[label](path)`（`path` に1段までの括弧を含んでよい）
+ * - 参照式リンクの**定義** `[label]: path`
+ * - HTML の `<a href="path">`
+ *
+ * ## 対応していないもの（意図的。ここに挙げていない取りこぼしは不具合として扱う）
+ *
+ * - **`#anchor` の存在検証**。フラグメントは落として judgement に使わない。
+ *   したがって**見出しの改名で壊れた anchor はこの検査を緑で通る。人が見る担当のまま残る**
+ * - **画像リンク `![alt](path)`**。本文リンクだけを見る。`[![alt](img)](path)` は
+ *   外側の `path` だけを検査する
+ * - **fenced code block の中身**。リンクの書き方の例をコードブロックへ貼っても落ちない。
+ *   引用の中（`> ```）も fence として扱う
+ * - **インラインコードスパンの中身**（`` `[label](path)` ``）。CommonMark と同じく
+ *   コードスパンをリンクより先に潰す
+ * - **複数行にまたがるリンク**。行ベースで走査して `file:line` を出すことを優先している
  * - **参照式リンクの使用側**（`[text][ref]` の `ref` が定義されているか）。定義側は検査する
  * - 外部URLの到達性。ネットワークを要求した時点でこのジョブに置けなくなる
+ *
+ * **fence が閉じないまま EOF に達したら失敗させる。** 閉じ忘れは、それ以降の行を丸ごと
+ * 走査対象から外し、検査を黙って空振りさせるためである（`FIXTURES` の「未閉じ fence」を参照）。
  */
 
 import { execFileSync } from "node:child_process";
@@ -55,8 +72,38 @@ const ROOT = execFileSync("git", ["rev-parse", "--show-toplevel"], { encoding: "
  */
 const FENCE = /^ {0,3}(`{3,}|~{3,})/;
 
-/** `[label](target "title")`。`!` 付きの画像は対象外にするため、先頭を捕獲しておく */
-const INLINE_LINK = /(!?)\[(?:[^\]\\]|\\.)*\]\(\s*(<[^>]*>|[^()\s]*?)(?:\s+["'][^"']*["'])?\s*\)/g;
+/**
+ * 行頭の引用マーカー
+ *
+ * 剥がしてから fence を判定する。剥がさないと `> ```bash` が fence として認識されず、
+ * **引用の中のコードブロックだけが走査対象に残る。** 現在3箇所ある
+ * （`docs/dev/ci-env.md` / `docs/frontend/browser-verification-pitfalls.md` /
+ * `docs/frontend/design.md`）。
+ */
+const BLOCKQUOTE = /^(?: {0,3}>\s?)+/;
+
+/**
+ * インラインコードスパン
+ *
+ * CommonMark ではコードスパンがリンクより強く結合するため、リンクより先に潰す。
+ * #209 の運用原則が「リンクにせずパス名をコード表記で書く」を推奨している以上、
+ * コード表記の中にリンク構文が現れる導線は既にある。
+ */
+const CODE_SPAN = /(`+)(?:(?!\1)[^\n])*?\1/g;
+
+/** 画像 `![alt](path)`。本文リンクだけを見るため、リンク抽出の前に潰す */
+const IMAGE =
+  /!\[(?:[^\]\\]|\\.)*\]\(\s*(?:<[^>]*>|(?:[^()\s]|\([^()\s]*\))*?)(?:\s+["'][^"']*["'])?\s*\)/g;
+
+/**
+ * `[label](target "title")`
+ *
+ * `target` は1段までの括弧を許す（`./a(1).md`）。CommonMark は釣り合った括弧を
+ * 何段でも許すが、行ベースの検査で必要になるのは1段までである。
+ * 先頭の `(!?)` は画像の取りこぼしに対する保険で、通常は `IMAGE` が先に潰している。
+ */
+const INLINE_LINK =
+  /(!?)\[(?:[^\]\\]|\\.)*\]\(\s*(<[^>]*>|(?:[^()\s]|\([^()\s]*\))*?)(?:\s+["'][^"']*["'])?\s*\)/g;
 
 /**
  * 参照式リンクの定義（`[label]: target "title"`）
@@ -65,8 +112,119 @@ const INLINE_LINK = /(!?)\[(?:[^\]\\]|\\.)*\]\(\s*(<[^>]*>|[^()\s]*?)(?:\s+["'][
  */
 const REFERENCE_DEFINITION = /^ {0,3}\[(?:[^\]\\]|\\.)+\]:\s*(<[^>]*>|\S+)/;
 
+/** HTML の `<a href="...">`。markdown 記法だけを見ていると素通りする */
+const HTML_LINK = /<a\s[^>]*?href\s*=\s*["']([^"']*)["']/gi;
+
 /** スキーム付きの絶対URL（`https:` `mailto:` `tel:` 等） */
 const SCHEME = /^[a-zA-Z][a-zA-Z0-9+.-]*:/;
+
+/** 潰した記法を同じ長さの空白へ置き換える。前後のトークンが繋がるのを防ぐ */
+const blank = (matched) => " ".repeat(matched.length);
+
+/**
+ * 1本の markdown からリンク先の候補を行番号つきで取り出す
+ *
+ * ここでは解決も存在判定もしない。純粋に「どの行にどの文字列が書かれているか」だけを返す。
+ * `FIXTURES` が固定しているのはこの関数の振る舞いである。
+ *
+ * @param {string} text
+ * @returns {{ targets: { line: number, target: string }[], unclosedFenceLine: number | null }}
+ */
+function extractLinkTargets(text) {
+  const targets = [];
+  let openFence = null;
+  let openFenceLine = null;
+
+  text.split("\n").forEach((rawLine, index) => {
+    const line = rawLine.replace(BLOCKQUOTE, "");
+
+    const fence = FENCE.exec(line);
+    if (openFence) {
+      // 閉じフェンスは開きと同種で、同じ長さ以上でなければならない（CommonMark）
+      if (fence && fence[1][0] === openFence[0] && fence[1].length >= openFence.length) {
+        openFence = null;
+        openFenceLine = null;
+      }
+      return;
+    }
+    if (fence) {
+      openFence = fence[1];
+      openFenceLine = index + 1;
+      return;
+    }
+
+    // コードスパン → 画像 の順に潰す。この順でないと
+    // `` `![alt](path)` `` のようなコード表記の中の画像を二重に扱うことになる。
+    const scannable = line.replace(CODE_SPAN, blank).replace(IMAGE, blank);
+
+    for (const match of scannable.matchAll(INLINE_LINK)) {
+      if (match[1]) continue; // `IMAGE` が潰し損ねた画像
+      targets.push({ line: index + 1, target: match[2] });
+    }
+    const definition = REFERENCE_DEFINITION.exec(scannable);
+    if (definition) targets.push({ line: index + 1, target: definition[1] });
+    for (const match of scannable.matchAll(HTML_LINK)) {
+      targets.push({ line: index + 1, target: match[1] });
+    }
+  });
+
+  return { targets, unclosedFenceLine: openFence ? openFenceLine : null };
+}
+
+/**
+ * `extractLinkTargets` の振る舞いを固定するフィクスチャ
+ *
+ * この検査が壊れるときの壊れ方は「赤くなる」ではなく「黙って何も見つけなくなる」である。
+ * lint も build も型も気付かない（docs/dev/testing.md の「テストを足すかどうかの判断」）。
+ * 実データ 53本は誤検出（偽陽性）しか捕まえられないので、取りこぼし（偽陰性）はここで固定する。
+ *
+ * `target` は抽出したままの文字列で、外部URLやアンカーの切り捨ては `resolveTarget` の担当。
+ */
+const FIXTURES = [
+  { name: "インラインリンク", md: "[a](./a.md)", expect: ["./a.md"] },
+  { name: "画像は対象外", md: "![alt](./a.png)", expect: [] },
+  {
+    name: "画像を内側に持つリンクは外側だけ見る",
+    md: "[![alt](./a.png)](./b.md)",
+    expect: ["./b.md"],
+  },
+  { name: "コードスパンの中は対象外", md: "`[a](./a.md)`", expect: [] },
+  { name: "fenced code block の中は対象外", md: "```\n[a](./a.md)\n```", expect: [] },
+  { name: "引用の中の fence も fence として扱う", md: "> ```\n> [a](./a.md)\n> ```", expect: [] },
+  { name: "引用の中の本文リンクは検査する", md: "> [a](./a.md)", expect: ["./a.md"] },
+  { name: "括弧を1段含むパス", md: "[a](./a(1).md)", expect: ["./a(1).md"] },
+  { name: "参照式リンクの定義", md: "[a]: ./a.md", expect: ["./a.md"] },
+  { name: "HTML の a 要素", md: '<a href="./a.md">a</a>', expect: ["./a.md"] },
+  { name: "アンカーのみ（切り捨ては resolveTarget の担当）", md: "[a](#h)", expect: ["#h"] },
+  { name: "未閉じ fence", md: "```\n[a](./a.md)", expect: [], unclosedFenceLine: 1 },
+];
+
+/** フィクスチャが1件でも外れたら、実データを見る前に落とす */
+function runSelfCheck() {
+  const failures = [];
+  for (const fixture of FIXTURES) {
+    const { targets, unclosedFenceLine } = extractLinkTargets(fixture.md);
+    const actual = targets.map((item) => item.target);
+    const expectedFence = fixture.unclosedFenceLine ?? null;
+    if (JSON.stringify(actual) !== JSON.stringify(fixture.expect)) {
+      failures.push(
+        `${fixture.name}: 期待 ${JSON.stringify(fixture.expect)} / 実際 ${JSON.stringify(actual)}`
+      );
+    }
+    if (unclosedFenceLine !== expectedFence) {
+      failures.push(
+        `${fixture.name}: 未閉じ fence 期待 ${expectedFence} / 実際 ${unclosedFenceLine}`
+      );
+    }
+  }
+  if (failures.length > 0) {
+    console.error(`${LABEL} FAIL: 抽出器の自己検査が ${failures.length} 件外れました。`);
+    for (const failure of failures) console.error(`  ${failure}`);
+    console.error("");
+    console.error("  実データを見る前に落としています。抽出器を直してから再実行してください。");
+    process.exit(1);
+  }
+}
 
 /**
  * 追跡ファイルの一覧。`-z` はパスに空白や非ASCIIが入っても壊れないため
@@ -117,7 +275,7 @@ function resolveTarget(target, sourceFile) {
     decoded = withoutFragment;
   }
 
-  // `/` 始まりは GitHub のレンダラと同じくリポジトリルート起点として解決する
+  // `/` 始まりはリポジトリルート起点として解決する
   const joined = decoded.startsWith("/")
     ? path.normalize(decoded.slice(1))
     : path.normalize(path.join(path.dirname(sourceFile), decoded));
@@ -130,55 +288,53 @@ function isTracked(resolved) {
   return trackedFileSet.has(resolved) || trackedDirSet.has(resolved);
 }
 
+runSelfCheck();
+
 const broken = [];
+const unclosedFences = [];
 let relativeLinkCount = 0;
 let skippedCount = 0;
 
 for (const file of markdownFiles) {
-  const lines = readFileSync(path.join(ROOT, file), "utf8").split("\n");
-  let openFence = null;
+  const { targets, unclosedFenceLine } = extractLinkTargets(
+    readFileSync(path.join(ROOT, file), "utf8")
+  );
 
-  lines.forEach((line, index) => {
-    const fence = FENCE.exec(line);
-    if (openFence) {
-      // 閉じフェンスは開きと同種で、同じ長さ以上でなければならない（CommonMark）
-      if (fence && fence[1][0] === openFence[0] && fence[1].length >= openFence.length) {
-        openFence = null;
-      }
-      return;
-    }
-    if (fence) {
-      openFence = fence[1];
-      return;
-    }
+  if (unclosedFenceLine !== null) unclosedFences.push({ file, line: unclosedFenceLine });
 
-    /** この行に現れたリンク先の候補。インライン記法と参照式定義の両方を集める */
-    const targets = [];
-    for (const match of line.matchAll(INLINE_LINK)) {
-      if (match[1]) continue; // `![alt](path)` の画像は対象外
-      targets.push(match[2]);
+  for (const { line, target } of targets) {
+    const resolved = resolveTarget(target, file);
+    if (resolved === null) {
+      skippedCount++;
+      continue;
     }
-    const definition = REFERENCE_DEFINITION.exec(line);
-    if (definition) targets.push(definition[1]);
+    relativeLinkCount++;
+    if (isTracked(resolved)) continue;
 
-    for (const target of targets) {
-      const resolved = resolveTarget(target, file);
-      if (resolved === null) {
-        skippedCount++;
-        continue;
-      }
-      relativeLinkCount++;
-      if (isTracked(resolved)) continue;
+    /*
+     * ここから先は失敗メッセージを作るためだけの分岐である。
+     * **`existsSync` を合否に混ぜてはいけない。** 混ぜた瞬間、#209 が直した形
+     * （`.gitignore` 対象へのリンク）が手元でだけ緑になる。
+     */
+    const untrackedButPresent = existsSync(path.join(ROOT, resolved));
+    broken.push({ file, line, target, resolved, untrackedButPresent });
+  }
+}
 
-      /*
-       * ここから先は失敗メッセージを作るためだけの分岐である。
-       * **`existsSync` を合否に混ぜてはいけない。** 混ぜた瞬間、#209 が直した形
-       * （`.gitignore` 対象へのリンク）が手元でだけ緑になる。
-       */
-      const untrackedButPresent = existsSync(path.join(ROOT, resolved));
-      broken.push({ file, line: index + 1, target, resolved, untrackedButPresent });
-    }
-  });
+if (unclosedFences.length > 0) {
+  console.error(
+    `${LABEL} FAIL: 閉じていない fenced code block が ${unclosedFences.length} 件あります。`
+  );
+  for (const item of unclosedFences) {
+    console.error(
+      `  ${item.file}:${item.line}  ここで開いた fence が閉じないまま EOF に達しました`
+    );
+  }
+  console.error("");
+  console.error(
+    "  **この行より後ろは1行も検査されていません。** 閉じ忘れは検査を黙って空振りさせます。"
+  );
+  process.exit(1);
 }
 
 if (broken.length > 0) {
@@ -204,6 +360,9 @@ if (broken.length > 0) {
   console.error("");
   console.error(
     "  この検査は Git の追跡対象だけを見ます。作業ツリーに在ることは根拠になりません。"
+  );
+  console.error(
+    "  `#anchor` の存在は検査していません。見出しを改名したときは自分で追ってください。"
   );
   process.exit(1);
 }
