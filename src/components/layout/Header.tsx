@@ -64,6 +64,10 @@ export function Header() {
   return (
     <>
       <header
+        // transition-all はここでは意図的に残している。isAtTop の切り替えで
+        // padding（px/pt）と背景色が同時に変わり、どちらのアニメーションも演出の一部。
+        // #183 D で他の24箇所は変化するプロパティを明示したが、ヘッダーの追従だけは
+        // レイアウトプロパティの補間が本来の目的であり、all が妥当な箇所である。
         className={`sticky top-0 z-40 transition-all duration-300 ${
           isAtTop ? "px-0 pt-0" : "px-4 pt-2"
         }`}
@@ -75,6 +79,9 @@ export function Header() {
         }}
       >
         <div
+          // 同上。ここは border-radius・box-shadow・background-color に加えて
+          // container の max-width と mx-auto の margin まで変化する。
+          // 列挙すると5プロパティになり all との差が無いため、そのままにしてある。
           className={`flex items-center justify-between px-6 py-3 transition-all duration-300 ${
             isAtTop
               ? "rounded-none shadow-none"

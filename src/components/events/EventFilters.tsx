@@ -65,7 +65,7 @@ export function EventFilters({ filters }: EventFiltersProps) {
               <button
                 key={option.value}
                 onClick={() => handleFilterChange({ date: option.value })}
-                className={`rounded-full border px-4 py-2 text-sm font-medium transition-all focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 ${
+                className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 ${
                   currentDate === option.value
                     ? "border-primary-600 bg-primary-600 text-white"
                     : "border-gray-200 bg-gray-50 text-gray-700 hoverable:hover:border-gray-400 hoverable:hover:bg-white"
@@ -86,7 +86,7 @@ export function EventFilters({ filters }: EventFiltersProps) {
               <button
                 key={option.value}
                 onClick={() => handleFilterChange({ type: option.value })}
-                className={`rounded-full border px-4 py-2 text-sm font-medium transition-all focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 ${
+                className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 ${
                   currentType === option.value
                     ? "border-primary-600 bg-primary-600 text-white"
                     : "border-gray-200 bg-gray-50 text-gray-700 hoverable:hover:border-gray-400 hoverable:hover:bg-white"

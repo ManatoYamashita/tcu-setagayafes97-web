@@ -191,7 +191,7 @@ export default async function PrivacyPolicyPage({
           <p className="mb-4 text-gray-700">{privacyPolicyConfig.contact.description}</p>
           <Link
             href={privacyPolicyConfig.contact.url}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-white transition-all hover:bg-primary-500 hover:shadow-lg"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-white transition-[color,background-color,border-color,box-shadow] hover:bg-primary-500 hover:shadow-lg"
           >
             <Mail className="h-5 w-5" />
             <span>{t("toContactForm")}</span>

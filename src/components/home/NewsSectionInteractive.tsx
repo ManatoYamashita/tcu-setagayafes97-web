@@ -312,7 +312,7 @@ export function NewsSectionInteractive({ newsList }: NewsSectionProps) {
               >
                 <Link
                   href="/info"
-                  className="group inline-flex items-center gap-3 rounded-full border-2 border-gray-900 px-8 py-3 font-semibold text-gray-900 transition-all hover:bg-gray-900 hover:text-white"
+                  className="group inline-flex items-center gap-3 rounded-full border-2 border-gray-900 px-8 py-3 font-semibold text-gray-900 transition-colors hover:bg-gray-900 hover:text-white"
                 >
                   <span>お知らせ一覧を見る</span>
                   <svg

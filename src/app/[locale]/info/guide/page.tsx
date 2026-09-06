@@ -200,7 +200,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
               return (
                 <div
                   key={item.id}
-                  className={`rounded-xl border-l-4 ${style.border} ${style.bg} p-5 shadow-sm transition-all hover:shadow-md`}
+                  className={`rounded-xl border-l-4 ${style.border} ${style.bg} p-5 shadow-sm transition-shadow hover:shadow-md`}
                 >
                   <div className="mb-2 flex items-center gap-2">
                     <span aria-hidden="true" className="text-2xl">
@@ -441,7 +441,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
           <div className="grid gap-4 md:grid-cols-3">
             <Link
               href="/access"
-              className="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 transition-all hover:border-primary-300 hover:shadow-md"
+              className="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 transition-[color,background-color,border-color,box-shadow] hover:border-primary-300 hover:shadow-md"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-50 transition-colors group-hover:bg-primary-100">
                 <Map className="h-5 w-5 text-primary" />
@@ -453,7 +453,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
             </Link>
             <Link
               href="/info/contact"
-              className="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 transition-all hover:border-primary-300 hover:shadow-md"
+              className="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 transition-[color,background-color,border-color,box-shadow] hover:border-primary-300 hover:shadow-md"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-50 transition-colors group-hover:bg-primary-100">
                 <Mail className="h-5 w-5 text-primary" />
@@ -465,7 +465,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
             </Link>
             <Link
               href="/info/faq"
-              className="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 transition-all hover:border-primary-300 hover:shadow-md"
+              className="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 transition-[color,background-color,border-color,box-shadow] hover:border-primary-300 hover:shadow-md"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-50 transition-colors group-hover:bg-primary-100">
                 <HelpCircle className="h-5 w-5 text-primary" />

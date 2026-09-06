@@ -45,13 +45,13 @@ export default function EventDetailNotFound() {
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
             <Link
               href="/events"
-              className="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 text-base font-semibold text-primary shadow-md transition-all duration-200 hover:bg-white/90 hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
+              className="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 text-base font-semibold text-primary shadow-md transition-[color,background-color,border-color,box-shadow] duration-200 hover:bg-white/90 hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
             >
               企画一覧へ戻る
             </Link>
             <Link
               href="/"
-              className="inline-flex items-center justify-center rounded-lg bg-white/10 px-6 py-3 text-base font-semibold text-gray-900 shadow-md transition-all duration-200 hover:bg-white/20 hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-white"
+              className="inline-flex items-center justify-center rounded-lg bg-white/10 px-6 py-3 text-base font-semibold text-gray-900 shadow-md transition-[color,background-color,border-color,box-shadow] duration-200 hover:bg-white/20 hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-white"
             >
               トップページへ戻る
             </Link>

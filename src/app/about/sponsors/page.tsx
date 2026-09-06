@@ -89,7 +89,7 @@ interface SponsorCardProps {
 
 function SponsorCard({ sponsor }: SponsorCardProps) {
   const CardContent = (
-    <div className="group h-full overflow-hidden rounded-lg border border-gray-200/20 bg-white/10 shadow-sm transition-all hover:border-gray-200 hover:shadow-lg">
+    <div className="group h-full overflow-hidden rounded-lg border border-gray-200/20 bg-white/10 shadow-sm transition-[color,background-color,border-color,box-shadow] hover:border-gray-200 hover:shadow-lg">
       {/* ロゴ */}
       {sponsor.image ? (
         <div className="relative aspect-video w-full overflow-hidden bg-white/10">
