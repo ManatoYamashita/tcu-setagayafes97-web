@@ -117,11 +117,11 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
           >
             {events.map((event) => {
               const imageUrl = event.thumbnail?.url || "/images/photos/setagayafe97-image.webp";
-              // 分類タグ。企画種別はタイトル横のバッジが担うため、ここでは繰り返さない。
+              // 分類タグ。企画種別を含め、カードの識別情報はすべてこの行へ集約する。
               // microCMS は未入力のフィールドをキーごと返さないため、building は
               // 実データで欠落しうる（#166）。空文字のまま描くと中身の無いタグが
               // ただの丸として並ぶので、ここで落としてから描画する
-              const tags = [event.building].filter(Boolean);
+              const tags = [typeLabels[event.type], event.building].filter(Boolean);
               return (
                 <Link
                   key={event.id}
@@ -160,15 +160,10 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
 
                     {/* コンテンツ（下部） */}
                     <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col rounded-b-3xl p-5">
-                      {/* タイトル + バッジ */}
-                      <div className="flex items-start justify-between gap-3">
-                        <h3 className="text-base font-bold leading-snug text-white line-clamp-2 sm:text-lg">
-                          {event.title}
-                        </h3>
-                        <span className="shrink-0 rounded-full border border-white/40 bg-white/15 px-2.5 py-1 text-[10px] font-medium text-white backdrop-blur-sm">
-                          {typeLabels[event.type]}
-                        </span>
-                      </div>
+                      {/* タイトル */}
+                      <h3 className="text-base font-bold leading-snug text-white line-clamp-2 sm:text-lg">
+                        {event.title}
+                      </h3>
 
                       {/* 説明文 */}
                       <p className="mt-2.5 text-xs leading-relaxed text-white/70 line-clamp-3">
@@ -181,7 +176,7 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
                           {tags.map((tag) => (
                             <span
                               key={tag}
-                              className="rounded-full bg-white/15 px-3 py-1 text-[10px] font-medium text-white/80 backdrop-blur-sm"
+                              className="rounded-full border border-white/40 bg-white/15 px-3 py-1 text-[10px] font-medium text-white backdrop-blur-sm"
                             >
                               {tag}
                             </span>
