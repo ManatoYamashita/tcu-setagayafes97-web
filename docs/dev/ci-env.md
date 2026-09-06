@@ -462,9 +462,10 @@ curl -s https://<production deployment url>/robots.txt | grep Sitemap
 ## 関連ドキュメント
 
 - [docs/dev/git.md](./git.md) — ブランチ戦略と CI/CD ワークフロー
-- `.github/workflows/feature-ci.yml` — Static Checks（Lint / Format / 型）と Build Check
+- `.github/workflows/feature-ci.yml` — Static Checks（Lint / Format / 型 / ユニットテスト /
+  ドキュメントの相対リンク）、Layout E2E、Build Check
 - `.github/workflows/production-deploy-guard.yml` — `main` への push で Production デプロイの作成を確認
 
 ---
 
-**最終更新日**: 2026-09-03
+**最終更新日**: 2026-09-06
