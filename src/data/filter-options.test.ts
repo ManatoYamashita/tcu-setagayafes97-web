@@ -61,7 +61,14 @@ describe("resolveBuildingId", () => {
     expect(resolveBuildingId("")).toBe(OTHER_BUILDING_ID);
   });
 
-  it("年号のような数字を建物へ吸い込まない", () => {
+  it("数字だけの教室番号も先頭1桁で読む", () => {
+    // 英字を伴わない表記で入稿されても拾う。「2026 は弾くのに 100 は 1号館」という
+    // 非対称は、歯止めが桁数（3桁 + 英字1文字）だけであることの帰結である
+    expect(resolveBuildingId("100")).toBe("1号館");
+    expect(resolveBuildingId("999")).toBe("9号館");
+  });
+
+  it("年号のような4桁の数字を建物へ吸い込まない", () => {
     expect(resolveBuildingId("2026")).toBe(OTHER_BUILDING_ID);
   });
 
