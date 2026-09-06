@@ -110,9 +110,17 @@ function normalizeSNSLinks(sns: string | undefined): SNSLinks | undefined {
  * @param rawEvent microCMSから取得した生データ
  * @returns 正規化されたEvent
  */
-function normalizeEvent(rawEvent: RawEvent): Event {
+export function normalizeEvent(rawEvent: RawEvent): Event {
   return {
     ...rawEvent,
+    // microCMS側で必須設定にしていても、入力漏れがあれば undefined が返り得る。
+    // filterEvents 等の内部コードがこれらを常に string だと信頼できるよう、
+    // 外部データの境界であるここで一度だけ空文字へ既定化する。
+    title: rawEvent.title ?? "",
+    organizer: rawEvent.organizer ?? "",
+    description: rawEvent.description ?? "",
+    place: rawEvent.place ?? "",
+    building: rawEvent.building ?? "",
     date: normalizeEventDate(rawEvent.date),
     type: normalizeEventType(rawEvent.type),
     sns: typeof rawEvent.sns === "string" ? normalizeSNSLinks(rawEvent.sns) : undefined,
