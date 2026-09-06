@@ -117,10 +117,11 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
           >
             {events.map((event) => {
               const imageUrl = event.thumbnail?.url || "/images/photos/setagayafe97-image.webp";
+              // 分類タグ。企画種別はタイトル横のバッジが担うため、ここでは繰り返さない。
               // microCMS は未入力のフィールドをキーごと返さないため、building は
               // 実データで欠落しうる（#166）。空文字のまま描くと中身の無いタグが
               // ただの丸として並ぶので、ここで落としてから描画する
-              const tags = [typeLabels[event.type], event.building].filter(Boolean);
+              const tags = [event.building].filter(Boolean);
               return (
                 <Link
                   key={event.id}
@@ -159,13 +160,6 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
 
                     {/* コンテンツ（下部） */}
                     <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col rounded-b-3xl p-5">
-                      {/* ドットインジケーター */}
-                      <div className="mb-4 flex justify-center gap-1.5" aria-hidden="true">
-                        <span className="h-1.5 w-1.5 rounded-full bg-white/80" />
-                        <span className="h-1.5 w-1.5 rounded-full bg-white/30" />
-                        <span className="h-1.5 w-1.5 rounded-full bg-white/30" />
-                      </div>
-
                       {/* タイトル + バッジ */}
                       <div className="flex items-start justify-between gap-3">
                         <h3 className="text-base font-bold leading-snug text-white line-clamp-2 sm:text-lg">
