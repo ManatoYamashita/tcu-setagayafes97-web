@@ -44,7 +44,10 @@ export function EventCard({ event, variant = "default" }: EventCardProps) {
             <CircleImage
               src={event.thumbnail.url}
               alt={event.title}
-              size={isCompact ? "md" : "xl"}
+              // xl(160px)だと、xl:グリッドの4カラム時にカード幅(約195px)から
+              // p-6の余白(48px)を引いた残り(約147px)より大きく、
+              // flexが円を横方向だけ縮めて楕円になる。lg(128px)なら収まる。
+              size={isCompact ? "md" : "lg"}
             />
           </div>
         )}
