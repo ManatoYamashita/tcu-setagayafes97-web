@@ -49,6 +49,12 @@ jobs:
       - name: Run Prettier check
         run: pnpm run format:check
 
+      # 追跡 .md の相対リンクを解決する（#211）。git ls-files 以外に何も要求しないため、
+      # このジョブの「install だけで完結する」性質を崩さない。
+      # **作業ツリーではなく Git の追跡対象を歩く。** 詳細は scripts/assert-doc-links.mjs の冒頭。
+      - name: Check doc links
+        run: pnpm run check:doc-links
+
       # next build も型エラーで落ちる（ignoreBuildErrors 未設定）が、この検査は
       # 別に置く。secrets から独立していて数十秒で落ちること、そして
       # ignoreBuildErrors: true を1行足せば build 側の型検査だけは消せてしまうため。
