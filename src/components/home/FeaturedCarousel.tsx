@@ -117,6 +117,11 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
           >
             {events.map((event) => {
               const imageUrl = event.thumbnail?.url || "/images/photos/setagayafe97-image.webp";
+              // 分類タグ。企画種別はタイトル横のバッジが担うため、ここでは繰り返さない。
+              // microCMS は未入力のフィールドをキーごと返さないため、building は
+              // 実データで欠落しうる（#166）。空文字のまま描くと中身の無いタグが
+              // ただの丸として並ぶので、ここで落としてから描画する
+              const tags = [event.building].filter(Boolean);
               return (
                 <Link
                   key={event.id}
@@ -145,15 +150,16 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
                       aria-hidden="true"
                     />
 
+                    {/* 可読性オーバーレイ（濃い紫）。ブラー層より上から始める理由と
+                        停止位置の根拠は globals.css の .featured-card-overlay を参照 */}
+                    <div
+                      className="featured-card-overlay pointer-events-none absolute inset-x-0 bottom-0 z-[9] rounded-b-3xl"
+                      style={{ top: "25%" }}
+                      aria-hidden="true"
+                    />
+
                     {/* コンテンツ（下部） */}
                     <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col rounded-b-3xl p-5">
-                      {/* ドットインジケーター */}
-                      <div className="mb-4 flex justify-center gap-1.5" aria-hidden="true">
-                        <span className="h-1.5 w-1.5 rounded-full bg-white/80" />
-                        <span className="h-1.5 w-1.5 rounded-full bg-white/30" />
-                        <span className="h-1.5 w-1.5 rounded-full bg-white/30" />
-                      </div>
-
                       {/* タイトル + バッジ */}
                       <div className="flex items-start justify-between gap-3">
                         <h3 className="text-base font-bold leading-snug text-white line-clamp-2 sm:text-lg">
@@ -170,14 +176,18 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
                       </p>
 
                       {/* 分類タグ */}
-                      <div className="mt-3 flex flex-wrap gap-1.5">
-                        <span className="rounded-full bg-white/15 px-3 py-1 text-[10px] font-medium text-white/80 backdrop-blur-sm">
-                          {typeLabels[event.type]}
-                        </span>
-                        <span className="rounded-full bg-white/15 px-3 py-1 text-[10px] font-medium text-white/80 backdrop-blur-sm">
-                          {event.building}
-                        </span>
-                      </div>
+                      {tags.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {tags.map((tag) => (
+                            <span
+                              key={tag}
+                              className="rounded-full bg-white/15 px-3 py-1 text-[10px] font-medium text-white/80 backdrop-blur-sm"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
 
                       {/* 詳細ボタン */}
                       <span className="mt-4 block w-full rounded-full bg-white py-2.5 text-center text-sm font-semibold text-gray-900 transition-opacity group-hover:opacity-90">
