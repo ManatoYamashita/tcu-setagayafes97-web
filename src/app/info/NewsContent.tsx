@@ -91,7 +91,7 @@ function FilterButton({ label, isActive, onClick, count }: FilterButtonProps) {
   return (
     <button
       onClick={onClick}
-      className={`rounded-full border px-5 py-2 text-sm font-semibold transition-all focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 ${
+      className={`rounded-full border px-5 py-2 text-sm font-semibold transition-colors focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 ${
         isActive
           ? "border-primary-600 bg-primary-600 text-white shadow-md"
           : "border-gray-200 bg-gray-50 text-gray-700 hoverable:hover:border-gray-400 hoverable:hover:bg-white"
@@ -119,7 +119,7 @@ function NewsCard({ news }: NewsCardProps) {
 
   return (
     <Link href={`/info/${news.id}`} className="group block h-full">
-      <article className="h-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all hoverable:hover:border-gray-400 hoverable:hover:shadow-lg">
+      <article className="h-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-[color,background-color,border-color,box-shadow] hoverable:hover:border-gray-400 hoverable:hover:shadow-lg">
         {/* サムネイル */}
         {news.thumbnail && (
           <div className="relative aspect-video w-full overflow-hidden">

@@ -119,7 +119,7 @@ export default function PamphletPage() {
                         <a
                           href={pamphlet.fileUrl}
                           download
-                          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-semibold text-primary transition-all hover:bg-white/90 hover:shadow-lg md:w-auto"
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-semibold text-primary transition-[color,background-color,border-color,box-shadow] hover:bg-white/90 hover:shadow-lg md:w-auto"
                         >
                           <Download className="h-5 w-5" />
                           <span>PDFをダウンロード</span>

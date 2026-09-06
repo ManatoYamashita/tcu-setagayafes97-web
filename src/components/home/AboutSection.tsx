@@ -240,7 +240,7 @@ export function AboutSection() {
             <Link
               ref={ctaRef}
               href={topSection.cta.href}
-              className="group inline-flex items-center gap-2 rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-primary-700 hover:shadow-lg opacity-0"
+              className="group inline-flex items-center gap-2 rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition-[color,background-color,border-color,box-shadow] hover:bg-primary-700 hover:shadow-lg opacity-0"
             >
               {topSection.cta.label}
               <svg
