@@ -121,6 +121,8 @@ docs/
   - `process.env.NODE_ENV` への直接代入は `readonly` 宣言により TS2540 になる。`vi.stubEnv()` を使う
   - **テストの価値は「落ちること」でしか測れない。** #157 の退行8種を実際に注入した結果を記録
   - テストは「いまのデータ」ではなく「不変条件」を固定する（第98回の年次更新で無関係な赤を出さないため）
+  - **省略可能な引数は、本番の呼び出し元が渡しているかまで grep する。** 単体テストは自分で渡してしまうため、渡っていなくても緑のまま通る（#207）
+  - **「どちらも正しい」と書いた契約は疑う。** テストは差異を固定するが、差異が妥当かは何も言わない（`filterEvents` / `filterEventsByDate` は #207 で統合された）
 
 - **[ci-env.md](./dev/ci-env.md)** - GitHub Actions 環境変数管理
   - Repository Secrets / Variables の使い分け基準
@@ -275,6 +277,7 @@ docs/
   - `navigation.type` は BFCache 復帰でも `"navigate"` のまま。`"back_forward"` はドキュメント再作成のサイン（逆に読むと判定が反転する）
 
 - **[browser-verification-pitfalls.md](./frontend/browser-verification-pitfalls.md)** - 検証手順そのものが誤る実例
+  - **ハイドレーション完了前に読むと結論が反転する。** 測定値に「まだ fallback か」を含め、false になるまで読まない。`navigate` 後の `wait` だけでは足りず、`readyState === "complete"` も使えない（#207 で3回誤診）
   - **Tailwind の任意値を `grep` するときは `-F`。** `[...]` が文字クラスになり、存在するのに0件と出る
   - **CSS のカスタムクラスが効かないときは `.next` を丸ごと削除する。** HMR でも `.next/cache` 削除でも復旧しないことがある
   - **`resize_window` は viewport を変えない。** レスポンシブ検証は `agent-browser set viewport <w> <h>` で行う（`open --viewport` は効かない実測あり。メディアクエリの切り替わりはコンテナ幅を絞る方法では再現できない）
