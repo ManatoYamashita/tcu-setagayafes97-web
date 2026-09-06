@@ -58,8 +58,10 @@ export function EventFilters({ filters }: EventFiltersProps) {
 
       <div className="space-y-6">
         {/* 日程フィルター */}
-        <div>
-          <label className="mb-2 block text-sm font-semibold text-gray-900/90">開催日</label>
+        <fieldset className="m-0 min-w-0 border-0 p-0">
+          <legend className="m-0 mb-2 block p-0 text-sm font-semibold text-gray-900/90">
+            開催日
+          </legend>
           <div className="flex flex-wrap gap-2">
             {dateFilterOptions.map((option) => (
               <button
@@ -76,11 +78,13 @@ export function EventFilters({ filters }: EventFiltersProps) {
               </button>
             ))}
           </div>
-        </div>
+        </fieldset>
 
         {/* 企画種別フィルター */}
-        <div>
-          <label className="mb-2 block text-sm font-semibold text-gray-900/90">企画種別</label>
+        <fieldset className="m-0 min-w-0 border-0 p-0">
+          <legend className="m-0 mb-2 block p-0 text-sm font-semibold text-gray-900/90">
+            企画種別
+          </legend>
           <div className="flex flex-wrap gap-2">
             {typeFilterOptions.map((option) => (
               <button
@@ -97,7 +101,7 @@ export function EventFilters({ filters }: EventFiltersProps) {
               </button>
             ))}
           </div>
-        </div>
+        </fieldset>
 
         {/* 建物フィルター */}
         <div>
