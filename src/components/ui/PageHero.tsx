@@ -86,18 +86,14 @@ export function PageHero({
               <p className="mt-3 text-base text-gray-900/90 lg:mt-4 lg:text-lg">{description}</p>
             )}
             {ctaHref && (
-              <div className="mt-6 flex items-center gap-4 lg:mt-8">
-                <Link
-                  href={ctaHref}
-                  aria-label={ctaLabel}
-                  className="flex h-14 w-14 items-center justify-center rounded-full border border-primary-500 bg-primary-400 text-white transition-colors hover:bg-primary-500 lg:h-16 lg:w-16"
-                >
-                  <ArrowRight className="h-5 w-5 lg:h-6 lg:w-6" />
-                </Link>
+              <Link href={ctaHref} className="group mt-6 inline-flex items-center gap-4 lg:mt-8">
+                <span className="flex h-14 w-14 items-center justify-center rounded-full border border-primary-500 bg-primary-400 text-white transition-colors group-hover:bg-primary-500 lg:h-16 lg:w-16">
+                  <ArrowRight className="h-5 w-5 lg:h-6 lg:w-6" aria-hidden="true" />
+                </span>
                 <span className="text-sm font-semibold uppercase tracking-wider text-gray-900 lg:text-base">
                   {ctaLabel}
                 </span>
-              </div>
+              </Link>
             )}
           </div>
         </div>
