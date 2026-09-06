@@ -38,6 +38,31 @@ pnpm dev
 
 Tailwind のユーティリティ（`whitespace-nowrap` など既存語彙）は反映されるのに、**新規に定義したカスタムクラスだけが落ちる**という部分的な症状でした。「書いたはずの CSS が効かない」ときは、コードを疑う前にここを潰してください。
 
+**2026-09-06、`.featured-card-overlay` で再発しました（2例目）。** 同じ `@layer components` の
+既存クラス（`hero-about-bg` / `special-hero-overlay`）は正常に配信されており、
+**新規クラスだけが落ちる**点まで同じです。
+
+見分け方は computed style です。要素の `class` 属性にはクラス名が付いたままで、
+`getComputedStyle(el).backgroundImage` だけが `none` を返します。**エラーも警告も出ません。**
+
+```js
+// クラスは付いているのに背景が none → CSS が生成されていない
+document.querySelector(".featured-card-overlay").className; // "featured-card-overlay pointer-events-none ..."
+getComputedStyle(document.querySelector(".featured-card-overlay")).backgroundImage; // "none"
+```
+
+**CSSOM（`document.styleSheets` の `cssRules`）の走査で判定してはいけません。** Next.js の dev では
+既存クラスまで 0 件と出ます（2026-09-06 実測）。配信CSSを数えるなら `link[rel=stylesheet]` を
+`fetch()` して本文を検索するか、production ビルドの `.next/static/chunks/*.css` を `grep` します。
+
+**dev で確認できても production を別に確かめてください。** 今回は dev のキャッシュに騙されたため
+`pnpm build` 後の生成CSSまで見ています。Lightning CSS は `to top` の停止位置を反転して出力し、
+HEX フォールバックを併記します。
+
+```
+.featured-card-overlay{background:linear-gradient(#59207200 0%,#592072b3 34%,...)}
+```
+
 ## `resize_window` は viewport を変えない
 
 Claude in Chrome の `resize_window` は**ウィンドウ枠のサイズを変えるだけで、`window.innerWidth` に反映されないことがある**（2026-08-16 実測。375×812 を指定しても `innerWidth` は 1217 のまま）。加えて、縮めた状態から広げようとすると次のエラーで失敗する。
