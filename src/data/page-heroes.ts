@@ -60,14 +60,6 @@ export const pageHeroes: Record<string, PageHeroData> = {
     imageSrc: "/images/photos/setagayafe97-image.webp",
     imageAlt: "お知らせイメージ",
   },
-  about: {
-    title: ["世田谷祭", "こころを動かす", "カラクリ"],
-    subtitle: "About Us",
-    ctaHref: "/events",
-    ctaLabel: "View More",
-    imageSrc: "/images/photos/setagayafe97-image.webp",
-    imageAlt: "実行委員会の活動風景",
-  },
   contact: {
     title: "お問い合わせ",
     subtitle: "Contact",
