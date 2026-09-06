@@ -80,9 +80,9 @@ export default async function EventsPage() {
   // 全企画を取得（最大200件）
   const events = await getEventsList(200);
 
-  // 建物の選択肢は全企画から導出する。ページ分割後の配列からは作れないので、
-  // fallback と EventsContent の両方へ同じものを降ろす
-  const buildingOptions = listBuildingOptions(events);
+  // 建物の選択肢（fallback 用）。fallback は定義上クエリ無し（DEFAULT_EVENT_FILTERS）なので
+  // 選択中の建物を持たない。本描画側は選択値を知っている EventsContent が自分で作る
+  const fallbackBuildingOptions = listBuildingOptions(events);
 
   return (
     <PageSheetLayout hero={pageHeroes.events}>
@@ -132,14 +132,14 @@ export default async function EventsPage() {
           <EventsView
             events={paginateEvents(events, 1, EVENTS_PER_PAGE)}
             filters={DEFAULT_EVENT_FILTERS}
-            buildingOptions={buildingOptions}
+            buildingOptions={fallbackBuildingOptions}
             totalCount={events.length}
             currentPage={1}
             totalPages={getTotalPages(events.length, EVENTS_PER_PAGE)}
           />
         }
       >
-        <EventsContent initialEvents={events} buildingOptions={buildingOptions} />
+        <EventsContent initialEvents={events} />
       </Suspense>
 
       {/* 一覧を見終えた来場者をもう一度 LP へ送る。上部の細いリンクとは粒度が違うので併存させる */}

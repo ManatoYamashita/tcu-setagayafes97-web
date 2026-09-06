@@ -2,9 +2,9 @@
 
 import { useSearchParams } from "next/navigation";
 import type { Event } from "@/types/events";
-import type { BuildingFilterOption } from "@/data/filter-options";
 import {
   filterEvents,
+  listBuildingOptions,
   paginateEvents,
   getTotalPages,
   parseEventFilters,
@@ -15,13 +15,6 @@ import { EventsView } from "./EventsView";
 
 interface EventsContentProps {
   initialEvents: Event[];
-  /**
-   * 建物の選択肢
-   *
-   * ここで `listBuildingOptions()` を呼び直さず、`page.tsx` が作ったものを受け取ります。
-   * 同じ値を2箇所で別々に作ると、fallback と本描画でセレクトの中身がずれます。
-   */
-  buildingOptions: BuildingFilterOption[];
 }
 
 /**
@@ -33,12 +26,21 @@ interface EventsContentProps {
  * 読む場所を増やすと落ちる範囲が広がるため、下位（`EventFilters` / `Pagination`）へは
  * 値を props で渡します。境界は `src/app/events/page.tsx` にあります（#156）。
  */
-export function EventsContent({ initialEvents, buildingOptions }: EventsContentProps) {
+export function EventsContent({ initialEvents }: EventsContentProps) {
   const searchParams = useSearchParams();
 
   // URL Search Params からフィルター情報を取得
   const filters = parseEventFilters(searchParams);
   const currentPage = parseEventPage(searchParams);
+
+  // 建物の選択肢。全企画から導出するので、ページ分割後の配列からは作れない。
+  //
+  // **選択中の建物を渡せるのはここだけ。** page.tsx は useSearchParams() を読まないため
+  // 選択値を知らず、そちらで作った配列を降ろすと listBuildingOptions() の selected が
+  // production から一度も渡らない。該当0件の建物（?building=7号館 など）を指定されたとき、
+  // <select> の value が選択肢に無い状態＝ selectedIndex = -1 になり、絞り込みが
+  // 効いていないように見える。
+  const buildingOptions = listBuildingOptions(initialEvents, filters.building);
 
   // フィルタリング
   const filteredEvents = filterEvents(initialEvents, filters);
