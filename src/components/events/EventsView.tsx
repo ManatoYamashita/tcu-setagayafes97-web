@@ -1,5 +1,6 @@
 import type { Event } from "@/types/events";
 import type { FilterParams } from "@/lib/filters";
+import type { BuildingFilterOption } from "@/data/filter-options";
 import { EventGrid } from "./EventGrid";
 import { EventFilters } from "./EventFilters";
 import { Pagination } from "./Pagination";
@@ -9,6 +10,13 @@ interface EventsViewProps {
   events: Event[];
   /** 現在のフィルター。EventFilters と Pagination が遷移先URLの組み立てに使う */
   filters: FilterParams;
+  /**
+   * 建物の選択肢
+   *
+   * 全企画から導出するため、ページ分割後の `events` からは作れません。
+   * `src/app/events/page.tsx` が `listBuildingOptions()` で1回だけ作って降ろします。
+   */
+  buildingOptions: BuildingFilterOption[];
   /** フィルタリング後の総件数（「N 件の企画が見つかりました」の N） */
   totalCount: number;
   currentPage: number;
@@ -30,6 +38,7 @@ interface EventsViewProps {
 export function EventsView({
   events,
   filters,
+  buildingOptions,
   totalCount,
   currentPage,
   totalPages,
@@ -39,7 +48,7 @@ export function EventsView({
       <div className="lg:grid lg:grid-cols-[300px_1fr] lg:gap-8">
         {/* サイドバー: フィルター */}
         <aside className="mb-8 lg:mb-0">
-          <EventFilters filters={filters} />
+          <EventFilters filters={filters} buildingOptions={buildingOptions} />
         </aside>
 
         {/* メインコンテンツ */}

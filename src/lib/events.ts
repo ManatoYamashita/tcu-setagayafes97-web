@@ -72,6 +72,7 @@ function normalizeEventType(type: string[] | string | undefined): EventType {
   if (
     cleanType === "room" ||
     cleanType === "stage" ||
+    cleanType === "store" ||
     cleanType === "special" ||
     cleanType === "other"
   ) {
@@ -121,6 +122,9 @@ export function normalizeEvent(rawEvent: RawEvent): Event {
     description: rawEvent.description ?? "",
     place: rawEvent.place ?? "",
     building: rawEvent.building ?? "",
+    // content は実データ18件中16件で欠落している（2026-09-06 実測）。
+    // キーワード検索が本文も対象にするため、ここでも既定化しておく
+    content: rawEvent.content ?? "",
     date: normalizeEventDate(rawEvent.date),
     type: normalizeEventType(rawEvent.type),
     sns: typeof rawEvent.sns === "string" ? normalizeSNSLinks(rawEvent.sns) : undefined,

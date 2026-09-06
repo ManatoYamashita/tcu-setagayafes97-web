@@ -8,6 +8,7 @@ import type { Event, EventType } from "@/types/events";
 const typeLabels: Record<EventType, string> = {
   room: "教室企画",
   stage: "ステージ",
+  store: "模擬店",
   special: "特別企画",
   other: "その他",
 };

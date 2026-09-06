@@ -1,3 +1,14 @@
+import {
+  buildings,
+  dateFilterOptions,
+  getBuildingLabel,
+  isKnownBuildingId,
+  OTHER_BUILDING_ID,
+  resolveBuildingId,
+  typeFilterOptions,
+  type BuildingFilterOption,
+} from "@/data/filter-options";
+import { searchEvents } from "./search";
 import type { Event, EventDate, EventType } from "@/types/events";
 
 /**
@@ -42,6 +53,42 @@ interface SearchParamsLike {
   get(name: string): string | null;
 }
 
+/** 実在する日程の値（"all" を含む） */
+const knownDates = new Set<string>(dateFilterOptions.map((option) => option.value));
+
+/** 実在する企画種別の値（"all" を含む） */
+const knownTypes = new Set<string>(typeFilterOptions.map((option) => option.value));
+
+/**
+ * URL のクエリ値をホワイトリストで検証する
+ *
+ * **素通しにしてはいけません。** 以前は `as` キャストだけだったため、`?type=Stage` のように
+ * 大小文字が違うだけの値や、`?type=bogus` のような存在しない値が、エラーにも既定値にもならず
+ * **静かに0件**を返していました。来場者からは「絞り込みが壊れている」と見えます。
+ *
+ * @param raw クエリの生値
+ * @param known 許可する値の集合
+ * @returns 集合に含まれる値、含まれなければ "all"
+ */
+function parseOption(raw: string | null, known: Set<string>): string {
+  if (!raw) return "all";
+  const normalized = raw.trim().toLowerCase();
+  return known.has(normalized) ? normalized : "all";
+}
+
+/**
+ * 建物のクエリ値を検証する
+ *
+ * 建物IDは `9号館` のような日本語なので `toLowerCase()` はせず、
+ * `isKnownBuildingId()`（`src/data/filter-options.ts`）で照合します。
+ */
+function parseBuilding(raw: string | null): string {
+  if (!raw) return "all";
+  const value = raw.trim();
+  if (value === "all" || value === "") return "all";
+  return isKnownBuildingId(value) ? value : "all";
+}
+
 /**
  * URL のクエリからフィルターパラメータを組み立てる
  * @param params 読み取り元のクエリ
@@ -49,10 +96,12 @@ interface SearchParamsLike {
  */
 export function parseEventFilters(params: SearchParamsLike): FilterParams {
   return {
-    date: (params.get("date") as EventDate | "all") || "all",
-    type: (params.get("type") as EventType | "all") || "all",
-    building: params.get("building") || "all",
-    keyword: params.get("keyword") || "",
+    date: parseOption(params.get("date"), knownDates) as EventDate | "all",
+    type: parseOption(params.get("type"), knownTypes) as EventType | "all",
+    building: parseBuilding(params.get("building")),
+    // 空白だけのキーワードで検索を走らせない。`?keyword=%20` は truthy なので
+    // trim しないと「全件から空白を含むものを探す」という無意味な検索になる
+    keyword: (params.get("keyword") || "").trim(),
   };
 }
 
@@ -106,17 +155,38 @@ export function eventsHref(filters: FilterParams, page = 1): string {
 }
 
 /**
+ * 企画が指定された日程に該当するか
+ *
+ * **両日開催（`both`）は Day1 にも Day2 にも含めます。** 1日目を選んだ来場者にとって、
+ * 両日やっている企画は「1日目にやっている企画」だからです。厳密一致にすると
+ * 「あるはずの企画が出ない」というバグに見えます。
+ *
+ * `src/lib/timetable.ts` の `filterEventsByDate()` もこの述語を使います。
+ * **規則を2箇所で持たないこと。** 片方だけ変えると、企画一覧とタイムテーブルで
+ * 同じ日の企画数が食い違います。
+ *
+ * @param event 判定する企画
+ * @param date 絞り込む日程。"all" は常に true
+ */
+export function matchesEventDate(event: Event, date: EventDate | "all"): boolean {
+  if (date === "all") return true;
+  if (date === "day1" || date === "day2") return event.date === date || event.date === "both";
+  return event.date === date;
+}
+
+/**
  * 企画をフィルタリング
  * @param events 企画の配列
  * @param filters フィルターパラメータ
- * @returns フィルタリングされた企画の配列
+ * @returns フィルタリングされた企画の配列。キーワード指定時は関連度順
  */
 export function filterEvents(events: Event[], filters: FilterParams): Event[] {
   let filtered = events;
 
   // 日程フィルター
   if (filters.date && filters.date !== "all") {
-    filtered = filtered.filter((e) => e.date === filters.date);
+    const date = filters.date;
+    filtered = filtered.filter((e) => matchesEventDate(e, date));
   }
 
   // 企画種別フィルター
@@ -125,24 +195,52 @@ export function filterEvents(events: Event[], filters: FilterParams): Event[] {
   }
 
   // 建物フィルター
+  //
+  // microCMS の `building` は実データで全件未入力のため、`e.building` との比較は
+  // 常に0件になる（#166）。入稿済みの `place` から導出した建物IDで判定する。
   if (filters.building && filters.building !== "all") {
-    filtered = filtered.filter((e) => e.building === filters.building);
+    filtered = filtered.filter((e) => resolveBuildingId(e.place, e.building) === filters.building);
   }
 
-  // キーワード検索
+  // キーワード検索（結果は関連度順に並ぶ）
   if (filters.keyword) {
-    const keyword = filters.keyword.toLowerCase();
-    filtered = filtered.filter(
-      (e) =>
-        e.title.toLowerCase().includes(keyword) ||
-        e.organizer.toLowerCase().includes(keyword) ||
-        e.description.toLowerCase().includes(keyword) ||
-        e.place.toLowerCase().includes(keyword) ||
-        e.building.toLowerCase().includes(keyword)
-    );
+    filtered = searchEvents(filtered, filters.keyword);
   }
 
   return filtered;
+}
+
+/**
+ * 実データに存在する建物だけを選択肢として返す
+ *
+ * `src/lib/timetable.ts` の `listStageTabs()` と同じ設計です。固定の14件を出していた頃は、
+ * どれを選んでも0件になる選択肢が並んでいました。
+ *
+ * **選択中の値は該当0件でもリストへ残します。** 外すと `<select>` の `value` が
+ * 選択肢に無い状態になり、React が警告を出したうえで表示が「すべて」へ化けます。
+ *
+ * @param events 全企画（絞り込み前のもの）
+ * @param selected 現在選択中の建物ID
+ * @returns 「すべて」を先頭に、`buildings` の宣言順（最後に「その他」）で並べた選択肢
+ */
+export function listBuildingOptions(
+  events: Event[],
+  selected: string = "all"
+): BuildingFilterOption[] {
+  const present = new Set(events.map((event) => resolveBuildingId(event.place, event.building)));
+
+  if (selected !== "all" && isKnownBuildingId(selected)) {
+    present.add(selected);
+  }
+
+  const order = [...buildings.map((building) => building.id), OTHER_BUILDING_ID];
+
+  return [
+    { value: "all", label: "すべて" },
+    ...order
+      .filter((id) => present.has(id))
+      .map((id) => ({ value: id, label: getBuildingLabel(id) })),
+  ];
 }
 
 /**

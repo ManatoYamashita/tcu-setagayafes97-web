@@ -5,6 +5,7 @@ import { getEventsList } from "@/lib/events";
 import {
   paginateEvents,
   getTotalPages,
+  listBuildingOptions,
   DEFAULT_EVENT_FILTERS,
   EVENTS_PER_PAGE,
 } from "@/lib/filters";
@@ -79,6 +80,10 @@ export default async function EventsPage() {
   // 全企画を取得（最大200件）
   const events = await getEventsList(200);
 
+  // 建物の選択肢は全企画から導出する。ページ分割後の配列からは作れないので、
+  // fallback と EventsContent の両方へ同じものを降ろす
+  const buildingOptions = listBuildingOptions(events);
+
   return (
     <PageSheetLayout hero={pageHeroes.events}>
       {/* 著名人企画への導線。解禁前（SPECIAL_VISIBLE=false）は出さない */}
@@ -127,13 +132,14 @@ export default async function EventsPage() {
           <EventsView
             events={paginateEvents(events, 1, EVENTS_PER_PAGE)}
             filters={DEFAULT_EVENT_FILTERS}
+            buildingOptions={buildingOptions}
             totalCount={events.length}
             currentPage={1}
             totalPages={getTotalPages(events.length, EVENTS_PER_PAGE)}
           />
         }
       >
-        <EventsContent initialEvents={events} />
+        <EventsContent initialEvents={events} buildingOptions={buildingOptions} />
       </Suspense>
 
       {/* 一覧を見終えた来場者をもう一度 LP へ送る。上部の細いリンクとは粒度が違うので併存させる */}

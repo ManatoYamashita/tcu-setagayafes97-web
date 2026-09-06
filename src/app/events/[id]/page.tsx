@@ -95,7 +95,10 @@ export default async function EventPage({ params }: EventPageProps) {
     },
     location: {
       "@type": "Place",
-      name: `${event.building} ${event.place}`,
+      // building は実データで全件未入力のため、テンプレート結合すると
+      // "undefined 11D" や " 11D" が構造化データへ出る。空の項目を落としてから繋ぐ
+      // （src/app/special/[id]/page.tsx と同じ扱い）
+      name: [event.building, event.place].filter(Boolean).join(" ") || "会場未定",
       address: {
         "@type": "PostalAddress",
         addressLocality: "世田谷区",

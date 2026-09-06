@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import type { Event } from "@/types/events";
+import type { BuildingFilterOption } from "@/data/filter-options";
 import {
   filterEvents,
   paginateEvents,
@@ -14,6 +15,13 @@ import { EventsView } from "./EventsView";
 
 interface EventsContentProps {
   initialEvents: Event[];
+  /**
+   * 建物の選択肢
+   *
+   * ここで `listBuildingOptions()` を呼び直さず、`page.tsx` が作ったものを受け取ります。
+   * 同じ値を2箇所で別々に作ると、fallback と本描画でセレクトの中身がずれます。
+   */
+  buildingOptions: BuildingFilterOption[];
 }
 
 /**
@@ -25,7 +33,7 @@ interface EventsContentProps {
  * 読む場所を増やすと落ちる範囲が広がるため、下位（`EventFilters` / `Pagination`）へは
  * 値を props で渡します。境界は `src/app/events/page.tsx` にあります（#156）。
  */
-export function EventsContent({ initialEvents }: EventsContentProps) {
+export function EventsContent({ initialEvents, buildingOptions }: EventsContentProps) {
   const searchParams = useSearchParams();
 
   // URL Search Params からフィルター情報を取得
@@ -43,6 +51,7 @@ export function EventsContent({ initialEvents }: EventsContentProps) {
     <EventsView
       events={paginatedEvents}
       filters={filters}
+      buildingOptions={buildingOptions}
       totalCount={filteredEvents.length}
       currentPage={currentPage}
       totalPages={totalPages}
