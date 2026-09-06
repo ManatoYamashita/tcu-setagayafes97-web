@@ -46,7 +46,7 @@ export function EventsView({
         <main>
           {/* 検索結果件数 */}
           <div className="mb-6 flex items-center justify-between">
-            <p className="text-sm text-gray-900/80">
+            <p className="text-sm text-gray-700" role="status" aria-live="polite">
               <span className="font-semibold text-gray-900">{totalCount}</span>{" "}
               件の企画が見つかりました
             </p>
