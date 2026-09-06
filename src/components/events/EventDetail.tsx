@@ -29,6 +29,7 @@ const dateBadgeLabels: Record<Event["date"], string> = {
 const typeLabels: Record<Event["type"], string> = {
   room: "教室企画",
   stage: "ステージ企画",
+  store: "模擬店",
   special: "スペシャル企画",
   other: "その他",
 };

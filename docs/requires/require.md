@@ -110,8 +110,10 @@ interface Event {
   date: "day1" | "day2" | "both" | "other"; // セレクト: 1日目/2日目/両日/その他
   type: "room" | "stage" | "special";
   other; // セレクト: 教室企画/ステージ企画/スペシャル/その他
-  place: string; // テキスト（例: "7号館 3F 301"）
-  building?: string; // テキスト（3Dマップ連携用、例: "7"）
+  place: string; // テキスト（例: "7号館 3F 301"）。**必須。検索・絞り込みはこれを使う**
+  // building は 3Dマップ連携用に定義したが、3Dマップは見送られ、実データでも全件未入力。
+  // 建物の絞り込みは place からの導出で行う → docs/frontend/events-search.md
+  building?: string; // テキスト（例: "7"）
   title: string; // テキストフィールド
   organizer: string; // テキスト（所属団体・サークル名）
   thumbnail?: MicroCMSImage; // 画像フィールド（任意）

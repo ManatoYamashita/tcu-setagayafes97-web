@@ -8,6 +8,7 @@ import {
   getStageName,
 } from "@/data/stages";
 import { parseTimeToMinutes } from "@/lib/timetable-layout";
+import { matchesEventDate } from "@/lib/filters";
 
 /**
  * タイムテーブルのデータ選択
@@ -55,10 +56,14 @@ export function filterStageEvents(events: Event[]): Event[] {
  * 日程でフィルタリング
  *
  * `both`（両日開催）は Day1 / Day2 のどちらにも出します。
+ *
+ * **判定そのものは `matchesEventDate()`（`src/lib/filters.ts`）が持ちます。**
+ * 企画一覧の絞り込みと同じ規則を2箇所に書くと、片方だけ変えたときに
+ * 「同じ日なのに件数が食い違う」が起きます。
  */
 export function filterEventsByDate(events: Event[], date: EventDate | "all"): Event[] {
   if (date === "all") return events;
-  return events.filter((event) => event.date === date || event.date === "both");
+  return events.filter((event) => matchesEventDate(event, date));
 }
 
 /**

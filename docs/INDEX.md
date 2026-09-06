@@ -31,6 +31,7 @@ docs/
 │   ├── browser-verification-pitfalls.md # 検証手順そのものが誤る実例
 │   ├── layout-patterns.md         # レイアウトパターンと設計原則
 │   ├── timetable-gantt.md         # タイムテーブル盤面（ガントチャート）の設計
+│   ├── events-search.md           # /events の検索と絞り込み（正規化・建物導出）
 │   ├── layout-e2e.md              # レイアウトの実測アサーション（Playwright）
 │   ├── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
 │   ├── performance.md             # Lighthouse基準値とフロントエンド性能ルール
@@ -120,6 +121,8 @@ docs/
   - `process.env.NODE_ENV` への直接代入は `readonly` 宣言により TS2540 になる。`vi.stubEnv()` を使う
   - **テストの価値は「落ちること」でしか測れない。** #157 の退行8種を実際に注入した結果を記録
   - テストは「いまのデータ」ではなく「不変条件」を固定する（第98回の年次更新で無関係な赤を出さないため）
+  - **省略可能な引数は、本番の呼び出し元が渡しているかまで grep する。** 単体テストは自分で渡してしまうため、渡っていなくても緑のまま通る（#207）
+  - **「どちらも正しい」と書いた契約は疑う。** テストは差異を固定するが、差異が妥当かは何も言わない（`filterEvents` / `filterEventsByDate` は #207 で統合された）
 
 - **[ci-env.md](./dev/ci-env.md)** - GitHub Actions 環境変数管理
   - Repository Secrets / Variables の使い分け基準
@@ -274,6 +277,7 @@ docs/
   - `navigation.type` は BFCache 復帰でも `"navigate"` のまま。`"back_forward"` はドキュメント再作成のサイン（逆に読むと判定が反転する）
 
 - **[browser-verification-pitfalls.md](./frontend/browser-verification-pitfalls.md)** - 検証手順そのものが誤る実例
+  - **ハイドレーション完了前に読むと結論が反転する。** 測定値に「まだ fallback か」を含め、false になるまで読まない。`navigate` 後の `wait` だけでは足りず、`readyState === "complete"` も使えない（#207 で3回誤診）
   - **Tailwind の任意値を `grep` するときは `-F`。** `[...]` が文字クラスになり、存在するのに0件と出る
   - **CSS のカスタムクラスが効かないときは `.next` を丸ごと削除する。** HMR でも `.next/cache` 削除でも復旧しないことがある
   - **`resize_window` は viewport を変えない。** レスポンシブ検証は `agent-browser set viewport <w> <h>` で行う（`open --viewport` は効かない実測あり。メディアクエリの切り替わりはコンテナ幅を絞る方法では再現できない）
@@ -308,6 +312,20 @@ docs/
   - 選択中のステージは当日0件でもタブに残す（残さないとどのタブも `aria-pressed` にならず、絞り込みが画面から読めない）
   - 盤面と縦スタックの DOM 2枚持ちは、インラインスタイルにレスポンシブバリアントが無いことによる意図的な例外
   - **検証は2層。** 算術で表せる不変条件は `pnpm test` が固定し、盤面が実際に 0px でないことは実ブラウザでしか測れない（[dev/testing.md](./dev/testing.md)）
+
+- **[events-search.md](./frontend/events-search.md)** - `/events` の検索と絞り込み
+  - **`building` は実データ18件すべて未入力。** 必須で全件埋まっている `place` から建物を導出する
+  - **正規化は `normalizeText()` の1本に集約する。** 検索と建物導出で別々に正規化すると
+    「検索では出るのにフィルタでは落ちる」が生まれる（`９号館` と `9号館` が同居している）
+  - キーワード検索は**3段カスケード**（全文一致 → AND → OR）。`のど自慢` を割らずに
+    `9号館でやってるダンスのやつ` も捌くための構造
+  - **`buildings` 配列の並び順は仕様。** `号館` を `アリーナ` より前に置かないと
+    `９号館アリーナ` が体育館へ誤配される
+  - 検索語が0個 = 「0件」ではなく「**絞り込む条件が無い**」。全件を返す
+  - **URL クエリはホワイトリストで検証する。** `?type=Stage` が無言の0件になっていた
+  - **IME は `InputEvent.isComposing` で判定する。** `compositionend` を合図にすると
+    発火順の違いで環境によって検索が動かなくなる
+  - **ハイドレーション完了前に合成イベントを流すと検証が嘘をつく**（実測で3回誤った）
 
 - **[layout-e2e.md](./frontend/layout-e2e.md)** - レイアウトの実測アサーション（Playwright / #157）
   - **jsdom も Vitest Browser Mode も #148 を検出できない。** 前者はレイアウトエンジンが無く、後者は祖先の連鎖が本物と別物になる
@@ -363,4 +381,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-09-05
+**最終更新日**: 2026-09-06

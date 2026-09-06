@@ -108,6 +108,53 @@ return "other"; // ← 新しい選択肢はここに吸い込まれる
 - 対象: `normalizeInformationCategory()`（`informations.category`）、`src/lib/events.ts` と `src/lib/news.ts` の同種の関数
 - 値は API をまたいで一意になるよう命名する。やむを得ず衝突する場合（例: `events.type` と `informations.category` の `special`）は、取得関数の JSDoc に区別を明記する
 
+### 実例: `events.type` の `store : 模擬店`（2026-09-06）
+
+実機には `store : 模擬店` が入稿されていたが、`EventType` にも `normalizeEventType()` にも
+`typeFilterOptions` にも無かった。**エラーも警告も出ないまま「その他」に混ざり、
+専用の絞り込みができない状態が続いていた。** リポジトリの `microcms/events.json` も
+古いままで、スキーマ写しからは気づけない。
+
+直すのは3箇所 + スキーマ写し。`EventType` を増やすと `Record<EventType, string>` の
+マップが型エラーになるので、**残りの追随先は `pnpm type-check` が機械的に洗い出す**
+（`Badge` の variant、`EventCard` / `EventDetail` / `FeaturedCarousel` の `typeLabels`）。
+
+## 入力必須にしても値は入ってこない
+
+**`required: true` は入稿画面の制約であって、API レスポンスの保証ではない。**
+実データ18件の実測（2026-09-06）:
+
+| フィールド                  | 必須 | 欠落件数    |
+| --------------------------- | ---- | ----------- |
+| `building`（建物番号）      | 任意 | **18 / 18** |
+| `content`（詳細）           | ✓    | 16 / 18     |
+| `organizer` / `description` | ✓    | 3 / 18      |
+| `title` / `place`           | ✓    | 0           |
+
+microCMS は未入力フィールドを**キーごと返さない**ため、型が `string` でも実行時は
+`undefined` になる。`.toLowerCase()` を呼んで企画一覧がエラー画面へ落ちていた（#166）。
+
+**防御はデータ層に置く。** `normalizeEvent()`（`src/lib/events.ts`）が境界で空文字へ
+既定化する。`filterEvents()` 側に `?.` を撒くと、同じ前提に依存する他の箇所
+（詳細ページ・構造化データ・関連企画）が守られない。
+
+> [!NOTE]
+> **既定化は壊れ方を変えるだけで、結合の誤りは消えない。** `/events/[id]` の JSON-LD は
+> `` `${event.building} ${event.place}` `` というテンプレート結合で、`?? ""` を入れた
+> #199（`1fb25db`）より前は `"undefined 11D"` を、入れた後は `" 11D"`（先頭に空白）を
+> 全18ページへ出していた。空の項目を落としてから繋ぐ形
+> （`[building, place].filter(Boolean).join(" ")`）にしたのは #207 である。
+> **「`?? ""` を入れたから直った」ではない。**
+
+### `building` は埋まらない前提で設計してある
+
+`building` を入稿してもらう運用には寄せず、**必須で全件埋まっている `place` から
+建物を導出する**方式を採った（`resolveBuildingId()`）。設計は
+[`docs/frontend/events-search.md`](../frontend/events-search.md) を参照。
+
+`place` は自由入力なので `9号館アリーナ` と `９号館アリーナ` が同居する。
+**照合は必ず `normalizeText()` を通すこと。**
+
 ## カスタムフィールドと繰り返しフィールド
 
 ### ネストの制約

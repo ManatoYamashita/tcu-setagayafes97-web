@@ -24,6 +24,7 @@
       "selectItems": [
         { "id": "vXKAN6bAHW", "value": "room : 教室企画" },
         { "id": "HiWE3JsSXV", "value": "stage : ステージ企画" },
+        { "id": "store-slot", "value": "store : 模擬店" },
         { "id": "MbWeQ2gfEg", "value": "special : スペシャル企画" },
         { "id": "251gQP6xuI", "value": "other : その他" }
       ]

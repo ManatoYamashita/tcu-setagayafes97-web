@@ -9,6 +9,7 @@ export type BadgeVariant =
   | "both"
   | "room"
   | "stage"
+  | "store"
   | "special";
 
 export type BadgeTone = "default" | "soft";
@@ -36,6 +37,7 @@ export function Badge({ variant, label, tone = "default", className }: BadgeProp
     both: "bg-secondary text-gray-900",
     room: "bg-green-500 text-gray-900",
     stage: "bg-orange-500 text-gray-900",
+    store: "bg-amber-500 text-gray-900",
     special: "bg-pink-500 text-gray-900",
   };
 

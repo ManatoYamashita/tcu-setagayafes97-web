@@ -7,8 +7,13 @@ export type EventDate = "day1" | "day2" | "both" | "other";
 
 /**
  * 企画種別
+ *
+ * microCMS の select `type` と1対1で対応します。**選択肢を増やしたら、ここだけでなく
+ * `src/lib/events.ts` の `normalizeEventType()` と `src/data/filter-options.ts` の
+ * `typeFilterOptions` も直すこと。** 正規化はホワイトリスト方式なので、直さないと
+ * 新しい値がエラーも警告も出さずに `other` へ落ちます（`store` が実際にそうなっていました）。
  */
-export type EventType = "room" | "stage" | "special" | "other";
+export type EventType = "room" | "stage" | "store" | "special" | "other";
 
 /**
  * SNS情報

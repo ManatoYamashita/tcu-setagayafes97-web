@@ -19,6 +19,7 @@ const dateLabels: Record<Event["date"], string> = {
 const typeLabels: Record<Event["type"], string> = {
   room: "教室",
   stage: "ステージ",
+  store: "模擬店",
   special: "スペシャル",
   other: "その他",
 };

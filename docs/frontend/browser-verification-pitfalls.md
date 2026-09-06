@@ -12,6 +12,37 @@
 
 観測対象ではなく、**確認の仕方**が結論を狂わせた実例です。
 
+### ハイドレーションが終わる前に読むと、結論が反転する
+
+`/events?building=7号館` の建物セレクトを測って、**修正が効いていないという誤った結論を
+3回続けて得た**（2026-09-06）。読んでいたのは `<Suspense>` の fallback、つまり
+**クエリを反映する前の静的HTML**だった。
+
+`/events` は `EventsContent` が `useSearchParams()` を読むため、ページ本体はクライアント
+描画に落ちる（#156）。ハイドレーションが終わるまで、DOM にあるのは fallback である。
+**`navigate` の直後に `wait` を挟むだけでは足りない。** 今回は 8 秒待っても fallback のままで、
+スクリーンショットを撮ってタブが前面に来た直後に初めて正しい値が読めた。
+**MCP 経由の操作ではタブが非フォアグラウンドだと描画が進まないことがある。**
+
+対策は、測定値そのものに「まだ fallback か」を含めて、**false になるまで読まないこと。**
+
+```js
+// 測定JSに必ず載せる。true の間の値は捨てる
+const t = document.body.innerText;
+({
+  hydrated: !t.includes("読み込み中"),
+  countLine: (t.match(/\d+\s*件[^\n]*/) || [null])[0],
+  value: document.getElementById("building-filter")?.value,
+});
+```
+
+判定に使えるのは「fallback には無く、本描画にだけ現れるもの」である。上の例では
+`loading.tsx` の「読み込み中...」の消失と、`N 件の企画が見つかりました` の出現を見ている。
+**`document.readyState === "complete"` は使えない**（fallback のままでも complete になる）。
+
+同じ理由で、**修正前後の比較は必ず同じ待ち方で行うこと。** 片方だけ待ちが足りないと、
+「直った／直っていない」がそのまま逆に出る。
+
 ### `grep` で Tailwind の任意値を検索するときは `-F`
 
 生成CSSに任意値クラスが含まれるかを確認する場面で、`[...]` が正規表現の文字クラスとして解釈され、**存在するのに 0 件と出ました。**
@@ -141,3 +172,4 @@ document.documentElement.scrollWidth > document.documentElement.clientWidth; // 
 ---
 
 **作成日:** 2026-08-16（agent-browser-workflow.md から分離）
+**最終更新日:** 2026-09-06

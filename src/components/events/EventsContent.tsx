@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import type { Event } from "@/types/events";
 import {
   filterEvents,
+  listBuildingOptions,
   paginateEvents,
   getTotalPages,
   parseEventFilters,
@@ -32,6 +33,15 @@ export function EventsContent({ initialEvents }: EventsContentProps) {
   const filters = parseEventFilters(searchParams);
   const currentPage = parseEventPage(searchParams);
 
+  // 建物の選択肢。全企画から導出するので、ページ分割後の配列からは作れない。
+  //
+  // **選択中の建物を渡せるのはここだけ。** page.tsx は useSearchParams() を読まないため
+  // 選択値を知らず、そちらで作った配列を降ろすと listBuildingOptions() の selected が
+  // production から一度も渡らない。該当0件の建物（?building=7号館 など）を指定されたとき、
+  // <select> の value が選択肢に無い状態＝ selectedIndex = -1 になり、絞り込みが
+  // 効いていないように見える。
+  const buildingOptions = listBuildingOptions(initialEvents, filters.building);
+
   // フィルタリング
   const filteredEvents = filterEvents(initialEvents, filters);
 
@@ -43,6 +53,7 @@ export function EventsContent({ initialEvents }: EventsContentProps) {
     <EventsView
       events={paginatedEvents}
       filters={filters}
+      buildingOptions={buildingOptions}
       totalCount={filteredEvents.length}
       currentPage={currentPage}
       totalPages={totalPages}

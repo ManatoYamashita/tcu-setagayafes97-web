@@ -5,6 +5,7 @@ import { getEventsList } from "@/lib/events";
 import {
   paginateEvents,
   getTotalPages,
+  listBuildingOptions,
   DEFAULT_EVENT_FILTERS,
   EVENTS_PER_PAGE,
 } from "@/lib/filters";
@@ -79,6 +80,10 @@ export default async function EventsPage() {
   // 全企画を取得（最大200件）
   const events = await getEventsList(200);
 
+  // 建物の選択肢（fallback 用）。fallback は定義上クエリ無し（DEFAULT_EVENT_FILTERS）なので
+  // 選択中の建物を持たない。本描画側は選択値を知っている EventsContent が自分で作る
+  const fallbackBuildingOptions = listBuildingOptions(events);
+
   return (
     <PageSheetLayout hero={pageHeroes.events}>
       {/* 著名人企画への導線。解禁前（SPECIAL_VISIBLE=false）は出さない */}
@@ -127,6 +132,7 @@ export default async function EventsPage() {
           <EventsView
             events={paginateEvents(events, 1, EVENTS_PER_PAGE)}
             filters={DEFAULT_EVENT_FILTERS}
+            buildingOptions={fallbackBuildingOptions}
             totalCount={events.length}
             currentPage={1}
             totalPages={getTotalPages(events.length, EVENTS_PER_PAGE)}
