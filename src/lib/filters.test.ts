@@ -6,6 +6,7 @@ import {
   filterEvents,
   generatePageNumbers,
   getTotalPages,
+  listBuildingOptions,
   paginateEvents,
   parseEventFilters,
   parseEventPage,
@@ -71,22 +72,40 @@ describe("filterEvents", () => {
     expect(ids(filterEvents(events, filters))).toEqual(ids(events));
   });
 
-  it("date を厳密一致で扱い、両日開催を1日目に含めない", () => {
-    // /events は dateFilterOptions に「両日開催」を独立した選択肢として持つ。
-    // Day1 / Day2 のタブしか無い /timetable の filterEventsByDate() が
-    // "both" を両方へ出すのとは、意図的に異なる契約である。
-    expect(ids(filterEvents(events, { date: "day1" }))).toEqual(["ev-day1"]);
-    expect(ids(filterEvents(events, { date: "day2" }))).toEqual(["ev-day2"]);
+  it("1日目・2日目に両日開催を含める", () => {
+    // 来場者にとって「両日やっている企画」は「1日目にやっている企画」である。
+    // 厳密一致にすると「あるはずの企画が出ない」というバグに見える。
+    // 判定は matchesEventDate() が持ち、/timetable の filterEventsByDate() も同じものを使う。
+    expect(ids(filterEvents(events, { date: "day1" }))).toEqual(["ev-day1", "ev-both"]);
+    expect(ids(filterEvents(events, { date: "day2" }))).toEqual(["ev-day2", "ev-both"]);
     expect(ids(filterEvents(events, { date: "both" }))).toEqual(["ev-both"]);
     expect(ids(filterEvents(events, { date: "other" }))).toEqual(["ev-other"]);
   });
 
-  it("type と building も厳密一致で扱う", () => {
+  it("type は厳密一致で扱う", () => {
     expect(ids(filterEvents(events, { type: "room" }))).toEqual(["ev-day1", "ev-both"]);
-    expect(ids(filterEvents(events, { building: "7号館" }))).toEqual(["ev-day2"]);
   });
 
-  it("キーワードが5つのフィールドを横断する", () => {
+  it("building は place から導出した建物で判定する", () => {
+    // building フィールドが入っていればそれを使う
+    expect(ids(filterEvents(events, { building: "7号館" }))).toEqual(["ev-day2"]);
+    // building が空でも place から導出できる（microCMS の実データはこちら）
+    const derived = [
+      fixture("ev-derived", {
+        date: "day1",
+        type: "stage",
+        place: "９号館アリーナ",
+        building: "",
+        title: "ダンスステージ",
+        organizer: "ダンス部",
+      }),
+    ];
+    expect(ids(filterEvents(derived, { building: "9号館" }))).toEqual(["ev-derived"]);
+    // 「アリーナ」より「号館」が勝つので体育館には入らない
+    expect(filterEvents(derived, { building: "体育館" })).toEqual([]);
+  });
+
+  it("キーワードがタイトル・団体名・場所・建物・概要を横断する", () => {
     expect(ids(filterEvents(events, { keyword: "化学実験ショー" }))).toEqual(["ev-day1"]); // title
     expect(ids(filterEvents(events, { keyword: "ジャズ研究会" }))).toEqual(["ev-day2"]); // organizer
     expect(ids(filterEvents(events, { keyword: "ジオラマ" }))).toEqual(["ev-both"]); // description
@@ -107,6 +126,27 @@ describe("filterEvents", () => {
     expect(ids(filterEvents(events, { type: "room", building: "2号館" }))).toEqual(["ev-both"]);
     // 単独では該当するが、組み合わせると該当しない
     expect(filterEvents(events, { type: "room", building: "7号館" })).toEqual([]);
+  });
+
+  it("表記ゆれを吸収する（全角・カタカナ・大小文字）", () => {
+    const wobbly = [
+      fixture("ev-wobbly", {
+        date: "day1",
+        type: "stage",
+        place: "９号館アリーナ",
+        building: "",
+        title: "ダンスステージ",
+        organizer: "ダンス部",
+      }),
+    ];
+
+    expect(ids(filterEvents(wobbly, { keyword: "9号館" }))).toEqual(["ev-wobbly"]);
+    expect(ids(filterEvents(wobbly, { keyword: "だんす" }))).toEqual(["ev-wobbly"]);
+  });
+
+  it("空白だけのキーワードでは絞り込まない", () => {
+    // parseEventFilters が trim するので filterEvents へは空文字で入る
+    expect(ids(filterEvents(events, { keyword: "" }))).toEqual(ids(events));
   });
 
   it("引数の配列を破壊しない", () => {
@@ -257,6 +297,76 @@ describe("parseEventFilters", () => {
       building: "7号館",
       keyword: "軽音",
     });
+  });
+
+  it("大小文字だけが違う値を受け入れる", () => {
+    // ?type=Stage を無言の0件にしない
+    const params = new URLSearchParams("date=DAY1&type=Stage");
+    expect(parseEventFilters(params)).toMatchObject({ date: "day1", type: "stage" });
+  });
+
+  it("存在しない値は既定値へ倒す（無言の0件を作らない）", () => {
+    const params = new URLSearchParams("date=day9&type=bogus&building=99号館");
+
+    expect(parseEventFilters(params)).toEqual({
+      date: "all",
+      type: "all",
+      building: "all",
+      keyword: "",
+    });
+  });
+
+  it("キーワードの前後の空白を落とす", () => {
+    expect(parseEventFilters(new URLSearchParams("keyword=%20%20"))).toMatchObject({ keyword: "" });
+    expect(parseEventFilters(new URLSearchParams("keyword=%20軽音%20"))).toMatchObject({
+      keyword: "軽音",
+    });
+  });
+});
+
+/**
+ * 建物の選択肢
+ *
+ * 固定の14件を出していた頃は、どれを選んでも0件になる選択肢が並んでいた。
+ * 実データに存在する建物だけを出すことがこの関数の契約である。
+ */
+describe("listBuildingOptions", () => {
+  it("企画が1件も無い建物を出さない", () => {
+    const values = listBuildingOptions(events).map((option) => option.value);
+
+    expect(values).toEqual(["all", "1号館", "2号館", "7号館", "体育館"]);
+  });
+
+  it("先頭は必ず「すべて」", () => {
+    expect(listBuildingOptions([])).toEqual([{ value: "all", label: "すべて" }]);
+  });
+
+  it("place から導出した建物も選択肢に出る", () => {
+    const derived = [
+      fixture("ev-derived", {
+        date: "day1",
+        type: "stage",
+        place: "TCUホール",
+        building: "",
+        title: "開会式",
+        organizer: "実行委員会",
+      }),
+    ];
+
+    expect(listBuildingOptions(derived).map((option) => option.value)).toEqual(["all", "ホール"]);
+  });
+
+  it("選択中の建物は該当0件でもリストに残す", () => {
+    // 外すと <select> の value が選択肢に無い状態になり、表示が「すべて」へ化ける
+    const values = listBuildingOptions(events, "グラウンド").map((option) => option.value);
+
+    expect(values).toContain("グラウンド");
+  });
+
+  it("未知の値は残さない", () => {
+    const values = listBuildingOptions(events, "99号館").map((option) => option.value);
+
+    expect(values).not.toContain("99号館");
   });
 });
 
