@@ -35,10 +35,15 @@ export function EventGrid({ events, variant = "default" }: EventGridProps) {
     );
   }
 
+  // compact（関連企画等、常に3件固定）には xl 列を増やさない。
+  // 3件しかない行にカラムだけ増やすと、4本目のトラックが空のまま伸びてしまう。
+  const gridColsClassName =
+    variant === "compact"
+      ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+      : "grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+
   return (
-    <div
-      className={`grid ${variant === "compact" ? "gap-4" : "gap-6"} sm:grid-cols-2 lg:grid-cols-3`}
-    >
+    <div className={gridColsClassName}>
       {events.map((event) => (
         <EventCard key={event.id} event={event} variant={variant} />
       ))}
