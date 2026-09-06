@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronDown } from "lucide-react";
 import { eventsHref, type FilterParams } from "@/lib/filters";
 import { dateFilterOptions, typeFilterOptions, buildingFilterOptions } from "@/data/filter-options";
 
@@ -8,6 +10,9 @@ interface EventFiltersProps {
   /** 現在のフィルター。遷移先URLの組み立てと選択状態の表示に使う */
   filters: FilterParams;
 }
+
+/** キーワード入力からURL反映までのデバウンス時間（ms） */
+const KEYWORD_DEBOUNCE_MS = 300;
 
 /**
  * 企画フィルターコンポーネント
@@ -17,6 +22,11 @@ interface EventFiltersProps {
  * `EventsView` 経由で `<Suspense>` の fallback にも描かれるため、ここでクエリを読むと
  * fallback 自身が bailout し、ページ本体が静的HTMLから消えます（#156）。
  * `useRouter()` は bailout を起こさないのでそのまま使えます。
+ *
+ * `lg` 未満では開閉可能なパネルにする。開催日・種別・建物・キーワードの4項目が
+ * 常に全展開されていると、モバイルで最初のカードが画面外に押し出されるため。
+ * 既定は折りたたみだが、URLに絞り込み条件が既にある場合（深いリンク・戻る/進む）は
+ * 自動展開してその場で文脈が見えるようにする。
  */
 export function EventFilters({ filters }: EventFiltersProps) {
   const router = useRouter();
@@ -25,6 +35,32 @@ export function EventFilters({ filters }: EventFiltersProps) {
   const currentType = filters.type ?? "all";
   const currentBuilding = filters.building ?? "all";
   const currentKeyword = filters.keyword ?? "";
+
+  const activeFilterCount = [
+    currentDate !== "all",
+    currentType !== "all",
+    currentBuilding !== "all",
+    currentKeyword !== "",
+  ].filter(Boolean).length;
+  const hasActiveFilters = activeFilterCount > 0;
+
+  const [isOpen, setIsOpen] = useState(hasActiveFilters);
+
+  // キーワードはURLへ即座に反映せず、入力が止まってから遷移する（デバウンス）。
+  // 入力自体はローカル状態で即時反映し、体感の遅延を無くす。
+  const [keywordInput, setKeywordInput] = useState(currentKeyword);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // リセットや戻る/進むなど、外部からURLのkeywordが変わったときはローカル入力も合わせる
+  useEffect(() => {
+    setKeywordInput(currentKeyword);
+  }, [currentKeyword]);
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
 
   /**
    * フィルター変更ハンドラー
@@ -37,6 +73,22 @@ export function EventFilters({ filters }: EventFiltersProps) {
   };
 
   /**
+   * キーワード入力ハンドラー
+   *
+   * 入力のたびに `router.push` すると1文字ごとに履歴が汚染され、200件規模の
+   * 再フィルタリングも都度走る。ここだけ `router.replace` + デバウンスにする。
+   */
+  const handleKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setKeywordInput(value);
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      router.replace(eventsHref({ ...filters, keyword: value }));
+    }, KEYWORD_DEBOUNCE_MS);
+  };
+
+  /**
    * フィルターをリセット
    */
   const handleReset = () => {
@@ -44,9 +96,27 @@ export function EventFilters({ filters }: EventFiltersProps) {
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6">
+    <div className="rounded-lg border border-gray-200 bg-white p-4 lg:p-6">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-gray-900">絞り込み</h2>
+        <h2 className="hidden text-lg font-bold text-gray-900 lg:block">絞り込み</h2>
+        <button
+          type="button"
+          onClick={() => setIsOpen((open) => !open)}
+          aria-expanded={isOpen}
+          aria-controls="event-filters-panel"
+          className="flex items-center gap-2 text-lg font-bold text-gray-900 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 lg:hidden"
+        >
+          <span>絞り込み</span>
+          {hasActiveFilters && (
+            <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-600 px-1.5 text-xs font-semibold text-white">
+              {activeFilterCount}
+            </span>
+          )}
+          <ChevronDown
+            className={`h-5 w-5 text-gray-700 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+            aria-hidden="true"
+          />
+        </button>
         <button
           onClick={handleReset}
           className="text-sm text-gray-900 underline hover:text-gray-900/80 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
@@ -56,7 +126,7 @@ export function EventFilters({ filters }: EventFiltersProps) {
         </button>
       </div>
 
-      <div className="space-y-6">
+      <div id="event-filters-panel" className={`space-y-6 lg:block ${isOpen ? "" : "hidden"}`}>
         {/* 日程フィルター */}
         <fieldset className="m-0 min-w-0 border-0 p-0">
           <legend className="m-0 mb-2 block p-0 text-sm font-semibold text-gray-900/90">
@@ -137,8 +207,8 @@ export function EventFilters({ filters }: EventFiltersProps) {
             type="text"
             id="keyword-search"
             placeholder="企画名、団体名などで検索"
-            value={currentKeyword}
-            onChange={(e) => handleFilterChange({ keyword: e.target.value })}
+            value={keywordInput}
+            onChange={handleKeywordChange}
             className="w-full rounded-lg border border-gray-400 bg-white px-4 py-2 text-sm text-gray-900 placeholder-gray-600 focus:border-gray-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
           />
         </div>
