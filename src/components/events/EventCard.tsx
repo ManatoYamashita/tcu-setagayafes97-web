@@ -34,7 +34,10 @@ export function EventCard({ event, variant = "default" }: EventCardProps) {
   const venue = [event.building, event.place].filter(Boolean).join(" ") || "会場未定";
 
   return (
-    <Link href={href} className="group block h-full">
+    <Link
+      href={href}
+      className={`group block h-full focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 ${isCompact ? "rounded-lg" : "rounded-xl"}`}
+    >
       <article
         className={`h-full overflow-hidden border border-gray-200 bg-white transition-[border-color,box-shadow] hover:border-primary-300 hover:shadow-sm ${isCompact ? "flex items-start rounded-lg" : "rounded-xl"}`}
       >
