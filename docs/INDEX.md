@@ -31,6 +31,7 @@ docs/
 │   ├── browser-verification-pitfalls.md # 検証手順そのものが誤る実例
 │   ├── layout-patterns.md         # レイアウトパターンと設計原則
 │   ├── timetable-gantt.md         # タイムテーブル盤面（ガントチャート）の設計
+│   ├── events-search.md           # /events の検索と絞り込み（正規化・建物導出）
 │   ├── layout-e2e.md              # レイアウトの実測アサーション（Playwright）
 │   ├── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
 │   ├── performance.md             # Lighthouse基準値とフロントエンド性能ルール
@@ -309,6 +310,20 @@ docs/
   - 盤面と縦スタックの DOM 2枚持ちは、インラインスタイルにレスポンシブバリアントが無いことによる意図的な例外
   - **検証は2層。** 算術で表せる不変条件は `pnpm test` が固定し、盤面が実際に 0px でないことは実ブラウザでしか測れない（[dev/testing.md](./dev/testing.md)）
 
+- **[events-search.md](./frontend/events-search.md)** - `/events` の検索と絞り込み
+  - **`building` は実データ18件すべて未入力。** 必須で全件埋まっている `place` から建物を導出する
+  - **正規化は `normalizeText()` の1本に集約する。** 検索と建物導出で別々に正規化すると
+    「検索では出るのにフィルタでは落ちる」が生まれる（`９号館` と `9号館` が同居している）
+  - キーワード検索は**3段カスケード**（全文一致 → AND → OR）。`のど自慢` を割らずに
+    `9号館でやってるダンスのやつ` も捌くための構造
+  - **`buildings` 配列の並び順は仕様。** `号館` を `アリーナ` より前に置かないと
+    `９号館アリーナ` が体育館へ誤配される
+  - 検索語が0個 = 「0件」ではなく「**絞り込む条件が無い**」。全件を返す
+  - **URL クエリはホワイトリストで検証する。** `?type=Stage` が無言の0件になっていた
+  - **IME は `InputEvent.isComposing` で判定する。** `compositionend` を合図にすると
+    発火順の違いで環境によって検索が動かなくなる
+  - **ハイドレーション完了前に合成イベントを流すと検証が嘘をつく**（実測で3回誤った）
+
 - **[layout-e2e.md](./frontend/layout-e2e.md)** - レイアウトの実測アサーション（Playwright / #157）
   - **jsdom も Vitest Browser Mode も #148 を検出できない。** 前者はレイアウトエンジンが無く、後者は祖先の連鎖が本物と別物になる
   - **`pnpm build && pnpm start` は原理的に使えない。** フィクスチャ分岐が `NODE_ENV !== "production"` に閉じており、本番ビルドではチャンクごと落ちる
@@ -363,4 +378,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-09-05
+**最終更新日**: 2026-09-06

@@ -148,6 +148,21 @@ WCAG 1.4.11（非テキストコントラスト）の 3:1 を満たす必要が�
 タブ側（`TimetableTabs`）は `availableStages` を親配列にして描画します。
 `stages` を親にして `filter` すると、そこに存在しない「その他」のタブが永久に出せません。
 
+> [!NOTE]
+> **企画一覧の建物フィルタは、この節と同じ設計を写したものです**
+> （`resolveBuildingId()` / `OTHER_BUILDING_ID` / `listBuildingOptions()`）。
+> 片方を直すときはもう片方も見てください →
+> [events-search.md](./events-search.md)
+
+## 日程の判定は `filters.ts` が持つ
+
+`filterEventsByDate()` は自前で判定せず、`matchesEventDate()`（`src/lib/filters.ts`）へ
+委譲しています。**`both`（両日開催）を Day1 / Day2 の両方へ出す規則を2箇所で持たないため**です。
+
+以前は `/events` 側が厳密一致（`both` を1日目に含めない）で、こちらだけが両方へ出していました。
+同じ日を選んでいるのに企画一覧とタイムテーブルで件数が食い違い、来場者からは
+「1日目にあるはずの企画が一覧に出ない」というバグに見えます。
+
 ### 選択中のステージは当日0件でもタブに残す
 
 一覧は `listStageTabs()` が作ります。「表示中の日程に企画があるステージ」に加えて、
