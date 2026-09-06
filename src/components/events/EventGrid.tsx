@@ -29,8 +29,8 @@ export function EventGrid({ events, variant = "default" }: EventGridProps) {
             d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <p className="text-lg font-semibold text-gray-900/80">該当する企画が見つかりませんでした</p>
-        <p className="mt-2 text-sm text-gray-900/60">フィルター条件を変更してお試しください</p>
+        <p className="text-lg font-semibold text-gray-700">該当する企画が見つかりませんでした</p>
+        <p className="mt-2 text-sm text-gray-600">フィルター条件を変更してお試しください</p>
       </div>
     );
   }
