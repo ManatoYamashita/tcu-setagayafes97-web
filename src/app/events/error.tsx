@@ -3,9 +3,16 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
+import { pageHeroes } from "@/data/page-heroes";
 
 /**
  * 企画一覧ページのエラーページ
+ *
+ * 本体（`page.tsx`）と同じ `PageSheetLayout` を使う。以前は濃紫グラデーションの
+ * ヘッダーを個別に手書きしており、本体の白いシートへ切り替わる瞬間に見た目が
+ * 飛んでいた上、その濃色背景に text-gray-900 を直置きしていたためコントラストも
+ * 不足していた。白いシートへ揃えることでどちらも解消する。
  */
 export default function EventsError({
   error,
@@ -19,18 +26,7 @@ export default function EventsError({
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary">
-      {/* ページヘッダー */}
-      <div className="bg-secondary py-16 text-gray-900">
-        <div className="container mx-auto px-4">
-          <h1 className="mb-4 text-center text-4xl font-bold md:text-5xl">企画を探す</h1>
-          <p className="text-center text-lg opacity-90">
-            第97回 世田谷祭の企画を検索・閲覧できます
-          </p>
-        </div>
-      </div>
-
-      {/* エラーメッセージ */}
+    <PageSheetLayout hero={pageHeroes.events}>
       <div className="container mx-auto px-4 py-24">
         <div className="mx-auto max-w-md text-center">
           <svg
@@ -48,22 +44,26 @@ export default function EventsError({
             />
           </svg>
           <h2 className="mb-4 text-2xl font-bold text-gray-900">エラーが発生しました</h2>
-          <p className="mb-8 text-gray-900/80">
+          <p className="mb-8 text-gray-700">
             企画一覧の読み込み中にエラーが発生しました。しばらく経ってから再度お試しください。
           </p>
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <Button onClick={reset} variant="primary">
+            <Button
+              onClick={reset}
+              variant="primary"
+              className="bg-primary-600 text-white hoverable:hover:bg-primary-700"
+            >
               再試行
             </Button>
             <Link
               href="/"
-              className="inline-flex items-center justify-center rounded-lg bg-white/10 px-6 py-3 text-base font-semibold text-gray-900 shadow-md transition-[color,background-color,border-color,box-shadow] duration-200 hover:bg-white/20 hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-white"
+              className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 px-6 py-3 text-base font-semibold text-gray-700 shadow-md transition-[color,background-color,border-color,box-shadow] duration-200 hoverable:hover:border-gray-400 hoverable:hover:bg-white focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
             >
               トップページへ戻る
             </Link>
           </div>
         </div>
       </div>
-    </div>
+    </PageSheetLayout>
   );
 }
