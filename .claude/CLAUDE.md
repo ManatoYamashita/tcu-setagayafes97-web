@@ -127,6 +127,8 @@ push 時は head をそのまま、PR 時は head を base へマージした結
 
 `Static Checks` は **`pnpm install` だけで完結する検査**（lint / format / 型 / ユニットテスト /
 ドキュメントの相対リンク）を束ねたジョブである。
+**リンク検査が見るのは相対リンクだけで、`#anchor` の存在と外部URLの到達性は射程外である**
+（見るもの・見ないものの一覧は `scripts/assert-doc-links.mjs` の冒頭）。
 `Layout E2E` は実ブラウザで `/timetable` の盤面を測る（#148 の再発防止装置）。
 **このジョブは secrets を要求しないため、fork からの PR でも緑赤が出る唯一のジョブである**
 （`Build Check` は microCMS の secrets 不達で fork PR では必ず落ちる）。

@@ -558,4 +558,4 @@ git push origin feature-add-gtm
 - 2026-08-29: 「マージ前の検証」を追加（`merge-tree` で消えるファイルを確認、worktree での実動確認、マージ前チェックリスト）
 - 2026-09-03: `feature-ci.yml` に型チェックを追加し、`lint-and-format` を `static-checks` へ改名（#157 段階1）
 - 2026-09-03: ユニットテストと実ブラウザのレイアウト実測を CI へ追加。共通のセットアップ4ステップを `.github/actions/setup` へ切り出した（#157 段階2・3）
-- 2026-09-06: ドキュメントの相対リンク検査（`pnpm check:doc-links`）を `Static Checks` へ追加（#211）
+- 2026-09-06: ドキュメントの相対リンク検査（`pnpm check:doc-links`）を `Static Checks` へ追加（#211）。**見るのは相対リンクだけで、`#anchor` の存在は射程外**
