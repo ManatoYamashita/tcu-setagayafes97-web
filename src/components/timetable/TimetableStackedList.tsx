@@ -1,4 +1,5 @@
 import type { StageGroup } from "@/lib/timetable";
+import { parseTimeToMinutes } from "@/lib/timetable-layout";
 import { TimetableEventCard } from "./TimetableEventCard";
 
 interface TimetableStackedListProps {
@@ -9,7 +10,7 @@ interface TimetableStackedListProps {
  * モバイルの縦スタック表示
  *
  * ガント盤面は最小でも 972px（時間軸 72px + 5列 × 180px）を要求するため、
- * 狭い画面では成立しない。時刻による位置づけを諦めて、ステージごとの時系列リストにする。
+ * 狭い画面では成立しない。時刻による位置づけを諦めて、全ステージ横断の時系列リストにする。
  *
  * 盤面と DOM を2本持っているのは、`docs/frontend/layout-patterns.md`「DOM 2枚持ちを避ける」の
  * **例外**である。同ドキュメントの指針は「形状差が Tailwind のバリアントだけで表現できる場合」を
@@ -23,20 +24,29 @@ interface TimetableStackedListProps {
  * 画像を持たないカードなので、同ドキュメントが挙げる二重 fetch の実害も無い。
  */
 export function TimetableStackedList({ groups }: TimetableStackedListProps) {
+  const items = groups
+    .flatMap((group) =>
+      group.events.map((event) => ({ event, stageName: group.name, stageId: group.id }))
+    )
+    .sort((a, b) => {
+      const startDiff =
+        (parseTimeToMinutes(a.event.startTime) ?? Number.POSITIVE_INFINITY) -
+        (parseTimeToMinutes(b.event.startTime) ?? Number.POSITIVE_INFINITY);
+
+      if (startDiff !== 0) return startDiff;
+      return a.stageId.localeCompare(b.stageId);
+    });
+
   return (
-    <div data-timetable-list className="space-y-8">
-      {groups.map((group) => (
-        <section key={group.id}>
-          <h3 className="mb-3 text-lg font-bold text-gray-900">{group.name}</h3>
-          <ul className="space-y-3">
-            {group.events.map((event) => (
-              <li key={event.id}>
-                <TimetableEventCard event={event} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+    <div data-timetable-list>
+      <p className="mb-3 text-sm font-semibold text-gray-700">開始時刻順</p>
+      <ol className="space-y-3" role="list">
+        {items.map(({ event, stageName }) => (
+          <li key={event.id} data-timetable-list-item data-start-time={event.startTime}>
+            <TimetableEventCard event={event} stageName={stageName} />
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

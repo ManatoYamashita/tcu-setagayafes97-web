@@ -33,7 +33,7 @@ export function TimetableChart({ groups, range }: TimetableChartProps) {
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4 sm:p-6">
+    <div className="bg-white sm:rounded-xl sm:border sm:border-gray-200 sm:p-4 lg:p-6">
       {/* デスクトップ: ガントチャート */}
       <div className="hidden lg:block">
         <TimetableGantt groups={groups} range={range} />

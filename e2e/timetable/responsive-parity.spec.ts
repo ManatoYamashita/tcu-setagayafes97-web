@@ -24,6 +24,36 @@ test.describe("モバイル幅", () => {
     await expect(page.locator("[data-timetable-list]")).not.toContainText("時刻が壊れている企画");
   });
 
+  test("全ステージの企画を開始時刻順に並べ、各カードにステージ名を出す", async ({
+    timetablePage: page,
+  }) => {
+    const startTimes = await page
+      .locator("[data-timetable-list-item]")
+      .evaluateAll((items) => items.map((item) => item.getAttribute("data-start-time")));
+
+    expect(startTimes).toEqual([
+      "09:30",
+      "10:30",
+      "11:00",
+      "11:00",
+      "12:00",
+      "13:00",
+      "13:30",
+      "15:00",
+      "17:30",
+    ]);
+    await expect(page.locator("[data-timetable-list-item]").first()).toContainText("体育館");
+  });
+
+  test("320px幅でもカード本文に250px以上を確保する", async ({ timetablePage: page }) => {
+    const cardWidth = await page
+      .locator("[data-timetable-list-item] a")
+      .first()
+      .evaluate((element) => Math.round(element.getBoundingClientRect().width));
+
+    expect(cardWidth).toBeGreaterThanOrEqual(250);
+  });
+
   test("横スクロールがページ全体へ漏れていない", async ({ timetablePage: page }) => {
     const metrics = await page.evaluate(() => ({
       documentScrollWidth: document.documentElement.scrollWidth,

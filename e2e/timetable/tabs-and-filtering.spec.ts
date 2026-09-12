@@ -11,6 +11,11 @@ const STAGE_TABS = "[data-timetable-stage-tabs]";
  * オーバーレイを差し込むため、ページ全体から素で数えると将来壊れます。
  */
 test.describe("タブと絞り込み", () => {
+  test("選択日と絞り込み後の件数を盤面の直前に表示する", async ({ timetablePage: page }) => {
+    await expect(page.getByRole("heading", { name: "10月31日（土）の企画" })).toBeVisible();
+    await expect(page.locator("[data-timetable-summary]")).toHaveText("9企画を表示中");
+  });
+
   test("選択中のステージが当日0件でも押下状態で残る", async ({ page, gotoTimetable }) => {
     // day2 に体育館の企画は無い。タブ一覧から落とすと、どのタブも aria-pressed に
     // ならず、何で絞り込まれているのか画面から読めなくなる（#154 のレビュー指摘）

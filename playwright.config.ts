@@ -68,9 +68,9 @@ export default defineConfig({
       testIgnore: /responsive-parity\.spec\.ts/,
     },
     {
-      // lg 未満。盤面ではなく縦スタック（TimetableStackedList）が出ます。
+      // 対応下限の320px。lg 未満なので盤面ではなく縦スタックが出ます。
       name: "mobile",
-      use: { ...devices["Desktop Chrome"], viewport: { width: 390, height: 844 } },
+      use: { ...devices["Desktop Chrome"], viewport: { width: 320, height: 640 } },
       testMatch: /responsive-parity\.spec\.ts/,
     },
   ],
