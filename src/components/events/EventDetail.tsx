@@ -2,6 +2,8 @@ import Image from "next/image";
 import type { Event } from "@/types/events";
 import { Badge } from "@/components/ui/Badge";
 import { SNSLinks } from "./SNSLinks";
+import { EventMediaPlaceholder } from "./EventMediaPlaceholder";
+import { displayEventText, EVENT_DISPLAY_FALLBACKS } from "@/lib/event-display";
 
 interface EventDetailProps {
   event: Event;
@@ -50,15 +52,22 @@ function EventFact({ label, value }: EventFactProps) {
  * 企画の主役である画像・タイトルと、来場に必要な情報を優先して表示する。
  */
 export function EventDetail({ event }: EventDetailProps) {
-  const venue = [event.building, event.place].filter(Boolean).join(" ") || "会場未定";
+  const title = displayEventText(event.title, EVENT_DISPLAY_FALLBACKS.title);
+  const organizer = displayEventText(event.organizer, EVENT_DISPLAY_FALLBACKS.organizer);
+  const description = displayEventText(event.description, EVENT_DISPLAY_FALLBACKS.description);
+  const venue =
+    [event.building?.trim(), event.place?.trim()].filter(Boolean).join(" ") ||
+    EVENT_DISPLAY_FALLBACKS.venue;
+  const hasThumbnail = Boolean(event.thumbnail?.url);
   const thumbnailWidth = event.thumbnail?.width ?? 0;
   const thumbnailHeight = event.thumbnail?.height ?? 0;
   const isIconThumbnail =
-    event.thumbnail !== undefined &&
-    thumbnailWidth > 0 &&
-    thumbnailHeight > 0 &&
-    Math.abs(thumbnailWidth - thumbnailHeight) / Math.max(thumbnailWidth, thumbnailHeight) <=
-      SQUARE_IMAGE_TOLERANCE;
+    !hasThumbnail ||
+    (event.thumbnail !== undefined &&
+      thumbnailWidth > 0 &&
+      thumbnailHeight > 0 &&
+      Math.abs(thumbnailWidth - thumbnailHeight) / Math.max(thumbnailWidth, thumbnailHeight) <=
+        SQUARE_IMAGE_TOLERANCE);
   const time =
     event.startTime && event.endTime
       ? `${event.startTime} 〜 ${event.endTime}`
@@ -72,15 +81,15 @@ export function EventDetail({ event }: EventDetailProps) {
       <div
         className={`grid gap-8 lg:gap-12 ${isIconThumbnail ? "lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-center" : "lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.75fr)] lg:items-start"}`}
       >
-        {event.thumbnail && (
-          <div
-            className={`event-detail-entrance-media relative overflow-hidden ${isIconThumbnail ? "mx-auto flex aspect-square w-full max-w-52 items-center justify-center rounded-2xl border border-primary-100 bg-primary-50 sm:max-w-64 lg:max-w-72" : "-mx-4 -mt-10 aspect-[4/3] rounded-t-2xl rounded-b-none sm:-mx-6 sm:aspect-[16/9] lg:mx-0 lg:mt-0 lg:aspect-[4/3] lg:rounded-b-2xl"}`}
-          >
-            {isIconThumbnail ? (
+        <div
+          className={`event-detail-entrance-media relative overflow-hidden ${isIconThumbnail ? "mx-auto flex aspect-square w-full max-w-52 items-center justify-center rounded-2xl border border-primary-100 bg-primary-50 sm:max-w-64 lg:max-w-72" : "-mx-4 -mt-10 aspect-[4/3] rounded-t-2xl rounded-b-none sm:-mx-6 sm:aspect-[16/9] lg:mx-0 lg:mt-0 lg:aspect-[4/3] lg:rounded-b-2xl"}`}
+        >
+          {hasThumbnail ? (
+            isIconThumbnail ? (
               <div className="relative h-36 w-36 overflow-hidden rounded-xl sm:h-44 sm:w-44 lg:h-52 lg:w-52">
                 <Image
-                  src={event.thumbnail.url}
-                  alt={event.title}
+                  src={event.thumbnail!.url}
+                  alt={title}
                   fill
                   className="object-contain"
                   sizes="(min-width: 64rem) 208px, (min-width: 40rem) 176px, 144px"
@@ -89,20 +98,20 @@ export function EventDetail({ event }: EventDetailProps) {
               </div>
             ) : (
               <Image
-                src={event.thumbnail.url}
-                alt={event.title}
+                src={event.thumbnail!.url}
+                alt={title}
                 fill
                 className="object-cover object-center"
                 sizes="(min-width: 84rem) 668px, (min-width: 64rem) 50vw, 100vw"
                 priority
               />
-            )}
-          </div>
-        )}
+            )
+          ) : (
+            <EventMediaPlaceholder variant="detail" />
+          )}
+        </div>
 
-        <header
-          className={`event-detail-entrance-copy ${event.thumbnail ? "lg:py-6" : "lg:col-span-2 lg:py-6"}`}
-        >
+        <header className="event-detail-entrance-copy lg:py-6">
           <div className="flex flex-wrap gap-2">
             <Badge variant={event.date} label={dateBadgeLabels[event.date]} tone="soft" />
             <Badge
@@ -119,15 +128,13 @@ export function EventDetail({ event }: EventDetailProps) {
           </div>
 
           <h1 className="mt-5 text-3xl font-bold leading-[1.2] tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
-            {event.title}
+            {title}
           </h1>
 
-          {event.organizer && (
-            <div className="mt-6 border-t border-gray-200 pt-5">
-              <p className="text-xs font-semibold text-gray-600">主催</p>
-              <p className="mt-1 text-base font-semibold text-gray-900">{event.organizer}</p>
-            </div>
-          )}
+          <div className="mt-6 border-t border-gray-200 pt-5">
+            <p className="text-xs font-semibold text-gray-600">主催</p>
+            <p className="mt-1 text-base font-semibold text-gray-900">{organizer}</p>
+          </div>
         </header>
       </div>
 
@@ -162,9 +169,7 @@ export function EventDetail({ event }: EventDetailProps) {
         >
           企画概要
         </h2>
-        <p className="mt-5 whitespace-pre-wrap text-base leading-8 text-gray-700">
-          {event.description}
-        </p>
+        <p className="mt-5 whitespace-pre-wrap text-base leading-8 text-gray-700">{description}</p>
       </section>
 
       {/* 詳細説明（リッチテキスト） */}

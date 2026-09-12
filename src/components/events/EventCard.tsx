@@ -3,6 +3,8 @@ import Image from "next/image";
 import type { Event } from "@/types/events";
 import { Badge } from "@/components/ui/Badge";
 import { CircleImage } from "@/components/ui/CircleImage";
+import { EventMediaPlaceholder } from "./EventMediaPlaceholder";
+import { displayEventText, EVENT_DISPLAY_FALLBACKS } from "@/lib/event-display";
 
 interface EventCardProps {
   event: Event;
@@ -32,7 +34,13 @@ export function EventCard({ event, variant = "default" }: EventCardProps) {
   // 著名人企画は専用LP（/special/[id]）が正規URL。/events/[id] は生成されない
   const href = event.type === "special" ? `/special/${event.id}` : `/events/${event.id}`;
   const isCompact = variant === "compact";
-  const venue = [event.building, event.place].filter(Boolean).join(" ") || "会場未定";
+  const title = displayEventText(event.title, EVENT_DISPLAY_FALLBACKS.title);
+  const organizer = displayEventText(event.organizer, EVENT_DISPLAY_FALLBACKS.organizer);
+  const description = displayEventText(event.description, EVENT_DISPLAY_FALLBACKS.description);
+  const venue =
+    [event.building?.trim(), event.place?.trim()].filter(Boolean).join(" ") ||
+    EVENT_DISPLAY_FALLBACKS.venue;
+  const hasThumbnail = Boolean(event.thumbnail?.url);
 
   return (
     <Link
@@ -43,22 +51,22 @@ export function EventCard({ event, variant = "default" }: EventCardProps) {
         className={`h-full overflow-hidden border border-gray-200 bg-white transition-[border-color,box-shadow] hover:border-primary-300 hover:shadow-sm ${isCompact ? "flex items-start rounded-lg" : "rounded-xl"}`}
       >
         {/* 円形サムネイル */}
-        {event.thumbnail && (
-          <div className={isCompact ? "shrink-0 p-4" : "flex justify-center p-6"}>
+        <div className={isCompact ? "shrink-0 p-4" : "flex justify-center p-6"}>
+          {hasThumbnail ? (
             <CircleImage
-              src={event.thumbnail.url}
-              alt={event.title}
+              src={event.thumbnail!.url}
+              alt={title}
               // xl(160px)だと、xl:グリッドの4カラム時にカード幅(約195px)から
               // p-6の余白(48px)を引いた残り(約147px)より大きく、
               // flexが円を横方向だけ縮めて楕円になる。lg(128px)なら収まる。
               size={isCompact ? "md" : "lg"}
             />
-          </div>
-        )}
+          ) : (
+            <EventMediaPlaceholder variant="card" size={isCompact ? "md" : "lg"} />
+          )}
+        </div>
 
-        <div
-          className={`flex min-w-0 flex-1 flex-col ${isCompact && event.thumbnail ? "p-4 pl-0" : isCompact ? "p-4" : "p-6 pt-0"}`}
-        >
+        <div className={`flex min-w-0 flex-1 flex-col ${isCompact ? "p-4 pl-0" : "p-6 pt-0"}`}>
           {/* バッジ */}
           <div className="mb-3 flex flex-wrap gap-2">
             <Badge variant={event.date} label={dateLabels[event.date]} tone="soft" />
@@ -71,21 +79,21 @@ export function EventCard({ event, variant = "default" }: EventCardProps) {
               variant === "featured" ? "text-xl" : isCompact ? "text-base" : "text-lg"
             }`}
           >
-            {event.title}
+            {title}
           </h3>
 
           {/* 主催団体 */}
           <p
             className={`font-semibold text-primary-700 ${isCompact ? "mb-2 text-xs" : "mb-3 text-sm"}`}
           >
-            {event.organizer}
+            {organizer}
           </p>
 
           {/* 説明文 */}
           <p
             className={`${isCompact ? "mb-2 line-clamp-2 text-xs leading-5" : "mb-4 line-clamp-3 text-sm"} text-gray-900/80`}
           >
-            {event.description}
+            {description}
           </p>
 
           {/* メタ情報 */}
