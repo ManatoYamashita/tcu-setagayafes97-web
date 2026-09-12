@@ -289,18 +289,19 @@ export type EventCardDensity = "full" | "compact" | "minimal";
  * 密度ごとに必要な「カード実寸」の高さ（px / border-box）
  *
  * 内訳は `TimetableEventCard` の実装から積んでいます（Tailwind v4 の既定トークン。
- * `text-sm` 14px × `leading-tight` 1.25 = 17.5px、`text-xs` 12px の行送りは 16px）。
+ * `text-[0.9375rem]` 15px × `leading-[1.2]` = 18px、
+ * `text-[0.8125rem]` 13px × `leading-tight` 1.25 = 16.25px）。
  *
  * | 密度    | border | padding        | 内容                                          | 計 |
  * | ------- | ------ | -------------- | --------------------------------------------- | -- |
- * | full    | 2      | 12（`py-1.5`） | タイトル2行 35 + 4 + 時刻 16 + 4 + 場所 16 = 75 | 89 |
- * | compact | 2      | 8（`py-1`）    | タイトル1行 17.5 + 時刻 16 = 33.5               | 44 |
+ * | full    | 2      | 12（`py-1.5`） | タイトル2行 36 + 4 + 時刻 16.25 + 4 + 場所 16.25 = 76.5 | 90.5 |
+ * | compact | 2      | 8（`py-1`）    | タイトル1行 17.5 + 時刻 16 = 33.5               | 43.5 |
  *
  * **余白ごと収まる高さを閾値にしています。** 「文字が切れない下限」（上側の padding だけ数える）で
  * 判定すると、下余白が 0 まで潰れたカードが出ます。
  */
 const DENSITY_MIN_CARD_HEIGHT_PX = {
-  full: 75 + 12 + CARD_BORDER_PX,
+  full: 76.5 + 12 + CARD_BORDER_PX,
   compact: 33.5 + 8 + CARD_BORDER_PX,
 } as const;
 

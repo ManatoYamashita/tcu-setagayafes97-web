@@ -47,10 +47,10 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
   // 外向きの outline / ring がクリップされて見えなくなるため。
   const base =
     "block h-full overflow-hidden rounded-lg bg-white border border-gray-200 transition-colors " +
-    "hover:border-gray-400 border-l-4 border-l-primary-600 hover:border-l-primary-700 " +
+    "hoverable:hover:border-gray-400 border-l-4 border-l-primary-600 hoverable:hover:border-l-primary-700 " +
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-600";
 
-  const timeText = `${event.startTime} - ${event.endTime}`;
+  const timeText = `${event.startTime}–${event.endTime}`;
 
   // 高さが確保できないときは、優先度の低い情報から落とす。溢れさせて切ると
   // 「主催が途中で切れたカード」になり、読めない情報が場所だけ占めてしまう。
@@ -72,37 +72,41 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
   }
 
   // 縦の余白が `px-3` と揃わないのは、60分企画（カード実寸 92px）へ
-  // タイトル2行 + 時刻 + 場所（計 75px）を余白ごと収めるため。
-  // `py-3` に戻すと必要高が 101px になり、`getCardDensity` の閾値も連動して上がるため、
+  // 15px のタイトル2行 + 13px の時刻・場所（計 76.5px）を余白ごと収めるため。
+  // `py-3` に戻すと `getCardDensity` の閾値も連動して上がるため、
   // 1時間企画が compact へ落ちて場所が表示されなくなる。
   if (density === "full") {
     return (
       <Link href={href} aria-label={label} className={`${base} px-3 py-1.5`}>
-        <p className="mb-1 text-sm font-bold leading-tight text-gray-900 line-clamp-2">
+        <p className="mb-1 text-[0.9375rem] font-bold leading-[1.2] text-gray-900 line-clamp-2">
           {event.title}
         </p>
-        <p className="mb-1 truncate text-xs font-medium text-primary-700">{timeText}</p>
-        <p className="truncate text-xs text-gray-900/80">{event.place}</p>
+        <p className="mb-1 truncate text-[0.8125rem] font-semibold leading-tight text-primary-700 tabular-nums">
+          {timeText}
+        </p>
+        <p className="truncate text-[0.8125rem] leading-tight text-gray-700">{event.place}</p>
       </Link>
     );
   }
 
   // 密度指定なし = モバイルの縦スタック。高さが自由なので全項目を出す
   return (
-    <Link href={href} className={`${base} p-3`}>
-      {/* タイトル */}
-      <p className="mb-1 text-sm font-bold text-gray-900 line-clamp-2">{event.title}</p>
+    <Link href={href} className={`${base} p-4`}>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <p className="text-sm font-bold text-primary-700 tabular-nums">{timeText}</p>
+        {stageName && (
+          <span className="rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700">
+            {stageName}
+          </span>
+        )}
+      </div>
 
-      {/* 時刻 */}
-      <p className="mb-1 text-xs font-medium text-primary-700">{timeText}</p>
+      <p className="mt-2 text-base font-bold leading-snug text-gray-900">{event.title}</p>
+      <p className="mt-2 text-sm leading-relaxed text-gray-700">{event.place}</p>
 
-      {/* 場所 */}
-      <p className="text-xs text-gray-900/80">{event.place}</p>
-
-      {/* 主催 */}
-      {event.organizer && (
-        <p className="mt-1 text-xs text-gray-900/60 line-clamp-1">{event.organizer}</p>
-      )}
+      {event.organizer ? (
+        <p className="mt-1 text-sm leading-relaxed text-gray-600">{event.organizer}</p>
+      ) : null}
     </Link>
   );
 }

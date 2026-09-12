@@ -149,7 +149,8 @@ e2e/
 ビューポートは2つです。`desktop` の **1280px** は、盤面の最小幅 1152px（`72 + 6列 × 180`）に対して
 スクローラが約 1070px となり、**横スクロールの検証が実際に成立する**幅として選んでいます。
 
-`mobile` の 390px は `lg`(1024px) 未満で、盤面ではなく `TimetableStackedList` が出ます。
+`mobile` の 320px は対応下限かつ `lg`(1024px) 未満で、盤面ではなく
+`TimetableStackedList` が出ます。カード本文幅250px以上もこの条件で検証します。
 `desktop` project は `testIgnore` で `responsive-parity.spec.ts` を除外しています
 （除外しないと desktop 幅でモバイル用の検証が走って落ちます）。
 

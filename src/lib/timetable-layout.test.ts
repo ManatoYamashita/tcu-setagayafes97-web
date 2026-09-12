@@ -324,14 +324,14 @@ describe("getCardDensity", () => {
   });
 
   it("枠ではなくカード実寸で判定する", () => {
-    // 枠 89px のカード実寸は 85px で full の下限 89px に届かない。
-    // 枠のまま比べる実装に戻すと 89 >= 89 で full を返し、内容が溢れる（#154 の指摘）
-    expect(getCardDensity(89)).toBe("compact");
+    // 枠 90.5px のカード実寸は 86.5px で full の下限 90.5px に届かない。
+    // 枠のまま比べる実装に戻すと full を返し、内容が溢れる（#154 の指摘）
+    expect(getCardDensity(90.5)).toBe("compact");
   });
 
   it("full の境界", () => {
-    expect(getCardDensity(93)).toBe("full"); // 実寸 89
-    expect(getCardDensity(92)).toBe("compact"); // 実寸 88
+    expect(getCardDensity(94.5)).toBe("full"); // 実寸 90.5
+    expect(getCardDensity(94.4)).toBe("compact"); // 実寸 90.4
   });
 
   it("compact の境界", () => {

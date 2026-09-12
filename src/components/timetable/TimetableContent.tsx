@@ -11,7 +11,8 @@ import {
   warnUnresolvedStagePlaces,
 } from "@/lib/timetable";
 import { calculateTimeRange } from "@/lib/timetable-layout";
-import { TimetableTabs } from "./TimetableTabs";
+import { isKnownStageId } from "@/data/stages";
+import { getTimetableDateLabel, TimetableTabs } from "./TimetableTabs";
 import { TimetableChart } from "./TimetableChart";
 
 interface TimetableContentProps {
@@ -26,8 +27,10 @@ export function TimetableContent({ initialEvents }: TimetableContentProps) {
   const searchParams = useSearchParams();
 
   // URL Search Params から日程とステージを取得
-  const selectedDate = (searchParams.get("date") as EventDate) || "day1";
-  const selectedStage = searchParams.get("stage") || "all";
+  const dateParam = searchParams.get("date");
+  const selectedDate: EventDate = dateParam === "day2" ? "day2" : "day1";
+  const stageParam = searchParams.get("stage");
+  const selectedStage = stageParam && isKnownStageId(stageParam) ? stageParam : "all";
 
   // 日程だけで絞った集合。タブの一覧と時間レンジは必ずここから作る
   const dateEvents = useMemo(
@@ -58,9 +61,11 @@ export function TimetableContent({ initialEvents }: TimetableContentProps) {
   }, [initialEvents]);
 
   const hasEvents = groups.length > 0;
+  const eventCount = groups.reduce((count, group) => count + group.events.length, 0);
+  const selectedDateLabel = getTimetableDateLabel(selectedDate);
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="py-2 sm:py-4">
       {/* タブ */}
       <TimetableTabs
         selectedDate={selectedDate}
@@ -68,8 +73,19 @@ export function TimetableContent({ initialEvents }: TimetableContentProps) {
         availableStages={availableStages}
       />
 
-      {/* タイムテーブルチャート */}
-      <div className="mt-8">
+      <section className="mt-8" aria-labelledby="timetable-results-heading">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
+          <h2
+            id="timetable-results-heading"
+            className="font-sans text-xl font-bold text-balance text-gray-900 sm:text-2xl"
+          >
+            {selectedDateLabel}の企画
+          </h2>
+          <p data-timetable-summary role="status" className="text-sm font-medium text-gray-700">
+            {eventCount}企画を表示中
+          </p>
+        </div>
+
         {hasEvents ? (
           <TimetableChart groups={groups} range={range} />
         ) : (
@@ -84,7 +100,7 @@ export function TimetableContent({ initialEvents }: TimetableContentProps) {
             </p>
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }
