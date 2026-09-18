@@ -113,7 +113,7 @@ export function Header() {
           </Link>
 
           {/* 中央: デスクトップナビ */}
-          <DesktopNav items={headerItems} />
+          <DesktopNav items={headerItems} label={messages.header.mainNav} />
 
           {/* 右: 言語切り替え + ハンバーガー */}
           <div className="flex items-center gap-3">

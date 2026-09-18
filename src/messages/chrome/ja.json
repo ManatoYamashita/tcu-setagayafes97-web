@@ -9,6 +9,7 @@
     "access": "アクセス",
     "info": "インフォメーション",
     "news": "お知らせ",
+    "newsList": "お知らせ一覧",
     "guide": "ご来場の方へ",
     "faq": "よくある質問",
     "pamphlet": "パンフレットDL",
@@ -20,7 +21,8 @@
   },
   "header": {
     "openMenu": "メニューを開く",
-    "closeMenu": "メニューを閉じる"
+    "closeMenu": "メニューを閉じる",
+    "mainNav": "メインナビゲーション"
   },
   "footer": {
     "eventInfo": "企画情報",

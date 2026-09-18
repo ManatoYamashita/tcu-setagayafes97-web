@@ -9,6 +9,7 @@
     "access": "교통 안내",
     "info": "안내",
     "news": "공지사항",
+    "newsList": "공지사항 목록",
     "guide": "방문 안내",
     "faq": "자주 묻는 질문",
     "pamphlet": "팸플릿",
@@ -20,7 +21,8 @@
   },
   "header": {
     "openMenu": "메뉴 열기",
-    "closeMenu": "메뉴 닫기"
+    "closeMenu": "메뉴 닫기",
+    "mainNav": "메인 내비게이션"
   },
   "footer": {
     "eventInfo": "행사 정보",

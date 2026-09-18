@@ -9,6 +9,7 @@
     "access": "交通指南",
     "info": "信息中心",
     "news": "新闻公告",
+    "newsList": "公告一览",
     "guide": "参观指南",
     "faq": "常见问题",
     "pamphlet": "宣传册",
@@ -20,7 +21,8 @@
   },
   "header": {
     "openMenu": "打开菜单",
-    "closeMenu": "关闭菜单"
+    "closeMenu": "关闭菜单",
+    "mainNav": "主导航"
   },
   "footer": {
     "eventInfo": "活动信息",
