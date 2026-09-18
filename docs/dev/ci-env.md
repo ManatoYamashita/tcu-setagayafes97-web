@@ -43,13 +43,15 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 
 ### Vercel のみに登録する変数（GitHub には登録しない）
 
-| 変数名                    | 内容                                      | 登録先                                         |
-| ------------------------- | ----------------------------------------- | ---------------------------------------------- |
-| `MICROCMS_WEBHOOK_SECRET` | microCMS Webhook の署名検証用シークレット | `.env.example` / Vercel（Production・Preview） |
+| 変数名                    | 内容                                        | 登録先                                         |
+| ------------------------- | ------------------------------------------- | ---------------------------------------------- |
+| `MICROCMS_WEBHOOK_SECRET` | microCMS Webhook の署名検証用シークレット   | `.env.example` / Vercel（Production・Preview） |
+| `MICROCMS_DRAFT_SECRET`   | microCMS 画面プレビューの認証用シークレット | `.env.example` / Vercel（Production・Preview） |
 
 > [!IMPORTANT]
-> **`MICROCMS_WEBHOOK_SECRET` を GitHub Secrets と `feature-ci.yml` に登録してはいけない。**
-> `src/app/api/revalidate/route.ts` がリクエスト受信時にしか読まないため、ビルドには一切不要である。
+> **上記2つを GitHub Secrets と `feature-ci.yml` に登録してはいけない。**
+> `src/app/api/revalidate/route.ts` と `src/app/api/draft/route.ts` が
+> リクエスト受信時にしか読まないため、ビルドには一切不要である。
 > 未設定でもビルドは通る（実行時に 500 を返す fail closed 設計）。
 > **これは登録漏れではなく意図的な除外である。** 後から「他の microCMS 変数と揃っていない」と
 > 判断して追加しないこと。CI に秘密情報を増やす理由がない。
@@ -59,6 +61,12 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 > 順序を逆にすると、シークレット未設定の間の入稿が 500 で拒否される。
 > **microCMS の Webhook は失敗しても再送されないため、その入稿の再検証は永久に失われる。**
 > 詳細は [content-revalidation.md](./content-revalidation.md)。
+
+> [!WARNING]
+> **`MICROCMS_DRAFT_SECRET` も、microCMS 側で「画面プレビュー」を設定する「前」に登録すること。**
+> 順序を逆にすると最初のプレビューが 500（`Draft preview is not configured.`）になる。
+> こちらは Webhook と違って押し直せば済むが、原因が分からないまま設定を疑うことになる。
+> 詳細は [draft-preview.md](./draft-preview.md)。
 
 ### フラグ以外の変数を追加したときの判断基準
 
