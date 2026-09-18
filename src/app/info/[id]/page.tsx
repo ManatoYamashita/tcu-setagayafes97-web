@@ -240,7 +240,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </header>
 
             {/* 本文 */}
-            <div className="prose prose-lg prose-invert max-w-none">
+            <div className="prose max-w-[38em]">
               {/* 説明文 */}
               {news.description && (
                 <p className="text-xl leading-relaxed text-gray-900/90">{news.description}</p>

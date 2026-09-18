@@ -27,10 +27,7 @@ export function SpecialProfile({ content, photos }: SpecialProfileProps) {
       </h2>
 
       {content && (
-        <div
-          className="prose max-w-none prose-headings:text-gray-900 prose-p:text-gray-900/80 prose-a:text-primary"
-          dangerouslySetInnerHTML={{ __html: content }}
-        />
+        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: content }} />
       )}
 
       {/* grid だと枚数が奇数のとき最後の1枚が左カラムに固定されるため、

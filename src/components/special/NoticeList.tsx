@@ -37,10 +37,7 @@ export function NoticeList({ notices }: NoticeListProps) {
               {notice.heading}
             </h3>
             {notice.body && (
-              <div
-                className="prose prose-sm max-w-none prose-p:text-gray-900/80 prose-a:text-primary"
-                dangerouslySetInnerHTML={{ __html: notice.body }}
-              />
+              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: notice.body }} />
             )}
           </article>
         ))}
