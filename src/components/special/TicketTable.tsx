@@ -100,7 +100,7 @@ export function TicketTable({ tickets, note }: TicketTableProps) {
                   <td key={`method-${index}`} className="px-4 py-3 text-gray-900/80">
                     {ticket.method && (
                       <div
-                        className="prose prose-sm max-w-none prose-p:my-1 prose-p:text-gray-900/80"
+                        className="prose max-w-none [&_p]:my-1"
                         dangerouslySetInnerHTML={{ __html: ticket.method }}
                       />
                     )}
@@ -173,12 +173,7 @@ export function TicketTable({ tickets, note }: TicketTableProps) {
         </table>
       </div>
 
-      {note && (
-        <div
-          className="prose prose-sm mt-4 max-w-none prose-p:text-gray-900/80"
-          dangerouslySetInnerHTML={{ __html: note }}
-        />
-      )}
+      {note && <div className="prose mt-4 max-w-none" dangerouslySetInnerHTML={{ __html: note }} />}
     </section>
   );
 }

@@ -135,6 +135,69 @@ body {
   .prose a:focus-visible {
     text-decoration: underline;
   }
+
+  /* microCMS のリッチテキストは Preflight の初期化を受けたまま描画されるため、
+     入稿された構造が視覚的に失われる。実測（2026-09-18 / 本番 /info/theme に要素を注入）:
+
+       p           margin 0px              6段落が境界の無い1つの塊になる
+       h2          16px / 400              本文と同寸。上の h1,h2,h3 規則で書体だけが変わる
+       ul, ol      list-style: none        中黒と番号が消える
+       li          padding-inline-start 0  字下げも無くなる
+       blockquote  border-left-width: 0px  引用と地の文の区別が付かない
+
+     順序付きリストの番号は体裁ではなく情報なので、消えることを許容できない。
+     CMS が実際に出力する要素だけを対象にする。入稿実績の無い要素（blockquote,
+     table, figure など）は、入稿されてから足すこと。詳細は #179。 */
+  .prose p {
+    margin-block: 1em;
+    /* 日本語の本文は 1.5 では詰まる。Tailwind の text-base 既定（1.5）を上書きする。
+       個別に当てた leading-* ユーティリティには負ける優先順位 */
+    line-height: 1.8;
+  }
+
+  /* ブロックの端では余白を出さない。親側の余白（.mt-6 など）と二重に効くため */
+  .prose p:first-child {
+    margin-block-start: 0;
+  }
+
+  .prose p:last-child {
+    margin-block-end: 0;
+  }
+
+  .prose h2,
+  .prose h3 {
+    /* 見出しの前は広く、後ろは狭く。見出しが次の本文に属して見えるようにする */
+    margin-block: 1.5em 0.5em;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .prose h2 {
+    font-size: 1.5rem;
+  }
+
+  .prose h3 {
+    font-size: 1.25rem;
+  }
+
+  .prose ul,
+  .prose ol {
+    margin-block: 1em;
+    padding-inline-start: 1.5em;
+  }
+
+  .prose ul {
+    list-style: disc;
+  }
+
+  .prose ol {
+    list-style: decimal;
+  }
+
+  .prose li {
+    margin-block: 0.25em;
+    line-height: 1.8;
+  }
 }
 
 @utility text-balance {

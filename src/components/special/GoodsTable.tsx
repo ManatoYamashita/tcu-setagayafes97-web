@@ -122,12 +122,7 @@ export function GoodsTable({ goods, note }: GoodsTableProps) {
         </table>
       </div>
 
-      {note && (
-        <div
-          className="prose prose-sm mt-4 max-w-none prose-p:text-gray-900/80"
-          dangerouslySetInnerHTML={{ __html: note }}
-        />
-      )}
+      {note && <div className="prose mt-4 max-w-none" dangerouslySetInnerHTML={{ __html: note }} />}
     </section>
   );
 }
