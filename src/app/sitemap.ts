@@ -16,7 +16,7 @@ import { buildStaticSitemapEntries } from "@/lib/sitemap-entries";
  * このファイルは events / news の両方を読むため、再デプロイするまで新規企画も
  * 新規お知らせも sitemap に載らない状態になる。
  */
-export const revalidate = 3600;
+export const revalidate = 600;
 
 /** 一覧の最終更新日時のうち最も新しいもの。空なら undefined */
 function latestUpdate(items: readonly { updatedAt?: string; publishedAt?: string }[]) {

@@ -35,9 +35,9 @@ export async function generateMetadata({
 }
 
 /**
- * ISR設定: 1時間ごとに再検証
+ * ISR設定: 10分ごとに再検証
  */
-export const revalidate = 3600;
+export const revalidate = 600;
 
 /**
  * よくある質問（FAQ）ページ
