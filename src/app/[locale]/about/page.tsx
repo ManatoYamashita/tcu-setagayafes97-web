@@ -19,10 +19,10 @@ import { createAboutStructuredData, serializeJsonLd } from "@/lib/structured-dat
  *
  * **この宣言を外すと新規協賛が永久に反映されなくなる。**
  * 宣言が無い間、`/{ja,en,zh,ko}/about` は `initialRevalidateSeconds: false` であり、
- * 同じ `informations` を `revalidate = 3600` で描画している `/about/sponsors` と
+ * 同じ `informations` を `revalidate = 600` で描画している `/about/sponsors` と
  * 食い違っていた。値を揃えてある。
  */
-export const revalidate = 3600;
+export const revalidate = 600;
 
 /**
  * 静的パラメータ生成

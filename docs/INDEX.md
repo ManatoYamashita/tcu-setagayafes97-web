@@ -210,6 +210,8 @@ docs/
   - **下書きコンテンツで動作確認はできない。** `draftKey` は保存のたびに変わり失効する。表示確認はダミーを直接渡す一時ページで行う
 
 - **[content-revalidation.md](./dev/content-revalidation.md)** - コンテンツ反映の仕組み（オンデマンド再検証）
+  - microCMS 更新時の Webhook 即時失効と、失敗時の10分 ISR フォールバック
+  - 「下書き中」と「公開中かつ下書き中」の公開 API での違い
   - microCMS Webhook（`POST /api/revalidate`）を主系、時間ベース ISR を保険とする二段構え
   - **`revalidatePath` はパスの API ではなくタグの API。** `/about` や `type` 無しの動的ルートは、エラーにならず静かに何もしない
   - microCMS 側の設定手順。**削除・公開終了の通知タイミングは既定 OFF** で、ONにしないと「消したのに残る」が直らない

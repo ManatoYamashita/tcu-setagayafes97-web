@@ -28,9 +28,9 @@ export const metadata: Metadata = EVENTS_VISIBLE
     });
 
 /**
- * ISR設定: 1時間ごとに再検証
+ * ISR設定: 10分ごとに再検証
  */
-export const revalidate = 3600;
+export const revalidate = 600;
 
 /**
  * 検証用フィクスチャの差し替え（開発時のみ）
@@ -43,7 +43,7 @@ export const revalidate = 3600;
  * 到達不能コードになり、動的 import のチャンクごと生成されない。
  *
  * searchParams で切り替えないのは、それを読むとルートが動的になり
- * `revalidate = 3600` の ISR 挙動そのものが検証対象から外れてしまうため。
+ * `revalidate = 600` の ISR 挙動そのものが検証対象から外れてしまうため。
  */
 const USE_FIXTURE =
   process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_TIMETABLE_FIXTURE === "1";
