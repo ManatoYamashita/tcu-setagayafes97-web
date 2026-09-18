@@ -14,7 +14,7 @@ interface EventsViewProps {
    * 建物の選択肢
    *
    * 全企画から導出するため、ページ分割後の `events` からは作れません。
-   * `src/app/events/page.tsx` が `listBuildingOptions()` で1回だけ作って降ろします。
+   * `src/app/events/(list)/page.tsx` が `listBuildingOptions()` で1回だけ作って降ろします。
    */
   buildingOptions: BuildingFilterOption[];
   /** フィルタリング後の総件数（「N 件の企画が見つかりました」の N） */
@@ -28,7 +28,7 @@ interface EventsViewProps {
  *
  * **`useSearchParams()` に依存させないこと。** これは意図的な制約です。
  *
- * このツリーは `src/app/events/page.tsx` の `<Suspense>` の fallback としても描かれます。
+ * このツリーは `src/app/events/(list)/page.tsx` の `<Suspense>` の fallback としても描かれます。
  * fallback は「境界がクライアント描画へ落ちたときに静的HTMLへ出力されるもの」であり、
  * その中で `useSearchParams()` を呼ぶと fallback 自身が bailout して落ちる先を失います。
  * クエリを読むのは `EventsContent` の1箇所だけに保ってください。

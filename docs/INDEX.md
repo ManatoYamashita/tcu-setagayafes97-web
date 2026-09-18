@@ -198,7 +198,7 @@ docs/
   - Search Console をブラウザ自動操作する際の落とし穴（1回目のクリックが無視される・ダイアログのフェードイン・縦位置の揺れ）
 
 - **[microcms.md](./dev/microcms.md)** - microCMS API 制約と実装パターン
-  - 公開サイトの API キーに下書き・公開終了の全取得権限を付けない。`/info/[id]` の HTTP 404 は共通ローディングによるストリーミングに注意する
+  - 公開サイトの API キーに下書き・公開終了の全取得権限を付けない。`/info/[id]` と `/events/[id]` の HTTP 404 はローディングによるストリーミングに注意する
   - **サムネイルは入稿された原本を超えて拡大されない。** 正方形ロゴは 624px 四方、写真は 1400px 幅を推奨。実データは全件 207px 四方で、アイコン表示（208 CSS px）に対し既に等倍（#190）
   - **縦横差 5% 以内かどうかで表示が分岐する。** ロゴは正方形、写真は横長で入稿する
   - limit 上限100件の制約と offset ページネーション実装
@@ -354,7 +354,7 @@ docs/
   - 1024px 未満は盤面が `display:none` になり全アサーションが偽陰性。共通フィクスチャが測定条件を先に検査する
 
 - **[static-html-and-search-params.md](./frontend/static-html-and-search-params.md)** - `useSearchParams()` と静的HTML（#156）
-  - **境界を書かないとエラーにならず、いちばん近い `loading.tsx` が代役になる。** `/events` を捕まえていたのはルートではなく `src/app/events/loading.tsx`
+  - **境界を書かないとエラーにならず、いちばん近い `loading.tsx` が代役になる。** `/events` の一覧だけを `src/app/events/(list)/loading.tsx` で捕まえ、企画詳細へは継承させない
   - **境界を足すだけでは中身は静的HTMLに戻らない。** bailout は境界の内側を落とすものであり、戻すものではない
   - **fallback はサーバーで描かれてHTMLに出る。** そこへ既定状態の完成形を置くと企画カードのリンクが載る
   - **fallback の中で `useSearchParams()` を呼んではいけない**（それ以上落ちる先が無い）。下位からは props へ引き上げる
