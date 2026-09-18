@@ -10,7 +10,9 @@ import { TicketTable } from "@/components/special/TicketTable";
 import { NoticeList } from "@/components/special/NoticeList";
 import { SpecialPageMotion } from "@/components/special/SpecialPageMotion";
 import { SNSLinks } from "@/components/events/SNSLinks";
+import { DraftPreviewBanner } from "@/components/layout/DraftPreviewBanner";
 import { siteConfig, SPECIAL_GOODS_VISIBLE, SPECIAL_VISIBLE } from "@/data/site";
+import { readDraftPreviewContext } from "@/lib/draft-mode";
 import { createPageMetadata } from "@/lib/metadata";
 import { createBreadcrumbStructuredData, serializeJsonLd } from "@/lib/structured-data";
 
@@ -38,7 +40,8 @@ export async function generateStaticParams() {
  */
 export async function generateMetadata({ params }: SpecialPageProps): Promise<Metadata> {
   const { id } = await params;
-  const event = await getSpecialEventById(id);
+  const draft = await readDraftPreviewContext("events", id);
+  const event = await getSpecialEventById(id, draft?.draftKey);
 
   if (!event) {
     return createPageMetadata({
@@ -63,6 +66,8 @@ export async function generateMetadata({ params }: SpecialPageProps): Promise<Me
           alt: event.title,
         }
       : undefined,
+    // 下書きプレビューは公開前の内容である。canonical も出さない（createPageMetadata の仕様）
+    noindex: draft !== null,
   });
 }
 
@@ -85,12 +90,20 @@ function parsePriceValue(price?: string): string | undefined {
  * /events/[id] に統合すると「一覧は準備中なのに詳細だけ見える」不整合が生じるためです。
  */
 export default async function SpecialDetailPage({ params }: SpecialPageProps) {
-  if (!SPECIAL_VISIBLE) {
+  /*
+   * 下書きプレビューの判定に id が要るため、SPECIAL_VISIBLE の門より先に params を解決する。
+   * プレビューは公開フラグを跨ぐ。解禁前のLPを確認したいという要求はフラグが false の
+   * ときにこそ発生するためで、判断の経緯は docs/dev/draft-preview.md にある。
+   * 通常のアクセス（draft が null）に対する挙動はこれまでと変わらない。
+   */
+  const { id } = await params;
+  const draft = await readDraftPreviewContext("events", id);
+
+  if (!SPECIAL_VISIBLE && !draft) {
     notFound();
   }
 
-  const { id } = await params;
-  const event = await getSpecialEventById(id);
+  const event = await getSpecialEventById(id, draft?.draftKey);
 
   if (!event) {
     notFound();
@@ -138,32 +151,40 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
-      />
-
       {/*
-        パンくずの構造化データ。この直下の nav に視覚的なパンくずが実在するため
-        宣言してよい（画面に無い階層を宣言するとガイドライン違反になる）。
+        構造化データ。下書きプレビューでは出さない。
+        公開前の内容を機械可読な形で置く必要がなく、noindex との整合も取れる
       */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: serializeJsonLd(
-            createBreadcrumbStructuredData([
-              { name: "トップ", pathname: "/" },
-              /*
-               * 画面上の「著名人企画」はリンクではなく素のラベルであり、対応する
-               * URL が無い。Google が item の省略を許すのは末尾の項目だけなので、
-               * 中間階層としては宣言しない。/special を充てると SPECIAL_VISIBLE が
-               * 真の間は このLP自身へ 302 転送されるため循環する。
-               */
-              { name: event.title },
-            ])
-          ),
-        }}
-      />
+      {!draft && (
+        <>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+          />
+
+          {/*
+            パンくずの構造化データ。この直下の nav に視覚的なパンくずが実在するため
+            宣言してよい（画面に無い階層を宣言するとガイドライン違反になる）。
+          */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: serializeJsonLd(
+                createBreadcrumbStructuredData([
+                  { name: "トップ", pathname: "/" },
+                  /*
+                   * 画面上の「著名人企画」はリンクではなく素のラベルであり、対応する
+                   * URL が無い。Google が item の省略を許すのは末尾の項目だけなので、
+                   * 中間階層としては宣言しない。/special を充てると SPECIAL_VISIBLE が
+                   * 真の間は このLP自身へ 302 転送されるため循環する。
+                   */
+                  { name: event.title },
+                ])
+              ),
+            }}
+          />
+        </>
+      )}
 
       <div className="min-h-screen bg-secondary">
         {/* ヒーローと各セクションの入場モーション（DOM は出力しない） */}
@@ -233,6 +254,8 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
           </div>
         </div>
       </div>
+
+      {draft && <DraftPreviewBanner />}
     </>
   );
 }

@@ -276,16 +276,20 @@ export async function getSpecialEvents(): Promise<Event[]> {
  *
  * `getEventById()` と違い EVENTS_VISIBLE には依存しない（`getSpecialEvents()` と同じ理由）。
  * type が special でないコンテンツを指定した場合は null を返す。
+ *
  * @param id 企画ID
+ * @param draftKey microCMS の画面プレビューから渡された下書きキー。省略時は公開コンテンツのみ
  * @returns 著名人企画、該当しない場合は null
  */
-export async function getSpecialEventById(id: string): Promise<Event | null> {
-  if (!SPECIAL_VISIBLE) return null;
+export async function getSpecialEventById(id: string, draftKey?: string): Promise<Event | null> {
+  // draftKey があるときは公開フラグを跨ぐ（理由は getEventById() のコメントを参照）
+  if (!SPECIAL_VISIBLE && !draftKey) return null;
   if (!isMicrocmsConfigured) return null;
   try {
     const response: RawEvent = await client.get({
       endpoint: "events",
       contentId: id,
+      ...(draftKey ? { queries: { draftKey } } : {}),
     });
     const event = normalizeEvent(response);
     return event.type === "special" ? event : null;
@@ -323,17 +327,29 @@ export async function getFeaturedEvents(): Promise<Event[]> {
 
 /**
  * 特定の企画を取得
- * EVENTS_VISIBLE が false の間は常に null を返す（microCMSへは問い合わせない）
+ *
+ * EVENTS_VISIBLE が false の間は常に null を返す（microCMSへは問い合わせない）。
+ * ただし draftKey が渡された場合はフラグを跨ぐ（下記）。
+ *
  * @param id 企画ID
+ * @param draftKey microCMS の画面プレビューから渡された下書きキー。省略時は公開コンテンツのみ
  * @returns 企画情報、見つからない場合はnull
  */
-export async function getEventById(id: string): Promise<Event | null> {
-  if (!EVENTS_VISIBLE) return null;
+export async function getEventById(id: string, draftKey?: string): Promise<Event | null> {
+  /*
+   * draftKey があるときは公開フラグを跨ぐ。「解禁前の内容を確認したい」という要求は
+   * フラグが false のときにこそ発生するため、ここで塞ぐとプレビューの意味が無くなる。
+   * この経路は /api/draft のシークレットと、その時点で有効な draftKey の二重で守られており、
+   * 公開ルート（draftKey を伴わない通常のアクセス）の判定は一切変えていない。
+   * 判断の経緯は docs/dev/draft-preview.md を参照。
+   */
+  if (!EVENTS_VISIBLE && !draftKey) return null;
   if (!isMicrocmsConfigured) return null;
   try {
     const response: RawEvent = await client.get({
       endpoint: "events",
       contentId: id,
+      ...(draftKey ? { queries: { draftKey } } : {}),
     });
     // データを正規化して返す
     return normalizeEvent(response);

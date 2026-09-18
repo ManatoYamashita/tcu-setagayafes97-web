@@ -4,6 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { getNewsById, getNewsList } from "@/lib/news";
 import { Badge } from "@/components/ui/Badge";
+import { DraftPreviewBanner } from "@/components/layout/DraftPreviewBanner";
+import { readDraftPreviewContext } from "@/lib/draft-mode";
 import { createPageMetadata } from "@/lib/metadata";
 import {
   absoluteSiteUrl,
@@ -38,7 +40,8 @@ export async function generateStaticParams() {
  */
 export async function generateMetadata({ params }: NewsPageProps): Promise<Metadata> {
   const { id } = await params;
-  const news = await getNewsById(id);
+  const draft = await readDraftPreviewContext("news", id);
+  const news = await getNewsById(id, draft?.draftKey);
 
   if (!news) {
     return createPageMetadata({
@@ -63,6 +66,8 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
           alt: news.title,
         }
       : undefined,
+    // 下書きプレビューは公開前の内容である。canonical も出さない（createPageMetadata の仕様）
+    noindex: draft !== null,
   });
 }
 
@@ -71,7 +76,8 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
  */
 export default async function NewsPage({ params }: NewsPageProps) {
   const { id } = await params;
-  const news = await getNewsById(id);
+  const draft = await readDraftPreviewContext("news", id);
+  const news = await getNewsById(id, draft?.draftKey);
 
   if (!news) {
     notFound();
@@ -115,28 +121,35 @@ export default async function NewsPage({ params }: NewsPageProps) {
 
   return (
     <>
-      {/* 構造化データ */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
-      />
-
       {/*
-        パンくずの構造化データ。この直下の nav に視覚的なパンくずが実在するため
-        宣言してよい（画面に無い階層を宣言するとガイドライン違反になる）。
+        構造化データ。下書きプレビューでは出さない。
+        公開前の内容を機械可読な形で置く必要がなく、noindex との整合も取れる
       */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: serializeJsonLd(
-            createBreadcrumbStructuredData([
-              { name: "トップ", pathname: "/" },
-              { name: "お知らせ一覧", pathname: "/info" },
-              { name: news.title },
-            ])
-          ),
-        }}
-      />
+      {!draft && (
+        <>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+          />
+
+          {/*
+            パンくずの構造化データ。この直下の nav に視覚的なパンくずが実在するため
+            宣言してよい（画面に無い階層を宣言するとガイドライン違反になる）。
+          */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: serializeJsonLd(
+                createBreadcrumbStructuredData([
+                  { name: "トップ", pathname: "/" },
+                  { name: "お知らせ一覧", pathname: "/info" },
+                  { name: news.title },
+                ])
+              ),
+            }}
+          />
+        </>
+      )}
 
       <div className="min-h-screen bg-secondary">
         {/* パンくずリスト */}
@@ -265,6 +278,8 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </div>
         </div>
       </div>
+
+      {draft && <DraftPreviewBanner />}
     </>
   );
 }
