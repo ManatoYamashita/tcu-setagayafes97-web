@@ -9,6 +9,7 @@
     "access": "Access",
     "info": "Information",
     "news": "News",
+    "newsList": "All News",
     "guide": "Visitor Guide",
     "faq": "FAQ",
     "pamphlet": "Pamphlet",
@@ -20,7 +21,8 @@
   },
   "header": {
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "mainNav": "Main navigation"
   },
   "footer": {
     "eventInfo": "Event Info",

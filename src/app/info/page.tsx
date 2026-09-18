@@ -6,6 +6,10 @@ import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
 import { pageHeroes } from "@/data/page-heroes";
 import { NEWS_VISIBLE } from "@/data/site";
 import { createPageMetadata } from "@/lib/metadata";
+import { getChromeMessages } from "@/i18n/chrome-messages";
+
+/** 一覧の呼称はカタログ1箇所で決める。パンくず・戻るリンクと同じ値を使う */
+const { newsList } = getChromeMessages("ja").navigation;
 
 /**
  * メタデータ
@@ -13,13 +17,13 @@ import { createPageMetadata } from "@/lib/metadata";
  */
 export const metadata: Metadata = NEWS_VISIBLE
   ? createPageMetadata({
-      title: "お知らせ一覧",
+      title: newsList,
       description:
         "東京都市大学 第97回 世田谷祭のお知らせ一覧ページ。重要なお知らせやイベント情報をご確認いただけます。",
       pathname: "/info",
     })
   : createPageMetadata({
-      title: "お知らせ一覧",
+      title: newsList,
       description:
         "東京都市大学 第97回 世田谷祭のお知らせは現在準備中です。公開までもうしばらくお待ちください。",
       pathname: "/info",

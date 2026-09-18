@@ -21,7 +21,7 @@ export function FooterNav() {
     <>
       {footerSections.map((section) => (
         <div key={section.id}>
-          <h3 className="mb-4 font-bold text-white">{section.title}</h3>
+          <h2 className="mb-4 font-bold text-white">{section.title}</h2>
           <ul className="space-y-2">
             {section.links.map((link) => (
               // key は href ではなく id。href はロケールで変わるため

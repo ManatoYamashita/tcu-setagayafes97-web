@@ -4,6 +4,11 @@ import type { ChromeNavItem } from "@/components/layout/useChromeNav";
 
 interface DesktopNavProps {
   items: readonly ChromeNavItem[];
+  /**
+   * nav の aria-label。ページ内に nav が複数あるため名前が要る。
+   * 例: /info/[id] にはパンくずの nav が同居する
+   */
+  label: string;
 }
 
 /**
@@ -16,9 +21,9 @@ interface DesktopNavProps {
  * - children がない項目: 通常リンク
  * - children がある項目: NavDropdown を使用
  */
-export function DesktopNav({ items }: DesktopNavProps) {
+export function DesktopNav({ items, label }: DesktopNavProps) {
   return (
-    <nav className="hidden lg:block">
+    <nav aria-label={label} className="hidden lg:block">
       {/*
         gap は lg 帯だけ詰める。デスクトップナビは lg (1024px) から出るが、
         実測（2026-08-16）で必要幅は padding 48 + ロゴ 208 + ナビ + 言語切替 90。

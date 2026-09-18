@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 import { getNewsById, getNewsList } from "@/lib/news";
 import { Badge } from "@/components/ui/Badge";
 import { DraftPreviewBanner } from "@/components/layout/DraftPreviewBanner";
 import { readDraftPreviewContext } from "@/lib/draft-mode";
 import { createPageMetadata } from "@/lib/metadata";
+import { getChromeMessages } from "@/i18n/chrome-messages";
 import {
   absoluteSiteUrl,
   createBreadcrumbStructuredData,
@@ -76,6 +78,12 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
  */
 export default async function NewsPage({ params }: NewsPageProps) {
   const { id } = await params;
+  /*
+   * 一覧の呼称をここでベタ書きすると、ヘッダー（「お知らせ」）や
+   * フッターと食い違う。カタログ1箇所で決める。
+   * このルートは CMS 本文が日本語のみのため ja 固定でよい。
+   */
+  const { navigation } = getChromeMessages("ja");
   const draft = await readDraftPreviewContext("news", id);
   const news = await getNewsById(id, draft?.draftKey);
 
@@ -142,7 +150,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
               __html: serializeJsonLd(
                 createBreadcrumbStructuredData([
                   { name: "トップ", pathname: "/" },
-                  { name: "お知らせ一覧", pathname: "/info" },
+                  { name: navigation.newsList, pathname: "/info" },
                   { name: news.title },
                 ])
               ),
@@ -151,52 +159,32 @@ export default async function NewsPage({ params }: NewsPageProps) {
         </>
       )}
 
-      <div className="min-h-screen bg-secondary">
+      {/*
+        id は後続のスキップリンク（#177 A）がそのまま指せるように今から振っておく。
+        このルートは PageSheetLayout を経由しないため、main は自前で出す必要がある
+      */}
+      <main id="content" className="min-h-screen bg-secondary">
         {/* パンくずリスト */}
         <nav className="border-b border-gray-200/20 bg-secondary py-4" aria-label="パンくずリスト">
           <div className="container mx-auto px-4">
             <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-900/80">
               <li>
-                <Link href="/" className="hover:text-gray-900 hover:underline">
+                <Link href="/" className="text-primary-700 hover:underline">
                   トップ
                 </Link>
               </li>
-              <li>
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
+              {/* 区切りは階層ではない。li ごと隠さないとリストの項目数が階層数と合わなくなる */}
+              <li aria-hidden="true">
+                <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
               </li>
               <li>
-                <Link href="/info" className="hover:text-gray-900 hover:underline">
-                  お知らせ一覧
+                <Link href="/info" className="text-primary-700 hover:underline">
+                  {navigation.newsList}
                 </Link>
               </li>
-              <li>
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
+              {/* 区切りは階層ではない。li ごと隠さないとリストの項目数が階層数と合わなくなる */}
+              <li aria-hidden="true">
+                <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
               </li>
               <li className="font-semibold text-gray-900" aria-current="page">
                 {news.title}
@@ -218,7 +206,16 @@ export default async function NewsPage({ params }: NewsPageProps) {
                     news.type === "urgent" ? "重要" : news.type === "news" ? "お知らせ" : "その他"
                   }
                 />
-                <time className="text-sm text-gray-900/60">{publishedDate}</time>
+                {/*
+                  /60 は淡紫背景(#d5a7ed)で 4.22:1 となり AA を満たさない（#95）。
+                  同じページのパンくずで使っている /80 は 7.18:1
+                */}
+                <time
+                  dateTime={news.publishedAt || news.createdAt}
+                  className="text-sm text-gray-900/80"
+                >
+                  {publishedDate}
+                </time>
               </div>
 
               {/* タイトル */}
@@ -227,9 +224,14 @@ export default async function NewsPage({ params }: NewsPageProps) {
               {/* サムネイル */}
               {news.thumbnail && (
                 <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+                  {/*
+                    alt に h1 と同じ文字列を入れると同じ語が2回読み上げられ、
+                    画像の内容は一度も説明されないままになる。
+                    microCMS に代替テキスト用のフィールドが無いため装飾として扱う
+                  */}
                   <Image
                     src={news.thumbnail.url}
-                    alt={news.title}
+                    alt=""
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 896px"
@@ -259,25 +261,12 @@ export default async function NewsPage({ params }: NewsPageProps) {
               href="/info"
               className="inline-flex items-center gap-2 text-primary-700 hover:underline"
             >
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              <span>お知らせ一覧に戻る</span>
+              <ArrowLeft className="h-5 w-5" strokeWidth={1.5} aria-hidden="true" />
+              <span>{navigation.newsList}に戻る</span>
             </Link>
           </div>
         </div>
-      </div>
+      </main>
 
       {draft && <DraftPreviewBanner />}
     </>
