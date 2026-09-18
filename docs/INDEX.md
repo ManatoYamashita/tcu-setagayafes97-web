@@ -31,7 +31,8 @@ docs/
 │   ├── seo-metadata.md # 共通metadata・canonical・構造化データ・sitemap の方針
 │   ├── legacy-site-deindex.md # 過去回サイト群を検索結果から恒久除外する運用手順
 │   ├── microcms.md   # microCMS API 制約と実装パターン
-│   └── content-revalidation.md # microCMS Webhook によるオンデマンド再検証と運用手順
+│   ├── content-revalidation.md # microCMS Webhook によるオンデマンド再検証と運用手順
+│   └── draft-preview.md # microCMS 画面プレビューによる下書きの実機確認
 ├── frontend/         # フロントエンド関連ドキュメント
 │   ├── design.md                  # デザインシステム（カラー・タイポグラフィトークン）
 │   ├── access-page-design.md      # Accessページの情報設計・UI実装方針
@@ -208,7 +209,16 @@ docs/
   - **未入力の企画は表示用フォールバックで案内する。** 入稿データの修正は microCMS、公開画面の崩れ防止は `src/lib/event-display.ts` とプレースホルダーで分担する
   - カスタムフィールドのネスト制約と作成順序（子から親へ）。API をまたいだ参照は不可
   - **管理画面はブラウザ自動操作で編集できない。** 種類選択が実マウスイベントに依存し、スクリプトでは別の行へ適用される
-  - **下書きコンテンツで動作確認はできない。** `draftKey` は保存のたびに変わり失効する。表示確認はダミーを直接渡す一時ページで行う
+  - **手で控えた `draftKey` は使えない**（保存のたびに失効する）。画面プレビュー経由なら失効しない → [draft-preview.md](./dev/draft-preview.md)
+  - **「一時的に公開して確認」はもう使えない。** 公開フラグが4本とも `true` になり、公開すれば本番に出る
+
+- **[draft-preview.md](./dev/draft-preview.md)** - 下書きの実機確認（microCMS 画面プレビュー）
+  - 編集画面の「画面プレビュー」から、本番と同じ詳細ページで下書きを表示する仕組み。対象は `events` と `news`
+  - **`draftKey` は `searchParams` では受け取れない。** 読んだ時点でルートが動的化し、下書きを見ない訪問者の ISR まで失われる。cookie で運ぶ
+  - **`draftMode()` の `isEnabled` は静的生成を壊さないが、`cookies()` は壊す。** `isEnabled` が false のとき `cookies()` へ到達させない順序が要る（Next.js 16.1 の実装で確認）
+  - **プレビューは公開フラグ（`NEXT_PUBLIC_*_VISIBLE`）を跨ぐ。** 解禁前の確認こそが目的であるため。守りはシークレットと draftKey の二重
+  - 遷移先は `/api/draft` が下書きを取得し、正規化後の `type` を見て決める（著名人企画は `/special/[id]`）。存在確認を兼ねてオープンリダイレクトを防ぐ
+  - **解除を忘れると、そのブラウザは以後ずっと ISR を迂回する**
 
 - **[content-revalidation.md](./dev/content-revalidation.md)** - コンテンツ反映の仕組み（オンデマンド再検証）
   - microCMS 更新時の Webhook 即時失効と、失敗時の10分 ISR フォールバック

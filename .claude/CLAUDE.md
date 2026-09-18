@@ -252,6 +252,18 @@ microCMS の入稿は **Webhook 経由で数秒以内**に本番へ反映され�
 **公開フラグ `NEXT_PUBLIC_*_VISIBLE` はビルド時評価であり、Webhook では切り替わらない。**
 解禁作業には従来どおり再デプロイが要る。
 
+### 下書きの確認（画面プレビュー）
+
+microCMS の編集画面にある「画面プレビュー」から、**公開せずに本番と同じ詳細ページで下書きを確認できる**
+（受け口は `src/app/api/draft/route.ts`、対象は `events` と `news`）。設計と運用は
+[`docs/dev/draft-preview.md`](../docs/dev/draft-preview.md) を参照。
+
+> [!IMPORTANT]
+> **詳細ページで `cookies()` を無条件に呼んではいけない。** 呼んだ時点でルートが動的化し、
+> `/events/[id]` などの SSG が失われる。`draftMode()` の `isEnabled` が false のときに
+> 早期 return する順序（`src/lib/draft-mode.ts`）が静的生成を守っている。
+> 同じ理由で **`draftKey` を `searchParams` で受け取ってはいけない。**
+
 ### パフォーマンス最適化
 
 **Vercel Free Plan 制約を考慮:**

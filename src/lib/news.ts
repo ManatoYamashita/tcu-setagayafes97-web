@@ -44,6 +44,13 @@ function normalizeNewsType(type: string[] | string | undefined): NewsType {
 function normalizeNews(rawNews: RawNews): News {
   return {
     ...rawNews,
+    // microCMS側で必須設定にしていても、入力漏れがあれば undefined が返り得る
+    // （`normalizeEvent()` と同じ理由・同じ扱い）。
+    // 下書きのプレビューでは未入力が常態であり、既定化しないと createPageMetadata() に
+    // undefined が渡って "undefined | 東京都市大学 世田谷祭" というタイトルが出る
+    title: rawNews.title ?? "",
+    description: rawNews.description ?? "",
+    content: rawNews.content ?? "",
     type: normalizeNewsType(rawNews.type),
   };
 }
@@ -86,17 +93,23 @@ export async function getLatestHeroNews(): Promise<News | null> {
 
 /**
  * 特定のお知らせを取得
- * NEWS_VISIBLE が false の間は常に null を返す（microCMSへは問い合わせない）
+ *
+ * NEWS_VISIBLE が false の間は常に null を返す（microCMSへは問い合わせない）。
+ * ただし draftKey が渡された場合はフラグを跨ぐ（`getEventById()` と同じ判断。
+ * 理由は docs/dev/draft-preview.md）。
+ *
  * @param id お知らせID
+ * @param draftKey microCMS の画面プレビューから渡された下書きキー。省略時は公開コンテンツのみ
  * @returns お知らせ情報、見つからない場合はnull
  */
-export async function getNewsById(id: string): Promise<News | null> {
-  if (!NEWS_VISIBLE) return null;
+export async function getNewsById(id: string, draftKey?: string): Promise<News | null> {
+  if (!NEWS_VISIBLE && !draftKey) return null;
   if (!isMicrocmsConfigured) return null;
   try {
     const response: RawNews = await client.get({
       endpoint: "news",
       contentId: id,
+      ...(draftKey ? { queries: { draftKey } } : {}),
     });
     // データを正規化して返す
     return normalizeNews(response);

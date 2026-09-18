@@ -6,6 +6,8 @@ import { getEventById, getEventsList } from "@/lib/events";
 import { SPECIAL_VISIBLE } from "@/data/site";
 import { EventDetail } from "@/components/events/EventDetail";
 import { RelatedEvents } from "@/components/events/RelatedEvents";
+import { DraftPreviewBanner } from "@/components/layout/DraftPreviewBanner";
+import { readDraftPreviewContext } from "@/lib/draft-mode";
 import { createPageMetadata } from "@/lib/metadata";
 import { createBreadcrumbStructuredData, serializeJsonLd } from "@/lib/structured-data";
 interface EventPageProps {
@@ -36,7 +38,8 @@ export async function generateStaticParams() {
  */
 export async function generateMetadata({ params }: EventPageProps): Promise<Metadata> {
   const { id } = await params;
-  const event = await getEventById(id);
+  const draft = await readDraftPreviewContext("events", id);
+  const event = await getEventById(id, draft?.draftKey);
 
   if (!event) {
     return createPageMetadata({
@@ -61,6 +64,8 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
           alt: event.title,
         }
       : undefined,
+    // 下書きプレビューは公開前の内容である。canonical も出さない（createPageMetadata の仕様）
+    noindex: draft !== null,
   });
 }
 
@@ -69,14 +74,17 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
  */
 export default async function EventPage({ params }: EventPageProps) {
   const { id } = await params;
-  const event = await getEventById(id);
+  const draft = await readDraftPreviewContext("events", id);
+  const event = await getEventById(id, draft?.draftKey);
 
   if (!event) {
     notFound();
   }
 
-  // 著名人企画は /special/[id] が正規URL。既出のURLから来た場合に備えて誘導する
-  if (event.type === "special") {
+  // 著名人企画は /special/[id] が正規URL。既出のURLから来た場合に備えて誘導する。
+  // プレビュー中は転送しない。遷移先は /api/draft が下書きの type を見て既に決めており、
+  // ここで再度飛ばすと cookie の id と一致しない URL へ送って下書きを見失う
+  if (!draft && event.type === "special") {
     if (!SPECIAL_VISIBLE) {
       notFound();
     }
@@ -120,28 +128,35 @@ export default async function EventPage({ params }: EventPageProps) {
 
   return (
     <>
-      {/* 構造化データ */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
-      />
-
       {/*
-        パンくずの構造化データ。この直下の nav に視覚的なパンくずが実在するため
-        宣言してよい（画面に無い階層を宣言するとガイドライン違反になる）。
+        構造化データ。下書きプレビューでは出さない。
+        公開前の内容を機械可読な形で置く必要がなく、noindex との整合も取れる
       */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: serializeJsonLd(
-            createBreadcrumbStructuredData([
-              { name: "トップ", pathname: "/" },
-              { name: "企画を探す", pathname: "/events" },
-              { name: event.title },
-            ])
-          ),
-        }}
-      />
+      {!draft && (
+        <>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+          />
+
+          {/*
+            パンくずの構造化データ。この直下の nav に視覚的なパンくずが実在するため
+            宣言してよい（画面に無い階層を宣言するとガイドライン違反になる）。
+          */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: serializeJsonLd(
+                createBreadcrumbStructuredData([
+                  { name: "トップ", pathname: "/" },
+                  { name: "企画を探す", pathname: "/events" },
+                  { name: event.title },
+                ])
+              ),
+            }}
+          />
+        </>
+      )}
 
       <div className="min-h-screen bg-gradient-to-b from-white via-primary-50 to-secondary pb-20">
         {/* パンくずリスト */}
@@ -231,6 +246,8 @@ export default async function EventPage({ params }: EventPageProps) {
         {/* 関連企画 */}
         <RelatedEvents currentEvent={event} />
       </div>
+
+      {draft && <DraftPreviewBanner />}
     </>
   );
 }
