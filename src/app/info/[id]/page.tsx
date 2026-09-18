@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: NewsPageProps): Promise<Metad
       title: "お知らせが見つかりません",
       description: "お探しのお知らせは見つかりませんでした。",
       pathname: `/info/${id}`,
-      // 実在しないIDでも200が返るため、canonical を出さず noindex にする（詳細は createPageMetadata）。
+      // 存在しない記事から canonical を出さず、noindex にする（詳細は createPageMetadata）。
       noindex: true,
     });
   }
