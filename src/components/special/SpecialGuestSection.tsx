@@ -18,7 +18,7 @@ import { SpecialGuestMotion } from "./SpecialGuestMotion";
  * 契約で決まっており、URL の先行露出が事故になるためです（src/data/site.ts のコメント参照）。
  * EVENTS_VISIBLE には依存しないため、著名人だけを先行公開する運用でも表示されます。
  * /events は EVENTS_VISIBLE=false のとき一覧が準備中表示になりますが、その場合も
- * このセクションだけは準備中カードの下に残します（src/app/events/page.tsx）。
+ * このセクションだけは準備中カードの下に残します（src/app/events/(list)/page.tsx）。
  *
  * 文言は microCMS ではなく src/data/special-banner.ts が持ちますが、リンク先が実在するか
  * どうかだけは getSpecialEventById() で確認します。ID が変わって LP に到達できない場合は、

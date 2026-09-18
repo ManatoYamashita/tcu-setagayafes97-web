@@ -139,7 +139,7 @@
 
 ### 6. 企画機能実装
 
-- [x] 企画一覧ページルート（`/src/app/events/page.tsx`）を作成
+- [x] 企画一覧ページルート（`/src/app/events/(list)/page.tsx`）を作成
 - [x] 企画詳細ページルート（`/src/app/events/[id]/page.tsx`）を作成（動的ルーティング）
 - [x] microCMS Events APIからデータ取得ロジックを実装
 - [x] 企画一覧カード表示を実装（サムネイル、タイトル、カテゴリバッジ、場所、日程）

@@ -125,7 +125,7 @@ it("…", async () => {
 
 `listBuildingOptions(events, selected)` の `selected` は「選択中の建物を該当0件でも
 選択肢へ残す」ための引数で、テストも docs もその契約を書いていた。**それでも本番では
-一度も渡っていなかった**（#207 のレビューで発覚）。唯一の呼び出し元 `src/app/events/page.tsx` は
+一度も渡っていなかった**（#207 のレビューで発覚）。唯一の呼び出し元 `src/app/events/(list)/page.tsx` は
 `useSearchParams()` を読まない設計（#156）なので、選択値を知り得なかったためである。
 
 症状は「`?building=7号館` で建物セレクトが『すべて』と表示されたまま0件」。

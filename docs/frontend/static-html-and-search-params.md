@@ -22,14 +22,14 @@
 **境界を書かなくてもエラーにはなりません。** 代わりに、いちばん近い `loading.tsx` が
 作る境界が代役を務めます。このアプリには2枚あります。
 
-| ファイル                     | 代役になる範囲                           |
-| ---------------------------- | ---------------------------------------- |
-| `src/app/loading.tsx`        | ルート直下。ヘッダー・フッター以外の全部 |
-| `src/app/events/loading.tsx` | `/events` のページ全体                   |
+| ファイル                            | 代役になる範囲                           |
+| ----------------------------------- | ---------------------------------------- |
+| `src/app/loading.tsx`               | ルート直下。ヘッダー・フッター以外の全部 |
+| `src/app/events/(list)/loading.tsx` | `/events` の一覧ページ                   |
 
 > [!WARNING]
 > #156 の Issue 本文は「ルート直下の `src/app/loading.tsx` が捕まえる」と書いていますが、
-> `/events` を捕まえていたのは **`src/app/events/loading.tsx`** です（2026-09-03 実測）。
+> `/events` の一覧を捕まえるのは **`src/app/events/(list)/loading.tsx`** です。企画詳細の親セグメントには `loading.tsx` を置かないため、`/events/[id]` の404ステータスを維持できます。
 > 範囲が同じなので結果は変わりませんが、原因を追うときは**そのルートに `loading.tsx` が
 > あるかを先に見る**こと。
 
@@ -78,7 +78,7 @@ grep -o '.\{160\}BAILOUT_TO_CLIENT_SIDE_RENDERING' "$f"
 「中身をHTMLに載せたい」なら、**fallback をプレースホルダではなく既定状態の完成形にします。**
 
 `/events` では「クエリ無しで着地したときの表示」＝未フィルタ1ページ目を fallback に置きました
-（`src/app/events/page.tsx`）。
+（`src/app/events/(list)/page.tsx`）。
 
 ```
 <Suspense fallback={<EventsView ...既定値... />}>   ← 静的HTMLに出る
@@ -99,17 +99,17 @@ grep -o '.\{160\}BAILOUT_TO_CLIENT_SIDE_RENDERING' "$f"
 
 `.next/server/app/events.html` を直接読んだ結果。
 
-| 確認項目                                  | 境界なし                    | 境界あり（fallback = 既定ビュー） |
-| ----------------------------------------- | --------------------------- | --------------------------------- |
-| `data-page-hero="true"`                   | 0                           | **1**                             |
-| `data-page-sheet="true"`                  | 0                           | **1**                             |
-| `href="/events/xxx"`（重複除く）          | 0                           | **11**                            |
-| `href="/special/xxx"`（重複除く）         | 0                           | **1**                             |
-| `件の企画が見つかりました`                | 0                           | **1**（＋flightペイロードに1）    |
-| `BAILOUT_TO_CLIENT_SIDE_RENDERING` の位置 | `events/loading.tsx` の境界 | 追加した `<Suspense>` の内側      |
-| HTML raw                                  | 81,635 bytes                | 184,964 bytes                     |
-| gzip -9                                   | 15,429 bytes                | 24,898 bytes                      |
-| brotli -q11                               | 12,780 bytes                | **16,990 bytes**                  |
+| 確認項目                                  | 境界なし                           | 境界あり（fallback = 既定ビュー） |
+| ----------------------------------------- | ---------------------------------- | --------------------------------- |
+| `data-page-hero="true"`                   | 0                                  | **1**                             |
+| `data-page-sheet="true"`                  | 0                                  | **1**                             |
+| `href="/events/xxx"`（重複除く）          | 0                                  | **11**                            |
+| `href="/special/xxx"`（重複除く）         | 0                                  | **1**                             |
+| `件の企画が見つかりました`                | 0                                  | **1**（＋flightペイロードに1）    |
+| `BAILOUT_TO_CLIENT_SIDE_RENDERING` の位置 | `events/(list)/loading.tsx` の境界 | 追加した `<Suspense>` の内側      |
+| HTML raw                                  | 81,635 bytes                       | 184,964 bytes                     |
+| gzip -9                                   | 15,429 bytes                       | 24,898 bytes                      |
+| brotli -q11                               | 12,780 bytes                       | **16,990 bytes**                  |
 
 **転送量で見ると +4.2KB です。** raw では2.3倍に見えますが、HTMLと flight ペイロードに同じ
 マークアップが2度出るため圧縮がよく効きます。判断は必ず圧縮後の数字で行うこと。
@@ -163,7 +163,7 @@ const EVENTS_FALLBACK_TREE = [
 | 現状                                         | exit 0          |
 | `EventFilters` へ `useSearchParams` を戻した | **exit 1**      |
 
-**このルールが守るのは「クエリを読む場所」だけである。** `src/app/events/page.tsx` から
+**このルールが守るのは「クエリを読む場所」だけである。** `src/app/events/(list)/page.tsx` から
 `<Suspense>` 境界そのものを外す変更は、ESLint では止められない。そちらは次の装置が受け持つ。
 
 ---

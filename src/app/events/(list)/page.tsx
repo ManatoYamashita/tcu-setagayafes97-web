@@ -114,7 +114,7 @@ export default async function EventsPage() {
         企画一覧コンテンツ
 
         EventsContent は useSearchParams() を使うため <Suspense> 境界が要る。
-        境界が無いと、src/app/events/loading.tsx が代役を務めてしまい、
+        境界が無いと、src/app/events/(list)/loading.tsx が代役を務めてしまい、
         ページ全体（ヒーローと白いシートを含む）がクライアントレンダリングへ落ちる。
 
         fallback はただのプレースホルダではなく「クエリ無しで来たときの完成形」である。

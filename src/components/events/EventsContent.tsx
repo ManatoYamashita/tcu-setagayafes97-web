@@ -24,7 +24,7 @@ interface EventsContentProps {
  * **このアプリで `/events` のクエリを読むのはここだけです。** `useSearchParams()` は
  * 静的レンダリング時に「最も近い `<Suspense>` 境界より内側」をクライアント描画へ落とします。
  * 読む場所を増やすと落ちる範囲が広がるため、下位（`EventFilters` / `Pagination`）へは
- * 値を props で渡します。境界は `src/app/events/page.tsx` にあります（#156）。
+ * 値を props で渡します。境界は `src/app/events/(list)/page.tsx` にあります（#156）。
  */
 export function EventsContent({ initialEvents }: EventsContentProps) {
   const searchParams = useSearchParams();

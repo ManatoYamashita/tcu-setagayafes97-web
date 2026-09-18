@@ -154,14 +154,14 @@ PR #199 が `normalizeEvent()` の既定化で塞いだ）。
 「無言の0件」そのもの**になる。
 
 > [!IMPORTANT]
-> **`selected` を渡せるのはクエリを読める場所だけである。** `src/app/events/page.tsx` は
+> **`selected` を渡せるのはクエリを読める場所だけである。** `src/app/events/(list)/page.tsx` は
 > `useSearchParams()` を読まない設計（#156）なので選択値を知らない。したがって作る場所は
 > 2つに分かれる。
 >
-> | 作る場所                  | 呼び方                                         | 用途                                   |
-> | ------------------------- | ---------------------------------------------- | -------------------------------------- |
-> | `src/app/events/page.tsx` | `listBuildingOptions(events)`                  | `<Suspense>` の fallback（クエリ無し） |
-> | `EventsContent`           | `listBuildingOptions(initialEvents, selected)` | 本描画                                 |
+> | 作る場所                         | 呼び方                                         | 用途                                   |
+> | -------------------------------- | ---------------------------------------------- | -------------------------------------- |
+> | `src/app/events/(list)/page.tsx` | `listBuildingOptions(events)`                  | `<Suspense>` の fallback（クエリ無し） |
+> | `EventsContent`                  | `listBuildingOptions(initialEvents, selected)` | 本描画                                 |
 >
 > **2箇所で作っても中身はずれない。** fallback は定義上 `building: "all"`（`DEFAULT_EVENT_FILTERS`）
 > なので選択値を持たず、差は「選択中の1件」だけ——それがまさに欲しい差である。
