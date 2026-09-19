@@ -46,6 +46,7 @@ docs/
 │   ├── events-infinite-scroll.md  # /events の無限スクロールと絞り込みの追従
 │   ├── layout-e2e.md              # 実ブラウザの再発防止装置（盤面 / ランドマーク1周）
 │   ├── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
+│   ├── image-delivery.md          # 画像変換の委譲先（microCMS=imgix / 静的=Vercel）
 │   ├── performance.md             # Lighthouse基準値とフロントエンド性能ルール
 │   └── page-transition.md         # ページ遷移アニメーションとView Transitions API
 └── requires/         # 要件定義・仕様関連
@@ -291,6 +292,14 @@ docs/
     開催概要リスト限定の規約であり、白いシート全体の規約ではない**）
   - CSS 変数まとめ
   - リッチテキスト（`prose`）の扱い — typography プラグイン未導入と `@layer` の選び方
+
+- **[image-delivery.md](./frontend/image-delivery.md)** - 画像配信の経路（変換をどこにやらせるか）
+  - microCMS は imgix、`public/` の静的画像は Vercel。枠を焼いていたのは前者だけ（7% : 93%）
+  - 変換枠が枯れると「一部の画像だけ」が 402 で壊れる。同じ画像でも幅で生死が分かれる（#237）
+  - **`curl` で検証するときは `Accept` を付ける。** 付けないとキャッシュ済みでも 402 に見える
+  - `auto=format` が効かない理由と、`fm=webp` / `fit=max` を決めた実測値
+  - `AppImage` というラッパーに至るまでに実測で否定した2案
+  - 再発防止装置3つの射程の違い（ESLint / ユニットテスト / ビルド生成物）
 
 - **[performance.md](./frontend/performance.md)** - Lighthouse基準値とフロントエンド性能ルール
   - 初期表示モーションの尺は `src/lib/motion.ts` に集約（2026-08-29）

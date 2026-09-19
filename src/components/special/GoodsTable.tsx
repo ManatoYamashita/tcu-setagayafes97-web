@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { AppImage } from "@/components/ui/AppImage";
 import type { GoodsItem } from "@/types/events";
 
 interface GoodsTableProps {
@@ -88,7 +88,7 @@ export function GoodsTable({ goods, note }: GoodsTableProps) {
                 {hasImage && (
                   <td className="px-4 py-3">
                     {item.image && (
-                      <Image
+                      <AppImage
                         src={item.image.url}
                         alt=""
                         width={64}

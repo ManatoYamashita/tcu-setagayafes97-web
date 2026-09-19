@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { Download, FileText, AlertCircle } from "lucide-react";
 import { createPageMetadata } from "@/lib/metadata";
 /**

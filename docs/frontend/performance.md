@@ -290,9 +290,16 @@ const shouldWaitForOpener = willRunOpener() && !hasOpenerFinished();
 
 ### 画像
 
-- ローカル画像と許可済みリモート画像は原則 `next/image` を使う。
+- **画像は `AppImage` で描く。`next/image` を直接 import してはいけない**
+  （`eslint.config.mjs` が error で止める）。microCMS の画像は imgix、
+  `public/` の静的画像は Vercel の Image Optimization で変換される。振り分けは
+  `AppImage` が実行時に行うので、呼び出し側は意識しなくてよい。変換枠が枯れて画像が
+  402 で壊れた経緯（#237）と経路の設計は [image-delivery.md](./image-delivery.md) を参照。
 - 固定表示サイズでも `width` / `height` / `sizes` を明示する。
-- microCMS の画像を原寸のままロゴ一覧へ渡さず、表示寸法に応じて最適化する。
+- **`next.config.ts` の `deviceSizes` / `imageSizes` へ幅を足さない。** 静的画像の
+  Vercel 変換数と microCMS の imgix URL の本数を同時に増やす。足すなら用途を PR に書く。
+- 静的画像の事前縮小は未了（`tcu-7.webp` 1100x620 / 202KB、`mon7a.webp` 1280x1280 / 137KB）。
+  Vercel が表示寸法へ縮めているので急ぎではない。
 
 ### 無限ロゴ列
 
@@ -366,6 +373,10 @@ PR #107 の本番 mobile 計測（Performance 92、FCP 1.4 秒、LCP 2.9 秒、T
   CSS/アニメーションJSを初期HTMLから外しつつ、遅延・失敗時もロゴ表示とレイアウトを保つ。
 - `next/image` のAVIFを優先形式へ追加し、既存WebPを未対応ブラウザ向けフォールバックとして残す。
   ヘッダー・フッターの固定ロゴは品質を75から60へ下げ、表示寸法に対して過剰な転送を避ける。
+  （**2026-09-20 追記: 効く範囲が静的画像だけに狭まった。** microCMS の画像は前段の
+  CloudFront が Accept を落とし出し分けができないため、imgix 側で AVIF 固定にしている。
+  結果としてサイト全体が AVIF で揃うが、`formats` の出し分けが効くのは `public/` の
+  静的画像だけである。#237 の経緯と実測差は [image-delivery.md](./image-delivery.md) を参照）
 
 下部セクションの見出しと本文はSSRを維持し、データ欠落時のレイアウトとSEOを変えない。今回の検証は
 ローカル本番ビルドと静的HTMLの参照確認までとし、マージ・本番反映後に同一URL・mobile presetで

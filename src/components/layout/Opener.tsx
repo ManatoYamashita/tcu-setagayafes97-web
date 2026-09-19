@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { AppImage } from "@/components/ui/AppImage";
 import { gsap } from "gsap";
 import {
   markOpenerDone,
@@ -163,7 +163,7 @@ export function Opener() {
       >
         {/* アイコンラッパー */}
         <div ref={iconWrapperRef} className="relative w-64 h-64 will-change-transform opacity-0">
-          <Image
+          <AppImage
             src="/images/brand/favicon-white.webp"
             alt="世田谷祭ロゴ"
             fill

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { AppImage } from "@/components/ui/AppImage";
 import Link from "next/link";
 import type { News, NewsType } from "@/types/news";
 import { cn } from "@/lib/utils";
@@ -111,7 +111,7 @@ export function NewsCard({ news, variant = "default", className }: NewsCardProps
     >
       {/* 画像エリア */}
       <div className="relative aspect-[16/10] overflow-hidden rounded-lg border-2 border-gray-200 transition-colors duration-300 group-hover:border-primary-400">
-        <Image
+        <AppImage
           src={imageUrl}
           alt={news.title}
           fill

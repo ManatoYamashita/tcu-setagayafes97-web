@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Image from "next/image";
+import { AppImage } from "@/components/ui/AppImage";
 import Link from "next/link";
 import { gsap } from "gsap";
 
@@ -180,7 +180,7 @@ export function AboutSection() {
             >
               {/* メイン円形画像 */}
               <div className="relative aspect-square overflow-hidden rounded-full">
-                <Image
+                <AppImage
                   src={topSection.image.src}
                   alt={topSection.image.alt}
                   fill
@@ -190,7 +190,7 @@ export function AboutSection() {
               </div>
 
               {/* 歯車装飾: 右下に1個 */}
-              <Image
+              <AppImage
                 ref={gearRef}
                 src="/materials/geer1.webp"
                 alt=""
