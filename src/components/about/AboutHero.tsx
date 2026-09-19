@@ -184,10 +184,14 @@ export function AboutHero() {
             第
             {/*
               地色は gray-50（実配信 #f5f5f5、要素のスクリーンショットから実測）。
-              60px/700 は大テキスト扱いで要求 3:1。旧 from-purple-500 to-pink-400 は
-              始点 purple-500（実配信 #ad46ff）が 3.78 で通るものの、
-              終点 pink-400（実配信 #fb64b6）が 2.53 で未達だった。
+              60px/700 は大テキスト扱いで要求 3:1。旧グラデーションは既定パレットの
+              紫の500段（描画色 #ad46ff）から桃の400段（描画色 #fb64b6）で、
+              始点 3.78 は通るものの終点が 2.53 で未達だった。
               primary-600 / primary-700 は 6.84 / 10.28（#179 B / #95）
+
+              ここにクラス名を原形で書かないこと。Tailwind のソース走査はコメントも
+              読むため、書いた瞬間に使っていないユーティリティが配信CSSへ出る。
+              比の出し方とあわせて docs/frontend/design.md を参照。
             */}
             <span
               className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent tracking-tighter sm:text-5xl lg:text-6xl"
