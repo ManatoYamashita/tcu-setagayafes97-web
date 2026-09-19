@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import { RemoteImage } from "@/components/ui/RemoteImage";
 import Link from "next/link";
 import { Heart, ExternalLink } from "lucide-react";
 import { getSponsorsList } from "@/lib/informations";
@@ -97,7 +97,7 @@ function SponsorCard({ sponsor }: SponsorCardProps) {
       {/* ロゴ */}
       {sponsor.image ? (
         <div className="relative aspect-video w-full overflow-hidden bg-white/10">
-          <Image
+          <RemoteImage
             src={sponsor.image.url}
             alt={sponsor.title}
             fill

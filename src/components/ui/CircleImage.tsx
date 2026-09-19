@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { RemoteImage } from "./RemoteImage";
 
 interface CircleImageProps {
   src: string;
@@ -29,7 +29,7 @@ export function CircleImage({ src, alt, size = "md" }: CircleImageProps) {
 
   return (
     <div className={`relative overflow-hidden rounded-full ${sizeClasses[size]}`}>
-      <Image src={src} alt={alt} fill sizes={`${sizePx[size]}px`} className="object-cover" />
+      <RemoteImage src={src} alt={alt} fill sizes={`${sizePx[size]}px`} className="object-cover" />
     </div>
   );
 }

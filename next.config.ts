@@ -118,12 +118,34 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
-    deviceSizes: [512, 640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [32, 48, 64, 96, 128, 256, 320, 384, 420],
+    /*
+     * ここで最適化されるのは `public/` 配下の静的画像（22枚）だけである。
+     * microCMS の画像は `src/lib/image-loader.ts` を `loader` prop で渡して imgix へ
+     * 振り向けており、Vercel の変換枠を使わない。無料枠の枯渇で企画サムネイルが
+     * 402 で壊れた経緯と、`loaderFile`（全体適用）を採らなかった理由は
+     * docs/frontend/image-delivery.md を参照（#237）。
+     *
+     * 幅の候補はそのまま srcset に並ぶ。`sizes` に固定 px を書いても全候補が並ぶため、
+     * ここへ幅を足す行為は静的画像の変換数を掛け算で増やす。追加時は用途を PR に書くこと。
+     *
+     * 512 と 320 は隣接する 640 / 384 との差が小さく、丸め先との差はそれぞれ 25% / 20%
+     * にとどまるので落とした。2048 と 3840 は残す。PageHero が `100vw` を使っており、
+     * 4K・Retina 環境で目に見えて甘くなるため。
+     */
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [32, 48, 64, 96, 128, 256, 384, 420],
     qualities: [40, 60, 75],
     // AVIF は同じ品質でも WebP より転送量を抑えられる画像を優先する。
     // 未対応ブラウザには既存の WebP をフォールバックとして返す。
+    // これが効くのは静的画像だけで、microCMS 側は imgix で WebP 固定になる
+    // （前段の CloudFront が Accept を落とすため出し分けができない）。
     formats: ["image/avif", "image/webp"],
+    /*
+     * `loader` prop の渡し忘れで microCMS の画像が `/_next/image` へ回ったときに、
+     * ここが最後の関門になる。外すとその画像は 400 で確実に壊れるが、**枠を消費したまま
+     * 表示され続けるより、壊れて気付けるほうがよい**という判断で残している。
+     * 渡し忘れ自体は `scripts/assert-remote-images-bypass-optimizer.mjs` がビルド時に落とす。
+     */
     remotePatterns: [
       {
         protocol: "https",

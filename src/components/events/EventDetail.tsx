@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { RemoteImage } from "@/components/ui/RemoteImage";
 import type { Event } from "@/types/events";
 import { Badge } from "@/components/ui/Badge";
 import { SNSLinks } from "./SNSLinks";
@@ -87,7 +87,7 @@ export function EventDetail({ event }: EventDetailProps) {
           {hasThumbnail ? (
             isIconThumbnail ? (
               <div className="relative h-36 w-36 overflow-hidden rounded-xl sm:h-44 sm:w-44 lg:h-52 lg:w-52">
-                <Image
+                <RemoteImage
                   src={event.thumbnail!.url}
                   alt={title}
                   fill
@@ -97,7 +97,7 @@ export function EventDetail({ event }: EventDetailProps) {
                 />
               </div>
             ) : (
-              <Image
+              <RemoteImage
                 src={event.thumbnail!.url}
                 alt={title}
                 fill
