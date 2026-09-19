@@ -16,6 +16,7 @@
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
 | **`PageSheetLayout` が出す**（推奨） | `/access` `/about/privacy` `/events` `/info` `/info/contact` `/info/faq` `/info/guide` `/special` `/timetable`          |
 | **ルートが自前で出す**               | `/`（`src/app/page.tsx`）・`/about`・`/about/sponsors`・`/events/[id]`・`/info/[id]`・`/info/pamphlet`・`/special/[id]` |
+| **404・エラー画面が自前で出す**      | `src/app/not-found.tsx`・`src/app/error.tsx`・`src/app/events/[id]/not-found.tsx`・`src/app/events/[id]/error.tsx`      |
 
 自前で出す側は、ページ最外の `<div className="min-h-screen …">` を `<main>` に変えるだけでよい。
 
@@ -26,15 +27,41 @@
 `/about` が `PageSheetLayout` を使わないのは、`AboutHero` が `PageHero` ではなく
 シートをインラインで再現しているためである（`src/app/[locale]/about/page.tsx`）。
 
+### 404・エラー画面を数え落とさないこと
+
+**「ルート」を数えると必ず抜ける。** `not-found.tsx` と `error.tsx` は `page.tsx` を持たないが、
+`src/app/layout.tsx` の `{children}` に入るので **`<Header />` ごと描画される。**
+つまりスキップリンクだけが出て、飛び先が無い状態になりうる。
+
+#226 の初版で実際に4画面が抜けた。存在しないURLを開いて Tab → Enter を押しても
+フォーカスは動かず、`location.hash` に `#content` が付くだけで、続く Tab は
+ロゴ →「企画を探す」→「タイムテーブル」と**飛ばしたかったヘッダーへ戻っていた**
+（2026-09-19 実測 / `/no-such-page-xyz` / HTTP 404 / Chromium）。
+
+`src/app/events/error.tsx` は `PageSheetLayout` を通るので対象外である。
+`global-error.tsx` を足す場合も対象外になる（ルートレイアウトごと置き換わり
+`<Header />` が描画されないため、スキップリンク自体が存在しない）。
+
 ## `PageSheetLayout` の `<main>` は `data-page-sheet` を兼ねる
 
 ```tsx
 <main id="content" tabIndex={-1} className="… " data-page-sheet>
 ```
 
-**`data-page-sheet` を消さないこと。** Layout E2E が盤面の器としてこの属性を参照する
-（[layout-e2e.md](./layout-e2e.md)）。`<div>` から `<main>` へ変えたのは要素名だけで、
-属性もクラスもそのままである。
+**`data-page-sheet` を消さないこと。** 参照しているのは
+`src/components/access/AccessPageMotion.tsx` の2箇所（`querySelector` と `resolveRoot`）で、
+アクセスページの入場モーションがシートの外側をスコープとして拾うために使う。
+
+> [!WARNING]
+> **Layout E2E はこの属性を見ていない。** [layout-e2e.md](./layout-e2e.md) にも `e2e/` の
+> 5ファイルにも出現しない。むしろ [static-html-and-search-params.md](./static-html-and-search-params.md)
+> と `scripts/assert-events-static-html.mjs` は「**判定に使えない**」と明記している
+> （`ComingSoon` も `PageSheetLayout` を通るため、フラグが false でも1件出る）。
+> **外しても Layout E2E は緑のまま、アクセスページの入場モーションだけが静かに壊れる。**
+> そちらに自動テストは無い。
+
+`<div>` から `<main>` へ変えたとき、**`data-page-sheet` とレイアウトのクラスはそのまま**で、
+足したのは `id` と `tabIndex` と `focus-visible:outline-none` の3つだけである。
 
 ## 二重 `<main>` を作らない
 
@@ -97,6 +124,7 @@ document.querySelectorAll("main, [role=main]").length; // 必ず 1
 ## 確認方法
 
 新しいルートを足したら、実ブラウザで次の2つを見る。**ソースを読むだけでは足りない。**
+`not-found.tsx` / `error.tsx` を足したときも同じである（上の「404・エラー画面を数え落とさないこと」）。
 
 ```js
 // 1. main がちょうど1つで id が content か
@@ -106,6 +134,10 @@ document.querySelectorAll("main, [role=main]").length; // 必ず 1
 document
   .querySelector('a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])')
   .textContent.trim(); // "本文へスキップ"
+
+// 3. スキップリンクが空振りしないか（存在しないURLでも必ず見る）
+//    Tab → Enter のあと document.activeElement が MAIN#content になること
+document.activeElement.tagName + "#" + document.activeElement.id; // "MAIN#content"
 ```
 
 ---

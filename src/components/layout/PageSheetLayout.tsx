@@ -11,10 +11,13 @@ export function PageSheetLayout({ hero, children }: PageSheetLayoutProps) {
     <div className="min-h-screen bg-secondary">
       <PageHero {...hero} />
       {/*
-        スキップリンク（Header）の遷移先。data-page-sheet は Layout E2E が参照する
-        目印なので消さないこと（docs/frontend/layout-e2e.md）。
-        tabIndex={-1} はスキップリンク経由でフォーカスを受けるために要る。
-        キーボードの順送りには入らない
+        スキップリンク（Header）の遷移先。tabIndex={-1} はスキップリンク経由で
+        フォーカスを受けるために要る（キーボードの順送りには入らない）。
+
+        data-page-sheet を消さないこと。参照しているのは AccessPageMotion.tsx の
+        2箇所で、アクセスページの入場モーションがシートの外側をスコープとして拾う。
+        Layout E2E はこの属性を見ていないため、外しても e2e は緑のまま入場モーション
+        だけが壊れる（docs/frontend/landmarks-and-skip-link.md）
       */}
       <main
         id="content"
