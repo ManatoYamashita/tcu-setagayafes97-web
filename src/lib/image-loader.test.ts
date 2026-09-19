@@ -55,13 +55,25 @@ describe("appImageLoader — microCMS の画像", () => {
 });
 
 describe("appImageLoader — それ以外の画像", () => {
-  it("public 配下の静的画像は Next.js の最適化へ回す", () => {
-    const url = appImageLoader({ src: "/images/brand/logo.webp", width: 208, quality: 60 });
-    expect(url).toBe("/_next/image?url=%2Fimages%2Fbrand%2Flogo.webp&w=208&q=60");
+  /*
+   * imgix を使えない画像は、Vercel の最適化へ回さず原寸のまま返す。
+   * `/_next/image` へ回すと枠の枯渇に巻き込まれ、静的画像まで 402 で壊れる
+   * （2026-09-19、Preview で w=640〜1920 がすべて 402 だった）。
+   */
+  it("public 配下の静的画像は変換せず原寸を返す", () => {
+    expect(appImageLoader({ src: "/images/brand/logo.webp", width: 208, quality: 60 })).toBe(
+      "/images/brand/logo.webp"
+    );
+  });
+
+  it("Vercel の最適化エンドポイントを一切指さない", () => {
+    for (const src of ["/images/brand/logo.webp", "/materials/geers.webp"]) {
+      expect(appImageLoader({ src, width: 640 })).not.toContain("/_next/image");
+    }
   });
 
   it("ホスト名の前方一致で騙されない（別ホストは imgix 扱いしない）", () => {
     const lookalike = "https://images.microcms-assets.io.example.com/a.jpg";
-    expect(appImageLoader({ src: lookalike, width: 340 })).toContain("/_next/image");
+    expect(appImageLoader({ src: lookalike, width: 340 })).toBe(lookalike);
   });
 });

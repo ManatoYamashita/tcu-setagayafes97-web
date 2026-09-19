@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * リモート画像が Vercel の Image Optimization を通っていないことを検査する（#237 の再発防止装置）
+ * 画像が Vercel の Image Optimization を通っていないことを検査する（#237 の再発防止装置）
  *
  * `pnpm build` の末尾で走る。
  *
@@ -27,10 +27,11 @@
  *
  * ## 何を見ているか
  *
- * 事前描画されたHTMLに `/_next/image?url=https%3A%2F%2F`（= リモート画像を Vercel の
- * 最適化へ渡すURL）が現れないこと。ホストを microCMS に限定していないのは、
- * **将来ホストを増やしたときにも漏れを捕まえるため**である。別ホストの画像を意図して
- * Vercel の最適化へ通す場合は、本ファイルを同じコミットで直すこと。
+ * 事前描画されたHTMLに `/_next/image?url=`（= Vercel の最適化へ画像を渡すURL）が
+ * **1本も**現れないこと。リモートに限定していないのは、静的画像を `/_next/image` へ
+ * 回しても枠の枯渇からは逃れられないためである（2026-09-19 の Preview 実測で、
+ * 静的画像もブラウザが実際に選ぶ帯がすべて 402 だった）。意図して Vercel の最適化へ
+ * 戻す場合は、本ファイルを同じコミットで直すこと。
  *
  * 背景と設計は docs/frontend/image-delivery.md を参照。
  */
@@ -49,13 +50,13 @@ const { loadEnvConfig } = nextEnv;
 const APP_DIR = path.resolve(process.cwd(), ".next/server/app");
 
 /**
- * Vercel の最適化エンドポイントへリモート画像を渡すURL。
+ * Vercel の最適化エンドポイントへ画像を渡すURL。
  *
- * `next/image` は `url` を `encodeURIComponent` して埋めるため、リモート画像は
- * 必ず `https%3A%2F%2F` で始まる。ローカル画像は `%2Fimages%2F...` になるので、
- * この検査には引っかからない。
+ * **リモート・ローカルを問わず1本も出てはいけない。** 静的画像を `/_next/image` へ
+ * 回しても枠の枯渇からは逃れられず、2026-09-19 の Preview 実測では
+ * ブラウザが実際に選ぶ帯（w=640〜1920）がすべて 402 だった。
  */
-const OPTIMIZER_REMOTE_PATTERN = /\/_next\/image\?url=https%3A%2F%2F([^&"']+)/g;
+const OPTIMIZER_PATTERN = /\/_next\/image\?url=([^&"']+)/g;
 
 /** `src/lib/image-loader.ts` が生成する imgix URL の目印 */
 const IMGIX_MARKER = "images.microcms-assets.io/";
@@ -120,9 +121,10 @@ for (const file of htmlFiles) {
   if (html.includes(IMGIX_MARKER)) imgixCount += 1;
 
   const hosts = new Set();
-  for (const match of html.matchAll(OPTIMIZER_REMOTE_PATTERN)) {
-    // `https%3A%2F%2F` の直後から、次の `%2F`（パスの区切り）までがホスト名
-    hosts.add(decodeURIComponent(match[1]).split("/")[0]);
+  for (const match of html.matchAll(OPTIMIZER_PATTERN)) {
+    // リモートならホスト名、ローカルならパスそのものを記録する
+    const decoded = decodeURIComponent(match[1]);
+    hosts.add(decoded.startsWith("http") ? new URL(decoded).host : decoded);
   }
   if (hosts.size > 0) violations.set(path.relative(APP_DIR, file), hosts);
 }
@@ -133,18 +135,19 @@ if (violations.size > 0) {
     .map(([file, hosts]) => `    ${file} → ${[...hosts].join(", ")}`)
     .join("\n");
   fail(
-    `リモート画像が Vercel の Image Optimization を通っています（${violations.size} ファイル）。#237 の再発です。`,
+    `画像が Vercel の Image Optimization を通っています（${violations.size} ファイル）。#237 の再発です。`,
     [
       detail,
       violations.size > 10 ? `    ...ほか ${violations.size - 10} ファイル` : "",
       "",
       "  よくある原因:",
-      "    1. <Image> に loader={appImageLoader} を渡し忘れた（最も多い）",
-      "    2. 既存の <Image> から loader prop が消えた",
+      "    1. AppImage ではなく next/image を直接使った（最も多い）",
+      "       → 通常は eslint.config.mjs の no-restricted-imports が先に止めます",
+      "    2. AppImage から loader / unoptimized の指定が外れた",
       "    3. 新しいリモート画像ホストを追加し、src/lib/image-loader.ts の分岐に入れ忘れた",
       "",
       "  手で確かめる:",
-      "    grep -ro '/_next/image?url=https%3A%2F%2F[^\"&]*' .next/server/app | sort -u | head",
+      "    grep -ro '/_next/image?url=[^\"&]*' .next/server/app | sort -u | head",
       "",
       "  詳細: docs/frontend/image-delivery.md",
     ]
@@ -175,6 +178,6 @@ if (imgixCount === 0) {
 }
 
 console.log(
-  `${LABEL} OK: リモート画像は Vercel の最適化を通っていません` +
+  `${LABEL} OK: Vercel の画像最適化を通る画像はありません` +
     `（HTML ${htmlFiles.length} 枚中 ${imgixCount} 枚が imgix 経由の画像を含む）。`
 );
