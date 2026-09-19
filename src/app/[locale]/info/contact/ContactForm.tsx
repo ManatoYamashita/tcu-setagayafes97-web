@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Send, CheckCircle, AlertCircle } from "lucide-react";
@@ -19,6 +19,16 @@ export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
 
+  /**
+   * 送信結果バナー。結果が出たらここへフォーカスを移す。
+   *
+   * 成功時は `reset()` で入力内容が消えるため、フォーカスを動かさないと
+   * **「何も起きずに入力だけが消えた」ようにしか分からない。**
+   * バナーは `role` で読み上げられるが、読み上げを使わないキーボード利用者には
+   * 届かないので、フォーカスの移動が要る（#177 B-2）。
+   */
+  const statusRef = useRef<HTMLDivElement>(null);
+
   const {
     register,
     handleSubmit,
@@ -36,6 +46,10 @@ export function ContactForm() {
       agreeToPrivacyPolicy: false,
     },
   });
+
+  useEffect(() => {
+    if (submitStatus) statusRef.current?.focus();
+  }, [submitStatus]);
 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
@@ -70,7 +84,12 @@ export function ContactForm() {
     <div className="mx-auto max-w-3xl">
       {/* 成功メッセージ */}
       {submitStatus === "success" && (
-        <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-6">
+        <div
+          ref={statusRef}
+          tabIndex={-1}
+          role="status"
+          className="mb-6 rounded-lg border border-green-200 bg-green-50 p-6 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+        >
           <div className="flex items-center gap-3">
             <CheckCircle className="h-6 w-6 flex-shrink-0 text-green-600" />
             <div>
@@ -85,7 +104,12 @@ export function ContactForm() {
 
       {/* エラーメッセージ */}
       {submitStatus === "error" && (
-        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-6">
+        <div
+          ref={statusRef}
+          tabIndex={-1}
+          role="alert"
+          className="mb-6 rounded-lg border border-red-200 bg-red-50 p-6 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+        >
           <div className="flex items-center gap-3">
             <AlertCircle className="h-6 w-6 flex-shrink-0 text-red-600" />
             <div>
@@ -108,6 +132,8 @@ export function ContactForm() {
           <select
             id="type"
             {...register("type")}
+            aria-invalid={errors.type ? "true" : undefined}
+            aria-describedby={errors.type ? "type-error" : undefined}
             className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
           >
             {(Object.keys(contactTypeLabels) as ContactType[]).map((type) => (
@@ -116,7 +142,11 @@ export function ContactForm() {
               </option>
             ))}
           </select>
-          {errors.type && <p className="mt-1 text-sm text-red-600">{errors.type.message}</p>}
+          {errors.type && (
+            <p id="type-error" className="mt-1 text-sm text-red-600">
+              {errors.type.message}
+            </p>
+          )}
         </div>
 
         {/* お名前 */}
@@ -128,10 +158,17 @@ export function ContactForm() {
             id="name"
             type="text"
             {...register("name")}
+            autoComplete="name"
+            aria-invalid={errors.name ? "true" : undefined}
+            aria-describedby={errors.name ? "name-error" : undefined}
             placeholder="山田 太郎"
             className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
           />
-          {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
+          {errors.name && (
+            <p id="name-error" className="mt-1 text-sm text-red-600">
+              {errors.name.message}
+            </p>
+          )}
         </div>
 
         {/* メールアドレス */}
@@ -143,10 +180,17 @@ export function ContactForm() {
             id="email"
             type="email"
             {...register("email")}
+            autoComplete="email"
+            aria-invalid={errors.email ? "true" : undefined}
+            aria-describedby={errors.email ? "email-error" : undefined}
             placeholder="example@example.com"
             className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
           />
-          {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
+          {errors.email && (
+            <p id="email-error" className="mt-1 text-sm text-red-600">
+              {errors.email.message}
+            </p>
+          )}
         </div>
 
         {/* 電話番号（任意） */}
@@ -158,10 +202,17 @@ export function ContactForm() {
             id="phone"
             type="tel"
             {...register("phone")}
+            autoComplete="tel"
+            aria-invalid={errors.phone ? "true" : undefined}
+            aria-describedby={errors.phone ? "phone-error" : undefined}
             placeholder="090-1234-5678"
             className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
           />
-          {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>}
+          {errors.phone && (
+            <p id="phone-error" className="mt-1 text-sm text-red-600">
+              {errors.phone.message}
+            </p>
+          )}
         </div>
 
         {/* 件名 */}
@@ -173,10 +224,16 @@ export function ContactForm() {
             id="subject"
             type="text"
             {...register("subject")}
+            aria-invalid={errors.subject ? "true" : undefined}
+            aria-describedby={errors.subject ? "subject-error" : undefined}
             placeholder="企画について"
             className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
           />
-          {errors.subject && <p className="mt-1 text-sm text-red-600">{errors.subject.message}</p>}
+          {errors.subject && (
+            <p id="subject-error" className="mt-1 text-sm text-red-600">
+              {errors.subject.message}
+            </p>
+          )}
         </div>
 
         {/* お問い合わせ内容 */}
@@ -187,11 +244,17 @@ export function ContactForm() {
           <textarea
             id="message"
             {...register("message")}
+            aria-invalid={errors.message ? "true" : undefined}
+            aria-describedby={errors.message ? "message-error" : undefined}
             rows={8}
             placeholder="お問い合わせ内容を入力してください（10文字以上）"
             className="w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition-colors focus:border-primary-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
           />
-          {errors.message && <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>}
+          {errors.message && (
+            <p id="message-error" className="mt-1 text-sm text-red-600">
+              {errors.message.message}
+            </p>
+          )}
         </div>
 
         {/* プライバシーポリシー同意 */}
@@ -200,6 +263,10 @@ export function ContactForm() {
             <input
               type="checkbox"
               {...register("agreeToPrivacyPolicy")}
+              aria-invalid={errors.agreeToPrivacyPolicy ? "true" : undefined}
+              aria-describedby={
+                errors.agreeToPrivacyPolicy ? "agreeToPrivacyPolicy-error" : undefined
+              }
               className="mt-1 h-4 w-4 rounded border-gray-200 text-primary-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
             />
             <span className="text-sm text-gray-900/90">
@@ -210,7 +277,9 @@ export function ContactForm() {
             </span>
           </label>
           {errors.agreeToPrivacyPolicy && (
-            <p className="mt-1 text-sm text-red-600">{errors.agreeToPrivacyPolicy.message}</p>
+            <p id="agreeToPrivacyPolicy-error" className="mt-1 text-sm text-red-600">
+              {errors.agreeToPrivacyPolicy.message}
+            </p>
           )}
         </div>
 
