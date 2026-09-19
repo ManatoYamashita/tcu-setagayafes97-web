@@ -84,16 +84,23 @@ grep -o '.\{160\}BAILOUT_TO_CLIENT_SIDE_RENDERING' "$f"
 `/events` では「クエリ無しで着地したときの表示」＝未フィルタ1ページ目を fallback に置きました
 （`src/app/events/(list)/page.tsx`）。
 
+> [!NOTE]
+> 無限スクロールへ移行した後（#239）も、fallback が描くのは**先頭1ページ分の12件**である。
+> `EventsView` へ渡すのは絞り込み後の全件だが、表示範囲を決めるのは `EventInfiniteList` の
+> `visibleCount` であり、fallback は hydrate されないので12件のまま静的HTMLへ出る。
+> 設計は [events-infinite-scroll.md](./events-infinite-scroll.md) を参照。
+
 ```
 <Suspense fallback={<EventsView ...既定値... />}>   ← 静的HTMLに出る
   <EventsContent initialEvents={events} />          ← "use client" / useSearchParams
     └ <EventsView ... />                            ← 同じコンポーネント
+        └ <EventInfiniteList ... />                 ← "use client"（クエリは読まない）
 </Suspense>
 ```
 
 > [!IMPORTANT]
 > **fallback の中で `useSearchParams()` を呼んではいけません。** fallback にはそれ以上
-> 落ちる先がありません。`/events` で `EventFilters` と `Pagination` から
+> 落ちる先がありません。`/events` で `EventFilters` と `EventInfiniteList` から
 > `useSearchParams()` を外して props 化したのは、リファクタのついでではなく**この制約への対応**です。
 > クエリを読むのは `EventsContent` の1箇所だけに保ってください。
 
@@ -151,7 +158,7 @@ CLS が 0 なのは、スクロール位置0の視界をヒーローが占めて
 const EVENTS_FALLBACK_TREE = [
   "src/components/events/EventsView.tsx",
   "src/components/events/EventFilters.tsx",
-  "src/components/events/Pagination.tsx",
+  "src/components/events/EventInfiniteList.tsx",
   "src/components/events/EventGrid.tsx",
   "src/components/events/EventCard.tsx",
 ];

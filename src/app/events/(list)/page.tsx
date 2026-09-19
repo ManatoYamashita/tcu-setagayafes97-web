@@ -3,8 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getEventsList } from "@/lib/events";
 import {
-  paginateEvents,
-  getTotalPages,
+  resolveVisibleCount,
   listBuildingOptions,
   DEFAULT_EVENT_FILTERS,
   EVENTS_PER_PAGE,
@@ -123,19 +122,21 @@ export default async function EventsPage() {
         クエリ無しなら本描画と同一マークアップになるので、差し替わっても見た目は動かない。
 
         DEFAULT_EVENT_FILTERS は絞り込み無しなので filterEvents() は恒等写像になる。
-        呼ばずに events をそのまま渡している。
+        呼ばずに events をそのまま渡している。**全件を渡すが、静的HTMLへ描かれるのは
+        先頭1ページ分だけである**（EventInfiniteList が visibleCount で slice する）。
+        配列の参照は EventsContent の initialEvents と同一なので、Flight ペイロードにも
+        重複して載らない。
 
         詳細は docs/frontend/static-html-and-search-params.md を参照。
       */}
       <Suspense
         fallback={
           <EventsView
-            events={paginateEvents(events, 1, EVENTS_PER_PAGE)}
+            events={events}
             filters={DEFAULT_EVENT_FILTERS}
             buildingOptions={fallbackBuildingOptions}
-            totalCount={events.length}
-            currentPage={1}
-            totalPages={getTotalPages(events.length, EVENTS_PER_PAGE)}
+            initialVisibleCount={resolveVisibleCount(1, EVENTS_PER_PAGE, events.length)}
+            step={EVENTS_PER_PAGE}
           />
         }
       >

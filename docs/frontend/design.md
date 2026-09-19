@@ -354,7 +354,7 @@ echo "残存ゼロ（本体CSS ${css}）"
 @custom-variant hoverable (@media (hover: hover) and (pointer: fine));
 ```
 
-`EventFilters`、`Pagination`、ニュース・FAQの絞り込み、案内ページ内ナビゲーションのように状態表示と競合する操作要素は `hoverable:hover:` でゲートする。画像拡大やカードの装飾など、タッチ端末で残っても選択状態と誤認しにくい視覚効果は対象外とし、機械的に全 `hover:` を置換しない。
+`EventFilters`、ニュース・FAQの絞り込み、案内ページ内ナビゲーションのように状態表示と競合する操作要素は `hoverable:hover:` でゲートする。画像拡大やカードの装飾など、タッチ端末で残っても選択状態と誤認しにくい視覚効果は対象外とし、機械的に全 `hover:` を置換しない。
 
 #### Semantic Color
 

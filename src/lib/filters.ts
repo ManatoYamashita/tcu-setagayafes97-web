@@ -107,10 +107,14 @@ export function parseEventFilters(params: SearchParamsLike): FilterParams {
 
 /**
  * URL のクエリから現在のページ番号を取り出す
+ *
+ * 無限スクロールへ移行した後も残しています。`?page=N` は「N ページ目だけを見せる」ではなく
+ * **「N ページ分を展開した状態で着地する」**という意味になりました（`resolveVisibleCount`）。
+ *
  * @param params 読み取り元のクエリ
  * @returns ページ番号。数値として読めない場合は 1
  *
- * 範囲の検証はしません。負値や範囲外は `paginateEvents` が空配列として扱います（#162）。
+ * 範囲の検証はしません。負値や範囲外の丸めは `resolveVisibleCount` が引き受けます（#162）。
  */
 export function parseEventPage(params: SearchParamsLike): number {
   return Number(params.get("page")) || 1;
@@ -128,7 +132,7 @@ export function parseEventPage(params: SearchParamsLike): number {
  * **現在URLの未知パラメータは引き継ぎません。** 以前は `searchParams.toString()` を
  * 起点にしていましたが、`/events` が読むパラメータは date / type / building / keyword / page の
  * 5つだけであり（`parseEventFilters` と `parseEventPage` が読む全て）、props から組み直しても
- * 等価です。この形にしたのは、`EventFilters` と `Pagination` から `useSearchParams()` を
+ * 等価です。この形にしたのは、`EventFilters` と `EventInfiniteList` から `useSearchParams()` を
  * 外すためです（理由は `EventsView` のコメントを参照）。
  */
 export function buildEventsQuery(filters: FilterParams, page = 1): string {
@@ -244,70 +248,27 @@ export function listBuildingOptions(
 }
 
 /**
- * ページネーション処理
- * @param events 企画の配列
- * @param page 現在のページ番号（1から開始）
- * @param perPage 1ページあたりの表示件数
- * @returns ページネーションされた企画の配列。存在しないページなら空配列
+ * 初期表示件数を決める
  *
- * **1未満のページを弾くこと。** `page` は URL のクエリから検証なしに入ります
+ * 無限スクロールで「最初に何件出すか」です。`?page=3` で着地したら 3 ページ分
+ * （36件）を展開した状態で開きます。ページ分割の時代に配られた既存のURL・
+ * ブックマーク・ブラウザバックを壊さないための後方互換です。
+ *
+ * **範囲外を空にしてはいけません。** `page` は URL のクエリから検証なしに入ります
  * （`parseEventPage` の `Number(params.get("page")) || 1`。`-1` は truthy なので
- * `|| 1` を素通りします）。始点が負のまま `slice()` へ渡すと末尾からの相対位置として
- * 解釈され、**空でも1ページ目でもない「別のページ」が返ります**（#162）。
+ * `|| 1` を素通りします）。ページ分割だった頃は範囲外を空配列として扱っていましたが（#162）、
+ * 無限スクロールで同じことをすると `?page=-1` や `?page=999` が**カードの無い真っ白な一覧**に
+ * なります。ページを1枚選ぶのではなく「先頭からどこまで出すか」を決める値なので、
+ * 常に最低1ページ分を出し、総件数を超える指定は総件数へ丸めます。
  *
- * 範囲外を空にするのは、`page > 総ページ数` が既にそうなっているのと揃えるためです。
+ * @param page URL から読んだページ番号
+ * @param perPage 1ページあたりの件数
+ * @param total 絞り込み適用後の総件数
+ * @returns 最初に表示する件数。1ページ分以上・総件数以下（総件数が0なら0）
  */
-export function paginateEvents(events: Event[], page: number, perPage: number): Event[] {
-  // 小数は切り捨てる。?page=1.5 が slice(6, 18) という半端な窓を返さないように
+export function resolveVisibleCount(page: number, perPage: number, total: number): number {
+  // 小数は切り捨てる。?page=1.5 が 18 件という半端な初期値にならないように
   const safePage = Math.floor(page);
-  if (safePage < 1) return [];
-
-  const startIndex = (safePage - 1) * perPage;
-  const endIndex = startIndex + perPage;
-  return events.slice(startIndex, endIndex);
-}
-
-/**
- * 総ページ数を計算
- * @param totalCount 総件数
- * @param perPage 1ページあたりの表示件数
- * @returns 総ページ数
- */
-export function getTotalPages(totalCount: number, perPage: number): number {
-  return Math.ceil(totalCount / perPage);
-}
-
-/**
- * ページ番号の配列を生成（最大7個表示）
- * @param currentPage 現在のページ番号
- * @param totalPages 総ページ数
- * @returns 表示するページ番号の配列
- */
-export function generatePageNumbers(currentPage: number, totalPages: number): number[] {
-  const maxPages = 7;
-
-  if (totalPages <= maxPages) {
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
-  }
-
-  const pages: number[] = [];
-  const leftOffset = Math.floor(maxPages / 2);
-  const rightOffset = maxPages - leftOffset - 1;
-
-  let startPage = Math.max(1, currentPage - leftOffset);
-  let endPage = Math.min(totalPages, currentPage + rightOffset);
-
-  if (currentPage - leftOffset <= 0) {
-    endPage = Math.min(totalPages, endPage + (leftOffset - currentPage + 1));
-  }
-
-  if (currentPage + rightOffset > totalPages) {
-    startPage = Math.max(1, startPage - (currentPage + rightOffset - totalPages));
-  }
-
-  for (let i = startPage; i <= endPage; i++) {
-    pages.push(i);
-  }
-
-  return pages;
+  const requested = safePage < 1 ? perPage : safePage * perPage;
+  return Math.min(requested, total);
 }

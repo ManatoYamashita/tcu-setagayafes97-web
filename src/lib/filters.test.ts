@@ -4,12 +4,10 @@ import {
   DEFAULT_EVENT_FILTERS,
   eventsHref,
   filterEvents,
-  generatePageNumbers,
-  getTotalPages,
   listBuildingOptions,
-  paginateEvents,
   parseEventFilters,
   parseEventPage,
+  resolveVisibleCount,
   type FilterParams,
 } from "@/lib/filters";
 import { fixture } from "@/components/timetable/__fixtures__/stage-events";
@@ -156,121 +154,53 @@ describe("filterEvents", () => {
   });
 });
 
-describe("getTotalPages", () => {
-  it("件数と1ページあたりの表示数から総ページ数を出す", () => {
-    expect(getTotalPages(0, 12)).toBe(0);
-    expect(getTotalPages(1, 12)).toBe(1);
-    expect(getTotalPages(12, 12)).toBe(1);
-    expect(getTotalPages(13, 12)).toBe(2);
-  });
-});
-
-describe("paginateEvents", () => {
-  /** ページ分割の検証にだけ使う連番データ */
-  const items: Event[] = Array.from({ length: 30 }, (_, index) =>
-    fixture(`item-${index + 1}`, {
-      date: "day1",
-      type: "room",
-      place: "教室",
-      title: `企画 ${index + 1}`,
-      organizer: "テスト",
-    })
-  );
-
-  it("1ページ目を切り出す", () => {
-    expect(ids(paginateEvents(items, 1, 12))).toEqual(ids(items.slice(0, 12)));
+describe("resolveVisibleCount", () => {
+  it("?page=N は N ページ分を展開した件数になる", () => {
+    expect(resolveVisibleCount(1, 12, 98)).toBe(12);
+    expect(resolveVisibleCount(3, 12, 98)).toBe(36);
   });
 
-  it("最終ページの端数を切り出す", () => {
-    const lastPage = paginateEvents(items, 3, 12);
-    expect(lastPage).toHaveLength(6);
-    expect(ids(lastPage)).toEqual(ids(items.slice(24)));
+  it("総件数を超える指定は総件数へ丸める", () => {
+    // ページ分割だった頃は範囲外を空配列として扱っていたが（#162）、無限スクロールで
+    // 同じことをすると ?page=999 が「カードの無い真っ白な一覧」になる。
+    // 先頭からどこまで出すかを決める値なので、総件数で頭打ちにする
+    expect(resolveVisibleCount(9, 12, 98)).toBe(98);
+    expect(resolveVisibleCount(999, 12, 98)).toBe(98);
+    expect(resolveVisibleCount(2, 12, 5)).toBe(5);
   });
 
-  it("総ページ数を超えたページは空配列を返す", () => {
-    expect(paginateEvents(items, 4, 12)).toEqual([]);
-    expect(paginateEvents(items, 999, 12)).toEqual([]);
-  });
-
-  it("1未満のページは空配列を返す", () => {
-    // page は URL から検証なしに入る。始点が負のまま slice へ渡すと
-    // 末尾からの相対位置として解釈され、別のページが返る（#162）
-    expect(paginateEvents(items, 0, 12)).toEqual([]);
-    expect(paginateEvents(items, -1, 12)).toEqual([]);
-    expect(paginateEvents(items, -2, 12)).toEqual([]);
+  it("1未満のページでも1ページ分は返す", () => {
+    // page は URL から検証なしに入る。-1 は truthy なので
+    // parseEventPage の `Number(...) || 1` を素通りする（#162）
+    expect(resolveVisibleCount(0, 12, 98)).toBe(12);
+    expect(resolveVisibleCount(-1, 12, 98)).toBe(12);
+    expect(resolveVisibleCount(-99, 12, 98)).toBe(12);
   });
 
   it("小数のページを切り捨てる", () => {
-    // ?page=1.5 が slice(6, 18) という半端な窓を返さないこと
-    expect(ids(paginateEvents(items, 1.5, 12))).toEqual(ids(paginateEvents(items, 1, 12)));
+    // ?page=1.5 が 18 件という半端な初期値にならないこと
+    expect(resolveVisibleCount(1.5, 12, 98)).toBe(12);
+    expect(resolveVisibleCount(2.9, 12, 98)).toBe(24);
   });
 
-  it("全ページを連結すると元の配列に戻る（欠けも重複も無い）", () => {
-    const perPage = 12;
-    const totalPages = getTotalPages(items.length, perPage);
-    const joined = Array.from({ length: totalPages }, (_, index) =>
-      paginateEvents(items, index + 1, perPage)
-    ).flat();
-
-    expect(ids(joined)).toEqual(ids(items));
+  it("該当0件なら0を返す", () => {
+    expect(resolveVisibleCount(1, 12, 0)).toBe(0);
+    expect(resolveVisibleCount(-1, 12, 0)).toBe(0);
+    expect(resolveVisibleCount(999, 12, 0)).toBe(0);
   });
 
-  it("引数の配列を破壊しない", () => {
-    const before = ids(items);
-    paginateEvents(items, 2, 12);
-    expect(ids(items)).toEqual(before);
-  });
-});
+  it("どんなページ番号でも「総件数以下」かつ「1件以上（該当があれば）」に収まる", () => {
+    // この2条件が保たれている限り、URL をどう弄られても一覧が真っ白になることはない
+    for (let total = 0; total <= 60; total += 7) {
+      for (const page of [-99, -1, 0, 1, 1.5, 2, 3, 99]) {
+        const count = resolveVisibleCount(page, 12, total);
+        const label = `(page=${page}, total=${total})`;
 
-describe("generatePageNumbers", () => {
-  const MAX_PAGES = 7;
-
-  it("総ページ数が上限以下なら全ページを返す", () => {
-    expect(generatePageNumbers(1, 5)).toEqual([1, 2, 3, 4, 5]);
-    expect(generatePageNumbers(1, MAX_PAGES)).toEqual([1, 2, 3, 4, 5, 6, 7]);
-  });
-
-  it("ページが無ければ空配列を返す", () => {
-    expect(generatePageNumbers(1, 0)).toEqual([]);
-  });
-
-  it("先頭付近では窓を左端に寄せる", () => {
-    expect(generatePageNumbers(1, 10)).toEqual([1, 2, 3, 4, 5, 6, 7]);
-    expect(generatePageNumbers(4, 10)).toEqual([1, 2, 3, 4, 5, 6, 7]); // 左寄せの境界
-  });
-
-  it("中央では現在ページを挟む", () => {
-    expect(generatePageNumbers(5, 10)).toEqual([2, 3, 4, 5, 6, 7, 8]);
-  });
-
-  it("末尾付近では窓を右端に寄せる", () => {
-    expect(generatePageNumbers(7, 10)).toEqual([4, 5, 6, 7, 8, 9, 10]); // 右寄せの境界
-    expect(generatePageNumbers(10, 10)).toEqual([4, 5, 6, 7, 8, 9, 10]);
-  });
-
-  it("範囲外の現在ページでも妥当な窓を返す", () => {
-    // currentPage は URL から検証なしに入るため、範囲外でも壊れないこと
-    expect(generatePageNumbers(0, 10)).toEqual([1, 2, 3, 4, 5, 6, 7]);
-    expect(generatePageNumbers(-1, 10)).toEqual([1, 2, 3, 4, 5, 6, 7]);
-    expect(generatePageNumbers(15, 10)).toEqual([4, 5, 6, 7, 8, 9, 10]);
-  });
-
-  it("総ページ数1〜40の全組み合わせで4つの不変条件を満たす", () => {
-    for (let totalPages = 1; totalPages <= 40; totalPages++) {
-      for (let currentPage = 1; currentPage <= totalPages; currentPage++) {
-        const pages = generatePageNumbers(currentPage, totalPages);
-        const label = `(currentPage=${currentPage}, totalPages=${totalPages})`;
-
-        expect(pages, `長さ ${label}`).toHaveLength(Math.min(totalPages, MAX_PAGES));
-        expect(
-          pages.every((page, index) => index === 0 || page === pages[index - 1] + 1),
-          `昇順の連続 ${label}`
-        ).toBe(true);
-        expect(pages, `現在ページを含む ${label}`).toContain(currentPage);
-        expect(
-          pages.every((page) => page >= 1 && page <= totalPages),
-          `範囲内 ${label}`
-        ).toBe(true);
+        expect(count, `総件数以下 ${label}`).toBeLessThanOrEqual(total);
+        expect(count, `0以上 ${label}`).toBeGreaterThanOrEqual(0);
+        if (total > 0) {
+          expect(count, `1件以上 ${label}`).toBeGreaterThan(0);
+        }
       }
     }
   });
@@ -380,7 +310,7 @@ describe("parseEventPage", () => {
     expect(parseEventPage(new URLSearchParams("page="))).toBe(1);
   });
 
-  it("範囲の検証はしない（paginateEvents の担当）", () => {
+  it("範囲の検証はしない（resolveVisibleCount の担当）", () => {
     expect(parseEventPage(new URLSearchParams("page=-1"))).toBe(-1);
     expect(parseEventPage(new URLSearchParams("page=999"))).toBe(999);
   });

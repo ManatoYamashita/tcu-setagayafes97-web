@@ -392,8 +392,13 @@ microCMS の編集画面にある「画面プレビュー」から、**公開せ
 > **現存する `loading.tsx` は `src/app/events/(list)/loading.tsx` の1枚だけなので、
 > この危険が残るのは `/events` である。** ルート直下の1枚が消えた後も、`/timetable` と
 > `/events` はどちらも静的HTMLに本体が入っていることを実測で確認済み（2026-09-19）。
-> **再発防止装置は2つある。** `eslint.config.mjs` の `no-restricted-imports`（fallback ツリーの
-> 5ファイルが `useSearchParams` を import できない）と、`pnpm build` の末尾へ連結した
+> **再発防止装置は3つある。** `eslint.config.mjs` の `no-restricted-imports`（fallback ツリーの
+> 5ファイルが `useSearchParams` を import できない）、同じく `eslint.config.mjs` の
+> `react-hooks/exhaustive-deps: "error"` と `no-restricted-syntax` の2本組
+> （`EventInfiniteList.tsx` に限る。#239 で observer が張り直されず一覧が12件で止まった。
+> **格上げだけでは足りない** — 打ち切り条件も依存配列も `hasMore` へ**揃えて**戻すと依存は
+> 過不足なく揃うため `exhaustive-deps` は何も言わない。後者で効果と `useCallback` の中から
+> `hasMore` を読むこと自体を禁じて塞いだ）、そして `pnpm build` の末尾へ連結した
 > `scripts/assert-events-static-html.mjs`（`<Suspense>` 境界の消失と fallback の格下げを落とす。
 > **`EVENTS_VISIBLE` が false の間はスキップし、true になると自動で有効化する**）。
 > 判定方法・fallback の設計・実測値は
@@ -432,7 +437,17 @@ microCMS の編集画面にある「画面プレビュー」から、**公開せ
 
 - **フィルター**: 日程（Day1/Day2/両日）、場所（建物番号）、カテゴリ（教室/ステージ/スペシャル）、キーワード
 - **表示形式**: カード形式、サムネイル・タイトル・カテゴリバッジ・場所・日程
-- **ページネーション**: またはLazy Loading（無限スクロール）
+- **一覧は無限スクロール**（#239。ページ分割は撤去済み）。12件ずつ継ぎ足し、
+  「もっと見る」ボタンを併設する。絞り込みは `position: sticky` で画面内に留める。
+  `?page=N` は「N ページ目」ではなく**「N ページ分を展開して着地」**の意味になった。
+  設計と実測は [`docs/frontend/events-infinite-scroll.md`](../docs/frontend/events-infinite-scroll.md) を参照
+
+> [!IMPORTANT]
+> **`EventsView` へページ分割済みの配列を渡してはいけない。** 表示範囲は
+> `EventInfiniteList` が決める。呼び出し側で切ると、その先が永久に読めなくなる。
+> **`<aside>` の `self-start` を外すと sticky が一度も貼り付かない**（grid の既定は
+> `stretch` で高さが行全体まで伸びるため）。どちらも lint / 型 / テスト / build を
+> すべて通過する。
 
 ### タイムテーブル (/timetable)
 
