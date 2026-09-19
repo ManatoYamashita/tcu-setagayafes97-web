@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { RemoteImage } from "@/components/ui/RemoteImage";
+import { AppImage } from "@/components/ui/AppImage";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import { getNewsById, getNewsList } from "@/lib/news";
 import { Badge } from "@/components/ui/Badge";
@@ -233,7 +233,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
                     画像の内容は一度も説明されないままになる。
                     microCMS に代替テキスト用のフィールドが無いため装飾として扱う
                   */}
-                  <RemoteImage
+                  <AppImage
                     src={news.thumbnail.url}
                     alt=""
                     fill

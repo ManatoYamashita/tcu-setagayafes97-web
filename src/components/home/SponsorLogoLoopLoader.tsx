@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { RemoteImage } from "@/components/ui/RemoteImage";
+import { AppImage } from "@/components/ui/AppImage";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Information } from "@/types/informations";
 
@@ -31,7 +31,7 @@ function StaticSponsorLogos({ sponsors }: { sponsors: Information[] }) {
     <ul className="flex h-10 items-center gap-12 overflow-hidden" aria-label="協賛企業ロゴ">
       {logos.map(({ sponsor, displayWidth }) => (
         <li key={sponsor.id} className="flex h-10 shrink-0 items-center">
-          <RemoteImage
+          <AppImage
             src={sponsor.image!.url}
             alt={sponsor.title}
             width={displayWidth}

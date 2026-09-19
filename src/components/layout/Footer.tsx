@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { AppImage } from "@/components/ui/AppImage";
 import { siteConfig } from "@/data/site";
 import { FooterNav } from "@/components/layout/FooterNav";
 import { SocialIcons } from "@/components/ui/SocialIcons";
@@ -19,7 +19,7 @@ export function Footer() {
         <div className="container mx-auto px-4 py-8">
           {/* ロゴ: 左上 */}
           <div className="mb-6">
-            <Image
+            <AppImage
               src="/images/brand/logo-white.webp"
               alt={siteConfig.shortName}
               width={192}
@@ -47,7 +47,7 @@ export function Footer() {
           </div>
 
           <div className="mt-8 flex flex-col items-center border-t border-white/20 pt-8 text-white/85">
-            <Image
+            <AppImage
               src="/images/brand/logo-white.webp"
               alt={siteConfig.shortName}
               width={48}

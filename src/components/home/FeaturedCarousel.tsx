@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import Link from "next/link";
-import { RemoteImage } from "@/components/ui/RemoteImage";
+import { AppImage } from "@/components/ui/AppImage";
 import type { Event, EventType } from "@/types/events";
 
 const typeLabels: Record<EventType, string> = {
@@ -132,7 +132,7 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
                 >
                   <div className="relative aspect-[3/5] overflow-hidden rounded-3xl">
                     {/* 全面画像 */}
-                    <RemoteImage
+                    <AppImage
                       src={imageUrl}
                       alt={event.title}
                       fill

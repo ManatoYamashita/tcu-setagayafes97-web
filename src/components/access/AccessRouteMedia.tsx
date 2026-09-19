@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { AppImage } from "@/components/ui/AppImage";
 import { useEffect, useState } from "react";
 
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
@@ -25,7 +25,7 @@ export function AccessRouteMedia() {
 
   return (
     <div className="absolute inset-0 bg-white">
-      <Image
+      <AppImage
         src="/images/video-posters/access-tcu-setagaya.webp"
         alt=""
         fill

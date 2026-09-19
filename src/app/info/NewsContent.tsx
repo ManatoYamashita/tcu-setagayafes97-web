@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { RemoteImage } from "@/components/ui/RemoteImage";
+import { AppImage } from "@/components/ui/AppImage";
 import type { News } from "@/types/news";
 import { Badge } from "@/components/ui/Badge";
 
@@ -123,7 +123,7 @@ function NewsCard({ news }: NewsCardProps) {
         {/* サムネイル */}
         {news.thumbnail && (
           <div className="relative aspect-video w-full overflow-hidden">
-            <RemoteImage
+            <AppImage
               src={news.thumbnail.url}
               alt={news.title}
               fill

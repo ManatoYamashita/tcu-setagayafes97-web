@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import Image from "next/image";
+import { AppImage } from "./AppImage";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { PageHeroData } from "@/data/page-heroes";
@@ -44,7 +44,7 @@ export function PageHero({
           className="page-hero-image-fade absolute inset-0 lg:inset-auto lg:right-0 lg:top-0 lg:h-full lg:w-[70vw]"
           data-page-hero-image
         >
-          <Image
+          <AppImage
             src={imageSrc}
             alt={imageAlt ?? ""}
             fill
@@ -102,7 +102,7 @@ export function PageHero({
       {/* バッジ（将来利用） */}
       {hasImage && badgeSrc && (
         <div className="absolute right-4 top-24 z-30 h-20 w-20 overflow-hidden rounded-full border-4 border-secondary shadow-lg lg:right-8 lg:top-28 lg:h-24 lg:w-24">
-          <Image src={badgeSrc} alt={badgeAlt ?? ""} fill className="object-cover" />
+          <AppImage src={badgeSrc} alt={badgeAlt ?? ""} fill className="object-cover" />
         </div>
       )}
     </section>

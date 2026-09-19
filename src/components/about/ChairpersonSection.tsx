@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useRef } from "react";
-import Image from "next/image";
+import { AppImage } from "@/components/ui/AppImage";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
@@ -313,7 +313,7 @@ export function ChairpersonSection() {
               ref={imageFrameRef}
               className="relative aspect-[4/3] max-h-64 w-full overflow-hidden rounded-l-2xl shadow-lg sm:max-h-80 md:max-h-96 lg:aspect-square lg:max-h-none lg:rounded-full"
             >
-              <Image
+              <AppImage
                 src={image}
                 alt={imageAlt}
                 fill
@@ -366,7 +366,7 @@ export function ChairpersonSection() {
                   aspect-square の作用で高さまで一緒に縮む。 */}
               <div className="relative aspect-square w-24 shrink-0 overflow-hidden rounded-full shadow-lg sm:w-28 lg:w-full">
                 {/* 氏名・役職が隣接して読み上げられるため alt は空にする（装飾扱い） */}
-                <Image
+                <AppImage
                   src={subImage}
                   alt=""
                   fill

@@ -1,4 +1,4 @@
-import { RemoteImage } from "./RemoteImage";
+import { AppImage } from "./AppImage";
 
 interface CircleImageProps {
   src: string;
@@ -29,7 +29,7 @@ export function CircleImage({ src, alt, size = "md" }: CircleImageProps) {
 
   return (
     <div className={`relative overflow-hidden rounded-full ${sizeClasses[size]}`}>
-      <RemoteImage src={src} alt={alt} fill sizes={`${sizePx[size]}px`} className="object-cover" />
+      <AppImage src={src} alt={alt} fill sizes={`${sizePx[size]}px`} className="object-cover" />
     </div>
   );
 }

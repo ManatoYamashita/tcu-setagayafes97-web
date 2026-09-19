@@ -1,4 +1,4 @@
-import { RemoteImage } from "@/components/ui/RemoteImage";
+import { AppImage } from "@/components/ui/AppImage";
 import type { MicroCMSImage } from "microcms-js-sdk";
 
 interface SpecialHeroProps {
@@ -34,7 +34,7 @@ export function SpecialHero({ title, organizer, logo, photo }: SpecialHeroProps)
       {photo && (
         <>
           <div className="absolute inset-0" data-special-hero-image>
-            <RemoteImage
+            <AppImage
               src={photo.url}
               alt=""
               fill
@@ -56,7 +56,7 @@ export function SpecialHero({ title, organizer, logo, photo }: SpecialHeroProps)
         <div className="flex max-w-2xl flex-col gap-4" data-special-hero-copy>
           {logo ? (
             <h1 className="flex">
-              <RemoteImage
+              <AppImage
                 src={logo.url}
                 alt={title}
                 width={logo.width ?? 480}

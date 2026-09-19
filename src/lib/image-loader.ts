@@ -39,6 +39,11 @@ import type { ImageLoaderProps } from "next/image";
 /** microCMS のメディア配信ホスト。imgix 互換の変換パラメータを受け付ける。 */
 const MICROCMS_ASSETS_ORIGIN = "https://images.microcms-assets.io/";
 
+/** imgix の変換を掛けられる画像か。`AppImage` が `unoptimized` の切り替えに使う。 */
+export function isMicrocmsImage(src: string): boolean {
+  return src.startsWith(MICROCMS_ASSETS_ORIGIN);
+}
+
 /**
  * `quality` 未指定時の既定値。next/image の既定と揃える。
  *
@@ -88,21 +93,22 @@ function toImgixUrl(src: string, width: number, quality: number): string {
   return url.toString();
 }
 
-/**
- * Next.js の既定の最適化エンドポイントへ向ける。
- *
- * 同じ `<Image>` に microCMS の画像とローカルのフォールバック画像の両方が入りうるため
- * （`FeaturedCarousel` と `NewsCard` がその例）、このローダーは両方を扱える必要がある。
- * `basePath` を使っていないので `/_next/image` 直書きで足りる。
- */
-function toNextOptimizerUrl(src: string, width: number, quality: number): string {
-  return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality}`;
-}
-
 export function appImageLoader({ src, width, quality }: ImageLoaderProps): string {
-  const resolvedQuality = quality ?? DEFAULT_QUALITY;
+  /*
+   * imgix を使えない画像（`public/` 配下の静的画像）は、変換せず原寸のまま返す。
+   *
+   * `/_next/image` へ回すこともできるが、**それでは枠の枯渇から逃れられない。**
+   * 2026-09-19 に Preview で実測したところ、静的画像もブラウザが実際に選ぶ帯
+   * （w=640〜1920）はすべて 402 で、ロゴもヒーロー画像も壊れていた。
+   * 枠を一切使わない状態にするのが本 PR の目的である。
+   *
+   * 通常この分岐には到達しない。`AppImage` がローカル画像へ `unoptimized` を立て、
+   * その場合 next/image はローダーを呼ばないためである。ローダーを直接使われたときの
+   * 保険として、ここでも `/_next/image` を指さないようにしてある。
+   *
+   * 静的画像を表示寸法へ事前縮小する作業は別途行う（docs/frontend/image-delivery.md）。
+   */
+  if (!isMicrocmsImage(src)) return src;
 
-  return src.startsWith(MICROCMS_ASSETS_ORIGIN)
-    ? toImgixUrl(src, width, resolvedQuality)
-    : toNextOptimizerUrl(src, width, resolvedQuality);
+  return toImgixUrl(src, width, quality ?? DEFAULT_QUALITY);
 }
