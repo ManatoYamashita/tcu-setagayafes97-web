@@ -22,16 +22,19 @@
  *
  * `loader` prop はコンポーネントごとに渡す必要がある。`next.config.ts` の `loaderFile` で
  * 全体へ適用すれば渡し忘れは起きないが、**その設定は `/_next/image` を 404 にするため
- * `public/` の静的画像22枚が最適化を失う**（2026-09-19 実測）。渡し忘れを機械で拾う
+ * `public/` の静的画像が最適化を失う**（2026-09-19 実測）。渡し忘れを機械で拾う
  * この検査は、その代償を払わないための装置である。
  *
  * ## 何を見ているか
  *
- * 事前描画されたHTMLに `/_next/image?url=`（= Vercel の最適化へ画像を渡すURL）が
- * **1本も**現れないこと。リモートに限定していないのは、静的画像を `/_next/image` へ
- * 回しても枠の枯渇からは逃れられないためである（2026-09-19 の Preview 実測で、
- * 静的画像もブラウザが実際に選ぶ帯がすべて 402 だった）。意図して Vercel の最適化へ
- * 戻す場合は、本ファイルを同じコミットで直すこと。
+ * 事前描画されたHTMLに、**リモート画像**を `/_next/image?url=` へ渡すURLが
+ * **1本も**現れないこと。
+ *
+ * **ローカルの静的画像は対象外である。意図して Vercel の最適化に残している。**
+ * 枠を焼いていたのは microCMS 側だけで、2026-09-20 に本番HTMLの srcset を全数えした
+ * 結果は静的画像11ファイルで 178通り×2形式＝上限 356 変換（枠 5,000 の 7%）。
+ * 一方 microCMS は企画サムネイル93枚だけで約3,348（#237）。静的画像まで外すと
+ * LCP 要素が 4.7倍になるので、そちらは Vercel に残す。
  *
  * 背景と設計は docs/frontend/image-delivery.md を参照。
  */
@@ -52,9 +55,8 @@ const APP_DIR = path.resolve(process.cwd(), ".next/server/app");
 /**
  * Vercel の最適化エンドポイントへ画像を渡すURL。
  *
- * **リモート・ローカルを問わず1本も出てはいけない。** 静的画像を `/_next/image` へ
- * 回しても枠の枯渇からは逃れられず、2026-09-19 の Preview 実測では
- * ブラウザが実際に選ぶ帯（w=640〜1920）がすべて 402 だった。
+ * **ここで落とすのはリモート画像だけである。** ローカルの静的画像（`/images/...` など）は
+ * 意図して Vercel の最適化に残しているので、出ていても正常。
  */
 const OPTIMIZER_PATTERN = /\/_next\/image\?url=([^&"']+)/g;
 
@@ -122,9 +124,19 @@ for (const file of htmlFiles) {
 
   const hosts = new Set();
   for (const match of html.matchAll(OPTIMIZER_PATTERN)) {
-    // リモートならホスト名、ローカルならパスそのものを記録する
-    const decoded = decodeURIComponent(match[1]);
-    hosts.add(decoded.startsWith("http") ? new URL(decoded).host : decoded);
+    /*
+     * 壊れた percent エンコードで例外にしない。復号できない値はそのまま扱い、
+     * 親切なメッセージを出したまま exit 1 へ進む。
+     */
+    let decoded;
+    try {
+      decoded = decodeURIComponent(match[1]);
+    } catch {
+      decoded = match[1];
+    }
+    // ローカルの静的画像は Vercel の最適化に残しているので対象外
+    if (!decoded.startsWith("http")) continue;
+    hosts.add(new URL(decoded).host);
   }
   if (hosts.size > 0) violations.set(path.relative(APP_DIR, file), hosts);
 }
@@ -135,7 +147,7 @@ if (violations.size > 0) {
     .map(([file, hosts]) => `    ${file} → ${[...hosts].join(", ")}`)
     .join("\n");
   fail(
-    `画像が Vercel の Image Optimization を通っています（${violations.size} ファイル）。#237 の再発です。`,
+    `リモート画像が Vercel の Image Optimization を通っています（${violations.size} ファイル）。#237 の再発です。`,
     [
       detail,
       violations.size > 10 ? `    ...ほか ${violations.size - 10} ファイル` : "",
@@ -143,11 +155,11 @@ if (violations.size > 0) {
       "  よくある原因:",
       "    1. AppImage ではなく next/image を直接使った（最も多い）",
       "       → 通常は eslint.config.mjs の no-restricted-imports が先に止めます",
-      "    2. AppImage から loader / unoptimized の指定が外れた",
+      "    2. AppImage から loader の指定が外れた",
       "    3. 新しいリモート画像ホストを追加し、src/lib/image-loader.ts の分岐に入れ忘れた",
       "",
       "  手で確かめる:",
-      "    grep -ro '/_next/image?url=[^\"&]*' .next/server/app | sort -u | head",
+      "    grep -ro '/_next/image?url=http[^\"&]*' .next/server/app | sort -u | head",
       "",
       "  詳細: docs/frontend/image-delivery.md",
     ]
@@ -166,18 +178,22 @@ if (imgixCount === 0) {
    * 黙って成功にはしない。ただし合否条件にもしない。microCMS の入稿状況と取得の成否で
    * 0 枚はいつでも起こりうるうえ、その区別はここでは付かない。
    */
-  const reason =
+  const flagState =
     enabledFlags.length === 0
-      ? "公開フラグがすべて false のため、microCMS の画像はHTMLに出ません"
-      : `公開フラグ（${enabledFlags.join(", ")}）は有効ですが、microCMS の画像がHTMLにありません`;
+      ? "公開フラグはすべて false"
+      : `公開フラグ（${enabledFlags.join(", ")}）は有効`;
   console.warn(
-    `${LABEL} NOTE: 違反はありませんが、imgix 経由の画像も検出できませんでした。${reason}。` +
-      ` 検査が空振りしている可能性があります（HTML ${htmlFiles.length} 枚を走査）。`
+    `${LABEL} NOTE: 違反はありませんが、imgix 経由の画像も検出できませんでした（${flagState}）。` +
+      ` 協賛企業（SponsorBanner / /about/sponsors）はどの公開フラグにも依存しないため、` +
+      `本来はフラグが全て false でも microCMS の画像がHTMLに出ます。` +
+      ` 0枚ということは協賛の取得が0件だった可能性が高く、検査は空振りしています` +
+      `（HTML ${htmlFiles.length} 枚を走査）。`
   );
   process.exit(0);
 }
 
 console.log(
-  `${LABEL} OK: Vercel の画像最適化を通る画像はありません` +
-    `（HTML ${htmlFiles.length} 枚中 ${imgixCount} 枚が imgix 経由の画像を含む）。`
+  `${LABEL} OK: Vercel の画像最適化を通るリモート画像はありません` +
+    `（HTML ${htmlFiles.length} 枚中 ${imgixCount} 枚が imgix 経由の画像を含む）。` +
+    ` ローカルの静的画像は意図して Vercel の最適化に残しています。`
 );

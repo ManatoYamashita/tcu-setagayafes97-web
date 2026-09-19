@@ -45,7 +45,7 @@ docs/
 │   ├── events-search.md           # /events の検索と絞り込み（正規化・建物導出）
 │   ├── layout-e2e.md              # 実ブラウザの再発防止装置（盤面 / ランドマーク1周）
 │   ├── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
-│   ├── image-delivery.md          # 画像変換の委譲先（microCMS=imgix / 静的=原寸配信）
+│   ├── image-delivery.md          # 画像変換の委譲先（microCMS=imgix / 静的=Vercel）
 │   ├── performance.md             # Lighthouse基準値とフロントエンド性能ルール
 │   └── page-transition.md         # ページ遷移アニメーションとView Transitions API
 └── requires/         # 要件定義・仕様関連
@@ -293,8 +293,9 @@ docs/
   - リッチテキスト（`prose`）の扱い — typography プラグイン未導入と `@layer` の選び方
 
 - **[image-delivery.md](./frontend/image-delivery.md)** - 画像配信の経路（変換をどこにやらせるか）
-  - Vercel の Image Optimization は使わない。microCMS は imgix、静的画像は原寸配信
+  - microCMS は imgix、`public/` の静的画像は Vercel。枠を焼いていたのは前者だけ（7% : 93%）
   - 変換枠が枯れると「一部の画像だけ」が 402 で壊れる。同じ画像でも幅で生死が分かれる（#237）
+  - **`curl` で検証するときは `Accept` を付ける。** 付けないとキャッシュ済みでも 402 に見える
   - `auto=format` が効かない理由と、`fm=webp` / `fit=max` を決めた実測値
   - `AppImage` というラッパーに至るまでに実測で否定した2案
   - 再発防止装置3つの射程の違い（ESLint / ユニットテスト / ビルド生成物）

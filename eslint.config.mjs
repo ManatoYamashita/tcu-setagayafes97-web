@@ -117,8 +117,10 @@ const config = [
     // ここへ置く（#156 / #179 の規則と同じ理由）。
     //
     // 背景と実測は docs/frontend/image-delivery.md を参照。
-    files: ["src/**/*.tsx"],
-    ignores: ["src/components/ui/AppImage.tsx"],
+    // `.ts` も含める。JSX は書けないが re-export や `getImageProps` の利用で迂回できる。
+    // 例外はラッパー本体と、型だけを使うローダー（`import type` のみ）。
+    files: ["src/**/*.tsx", "src/**/*.ts"],
+    ignores: ["src/components/ui/AppImage.tsx", "src/lib/image-loader.ts"],
     rules: {
       "no-restricted-imports": [
         "error",

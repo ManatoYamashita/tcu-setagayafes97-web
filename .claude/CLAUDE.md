@@ -153,14 +153,16 @@ microCMS の secrets を要求するので fork PR では必ず落ちる）。�
 どちらも「ビルドは通るが壊れている」状態を落とすためにあり、ESLint でも Vitest でも
 代替できない（生成された HTML を読む以外に判定する方法が無い）。
 
-| スクリプト                                  | 落とすもの                                         | 参照                                                                                                  |
-| ------------------------------------------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `assert-events-static-html.mjs`             | `/events` の本体がクライアント描画へ落ちる（#156） | [`docs/frontend/static-html-and-search-params.md`](../docs/frontend/static-html-and-search-params.md) |
-| `assert-remote-images-bypass-optimizer.mjs` | リモート画像が Vercel の画像最適化を通る（#237）   | [`docs/frontend/image-delivery.md`](../docs/frontend/image-delivery.md)                               |
+| スクリプト                                  | 落とすもの                                                                       | 参照                                                                                                  |
+| ------------------------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `assert-events-static-html.mjs`             | `/events` の本体がクライアント描画へ落ちる（#156）                               | [`docs/frontend/static-html-and-search-params.md`](../docs/frontend/static-html-and-search-params.md) |
+| `assert-remote-images-bypass-optimizer.mjs` | **リモート**画像が Vercel の画像最適化を通る（#237。ローカルの静的画像は対象外） | [`docs/frontend/image-delivery.md`](../docs/frontend/image-delivery.md)                               |
 
 **どちらも検査対象が消えると空振りする。** 前者は `EVENTS_VISIBLE` が false のとき、
 後者は microCMS の画像が1枚もHTMLに出ないときで、いずれもログに `SKIP` / `NOTE` を出す。
 **その行が出ているときは、検査が効いていないと考えること。**
+なお後者は**公開フラグが全て false でも空振りしない**（協賛企業はフラグ非依存）。
+`NOTE` が出たら「協賛の取得が0件」を疑うこと。
 
 `pnpm type-check` が `next typegen` を前置しているのは、**`.next/types/validator.ts` が
 `.d.ts` ではなく `.ts` だから**である。`skipLibCheck: true` はこのファイルを守らないため、
@@ -311,14 +313,16 @@ microCMS の編集画面にある「画面プレビュー」から、**公開せ
 > 組み合わせ1つである。変換済みの結果は CDN に残るため、枯渇後は**未変換の組み合わせだけ**が
 > `402` になる。同じファイルでも幅によって表示されたりされなかったりする（#237）。
 >
-> **現在、Vercel の Image Optimization は一切使っていない。** microCMS の画像は imgix、
-> `public/` の静的画像は原寸配信である。
+> **microCMS の画像は imgix、`public/` の静的画像は Vercel の Image Optimization** で
+> 変換する。枠を焼いていたのは microCMS 側だけで、静的画像は上限でも月356変換（枠の7%）。
 > **画像は [`src/components/ui/AppImage.tsx`](../src/components/ui/AppImage.tsx) の
 > `AppImage` で描くこと。`next/image` の直接 import は `eslint.config.mjs` が止める。**
 > 経路の設計と実測値は [`docs/frontend/image-delivery.md`](../docs/frontend/image-delivery.md) を参照。
 >
 > 画像が壊れたら、まず原画像への直接アクセスと `/_next/image` 経由を分けて叩き、
 > `x-vercel-error` ヘッダを見ること。コードを探しても何も見つからない。
+> **`curl` で叩くときは必ず `Accept: image/avif,image/webp,…` を付けること。**
+> 付けないとブラウザが要求しない形式変種を尋ねることになり、キャッシュ済みでも 402 に見える。
 
 **Lighthouse 目標値:**
 

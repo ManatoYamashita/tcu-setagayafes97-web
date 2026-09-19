@@ -119,14 +119,17 @@ const nextConfig: NextConfig = {
   },
   images: {
     /*
-     * ここで最適化されるのは `public/` 配下の静的画像（22枚）だけである。
+     * Vercel の Image Optimization で最適化されるのは `public/` 配下の静的画像だけである。
      * microCMS の画像は `src/lib/image-loader.ts` を `loader` prop で渡して imgix へ
      * 振り向けており、Vercel の変換枠を使わない。無料枠の枯渇で企画サムネイルが
      * 402 で壊れた経緯と、`loaderFile`（全体適用）を採らなかった理由は
      * docs/frontend/image-delivery.md を参照（#237）。
      *
-     * 幅の候補はそのまま srcset に並ぶ。`sizes` に固定 px を書いても全候補が並ぶため、
-     * ここへ幅を足す行為は静的画像の変換数を掛け算で増やす。追加時は用途を PR に書くこと。
+     * **この2つの幅の一覧は、両方の経路に効く。** `getImgProps` は `loader` の種類に
+     * 関係なくここから幅を決め、その幅をローダーへ渡すためである。つまり
+     * 静的画像の変換数と、microCMS の imgix URL の本数を、同時に決めている。
+     * `sizes` に固定 px を書いても srcset には全候補が並ぶので、
+     * **ここへ幅を足す行為は Vercel の変換数を掛け算で増やす。** 追加時は用途を PR に書くこと。
      *
      * 512 と 320 は隣接する 640 / 384 との差が小さく、丸め先との差はそれぞれ 25% / 20%
      * にとどまるので落とした。2048 と 3840 は残す。PageHero が `100vw` を使っており、
@@ -141,10 +144,9 @@ const nextConfig: NextConfig = {
     // （前段の CloudFront が Accept を落とすため出し分けができない）。
     formats: ["image/avif", "image/webp"],
     /*
-     * `loader` prop の渡し忘れで microCMS の画像が `/_next/image` へ回ったときに、
-     * ここが最後の関門になる。外すとその画像は 400 で確実に壊れるが、**枠を消費したまま
-     * 表示され続けるより、壊れて気付けるほうがよい**という判断で残している。
-     * 渡し忘れ自体は `scripts/assert-remote-images-bypass-optimizer.mjs` がビルド時に落とす。
+     * microCMS のホストを許可している。`loader` prop の渡し忘れでここへ回った画像も
+     * 表示自体はできてしまうが、その場合は枠を消費する。渡し忘れは
+     * `scripts/assert-remote-images-bypass-optimizer.mjs` がビルド時に落とす。
      */
     remotePatterns: [
       {

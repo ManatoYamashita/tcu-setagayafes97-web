@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { appImageLoader } from "@/lib/image-loader";
+import { appImageLoader, isMicrocmsImage } from "@/lib/image-loader";
 
 /**
  * 画像配信経路の契約（#237）
@@ -56,24 +56,34 @@ describe("appImageLoader — microCMS の画像", () => {
 
 describe("appImageLoader — それ以外の画像", () => {
   /*
-   * imgix を使えない画像は、Vercel の最適化へ回さず原寸のまま返す。
-   * `/_next/image` へ回すと枠の枯渇に巻き込まれ、静的画像まで 402 で壊れる
-   * （2026-09-19、Preview で w=640〜1920 がすべて 402 だった）。
+   * このローダーは microCMS の画像にしか渡らない（`AppImage` が振り分ける）。
+   * `public/` の静的画像は `loader` 無し = next/image の既定ローダーで
+   * Vercel の最適化へ回る。ここで固定するのは「直接使われたときに
+   * imgix のパラメータを勝手に足さない」という保険の挙動である。
    */
-  it("public 配下の静的画像は変換せず原寸を返す", () => {
+  it("public 配下の静的画像は素通しする（imgix のパラメータを足さない）", () => {
     expect(appImageLoader({ src: "/images/brand/logo.webp", width: 208, quality: 60 })).toBe(
       "/images/brand/logo.webp"
     );
   });
 
-  it("Vercel の最適化エンドポイントを一切指さない", () => {
-    for (const src of ["/images/brand/logo.webp", "/materials/geers.webp"]) {
-      expect(appImageLoader({ src, width: 640 })).not.toContain("/_next/image");
-    }
-  });
-
   it("ホスト名の前方一致で騙されない（別ホストは imgix 扱いしない）", () => {
     const lookalike = "https://images.microcms-assets.io.example.com/a.jpg";
     expect(appImageLoader({ src: lookalike, width: 340 })).toBe(lookalike);
+  });
+});
+
+describe("isMicrocmsImage — AppImage の振り分け条件", () => {
+  /*
+   * `AppImage` はこの判定だけでローダーを渡すかを決める。true なら imgix、
+   * false なら Vercel の最適化。**枠を焼いていたのは microCMS 側だけ**なので、
+   * ここが false の画像まで最適化から外してはいけない（LCP 要素が 4.7 倍になる）。
+   */
+  it("microCMS の配信ホストだけを true にする", () => {
+    expect(isMicrocmsImage(MICROCMS_IMAGE)).toBe(true);
+    expect(isMicrocmsImage("/images/brand/logo.webp")).toBe(false);
+    expect(isMicrocmsImage("/materials/geers.webp")).toBe(false);
+    expect(isMicrocmsImage("https://images.microcms-assets.io.example.com/a.jpg")).toBe(false);
+    expect(isMicrocmsImage("http://images.microcms-assets.io/a.jpg")).toBe(false);
   });
 });

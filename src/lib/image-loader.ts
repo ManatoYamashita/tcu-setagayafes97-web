@@ -10,6 +10,8 @@ import type { ImageLoaderProps } from "next/image";
  * **microCMS 由来の画像を描く `<Image>` には必ず `loader={appImageLoader}` を渡すこと。**
  * 渡し忘れた画像は Vercel の変換枠を消費する。`pnpm build` の末尾で走る
  * `scripts/assert-remote-images-bypass-optimizer.mjs` が生成物を読んで検出する。
+ * 逆に、`public/` の静的画像へ渡してはいけない（Vercel の最適化を素通りして原寸配信になる）。
+ * 振り分けは `src/components/ui/AppImage.tsx` が実行時に行うので、呼び出し側は意識しなくてよい。
  *
  * ## 背景（#237）
  *
@@ -21,19 +23,25 @@ import type { ImageLoaderProps } from "next/image";
  * `(元画像, 幅, 品質, フォーマット)` の組み合わせ1つ。変換済みの結果は CDN に
  * 残るため、枯渇後は「未変換の組み合わせだけが壊れる」という分かりにくい形で表面化した。
  *
- * microCMS 側の企画サムネイルだけで 93 枚ある。一方 `public/` の静的画像は 22 枚しかない。
- * 枠を消費していた主体は前者であり、ここを imgix へ逃がすことが根治になる。
+ * 枠を焼いていた主体は microCMS 側である。2026-09-20 に本番HTMLの srcset を全数えした
+ * 結果、変換数の上限は `public/` の静的画像11ファイルで 178通り×2形式＝**356**
+ * （枠 5,000 の 7%）。対して microCMS は企画サムネイル93枚だけで約 3,348。
+ * **ここだけ imgix へ逃がせば根治する。静的画像は Vercel の最適化に残す。**
  *
  * ## なぜ `next.config.ts` の `loaderFile` ではなく `loader` prop なのか
  *
  * **`images.loader: "custom"` を設定すると、`/_next/image` エンドポイントが 404 になる。**
  * 2026-09-19 に `loaderFile` 方式で実装して実測したところ、`dev` / `start` のいずれでも
  * ローカル静的画像が 404 になった（`loaderFile` を外すと同じURLが 200 を返す）。
- * グローバルに適用すると、**imgix を使えない `public/` の22枚が巻き添えで最適化を失う。**
+ * グローバルに適用すると、**静的画像が巻き添えで最適化を失う。**
  *
- * `loader` prop は Server Component から渡しても動く（`getImgProps` がサーバー側で
- * 実行されるため、`Functions cannot be passed directly to Client Components` にならない）。
- * 2026-09-19 に `NewsCard`（Server Component）で実測済み。
+ * ## なぜ `AppImage` というラッパーが要るのか
+ *
+ * **`loader` prop に関数を渡せるのは Client Component だけである。** Server Component から
+ * 渡すと prerender の時点で `Functions cannot be passed directly to Client Components` で
+ * **ビルドが落ちる**（2026-09-19、`/about/sponsors` で実測）。`next/image` の既定
+ * エクスポートは `next/dist/client/image-component` のクライアント部品であり、
+ * 関数 prop はこの境界を越えられない。**開発サーバーでは顕在化せず `next build` で初めて出る。**
  */
 
 /** microCMS のメディア配信ホスト。imgix 互換の変換パラメータを受け付ける。 */
@@ -95,18 +103,12 @@ function toImgixUrl(src: string, width: number, quality: number): string {
 
 export function appImageLoader({ src, width, quality }: ImageLoaderProps): string {
   /*
-   * imgix を使えない画像（`public/` 配下の静的画像）は、変換せず原寸のまま返す。
+   * imgix を使えない画像は、変換せず原寸のまま返す。
    *
-   * `/_next/image` へ回すこともできるが、**それでは枠の枯渇から逃れられない。**
-   * 2026-09-19 に Preview で実測したところ、静的画像もブラウザが実際に選ぶ帯
-   * （w=640〜1920）はすべて 402 で、ロゴもヒーロー画像も壊れていた。
-   * 枠を一切使わない状態にするのが本 PR の目的である。
-   *
-   * 通常この分岐には到達しない。`AppImage` がローカル画像へ `unoptimized` を立て、
-   * その場合 next/image はローダーを呼ばないためである。ローダーを直接使われたときの
-   * 保険として、ここでも `/_next/image` を指さないようにしてある。
-   *
-   * 静的画像を表示寸法へ事前縮小する作業は別途行う（docs/frontend/image-delivery.md）。
+   * **通常この分岐には到達しない。** `AppImage` は microCMS の画像にしかこのローダーを
+   * 渡さず、`public/` の静的画像は `loader` 無し（= next/image の既定ローダー）で
+   * Vercel の最適化へ回るためである。ここは、このローダーを直接使われたときに
+   * 意図しないホストの画像を imgix のパラメータ付きで返さないための保険である。
    */
   if (!isMicrocmsImage(src)) return src;
 
