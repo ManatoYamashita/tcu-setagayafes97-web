@@ -131,7 +131,7 @@ export default async function PrivacyPolicyPage({
         {/* 第三者提供 */}
         <section className="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm md:p-8">
           <div className="mb-6 flex items-center gap-3">
-            <Users className="h-6 w-6 text-purple-500" />
+            <Users className="h-6 w-6 text-primary-500" />
             <h2 className="text-2xl font-bold text-gray-900">{t("sections.thirdParty")}</h2>
           </div>
           <p className="mb-4 font-semibold text-gray-900">
@@ -141,7 +141,7 @@ export default async function PrivacyPolicyPage({
           <ul className="space-y-2">
             {privacyPolicyConfig.thirdParty.exceptions.map((exception, index) => (
               <li key={index} className="flex items-start gap-2 text-gray-700">
-                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-purple-500"></span>
+                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary-500"></span>
                 <span>{exception}</span>
               </li>
             ))}

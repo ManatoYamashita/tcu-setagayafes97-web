@@ -125,7 +125,7 @@ export function FAQContent({ initialFAQ }: FAQContentProps) {
         <div className="rounded-xl border border-gray-200 bg-gray-50 p-8 text-center">
           <MessageCircleQuestion
             aria-hidden="true"
-            className="mx-auto mb-4 h-12 w-12 text-gray-300"
+            className="mx-auto mb-4 h-12 w-12 text-gray-200"
           />
           <p className="text-gray-500">{t("empty.title")}</p>
           <p className="mt-2 text-sm text-gray-400">
@@ -204,7 +204,7 @@ export function FAQContent({ initialFAQ }: FAQContentProps) {
         <div className="rounded-xl border border-gray-200 bg-gray-50 py-16 text-center">
           <MessageCircleQuestion
             aria-hidden="true"
-            className="mx-auto mb-4 h-12 w-12 text-gray-300"
+            className="mx-auto mb-4 h-12 w-12 text-gray-200"
           />
           <p className="text-gray-500">{t("noResults.title")}</p>
           <p className="mt-2 text-sm text-gray-400">{t("noResults.description")}</p>

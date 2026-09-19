@@ -31,9 +31,9 @@ export function Badge({ variant, label, tone = "default", className }: BadgeProp
   const variantStyles: Record<BadgeVariant, string> = {
     urgent: "bg-red-500 text-gray-900",
     news: "bg-blue-500 text-gray-900",
-    other: "bg-gray-500 text-gray-900",
+    other: "bg-gray-400 text-gray-900",
     day1: "bg-secondary text-gray-900",
-    day2: "bg-purple-600 text-gray-900",
+    day2: "bg-primary-400 text-gray-900",
     both: "bg-secondary text-gray-900",
     room: "bg-green-500 text-gray-900",
     stage: "bg-orange-500 text-gray-900",

@@ -80,7 +80,7 @@ export default function PamphletPage() {
                 <div className="lg:flex">
                   {/* 表紙画像 */}
                   <div className="relative aspect-[3/4] lg:w-64 lg:flex-shrink-0">
-                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary to-purple-600">
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary to-primary-600">
                       <div className="text-center text-gray-900">
                         <FileText className="mx-auto mb-2 h-16 w-16 opacity-50" />
                         <p className="text-sm font-semibold">表紙画像準備中</p>

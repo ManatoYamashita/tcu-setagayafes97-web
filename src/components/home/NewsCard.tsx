@@ -137,7 +137,7 @@ export function NewsCard({ news, variant = "default", className }: NewsCardProps
         <span>{getTypeLabel(news.type)}</span>
         {isLarge && (
           <>
-            <span className="text-gray-300">|</span>
+            <span className="text-gray-200">|</span>
             <time dateTime={news.publishedAt || news.createdAt}>{dateStr}</time>
           </>
         )}
