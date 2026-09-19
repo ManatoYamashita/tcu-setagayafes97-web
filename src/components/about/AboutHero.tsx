@@ -183,14 +183,29 @@ export function AboutHero() {
           <span className="block text-2xl font-semibold tracking-[0.08em] text-gray-900 sm:text-3xl lg:text-4xl">
             第
             {/*
-              地色は gray-50（実配信 #f5f5f5、要素のスクリーンショットから実測）。
-              60px/700 は大テキスト扱いで要求 3:1。旧 from-purple-500 to-pink-400 は
-              始点 purple-500（実配信 #ad46ff）が 3.78 で通るものの、
-              終点 pink-400（実配信 #fb64b6）が 2.53 で未達だった。
-              primary-600 / primary-700 は 6.84 / 10.28（#179 B / #95）
+              地色は gray-50（実配信 #f5f5f5）。60px/700 は大テキスト扱いで要求 3:1。
+
+              紫からピンクへ抜ける配色はサイト所有者の指定である。#179 B で
+              from-primary-600 to-primary-700（6.84 / 10.28）へ倒したが、
+              ピンクが失われるため本コミットで戻した。**元の値には戻していない。**
+
+              | 段                    | 実配信    | 比        |
+              | --------------------- | --------- | --------- |
+              | 旧 purple-500（始点） | `#ad46ff` | 3.78 OK   |
+              | 旧 pink-400（終点）   | `#fb64b6` | 2.53 未達 |
+              | primary-500（始点）   | `#9c50be` | 4.47 OK   |
+              | pink-500（終点）      | `#f6339a` | 3.29 OK   |
+
+              終点を1段だけ暗くすれば足りる。pink-400 は 2.53 で届かないが
+              pink-500 は 3.29 で通る。始点の purple-500 は eslint.config.mjs が
+              禁止しているため primary-500 へ置き換えた（色相差 15° 未満で
+              ブランド紫と区別されないため。docs/frontend/design.md）。
+
+              pink-500 は special バッジ（Badge.tsx の bg-pink-500）と同じ段で、
+              design.md が「残している非ブランド色相」として明記している。
             */}
             <span
-              className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent tracking-tighter sm:text-5xl lg:text-6xl"
+              className="text-4xl font-bold bg-gradient-to-r from-primary-500 to-pink-500 bg-clip-text text-transparent tracking-tighter sm:text-5xl lg:text-6xl"
               style={{ fontFamily: 'var(--font-kaisei-opti, "Kaisei Opti"), serif' }}
             >
               97
