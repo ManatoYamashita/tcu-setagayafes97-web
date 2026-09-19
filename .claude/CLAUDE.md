@@ -394,8 +394,11 @@ microCMS の編集画面にある「画面プレビュー」から、**公開せ
 > `/events` はどちらも静的HTMLに本体が入っていることを実測で確認済み（2026-09-19）。
 > **再発防止装置は3つある。** `eslint.config.mjs` の `no-restricted-imports`（fallback ツリーの
 > 5ファイルが `useSearchParams` を import できない）、同じく `eslint.config.mjs` の
-> `react-hooks/exhaustive-deps: "error"`（`EventInfiniteList.tsx` に限った格上げ。#239 で
-> observer が張り直されず一覧が12件で止まった）、そして `pnpm build` の末尾へ連結した
+> `react-hooks/exhaustive-deps: "error"` と `no-restricted-syntax` の2本組
+> （`EventInfiniteList.tsx` に限る。#239 で observer が張り直されず一覧が12件で止まった。
+> **格上げだけでは足りない** — 打ち切り条件も依存配列も `hasMore` へ**揃えて**戻すと依存は
+> 過不足なく揃うため `exhaustive-deps` は何も言わない。後者で効果と `useCallback` の中から
+> `hasMore` を読むこと自体を禁じて塞いだ）、そして `pnpm build` の末尾へ連結した
 > `scripts/assert-events-static-html.mjs`（`<Suspense>` 境界の消失と fallback の格下げを落とす。
 > **`EVENTS_VISIBLE` が false の間はスキップし、true になると自動で有効化する**）。
 > 判定方法・fallback の設計・実測値は
