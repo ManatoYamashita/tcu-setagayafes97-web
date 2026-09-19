@@ -43,6 +43,7 @@ docs/
 │   ├── landmarks-and-skip-link.md # <main> とスキップリンクの契約
 │   ├── timetable-gantt.md         # タイムテーブル盤面（ガントチャート）の設計
 │   ├── events-search.md           # /events の検索と絞り込み（正規化・建物導出）
+│   ├── events-infinite-scroll.md  # /events の無限スクロールと絞り込みの追従
 │   ├── layout-e2e.md              # 実ブラウザの再発防止装置（盤面 / ランドマーク1周）
 │   ├── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
 │   ├── image-delivery.md          # 画像変換の委譲先（microCMS=imgix / 静的=Vercel）
@@ -383,6 +384,14 @@ docs/
   - **IME は `InputEvent.isComposing` で判定する。** `compositionend` を合図にすると
     発火順の違いで環境によって検索が動かなくなる
   - **ハイドレーション完了前に合成イベントを流すと検証が嘘をつく**（実測で3回誤った）
+
+- **[events-infinite-scroll.md](./frontend/events-infinite-scroll.md)** - `/events` の無限スクロールと絞り込みの追従（#239）
+  - **ページ分割は撤去済み。** 旧 `Pagination` は `href` を持たない `<button>` だったため、SEO の損失はゼロ
+  - **監視は発火即 `disconnect()` し、`visibleCount` の変化でだけ張り直す。** 依存から落とすと
+    **1回だけ追加して永久に止まる**（実測: 12件 → 24件 で打ち止め）。`exhaustive-deps` を error へ格上げして縛った
+  - **`<aside>` の `self-start` は grid で必須。** 外すと高さが行全体まで伸び、sticky が一度も貼り付かない
+    （実測: 一覧表示中に画面外 15/16 回）。**lint / 型 / テスト / build のすべてを通過する**
+  - **`--header-height`（88px）をそのまま `top` に使わない。** スクロール中のヘッダー実高は 77px で、11px の隙間からカードが透ける
 
 - **[layout-e2e.md](./frontend/layout-e2e.md)** - 実ブラウザの再発防止装置（Playwright / #157 / #177 A）
   - 盤面の実測（#148）とランドマークの1周検査（#177 A）の2つが載る

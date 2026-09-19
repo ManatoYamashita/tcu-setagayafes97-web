@@ -20,12 +20,16 @@
 クライアント描画へ落とします（bailout）。落ちた範囲は静的HTMLに入りません。
 
 **境界を書かなくてもエラーにはなりません。** 代わりに、いちばん近い `loading.tsx` が
-作る境界が代役を務めます。このアプリには2枚あります。
+作る境界が代役を務めます。**現在このアプリに残っているのは1枚だけです。**
 
-| ファイル                            | 代役になる範囲                           |
-| ----------------------------------- | ---------------------------------------- |
-| `src/app/loading.tsx`               | ルート直下。ヘッダー・フッター以外の全部 |
-| `src/app/events/(list)/loading.tsx` | `/events` の一覧ページ                   |
+| ファイル                            | 代役になる範囲         |
+| ----------------------------------- | ---------------------- |
+| `src/app/events/(list)/loading.tsx` | `/events` の一覧ページ |
+
+> かつては `src/app/loading.tsx`（ルート直下。ヘッダー・フッター以外の全部）がもう1枚あり、
+> `/timetable` の #154 を捕まえていたのはこちらでした。**#217（`417e3a9`）で削除済み**です
+> （`redirect()` / `notFound()` がステータスへ反映されない副作用を取り除くため）。
+> **ルート直下へ戻すと、bailout の射程が全ページへ広がります。**
 
 > [!WARNING]
 > #156 の Issue 本文は「ルート直下の `src/app/loading.tsx` が捕まえる」と書いていますが、
@@ -80,16 +84,23 @@ grep -o '.\{160\}BAILOUT_TO_CLIENT_SIDE_RENDERING' "$f"
 `/events` では「クエリ無しで着地したときの表示」＝未フィルタ1ページ目を fallback に置きました
 （`src/app/events/(list)/page.tsx`）。
 
+> [!NOTE]
+> 無限スクロールへ移行した後（#239）も、fallback が描くのは**先頭1ページ分の12件**である。
+> `EventsView` へ渡すのは絞り込み後の全件だが、表示範囲を決めるのは `EventInfiniteList` の
+> `visibleCount` であり、fallback は hydrate されないので12件のまま静的HTMLへ出る。
+> 設計は [events-infinite-scroll.md](./events-infinite-scroll.md) を参照。
+
 ```
 <Suspense fallback={<EventsView ...既定値... />}>   ← 静的HTMLに出る
   <EventsContent initialEvents={events} />          ← "use client" / useSearchParams
     └ <EventsView ... />                            ← 同じコンポーネント
+        └ <EventInfiniteList ... />                 ← "use client"（クエリは読まない）
 </Suspense>
 ```
 
 > [!IMPORTANT]
 > **fallback の中で `useSearchParams()` を呼んではいけません。** fallback にはそれ以上
-> 落ちる先がありません。`/events` で `EventFilters` と `Pagination` から
+> 落ちる先がありません。`/events` で `EventFilters` と `EventInfiniteList` から
 > `useSearchParams()` を外して props 化したのは、リファクタのついでではなく**この制約への対応**です。
 > クエリを読むのは `EventsContent` の1箇所だけに保ってください。
 
@@ -147,7 +158,7 @@ CLS が 0 なのは、スクロール位置0の視界をヒーローが占めて
 const EVENTS_FALLBACK_TREE = [
   "src/components/events/EventsView.tsx",
   "src/components/events/EventFilters.tsx",
-  "src/components/events/Pagination.tsx",
+  "src/components/events/EventInfiniteList.tsx",
   "src/components/events/EventGrid.tsx",
   "src/components/events/EventCard.tsx",
 ];

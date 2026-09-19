@@ -77,8 +77,9 @@ export default async function TimetablePage() {
     <PageSheetLayout hero={pageHeroes.timetable}>
       {/*
         TimetableContent は useSearchParams() を使うため Suspense 境界が要る。
-        境界が無いと、ルート直下の src/app/loading.tsx が代役を務めてしまい、
-        ページ全体（ヒーローとシェルを含む）がクライアントレンダリングへ落ちる。
+        境界が無いと bailout の範囲がこのページ全体へ広がり、静的HTMLから本体が消える（#154）。
+        かつてはルート直下の src/app/loading.tsx が代役を務めていたが、#217 で削除済み。
+        ルート直下へ loading.tsx を戻すと、この境界の有無に関わらず影響が全ページへ広がる。
       */}
       <Suspense fallback={<div className="min-h-[50vh]" />}>
         <TimetableContent initialEvents={stageEvents} />

@@ -388,51 +388,66 @@ microCMS の編集画面にある「画面プレビュー」から、**公開せ
 └── /[locale]               # 多言語ページ (en, zh, ko)
 ```
 
-### リダイレクトはページ内 `redirect()` で実装しないこと（重要）
+### リダイレクトと 404 — ルート直下に `loading.tsx` を置かないこと（重要）
 
-**このアプリでは Server Component 内の `redirect()` が HTTP リダイレクトにならない。**
-ルート直下の `src/app/loading.tsx` によりストリーミングのシェルが先に送出されるため、
-ページのレンダリング中に投げた `redirect()` はステータスコードに反映されず、
-`<meta http-equiv="refresh" content="1;url=...">` へ格下げされる。
-結果は **HTTP 200 + 1秒待ってからのクライアント遷移**になる。
-`export const dynamic = "force-dynamic"` を足しても変わらない（2026-08-29 実測）。
+**ページ内の `redirect()` / `notFound()` は現在ちゃんと HTTP ステータスに反映される。**
+2026-09-19 の本番実測:
 
-本物のリダイレクトを返せる層は次の2つだけである。
+| URL                           | 返る値                                             |
+| ----------------------------- | -------------------------------------------------- |
+| `/events/special-event-mon7a` | **307** + `Location: /special/special-event-mon7a` |
+| `/events/存在しないID`        | **404**                                            |
+| `/special/存在しないID`       | **404**                                            |
+| `/info/存在しないID`          | **404**                                            |
 
-| 層                                | 用途                                                   |
-| --------------------------------- | ------------------------------------------------------ |
-| `next.config.ts` の `redirects()` | 静的に決まる転送。動的ルートの照合より先に走る（推奨） |
-| `src/proxy.ts`                    | リクエスト内容を見て決める必要がある転送               |
+> [!WARNING]
+> **かつてはそうではなかった。この性質はルート直下に `loading.tsx` を置いた瞬間に壊れる。**
+> `src/app/loading.tsx` が存在した間、ストリーミングのシェルが先に送出されるため、
+> ページのレンダリング中に投げた `redirect()` はステータスへ反映されず
+> `<meta http-equiv="refresh" content="1;url=...">` へ格下げされていた（HTTP 200 + 1秒待ち）。
+> `notFound()` も同様にソフト404になっていた。`export const dynamic = "force-dynamic"` を
+> 足しても変わらなかった（2026-08-29 実測）。
+>
+> このファイルは **#217（`417e3a9`）が `/info/[id]` のソフト404 を直すために削除**した。
+> **`/events/[id]` の 307 も、その巻き添えで一緒に直っている**（#127。当時は別件として
+> 未解消のまま残されていた）。**ルート直下へ `loading.tsx` を戻すと、両方まとめて再発する。**
 
+静的に決まる転送は、いまも `next.config.ts` の `redirects()` に置くのが正しい。
+**動的ルートの照合より先に走る**ためで、`/97th/about` のような「`[locale]` に
+飲み込まれて 200 で重複配信される」URL はこの層でしか塞げない。
+リクエスト内容を見て決める転送は `src/proxy.ts`。
 現在の転送一覧と設計判断は [`docs/dev/domain-migration.md`](../docs/dev/domain-migration.md) を参照。
 
 > [!IMPORTANT]
-> **同じ `loading.tsx` の境界は `useSearchParams()` の bailout も飲み込む。** 境界を書き忘れた
+> **`loading.tsx` の境界は `useSearchParams()` の bailout も飲み込む。** 境界を書き忘れた
 > Client Component があると、エラーにならないまま**ページ本体が静的HTMLから丸ごと消える**
 > （`/timetable` は #154、`/events` は #156）。**#148 は同じ `/timetable` でも別件**で、
 > `height: 100%` が `0px` に解決される CSS の不具合であり bailout とは無関係である。
-> `/events` を捕まえていたのはルートではなく `src/app/events/loading.tsx` である。
-> **再発防止装置は2つある。** `eslint.config.mjs` の `no-restricted-imports`（fallback ツリーの
-> 5ファイルが `useSearchParams` を import できない）と、`pnpm build` の末尾へ連結した
+>
+> **現存する `loading.tsx` は `src/app/events/(list)/loading.tsx` の1枚だけなので、
+> この危険が残るのは `/events` である。** ルート直下の1枚が消えた後も、`/timetable` と
+> `/events` はどちらも静的HTMLに本体が入っていることを実測で確認済み（2026-09-19）。
+> **再発防止装置は3つある。** `eslint.config.mjs` の `no-restricted-imports`（fallback ツリーの
+> 5ファイルが `useSearchParams` を import できない）、同じく `eslint.config.mjs` の
+> `react-hooks/exhaustive-deps: "error"` と `no-restricted-syntax` の2本組
+> （`EventInfiniteList.tsx` に限る。#239 で observer が張り直されず一覧が12件で止まった。
+> **格上げだけでは足りない** — 打ち切り条件も依存配列も `hasMore` へ**揃えて**戻すと依存は
+> 過不足なく揃うため `exhaustive-deps` は何も言わない。後者で効果と `useCallback` の中から
+> `hasMore` を読むこと自体を禁じて塞いだ）、そして `pnpm build` の末尾へ連結した
 > `scripts/assert-events-static-html.mjs`（`<Suspense>` 境界の消失と fallback の格下げを落とす。
 > **`EVENTS_VISIBLE` が false の間はスキップし、true になると自動で有効化する**）。
 > 判定方法・fallback の設計・実測値は
 > [`docs/frontend/static-html-and-search-params.md`](../docs/frontend/static-html-and-search-params.md) を参照。
 
-> [!WARNING]
-> `src/app/events/[id]/page.tsx` の `type=special` → `/special/[id]` 誘導は
-> ページ内 `redirect()` のままであり、上記のとおり 200 + meta refresh になっている。
-> 未解消（要Issue）。
-
 ### 未知のロケールセグメントの扱い
 
 `src/app/[locale]/` の `[locale]` は任意の文字列にマッチするため、放置すると
 `/foo/about` や `/hoge/access` が 404 ではなく `/about`・`/access` と同じ内容を
-200 で返す。`src/app/[locale]/layout.tsx` の `notFound()` はストリーミングの
-シェル送出後に投げられるためステータスに反映されない。
+200 で返す。
 
 `src/app/[locale]/layout.tsx` の `export const dynamicParams = false;` で解決済み
-（#128）。`generateStaticParams` が返す4ロケール以外は、レンダリングより前の
+（#128。`/foo/about`・`/hoge/access` がともに 404 を返すことを 2026-09-19 に実測）。
+**レンダリングより前のルート照合で弾く**のが要点で、`notFound()` に頼るより確実である。`generateStaticParams` が返す4ロケール以外は、レンダリングより前の
 ルート照合で 404 になる。**この宣言を外すと重複配信が再発する。**
 
 なお `/en` `/zh` `/ko` 単体のURLは別問題（多言語トップページが無い）で、
@@ -457,7 +472,17 @@ microCMS の編集画面にある「画面プレビュー」から、**公開せ
 
 - **フィルター**: 日程（Day1/Day2/両日）、場所（建物番号）、カテゴリ（教室/ステージ/スペシャル）、キーワード
 - **表示形式**: カード形式、サムネイル・タイトル・カテゴリバッジ・場所・日程
-- **ページネーション**: またはLazy Loading（無限スクロール）
+- **一覧は無限スクロール**（#239。ページ分割は撤去済み）。12件ずつ継ぎ足し、
+  「もっと見る」ボタンを併設する。絞り込みは `position: sticky` で画面内に留める。
+  `?page=N` は「N ページ目」ではなく**「N ページ分を展開して着地」**の意味になった。
+  設計と実測は [`docs/frontend/events-infinite-scroll.md`](../docs/frontend/events-infinite-scroll.md) を参照
+
+> [!IMPORTANT]
+> **`EventsView` へページ分割済みの配列を渡してはいけない。** 表示範囲は
+> `EventInfiniteList` が決める。呼び出し側で切ると、その先が永久に読めなくなる。
+> **`<aside>` の `self-start` を外すと sticky が一度も貼り付かない**（grid の既定は
+> `stretch` で高さが行全体まで伸びるため）。どちらも lint / 型 / テスト / build を
+> すべて通過する。
 
 ### タイムテーブル (/timetable)
 

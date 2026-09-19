@@ -91,7 +91,9 @@
 **なぜ `next.config.ts` なのか。** 理由は2つある。
 
 1. `/97th/about` は放置すると **404 ではなく 200 で `/about` の内容を返す**。`src/app/[locale]/about/page.tsx` の `[locale]` が `97th` をロケールとして飲み込むためで、`/foo/about` や `/hoge/access` でも同じ重複配信が起きる。`redirects()` は動的ルートの照合より先に走るため、ここで塞ぐのが確実である（`/97th` 以外の未知セグメントは未対応のまま残っている）。
-2. **ページ内の `redirect()` では代用できない。** ルート直下の `src/app/loading.tsx` によりストリーミングのシェルが先に送出され、ページのレンダリング中に投げた `redirect()` は HTTP ステータスに反映されず `<meta http-equiv="refresh" content="1;url=...">` へ格下げされる。`export const dynamic = "force-dynamic"` を足しても同じだった（実測）。**このアプリで本物の転送を返せるのは `next.config.ts` の `redirects()` と `src/proxy.ts` だけである。**
+2. **ページ内の `redirect()` では層が遅い。** `/97th/about` は `[locale]` に飲み込まれるため、動的ルートの照合より先に走る `redirects()` でなければ塞げない（理由1と同じ）。
+
+   > **2026-09-19 追記。** かつてここには「ページ内の `redirect()` は HTTP ステータスに反映されず `<meta http-equiv="refresh">` へ格下げされるため、本物の転送を返せるのは `redirects()` と `proxy.ts` だけである」と書いていたが、**現在は事実でない。** 原因だったルート直下の `src/app/loading.tsx` は #217（`417e3a9`）で削除済みで、ページ内 `redirect()` は 307 を返す（`/events/special-event-mon7a` で実測）。**ただし `/97th/about` をここに置く理由は上記のとおり層の順序なので、この設定は動かさない。**
 
 転送先の企画IDは `src/data/special-banner.ts` の `eventId` を出典とする。トップページの告知セクションが参照しているものと同一で、設定側にベタ書きすると2箇所へ散るためである。非公開（`NEXT_PUBLIC_SPECIAL_VISIBLE` が真でない）の間は LP が `notFound()` を返すので、転送先を `/special` の準備中表示へ落とし、`/special` 自身の転送は出さない。
 

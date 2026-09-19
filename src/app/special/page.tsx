@@ -40,11 +40,13 @@ export const revalidate = 600;
  *
  * IMPORTANT: 公開中の著名人企画が1組だけの現在、`/special` は `next.config.ts` の
  * `redirects()` で LP へ 302 されるため、このページは SPECIAL_VISIBLE が false の
- * ときの準備中表示にしか到達しません。ここでの `redirect()` 呼び出しでは代用
- * できないことが確認済みです。ルート直下の `loading.tsx` によりストリーミングの
- * シェルが先に送出され、ページのレンダリング中に投げた `redirect()` は HTTP
- * ステータスに反映されず `<meta http-equiv="refresh">` へ格下げされます
- * （HTTP 200 のまま1秒待たされる）。転送はルート照合より前の層で行うこと。
+ * ときの準備中表示にしか到達しません。転送を `redirects()` に置いているのは、
+ * この層が動的ルートの照合より先に走るからです。
+ *
+ * なお、かつてここには「ページ内の `redirect()` はルート直下の `loading.tsx` により
+ * `<meta http-equiv="refresh">` へ格下げされるので代用できない」と書いていましたが、
+ * その `loading.tsx` は #217 で削除され、現在ページ内 `redirect()` は 307 を返します。
+ * それでも転送をここへ戻さないのは、上記のとおり層の順序が理由です。
  *
  * 2組目が公開されたら `next.config.ts` の `/special` エントリを削除すれば、
  * このページが一覧として復帰します。

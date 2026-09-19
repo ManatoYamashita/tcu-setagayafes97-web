@@ -29,6 +29,9 @@ const KEYWORD_DEBOUNCE_MS = 300;
  * fallback 自身が bailout し、ページ本体が静的HTMLから消えます（#156）。
  * `useRouter()` / `useState()` / `useEffect()` は bailout を起こさないのでそのまま使えます。
  *
+ * **このパネルは親の `<aside>` ごと sticky で画面内に留まる**（#239）。スクロールしても
+ * 絞り込みへ戻れるようにするためで、高さの上限（`max-h`）はその前提とセットで要る。
+ *
  * `lg` 未満では開閉可能なパネルにする。開催日・種別・建物・キーワードの4項目が
  * 常に全展開されていると、モバイルで最初のカードが画面外に押し出されるため。
  * 既定は折りたたみだが、URLに絞り込み条件が既にある場合（深いリンク・戻る/進む）は
@@ -143,8 +146,18 @@ export function EventFilters({ filters, buildingOptions }: EventFiltersProps) {
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-4 lg:p-6">
-      <div className="mb-4 flex items-center justify-between">
+    /*
+      高さの上限は sticky 化（#239）とセットで要る。親の <aside> が画面上部へ貼り付くため、
+      これが無いと開いた瞬間にパネルが画面を縦いっぱいに占め、カードが1枚も見えなくなる。
+      ヘッダー（--header-height）と上下の余白を引いた残りが上限。
+    */
+    <div className="max-h-[calc(100svh-var(--header-height)-2rem)] overflow-y-auto rounded-lg border border-gray-200 bg-white p-4 lg:p-6">
+      {/*
+        折りたたみ時は下マージンを持たせない。lg 未満ではこのバーが貼り付いたまま
+        常に画面上部を占有するため、閉じているときの高さは 1px でも削る
+        （16px の差でカード1枚分の見え方が変わる）。lg では常に開いているので残す。
+      */}
+      <div className={`flex items-center justify-between lg:mb-4 ${isOpen ? "mb-4" : ""}`}>
         <h2 className="hidden text-lg font-bold text-gray-900 lg:block">絞り込み</h2>
         <button
           type="button"
