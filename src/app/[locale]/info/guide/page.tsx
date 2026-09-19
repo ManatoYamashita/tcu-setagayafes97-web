@@ -200,7 +200,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
               return (
                 <div
                   key={item.id}
-                  className={`rounded-xl border-l-4 ${style.border} ${style.bg} p-5 shadow-sm transition-shadow hover:shadow-md`}
+                  className={`rounded-xl border-l-4 ${style.border} ${style.bg} p-5 shadow-sm transition-shadow hoverable:hover:shadow-md`}
                 >
                   <div className="mb-2 flex items-center gap-2">
                     <span aria-hidden="true" className="text-2xl">
