@@ -30,11 +30,15 @@ interface PageMetadataOptions {
    * 検索エンジンからの除外
    *
    * コンテンツが見つからないときの詳細ページ（`/events/[id]` など）で使う。
-   * このアプリはルート直下の `src/app/loading.tsx` によりストリーミングのシェルが
-   * 先に送出されるため、ページ本体で投げた `notFound()` が HTTP ステータスへ
-   * 反映されない。実測（2026-09-03）では `/events/__no_such_id__` が
-   * **200 を返し、自分自身を canonical に指定していた**。
-   * つまり任意の文字列で薄いURLを無限に生成できる状態だった。
+   *
+   * `notFound()` は現在 HTTP 404 を返す（2026-09-19 実測）が、**ステータスとは別に
+   * メタデータ側の手当てが要る。** `generateMetadata` は `notFound()` より先に評価され、
+   * 存在しないIDに対しても canonical を出しうるためである。
+   *
+   * 履歴: ルート直下の `src/app/loading.tsx` があった間は `notFound()` 自体が
+   * ステータスへ反映されず、実測（2026-09-03）で `/events/__no_such_id__` が
+   * **200 を返し、自分自身を canonical に指定していた**。任意の文字列で薄いURLを
+   * 無限に生成できる状態だった。`loading.tsx` は #217 で削除済み。
    *
    * `noindex: true` のときは canonical も出さない。存在しないURLに
    * 自己参照 canonical を与えると、Google にその URL を正規版として宣言してしまう。
