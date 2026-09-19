@@ -166,7 +166,7 @@ export function EventFilters({ filters, buildingOptions }: EventFiltersProps) {
         </button>
         <button
           onClick={handleReset}
-          className="text-sm text-gray-900 underline hover:text-gray-900/80 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
+          className="text-sm text-gray-900 underline hoverable:hover:text-gray-900/80 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
           aria-label="フィルターをリセット"
         >
           リセット
@@ -232,7 +232,7 @@ export function EventFilters({ filters, buildingOptions }: EventFiltersProps) {
             id="building-filter"
             value={currentBuilding}
             onChange={(e) => handleFilterChange({ building: e.target.value })}
-            className="w-full rounded-lg border border-gray-400 bg-white px-4 py-2 text-sm text-gray-900 focus:border-gray-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
+            className="w-full rounded-lg border border-gray-400 bg-white px-4 py-2 text-base text-gray-900 focus:border-gray-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600 sm:text-sm"
           >
             {buildingOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -263,7 +263,7 @@ export function EventFilters({ filters, buildingOptions }: EventFiltersProps) {
               setIsComposing(false);
               setKeywordDraft(e.currentTarget.value);
             }}
-            className="w-full rounded-lg border border-gray-400 bg-white px-4 py-2 text-sm text-gray-900 placeholder-gray-600 focus:border-gray-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
+            className="w-full rounded-lg border border-gray-400 bg-white px-4 py-2 text-base text-gray-900 placeholder-gray-600 focus:border-gray-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600 sm:text-sm"
           />
           <p className="mt-2 text-xs text-gray-700">
             企画名・団体名・場所・紹介文から探します。文章のまま入力できます。

@@ -154,7 +154,7 @@ export function FAQContent({ initialFAQ }: FAQContentProps) {
           placeholder={t("search.placeholder")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full rounded-xl border border-gray-400 bg-gray-50 py-3 pl-12 pr-4 text-sm text-gray-900 placeholder-gray-500 transition-colors focus:border-gray-600 focus:bg-white focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
+          className="w-full rounded-xl border border-gray-400 bg-gray-50 py-3 pl-12 pr-4 text-base text-gray-900 placeholder-gray-500 transition-colors focus:border-gray-600 focus:bg-white focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600 sm:text-sm"
         />
       </div>
 
