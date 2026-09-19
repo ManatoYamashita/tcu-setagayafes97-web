@@ -51,8 +51,11 @@ export function EventsView({
           <EventFilters filters={filters} buildingOptions={buildingOptions} />
         </aside>
 
-        {/* メインコンテンツ */}
-        <main>
+        {/*
+          結果一覧。PageSheetLayout が <main> を出すようになったため div に戻す。
+          ここはサイドバー（aside）と並ぶ一区画であり、ページの main ではない
+        */}
+        <div>
           {/* 検索結果件数 */}
           <div className="mb-6 flex items-center justify-between">
             <p className="text-sm text-gray-700" role="status" aria-live="polite">
@@ -70,7 +73,7 @@ export function EventsView({
               <Pagination filters={filters} currentPage={currentPage} totalPages={totalPages} />
             </div>
           )}
-        </main>
+        </div>
       </div>
     </div>
   );

@@ -22,7 +22,8 @@
   "header": {
     "openMenu": "메뉴 열기",
     "closeMenu": "메뉴 닫기",
-    "mainNav": "메인 내비게이션"
+    "mainNav": "메인 내비게이션",
+    "skipToContent": "본문으로 건너뛰기"
   },
   "footer": {
     "eventInfo": "행사 정보",

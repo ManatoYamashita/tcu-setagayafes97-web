@@ -55,7 +55,7 @@ export default function EventsLoading() {
           </aside>
 
           {/* メインコンテンツ */}
-          <main>
+          <div>
             {/* 検索結果件数スケルトン */}
             <div className="mb-6 h-5 w-48 animate-pulse rounded bg-gray-200" />
 
@@ -89,7 +89,7 @@ export default function EventsLoading() {
                 </div>
               ))}
             </div>
-          </main>
+          </div>
         </div>
       </div>
     </PageSheetLayout>

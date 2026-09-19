@@ -40,6 +40,7 @@ docs/
 │   ├── browser-observation-limits.md  # ブラウザ観測の前提と限界（何が測れるか）
 │   ├── browser-verification-pitfalls.md # 検証手順そのものが誤る実例
 │   ├── layout-patterns.md         # レイアウトパターンと設計原則
+│   ├── landmarks-and-skip-link.md # <main> とスキップリンクの契約
 │   ├── timetable-gantt.md         # タイムテーブル盤面（ガントチャート）の設計
 │   ├── events-search.md           # /events の検索と絞り込み（正規化・建物導出）
 │   ├── layout-e2e.md              # レイアウトの実測アサーション（Playwright）
@@ -321,6 +322,7 @@ docs/
   - 誤診の実例は [page-transition.md](./frontend/page-transition.md) も参照
 
 - **[layout-patterns.md](./frontend/layout-patterns.md)** - レイアウトパターンと設計原則
+- **[landmarks-and-skip-link.md](./frontend/landmarks-and-skip-link.md)** - `<main id="content">` とスキップリンクの契約（#177 A）
   - Header/Hero統合パターン（calc()による実効100vh、CSS変数化）
   - z-index管理とレイヤー構造（標準スケール: 10/20/30/40/60）
   - absolute/fixed/sticky使い分けガイド

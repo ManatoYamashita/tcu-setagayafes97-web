@@ -58,8 +58,16 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   const { locale } = await params;
   setRequestLocale(locale);
 
+  /*
+   * スキップリンク（Header）の遷移先。このページは AboutHero が PageHero ではないため
+   * PageSheetLayout を使っておらず、main を自前で出す必要がある。
+   */
   return (
-    <div className="min-h-screen bg-secondary">
+    <main
+      id="content"
+      tabIndex={-1}
+      className="min-h-screen bg-secondary focus-visible:outline-none"
+    >
       {/*
         Organization と Event はトップページと同じ @id を使う。Google は同一 @id の
         ノードを結合するため、重複ではなくエンティティの補強になる。
@@ -101,6 +109,6 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 
       {/* 協賛企業 */}
       <SponsorBanner />
-    </div>
+    </main>
   );
 }

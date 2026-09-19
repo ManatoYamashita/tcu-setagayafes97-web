@@ -63,6 +63,21 @@ export function Header() {
 
   return (
     <>
+      {/*
+        スキップリンク。ページ内で最初のフォーカス可能要素である必要があるため、
+        sticky な <header> より前に置く。遷移先 #content は各ルートの <main>。
+
+        sr-only + not-sr-only は使わない。両者が同じ focus-visible 変種群の中で
+        position を奪い合い、Tailwind v4 のカスケード順（変種群 → プロパティ順）に
+        依存した結果になるため。translate で画面外へ退避させれば順序に依存しない。
+      */}
+      <a
+        href="#content"
+        className="fixed left-4 top-4 z-50 -translate-y-24 rounded-lg bg-primary-700 px-4 py-2 text-sm font-semibold text-white shadow-lg focus-visible:translate-y-0"
+      >
+        {messages.header.skipToContent}
+      </a>
+
       <header
         // transition-all はここでは意図的に残している。isAtTop の切り替えで
         // padding（px/pt）と背景色が同時に変わり、どちらのアニメーションも演出の一部。

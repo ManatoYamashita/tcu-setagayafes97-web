@@ -163,7 +163,11 @@ export default async function NewsPage({ params }: NewsPageProps) {
         id は後続のスキップリンク（#177 A）がそのまま指せるように今から振っておく。
         このルートは PageSheetLayout を経由しないため、main は自前で出す必要がある
       */}
-      <main id="content" className="min-h-screen bg-secondary">
+      <main
+        id="content"
+        tabIndex={-1}
+        className="min-h-screen bg-secondary focus-visible:outline-none"
+      >
         {/* パンくずリスト */}
         <nav className="border-b border-gray-200/20 bg-secondary py-4" aria-label="パンくずリスト">
           <div className="container mx-auto px-4">

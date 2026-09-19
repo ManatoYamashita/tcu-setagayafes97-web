@@ -4,8 +4,17 @@ import Link from "next/link";
  * 企画詳細ページの404ページ
  */
 export default function EventDetailNotFound() {
+  /*
+   * スキップリンク（Header）の遷移先。Header は全ルートで描画されるため、この画面にも
+   * 「本文へスキップ」が出る。main を出さないと押しても遷移先が無く、次の Tab が
+   * ヘッダー先頭へ戻ってしまう（docs/frontend/landmarks-and-skip-link.md）。
+   */
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary-dark to-primary">
+    <main
+      id="content"
+      tabIndex={-1}
+      className="min-h-screen bg-gradient-to-b from-primary-dark to-primary focus-visible:outline-none"
+    >
       {/* パンくずリスト */}
       <nav className="border-b border-gray-200/20 bg-white/10 py-4">
         <div className="container mx-auto px-4">
@@ -58,6 +67,6 @@ export default function EventDetailNotFound() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

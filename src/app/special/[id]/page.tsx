@@ -186,7 +186,11 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
         </>
       )}
 
-      <div className="min-h-screen bg-secondary">
+      <main
+        id="content"
+        tabIndex={-1}
+        className="min-h-screen bg-secondary focus-visible:outline-none"
+      >
         {/* ヒーローと各セクションの入場モーション（DOM は出力しない） */}
         <SpecialPageMotion />
 
@@ -253,7 +257,7 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
             )}
           </div>
         </div>
-      </div>
+      </main>
 
       {draft && <DraftPreviewBanner />}
     </>

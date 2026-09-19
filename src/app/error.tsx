@@ -13,8 +13,17 @@ export default function Error({
     console.error(error);
   }, [error]);
 
+  /*
+   * スキップリンク（Header）の遷移先。Header は全ルートで描画されるため、この画面にも
+   * 「本文へスキップ」が出る。main を出さないと押しても遷移先が無く、次の Tab が
+   * ヘッダー先頭へ戻ってしまう（docs/frontend/landmarks-and-skip-link.md）。
+   */
   return (
-    <div className="container mx-auto flex min-h-screen flex-col items-center justify-center px-4 py-24">
+    <main
+      id="content"
+      tabIndex={-1}
+      className="container mx-auto flex min-h-screen flex-col items-center justify-center px-4 py-24 focus-visible:outline-none"
+    >
       <h2 className="mb-4 text-2xl font-bold">エラーが発生しました</h2>
       <p className="mb-8 text-gray-900/80">
         ページの読み込みに失敗しました。しばらく経ってから再度お試しください。
@@ -25,6 +34,6 @@ export default function Error({
       >
         再試行
       </button>
-    </div>
+    </main>
   );
 }
