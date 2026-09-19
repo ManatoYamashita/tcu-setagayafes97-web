@@ -12,7 +12,7 @@ import { RESTRICTED_COLOR_TOKENS } from "./scripts/restricted-color-tokens.mjs";
 const EVENTS_FALLBACK_TREE = [
   "src/components/events/EventsView.tsx",
   "src/components/events/EventFilters.tsx",
-  "src/components/events/Pagination.tsx",
+  "src/components/events/EventInfiniteList.tsx",
   "src/components/events/EventGrid.tsx",
   "src/components/events/EventCard.tsx",
 ];
@@ -97,6 +97,29 @@ const config = [
           { selector: `TemplateElement[value.raw=/${pattern}/]`, message },
         ]),
       ],
+    },
+  },
+  {
+    // #239 の再発防止装置。
+    //
+    // `EventInfiniteList` の IntersectionObserver は、発火したら即 disconnect し、
+    // **効果が組み直されるときにだけ張り直す。** その契機は `visibleCount` の変化
+    // ひとつしかない。依存から落とすと observer が二度と繋ぎ直されず、
+    // **1回だけ追加して永久に止まる**（2026-09-20 実測。12件 → 24件 で打ち止め）。
+    //
+    // この事故は型でもユニットテストでも表現できない。実ブラウザなら捕まるが、
+    // **`/events` は microCMS を読むため CI では0件になり、E2E を置いても
+    // 企画が無いまま緑になる**（`getEventsList` は `isMicrocmsConfigured` が
+    // false なら `[]` を返す）。fail-open な検査を足すくらいなら、
+    // 依存配列そのものを規則で縛るほうが確実である。
+    //
+    // **`exhaustive-deps` は既定では warning であり、`pnpm lint` を緑のまま通す。**
+    // ここで error へ格上げして初めて CI が落ちる（格上げ前に退行を注入して実測済み）。
+    // 対象をこの1ファイルへ絞るのは、既存コードに意図的な
+    // `// eslint-disable-next-line react-hooks/exhaustive-deps` があるためである。
+    files: ["src/components/events/EventInfiniteList.tsx"],
+    rules: {
+      "react-hooks/exhaustive-deps": "error",
     },
   },
 ];
