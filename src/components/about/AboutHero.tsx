@@ -183,18 +183,35 @@ export function AboutHero() {
           <span className="block text-2xl font-semibold tracking-[0.08em] text-gray-900 sm:text-3xl lg:text-4xl">
             第
             {/*
-              地色は gray-50（実配信 #f5f5f5、要素のスクリーンショットから実測）。
-              60px/700 は大テキスト扱いで要求 3:1。旧グラデーションは既定パレットの
-              紫の500段（描画色 #ad46ff）から桃の400段（描画色 #fb64b6）で、
-              始点 3.78 は通るものの終点が 2.53 で未達だった。
-              primary-600 / primary-700 は 6.84 / 10.28（#179 B / #95）
+              地色は gray-50（実配信 #f5f5f5）。60px/700 は大テキスト扱いで要求 3:1。
 
-              ここにクラス名を原形で書かないこと。Tailwind のソース走査はコメントも
+              紫からピンクへ抜ける配色はサイト所有者の指定である。#179 B でブランド紫の
+              600段→700段（6.84 / 10.28）へ倒したが、ピンクが失われるため #229 で戻した。
+              **元の値には戻していない。**
+
+              | 段                          | 描画色    | 比        |
+              | --------------------------- | --------- | --------- |
+              | 旧・既定パレット 紫の500段  | `#ad46ff` | 3.78 OK   |
+              | 旧・既定パレット 桃の400段  | `#fb64b6` | 2.53 未達 |
+              | 現・ブランド紫の500段       | `#9c50be` | 4.47 OK   |
+              | 現・既定パレット 桃の500段  | `#f6339a` | 3.29 OK   |
+
+              終点を1段だけ暗くすれば足りる。桃の400段は 2.53 で届かないが500段は 3.29 で通る。
+              始点の既定パレット紫は eslint.config.mjs が禁止しているためブランド紫へ置き換えた
+              （色相差 15° 未満でブランド紫と区別されないため）。
+              桃の500段は special バッジと同じ段で、docs/frontend/design.md が
+              「残している非ブランド色相」として明記している。
+
+              桃の500段とブランド紫の500段は、フォールバックの #hex と lab() が一致するため
+              上の描画色をそのまま比の計算に使える（食い違うのは既定パレットの高彩度段。
+              docs/frontend/design.md「実配信HEXは2つある」）。
+
+              **ここにクラス名を原形で書かないこと。** Tailwind のソース走査はコメントも
               読むため、書いた瞬間に使っていないユーティリティが配信CSSへ出る。
-              比の出し方とあわせて docs/frontend/design.md を参照。
+              #229 が実際にこれを踏み、本番の配信CSSへ未使用の1件を出した（2026-09-19 実測）。
             */}
             <span
-              className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent tracking-tighter sm:text-5xl lg:text-6xl"
+              className="text-4xl font-bold bg-gradient-to-r from-primary-500 to-pink-500 bg-clip-text text-transparent tracking-tighter sm:text-5xl lg:text-6xl"
               style={{ fontFamily: 'var(--font-kaisei-opti, "Kaisei Opti"), serif' }}
             >
               97

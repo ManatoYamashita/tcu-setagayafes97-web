@@ -129,7 +129,12 @@ push 時は head をそのまま、PR 時は head を base へマージした結
 ドキュメントの相対リンク）を束ねたジョブである。
 **リンク検査が見るのは相対リンクだけで、`#anchor` の存在と外部URLの到達性は射程外である**
 （見るもの・見ないものの一覧は `scripts/assert-doc-links.mjs` の冒頭）。
-`Layout E2E` は実ブラウザで `/timetable` の盤面を測る（#148 の再発防止装置）。
+`Layout E2E` は**実ブラウザでしか捕まえられない事故に対する再発防止装置の置き場**で、
+現在2つ載っている。`/timetable` の盤面（#148）と、全ルート＋404画面の
+`<main id="content">` の1周検査（#177 A）である。
+**後者は生HTMLでは代替できない**（`/events` は生HTML 2個・ライブDOM 1個、
+動的404は生HTML 0個・ライブDOM 1個）。
+**新しいルートを足したら `e2e/landmarks/route-sweep.spec.ts` の表へ1行足すこと。**
 **このジョブは secrets を要求しないため、fork からの PR でも緑赤が出る唯一のジョブである**
 （`Build Check` は microCMS の secrets 不達で fork PR では必ず落ちる）。
 設計は [`docs/frontend/layout-e2e.md`](../docs/frontend/layout-e2e.md) を参照。

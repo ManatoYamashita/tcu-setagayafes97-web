@@ -43,7 +43,7 @@ docs/
 │   ├── landmarks-and-skip-link.md # <main> とスキップリンクの契約
 │   ├── timetable-gantt.md         # タイムテーブル盤面（ガントチャート）の設計
 │   ├── events-search.md           # /events の検索と絞り込み（正規化・建物導出）
-│   ├── layout-e2e.md              # レイアウトの実測アサーション（Playwright）
+│   ├── layout-e2e.md              # 実ブラウザの再発防止装置（盤面 / ランドマーク1周）
 │   ├── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
 │   ├── performance.md             # Lighthouse基準値とフロントエンド性能ルール
 │   └── page-transition.md         # ページ遷移アニメーションとView Transitions API
@@ -370,7 +370,9 @@ docs/
     発火順の違いで環境によって検索が動かなくなる
   - **ハイドレーション完了前に合成イベントを流すと検証が嘘をつく**（実測で3回誤った）
 
-- **[layout-e2e.md](./frontend/layout-e2e.md)** - レイアウトの実測アサーション（Playwright / #157）
+- **[layout-e2e.md](./frontend/layout-e2e.md)** - 実ブラウザの再発防止装置（Playwright / #157 / #177 A）
+  - 盤面の実測（#148）とランドマークの1周検査（#177 A）の2つが載る
+  - 生HTMLでは数えられない理由（`/events` は生HTML 2個・ライブDOM 1個）
   - **jsdom も Vitest Browser Mode も #148 を検出できない。** 前者はレイアウトエンジンが無く、後者は祖先の連鎖が本物と別物になる
   - **`pnpm build && pnpm start` は原理的に使えない。** フィクスチャ分岐が `NODE_ENV !== "production"` に閉じており、本番ビルドではチャンクごと落ちる
   - **secrets を要求しない唯一のジョブ。** フィクスチャ経路は `getEventsList()` を呼ばないため fork PR でも走る
