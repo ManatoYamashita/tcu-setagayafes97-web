@@ -102,7 +102,7 @@ function SponsorCard({ sponsor }: SponsorCardProps) {
           />
         </div>
       ) : (
-        <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-primary to-purple-600">
+        <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-primary to-primary-600">
           <Heart className="h-16 w-16 text-gray-900 opacity-50" />
         </div>
       )}

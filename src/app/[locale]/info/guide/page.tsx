@@ -37,7 +37,7 @@ const precautionStyles = {
   trash: { border: "border-l-green-400", bg: "bg-green-50" },
   pets: { border: "border-l-amber-400", bg: "bg-amber-50" },
   hazardous: { border: "border-l-red-400", bg: "bg-red-50" },
-  photos: { border: "border-l-purple-400", bg: "bg-purple-50" },
+  photos: { border: "border-l-primary-400", bg: "bg-primary-50" },
 } satisfies Record<PrecautionId, { border: string; bg: string }>;
 
 /**
@@ -358,8 +358,8 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
         {/* お子様連れの方へ (Tier 4) */}
         <section id="families" className="scroll-mt-24">
           <div className="mb-6 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
-              <Baby className="h-5 w-5 text-purple-500" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100">
+              <Baby className="h-5 w-5 text-primary-500" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900">{t("sections.families")}</h2>
           </div>
@@ -372,7 +372,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
                   value={
                     guideConfig.forFamilies.nursingRoom ? t("labels.exists") : t("labels.notExists")
                   }
-                  valueClassName="text-purple-600"
+                  valueClassName="text-primary-600"
                 />
                 <StatusCard
                   label={t("labels.diaperChanging")}
@@ -382,13 +382,13 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
                       ? t("labels.exists")
                       : t("labels.notExists")
                   }
-                  valueClassName="text-purple-600"
+                  valueClassName="text-primary-600"
                 />
               </div>
               <ul className="space-y-2">
                 {guideConfig.forFamilies.notes.map((note, index) => (
                   <li key={index} className="flex items-start gap-2 text-gray-700">
-                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-purple-500"></span>
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary-500"></span>
                     <span>{note}</span>
                   </li>
                 ))}

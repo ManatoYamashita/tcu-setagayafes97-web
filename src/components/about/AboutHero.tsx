@@ -182,8 +182,15 @@ export function AboutHero() {
         <h1 ref={titleRef} className="leading-tight" style={{ fontFamily: "var(--font-sans)" }}>
           <span className="block text-2xl font-semibold tracking-[0.08em] text-gray-900 sm:text-3xl lg:text-4xl">
             第
+            {/*
+              地色は gray-50（実配信 #f5f5f5、要素のスクリーンショットから実測）。
+              60px/700 は大テキスト扱いで要求 3:1。旧 from-purple-500 to-pink-400 は
+              始点 purple-500（実配信 #ad46ff）が 3.78 で通るものの、
+              終点 pink-400（実配信 #fb64b6）が 2.53 で未達だった。
+              primary-600 / primary-700 は 6.84 / 10.28（#179 B / #95）
+            */}
             <span
-              className="text-4xl font-bold bg-gradient-to-r from-purple-500 to-pink-400 bg-clip-text text-transparent tracking-tighter sm:text-5xl lg:text-6xl"
+              className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent tracking-tighter sm:text-5xl lg:text-6xl"
               style={{ fontFamily: 'var(--font-kaisei-opti, "Kaisei Opti"), serif' }}
             >
               97
@@ -204,7 +211,7 @@ export function AboutHero() {
         aria-label={scrollIndicator}
       >
         <span className="text-[10px] uppercase tracking-[0.2em] text-gray-400">Scroll</span>
-        <div className="relative h-10 w-px bg-gray-300">
+        <div className="relative h-10 w-px bg-gray-200">
           <div className="animate-scroll-line absolute left-1/2 top-0 h-3 w-px -translate-x-1/2 bg-gray-900" />
         </div>
       </div>

@@ -25,7 +25,7 @@ export function SNSLinks({ sns }: SNSLinksProps) {
             href={sns.twitter}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-11 items-center gap-2 border-b border-gray-300 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-[#1DA1F2] hover:text-gray-900 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#1DA1F2]"
+            className="inline-flex min-h-11 items-center gap-2 border-b border-gray-200 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-[#1DA1F2] hover:text-gray-900 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#1DA1F2]"
             aria-label="Twitterで開く"
           >
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -41,7 +41,7 @@ export function SNSLinks({ sns }: SNSLinksProps) {
             href={sns.instagram}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-11 items-center gap-2 border-b border-gray-300 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-[#E4405F] hover:text-gray-900 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#E4405F]"
+            className="inline-flex min-h-11 items-center gap-2 border-b border-gray-200 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-[#E4405F] hover:text-gray-900 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[#E4405F]"
             aria-label="Instagramで開く"
           >
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -61,7 +61,7 @@ export function SNSLinks({ sns }: SNSLinksProps) {
             href={sns.website}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-11 items-center gap-2 border-b border-gray-300 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-primary-600 hover:text-primary-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
+            className="inline-flex min-h-11 items-center gap-2 border-b border-gray-200 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-primary-600 hover:text-primary-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
             aria-label="公式サイトを開く"
           >
             <svg
