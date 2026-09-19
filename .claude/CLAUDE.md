@@ -60,7 +60,7 @@ pnpm install
 # 開発サーバー起動
 pnpm dev
 
-# ビルド
+# ビルド（末尾に生成物の検査が2本連結されている。下記「ビルド末尾の検査」を参照）
 pnpm build
 
 # プロダクションサーバー起動
@@ -146,6 +146,21 @@ push 時は head をそのまま、PR 時は head を base へマージした結
 secrets もビルド成果物も要求しないため、**fork からの PR でも結果が出る**（`Build Check` は
 microCMS の secrets を要求するので fork PR では必ず落ちる）。ここへ検査を足すときは、
 「install 以外に何も要求しないか」を基準に判断すること。要求するなら別ジョブにする。
+
+### ビルド末尾の検査
+
+`pnpm build` は `next build` のあとに、**生成物を読む検査を2本**流す。
+どちらも「ビルドは通るが壊れている」状態を落とすためにあり、ESLint でも Vitest でも
+代替できない（生成された HTML を読む以外に判定する方法が無い）。
+
+| スクリプト                                  | 落とすもの                                         | 参照                                                                                                  |
+| ------------------------------------------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `assert-events-static-html.mjs`             | `/events` の本体がクライアント描画へ落ちる（#156） | [`docs/frontend/static-html-and-search-params.md`](../docs/frontend/static-html-and-search-params.md) |
+| `assert-remote-images-bypass-optimizer.mjs` | リモート画像が Vercel の画像最適化を通る（#237）   | [`docs/frontend/image-delivery.md`](../docs/frontend/image-delivery.md)                               |
+
+**どちらも検査対象が消えると空振りする。** 前者は `EVENTS_VISIBLE` が false のとき、
+後者は microCMS の画像が1枚もHTMLに出ないときで、いずれもログに `SKIP` / `NOTE` を出す。
+**その行が出ているときは、検査が効いていないと考えること。**
 
 `pnpm type-check` が `next typegen` を前置しているのは、**`.next/types/validator.ts` が
 `.d.ts` ではなく `.ts` だから**である。`skipLibCheck: true` はこのファイルを守らないため、
@@ -281,6 +296,7 @@ microCMS の編集画面にある「画面プレビュー」から、**公開せ
 - Bandwidth: 100GB/月
 - Serverless Function実行時間: 10秒
 - ビルド時間: 45分
+- **Image Optimization の変換数**（2026-09-19 に枯渇して画像が壊れた。下記）
 
 **最適化戦略:**
 
@@ -288,6 +304,22 @@ microCMS の編集画面にある「画面プレビュー」から、**公開せ
 - サーバーレス関数の使用を最小化
 - 画像は Next.js Image コンポーネントで最適化
 - コード分割とダイナミックインポート
+
+> [!IMPORTANT]
+> **画像の変換枠は枯れる。枯れると「一部の画像だけ」が壊れる。**
+> 課金単位は画像1枚ではなく変換1回、すなわち `(元画像, 幅, 品質, フォーマット)` の
+> 組み合わせ1つである。変換済みの結果は CDN に残るため、枯渇後は**未変換の組み合わせだけ**が
+> `402` になる。同じファイルでも幅によって表示されたりされなかったりする（#237）。
+>
+> 現在、microCMS の画像は [`src/lib/image-loader.ts`](../src/lib/image-loader.ts) の
+> `appImageLoader` が imgix へ逃がしており、Vercel の枠を使うのは `public/` の静的画像22枚だけである。
+> **microCMS 由来の画像を描く `<Image>` には `loader={appImageLoader}` を渡すこと。**
+> 渡し忘れた画像は変換枠を消費する（ビルド末尾のガードが落とす）。
+> **`deviceSizes` / `imageSizes` へ幅を足す変更は、この22枚の変換数を掛け算で増やす。**
+> 経路の設計と実測値は [`docs/frontend/image-delivery.md`](../docs/frontend/image-delivery.md) を参照。
+>
+> 画像が壊れたら、まず原画像への直接アクセスと `/_next/image` 経由を分けて叩き、
+> `x-vercel-error` ヘッダを見ること。コードを探しても何も見つからない。
 
 **Lighthouse 目標値:**
 
