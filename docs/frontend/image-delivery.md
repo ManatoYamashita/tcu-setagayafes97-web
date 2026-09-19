@@ -3,48 +3,27 @@
 画像の変換を **どこにやらせるか** を決めているドキュメント。
 Lighthouse 基準値や個別の最適化手法は [`performance.md`](./performance.md) を参照。
 
-## 経路は2本ある
+## 結論から
 
-| 画像の出どころ                          | 変換する場所                     | 枚数 | Vercel の変換枠 |
-| --------------------------------------- | -------------------------------- | ---- | --------------- |
-| microCMS（`images.microcms-assets.io`） | imgix（microCMS のメディア配信） | 93+  | **使わない**    |
-| `public/` 配下の静的画像                | Vercel の Image Optimization     | 22   | 使う            |
+**Vercel の Image Optimization は一切使っていない。**
 
-振り分けは [`src/lib/image-loader.ts`](../../src/lib/image-loader.ts) の `appImageLoader` が行う。
+| 画像の出どころ                          | 変換する場所             | 枚数 |
+| --------------------------------------- | ------------------------ | ---- |
+| microCMS（`images.microcms-assets.io`） | imgix（microCMS の配信） | 93+  |
+| `public/` 配下の静的画像                | **変換しない**（原寸）   | 9    |
+
+すべての画像は [`src/components/ui/AppImage.tsx`](../../src/components/ui/AppImage.tsx) の
+`AppImage` で描く。出どころの判定は実行時に `src` を見て行うため、呼び出し側が区別する
+必要は無い。
 
 > [!IMPORTANT]
-> **microCMS 由来の画像を描く `<Image>` には `loader={appImageLoader}` を渡すこと。**
-> 渡し忘れた画像は Vercel の変換枠を消費する。現在の対象は12ファイル14箇所。
-> 渡し忘れは `pnpm build` の末尾で走るガードが落とす（後述）。
+> **`next/image` を直接 import してはいけない。** `eslint.config.mjs` の
+> `no-restricted-imports` が error で止める（例外は `AppImage.tsx` のみ）。
 
-同じ `<Image>` に microCMS の画像とローカルのフォールバック画像の両方が入りうるため
-（`FeaturedCarousel` と `NewsCard` がその例）、**ローダーは両方を扱う。**
-ローカル画像が来た場合は `/_next/image` へ回すので、既定と同じ挙動になる。
-
-### なぜ `loaderFile`（全体適用）ではないのか
-
-`next.config.ts` の `images.loaderFile` に登録すれば、すべての `next/image` が自動的に
-ローダーを通り、渡し忘れは構造的に起きない。**それでも採用していない。**
-
-**`images.loader: "custom"` を設定すると `/_next/image` エンドポイントが 404 になるためである。**
-2026-09-19 に実測した。
-
-| `next.config.ts` の設定 | `/_next/image?url=%2Fimages%2Fbrand%2Flogo.webp&w=64&q=60` |
-| ----------------------- | ---------------------------------------------------------- |
-| `loaderFile` あり       | **404**（`dev` / `start` とも）                            |
-| `loaderFile` なし       | `200` / `image/jpeg` / 622B                                |
-
-つまり全体適用にすると、**imgix を使えない `public/` の22枚が巻き添えで最適化を失う。**
-渡し忘れのリスクは機械で拾えるが、失った最適化は拾えない。
-
-なお `loader` prop は **Server Component から渡しても動く**。`getImgProps` がサーバー側で
-実行されるため、`Functions cannot be passed directly to Client Components` にはならない
-（`NewsCard` で実測）。対象12ファイルのうち6つは Server Component である。
-
-## なぜ分けたか（#237）
+## なぜこうなったか（#237）
 
 2026-09-19、本番の企画サムネイルが一部だけ表示されなくなった。原因は
-**Vercel Free Plan の変換枠（Image Transformations）の枯渇**である。
+**Vercel Free Plan の変換枠（Hobby は月5,000変換）の枯渇**である。
 
 ```
 $ curl -sI 'https://setagayafes.org/_next/image?url=<microCMS画像>&w=384&q=75'
@@ -60,7 +39,7 @@ x-vercel-error: OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED
 - 枯渇**前**に変換済み → CDN から `200` で配信され、いまも表示される
 - 未変換の組み合わせ → `402` で壊れる
 
-同一ファイルでも幅で生死が分かれる。`favicon-outline.webp` の実測（2026-09-19）。
+同一ファイルでも幅で生死が分かれる。`favicon-outline.webp` の実測。
 
 ```
 200  w=320 / 384 / 420 / 512 / 640 / 750 / 1080
@@ -69,19 +48,18 @@ x-vercel-error: OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED
 
 **画面幅と DPR で表示される画像が入れ替わるため、「ときどき一部が壊れる」という
 再現しにくい形で表面化する。** 枯渇を疑う前に画像やコードを探すと何も見つからない。
-`x-vercel-error` ヘッダを最初に見ること。
+**`x-vercel-error` ヘッダを最初に見ること。**
 
 ### 何が枠を食っていたか
 
 `sizes` に固定 px を書いても、srcset には `deviceSizes` + `imageSizes` の**全候補**が並ぶ。
 当時は18本あった。これに AVIF / WebP の2フォーマットが掛かる。
-microCMS の企画サムネイルだけで93枚あり、News と協賛ロゴが上乗せされる。
-一方 `public/` の静的画像は22枚しかない。**消費の主体は microCMS 側だった。**
+microCMS の企画サムネイルだけで93枚あり、News と協賛ロゴが上乗せされていた。
 
 ## imgix 側のパラメータ
 
-ローダーが付けるのは `w` / `q` / `fm=webp` / `auto=compress` / `fit=max` の5つ。
-いずれも実測で決めている（対象は `写真部.jpg` 1081x1081 / 原寸 70,481B、`w=340`）。
+`AppImage` が microCMS の画像へ付けるのは `w` / `q` / `fm=webp` / `auto=compress` /
+`fit=max` の5つ。いずれも実測で決めている（`写真部.jpg` 1081x1081 / 原寸 70,481B、`w=340`）。
 
 ### `auto=format` は使えない
 
@@ -105,7 +83,6 @@ imgix の `auto=format` は Accept ヘッダを見て AVIF / WebP を出し分�
 > [!NOTE]
 > AVIF へ上げれば1枚あたり 2.9KB 縮む（8,506B → 5,651B）。転送量が問題になった場合の
 > 選択肢として残しておくが、**下げ幅と引き換えに失うのはフォールバックである。**
-> 切り替えるなら実機での確認を伴うこと。
 
 ### `fit=max` は必須
 
@@ -119,58 +96,89 @@ imgix は既定で**拡大もする**。入稿画像の寸法は入稿者任せ�
 
 `fit=max` が無いと、劣化した水増し画像を倍近い転送量で配ることになる。
 
+## 静的画像を `unoptimized` にした理由
+
+`/_next/image` へ回しても**枠の枯渇からは逃れられない。** Preview で実測した結果が次である。
+**ブラウザが実際に選ぶ帯がすべて 402 で、ヘッダーロゴもヒーロー画像も壊れていた**
+（`w=3840` だけ 200 なのは、検証のために叩いて変換させてしまったため）。
+
+```
+画像                                     w=640   w=828  w=1080  w=1920  w=3840
+/images/brand/logo.webp q=60               402     402     402     402     200
+/images/photos/tcu-7.webp q=75             402     402     402     402     200
+/materials/geers.webp q=75                 402     402     402     402     402
+```
+
+枠を一切使わない状態にすることを選んだ。**代償として静的画像は原寸で配信される**
+（9種・合計 617KB）。表示寸法に対して過大なものがあるため、事前縮小は別途行う。
+
+| 画像                                    | 原寸      | サイズ   |
+| --------------------------------------- | --------- | -------- |
+| `images/photos/tcu-7.webp`              | 1100x620  | 202,386B |
+| `images/special/mon7a.webp`             | 1280x1280 | 136,784B |
+| `images/brand/favicon-outline.webp`     | 500x500   | 76,520B  |
+| `images/brand/logo-white.webp`          | 1000x400  | 54,688B  |
+| `images/photos/setagayafe97-image.webp` | 1024x1024 | 53,118B  |
+| `images/brand/logo.webp`                | 1000x400  | 51,520B  |
+| `materials/geers.webp`                  | 500x500   | 28,184B  |
+| `materials/geer1.webp`                  | 500x500   | 19,694B  |
+| `images/special/mon7a-logo.webp`        | 1524x405  | 9,296B   |
+
+## なぜ `AppImage` というラッパーなのか
+
+適用方式は2つ試して、いずれも実測で否定している。
+
+| 方式                                        | 結果                                                                                                                                                                              |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `next.config.ts` の `loaderFile` で全体適用 | **不可。** `images.loader: "custom"` は `/_next/image` を 404 にする（`dev` / `start` 双方で実測。外すと同じURLが 200）。当時は静的画像をそこへ回す設計だったため巻き添えになった |
+| `<Image loader={fn}>` に関数を直接渡す      | **不可。** Server Component からの受け渡しは prerender 時に `Functions cannot be passed directly to Client Components` で落ちる（`/about/sponsors` で実測）                       |
+
+`AppImage` が `"use client"` を持つことで、呼び出し側は Server / Client を問わなくなる。
+**この失敗は開発サーバーでは顕在化せず、`next build` で初めて出る。**
+
 ## 幅の候補（`deviceSizes` / `imageSizes`）
 
-**ここへ幅を足す行為は、静的画像の変換数を掛け算で増やす。** 追加するときは用途を PR に書くこと。
+静的画像を `unoptimized` にした現在、この設定が効く場所は無い。**将来 Vercel の
+最適化を再び使うなら、ここへ幅を足す行為が変換数を掛け算で増やすことを思い出すこと。**
 
 #237 で 512（`deviceSizes`）と 320（`imageSizes`）を落とした。隣接する 640 / 384 との差が
-小さく、丸め先との差はそれぞれ 25% / 20% にとどまるため。
-**2048 と 3840 は残している。** `PageHero` が `100vw` を使っており、4K・Retina 環境で
-目に見えて甘くなるからである。
+小さく、丸め先との差はそれぞれ 25% / 20% にとどまるため。2048 と 3840 は残している。
 
-`qualities: [40, 60, 75]` はそのまま。40 は `HeroSection`、60 は Header / Footer / Opener、
-75 がその他という使い分けが既にある。
-
-## 再発防止装置は2つあり、射程が違う
+## 再発防止装置は3つあり、射程が違う
 
 | 装置                                                | 走る場所            | 守るもの                           |
 | --------------------------------------------------- | ------------------- | ---------------------------------- |
+| `eslint.config.mjs` の `no-restricted-imports`      | `pnpm lint`         | `next/image` の直接 import         |
 | `src/lib/image-loader.test.ts`                      | `pnpm test`         | ローダー関数の**契約**             |
 | `scripts/assert-remote-images-bypass-optimizer.mjs` | `pnpm build` の末尾 | ローダーが**実際に効いている**こと |
 
-**ユニットテストだけでは足りない。** 次の3つはローダー関数を一切変えないため、
-テストは緑のまま素通りする。
+**ユニットテストだけでは足りない。** `AppImage` から `loader` / `unoptimized` の指定が
+外れても、ローダー関数は無傷なのでテストは緑のまま素通りする。ビルドは通り、枠が
+残っているうちは画面も正常に見える。生成物を読む以外に判定する方法が無い。
 
-1. 新しく `<Image>` を書いた人が `loader` prop を渡し忘れる（最も起こりやすい）
-2. 既存の `<Image>` から `loader` prop が消える
-3. 新しいリモート画像ホストを増やし、ローダーの分岐に入れ忘れる
-
-いずれもビルドは通り、画面も（枠が残っているうちは）正常に見える。生成物を読む以外に
-確かめる方法が無い。ガードは事前描画された全HTMLを走査し、
-`/_next/image?url=https%3A%2F%2F`（リモート画像を Vercel の最適化へ渡すURL）が
-1本も無いことを検査する。**ホストを microCMS に限定していないのは、将来ホストを
-増やしたときにも漏れを捕まえるためである。**
+ガードは事前描画された全HTMLを走査し、`/_next/image?url=` が **1本も**無いことを検査する。
+リモートに限定していないのは、静的画像を回しても枠の枯渇から逃れられないためである。
 
 ### 検証の記録（2026-09-19）
 
-- 正常時: `[assert-remote-images-bypass-optimizer] OK`
-- ローダーを外して再ビルド: **109ファイルで違反を検出し exit 1**
-- 生成された imgix URL を実際に取得: すべて `200` / `image/webp`
+- 正常時: `OK`。生成物の `/_next/image` は **0件**、imgix URL は 1,514 種
+- HTML へローカル画像の `/_next/image` を1本注入 → **検出して exit 1**
+- `Header.tsx` で `next/image` を直接 import → **ESLint が error で停止**
+- ローカル本番サーバーで主要6ページの画像を取得 → **54枚すべて 200**
 
 ### ガードが空振りする条件
 
-公開フラグがすべて false だと microCMS の画像がHTMLに出ず、検査対象が消える。
+公開フラグがすべて false だと microCMS の画像がHTMLに出ず、imgix 側の検査対象が消える。
 その場合ガードは `NOTE:` を出して成功扱いにする（入稿0件や取得失敗と区別が付かないため
 合否条件にしない）。**ログに `NOTE` が出ているときは、検査が効いていないと考えること。**
 
 ## 残っている制約
 
-- Vercel の変換枠を使うのは `public/` の静的画像22枚だけになった。枠を再び使い切るには
-  相当な追加が要る
-- **枠のリセット時期は Vercel ダッシュボードの Usage でしか分からない。** 402 が出たら
-  まずそこを見る
+- **枠のリセット時期は Vercel ダッシュボードの Usage でしか分からない。** ただし本対応後は
+  枠を使わないため、リセットを待つ必要も無い
 - imgix 側には変換数の課金が無く、配信も microCMS の CDN から出る。
   つまり **Vercel の帯域（100GB/月）も消費しない**
+- 静的画像9種は原寸配信のまま。表示寸法への事前縮小は未了
 
 ## 関連
 

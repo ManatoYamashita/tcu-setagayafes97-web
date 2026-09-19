@@ -311,11 +311,10 @@ microCMS の編集画面にある「画面プレビュー」から、**公開せ
 > 組み合わせ1つである。変換済みの結果は CDN に残るため、枯渇後は**未変換の組み合わせだけ**が
 > `402` になる。同じファイルでも幅によって表示されたりされなかったりする（#237）。
 >
-> 現在、microCMS の画像は [`src/lib/image-loader.ts`](../src/lib/image-loader.ts) の
-> `appImageLoader` が imgix へ逃がしており、Vercel の枠を使うのは `public/` の静的画像22枚だけである。
-> **microCMS 由来の画像を描く `<Image>` には `loader={appImageLoader}` を渡すこと。**
-> 渡し忘れた画像は変換枠を消費する（ビルド末尾のガードが落とす）。
-> **`deviceSizes` / `imageSizes` へ幅を足す変更は、この22枚の変換数を掛け算で増やす。**
+> **現在、Vercel の Image Optimization は一切使っていない。** microCMS の画像は imgix、
+> `public/` の静的画像は原寸配信である。
+> **画像は [`src/components/ui/AppImage.tsx`](../src/components/ui/AppImage.tsx) の
+> `AppImage` で描くこと。`next/image` の直接 import は `eslint.config.mjs` が止める。**
 > 経路の設計と実測値は [`docs/frontend/image-delivery.md`](../docs/frontend/image-delivery.md) を参照。
 >
 > 画像が壊れたら、まず原画像への直接アクセスと `/_next/image` 経由を分けて叩き、
