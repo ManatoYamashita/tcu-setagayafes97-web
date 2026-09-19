@@ -117,9 +117,32 @@ const config = [
     // ここで error へ格上げして初めて CI が落ちる（格上げ前に退行を注入して実測済み）。
     // 対象をこの1ファイルへ絞るのは、既存コードに意図的な
     // `// eslint-disable-next-line react-hooks/exhaustive-deps` があるためである。
+    //
+    // **`exhaustive-deps` だけでは #239 そのものの形を止められない。** 打ち切り条件を
+    // `hasMore` へ戻し、依存配列も `[hasMore, loadMore]` へ**揃えて**しまうと、
+    // 依存は過不足なく揃っているため `exhaustive-deps` は何も言わない（2026-09-20 実測。
+    // この形だけ exit 0 で通った。依存だけ・本体だけを触った中間状態は exit 1 になる）。
+    // `hasMore` は同じファイルの上部に定義済みで描画側でも使うため、
+    // 「整理のつもりで効果の中も揃える」は自然に起こる。
+    //
+    // そこで `no-restricted-syntax` で、効果の中から `hasMore` を読むこと自体を禁じる。
+    // 描画側（`{hasMore && ...}`）は対象外なので、既存の書き方は変えなくてよい。
     files: ["src/components/events/EventInfiniteList.tsx"],
     rules: {
       "react-hooks/exhaustive-deps": "error",
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "CallExpression[callee.name='useEffect'] Identifier[name='hasMore']",
+          message:
+            "効果の中で hasMore を読まないでください（#239）。継ぎ足しても hasMore は値・参照とも変わらないため、効果が組み直されず observer が張り直されません。打ち切り条件は visibleCount >= total と書き、依存配列に visibleCount を残してください。",
+        },
+        {
+          selector: "CallExpression[callee.name='useCallback'] Identifier[name='hasMore']",
+          message:
+            "useCallback の中で hasMore を読まないでください（#239）。依存に hasMore が入ると、継ぎ足しのたびに関数の参照が変わらず、効果の再実行の契機が失われます。",
+        },
+      ],
     },
   },
 ];

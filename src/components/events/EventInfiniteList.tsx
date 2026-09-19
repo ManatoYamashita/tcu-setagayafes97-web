@@ -118,7 +118,10 @@ export function EventInfiniteList({
    * microCMS を読むため CI では0件になり、**E2E を置いても企画が無いまま緑になります**
    * （`getEventsList` は `isMicrocmsConfigured` が false なら `[]` を返す）。
    * そこで `visibleCount` を効果の中で直接読み、`react-hooks/exhaustive-deps` に
-   * 依存を強制させています。**この参照を `hasMore` へ戻すと、規則ごと無効になります。**
+   * 依存を強制させています。**ただし本体と依存を `hasMore` へ揃えて戻すと、依存は
+   * 過不足なく揃うため `exhaustive-deps` は何も言いません。** その形は
+   * `eslint.config.mjs` の `no-restricted-syntax` が別に禁じています（効果と
+   * `useCallback` の中で `hasMore` を読むと lint が落ちる）。
    */
   useEffect(() => {
     if (visibleCount >= total) return;
