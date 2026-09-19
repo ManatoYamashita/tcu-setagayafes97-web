@@ -236,13 +236,13 @@ CI 緑・マージ済みのまま本番だけが40分以上古いまま取り残
 
 ### データ反映の仕組み（オンデマンド再検証）
 
-microCMS の入稿は **Webhook 経由で数秒以内**に本番へ反映される。詳細と運用手順は
+microCMS の入稿は **Webhook 経由で十数秒（実測10〜15秒）**で本番へ反映される。詳細と運用手順は
 [`docs/dev/content-revalidation.md`](../docs/dev/content-revalidation.md) を参照。
 
-| 系統 | 手段                                                                  | 反映まで               |
-| ---- | --------------------------------------------------------------------- | ---------------------- |
-| 主系 | microCMS Webhook → `POST /api/revalidate` → `revalidatePath()`        | 数秒                   |
-| 保険 | 各ページの `export const revalidate`（3600 / `/special/[id]` は 600） | 最大1時間＋1リクエスト |
+| 系統 | 手段                                                                  | 反映まで                     |
+| ---- | --------------------------------------------------------------------- | ---------------------------- |
+| 主系 | microCMS Webhook → `POST /api/revalidate` → `revalidatePath()`        | 十数秒（実測10〜15秒）       |
+| 保険 | microCMS を読むページとサイトマップの `export const revalidate = 600` | 10分経過後のアクセスで再生成 |
 
 **microCMS の Webhook は失敗しても再送されない。** 時間ベース ISR はその取りこぼしを拾う保険であり、
 `revalidate` 宣言を消してはいけない。
