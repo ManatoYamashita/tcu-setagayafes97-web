@@ -15,6 +15,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check:doc-links": "node scripts/assert-doc-links.mjs",
+    "check:colors": "node scripts/assert-no-restricted-colors.mjs",
     "prepare": "husky",
     "analyze": "ANALYZE=true next build --webpack"
   },

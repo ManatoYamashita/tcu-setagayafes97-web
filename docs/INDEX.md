@@ -271,8 +271,15 @@ docs/
   - **紫はすべて `primary-*` を使う** — `purple-*` はブランドと色相差 15° 未満で別色に見えない
   - **残している非ブランド色相と、その理由** — red / green / blue / orange / amber / pink を
     実測比つきで列挙。**バッジの既定配色が描画されるのはお知らせの2画面だけ**という注意つき（#228）
+  - **「実配信HEX」は2つある** — 出力CSSの `#hex` は `lab()` 非対応向けフォールバック
+    （**一次定義は `oklch()` だが出力CSSには残らない**）で、**動作下限のブラウザでは一度も
+    描画されない**。自前トークンは一致するが、Tailwind 既定パレットのガマット外の段では
+    食い違う。**既定パレットの比は grep ではなく canvas の実ピクセルで測る**
   - **規約を破れないようにしてある** — 上記3節は `eslint.config.mjs` の `no-restricted-syntax`
-    が機械的に守る。`@theme` へ段を足したら禁止リストから外すこと
+    と `scripts/assert-no-restricted-colors.mjs`（`pnpm check:colors`）が二段で守る。
+    **ESLint はコメントを見ないが Tailwind は読む**ため、生テキストを見る検査を別に置いた（#230）。
+    禁止リストの一次定義は `scripts/restricted-color-tokens.mjs` の1箇所で、
+    `@theme` へ段を足したらそこから外す
   - アクセシビリティ（コントラスト比）ガイドライン
   - 選択状態と競合する操作要素の `hoverable:hover:` ゲート方針
   - Kaisei Opti ブランドフォント仕様と使用制限

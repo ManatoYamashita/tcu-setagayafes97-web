@@ -1,6 +1,8 @@
 import nextConfig from "eslint-config-next";
 import prettierConfig from "eslint-config-prettier";
 
+import { RESTRICTED_COLOR_TOKENS } from "./scripts/restricted-color-tokens.mjs";
+
 /**
  * `<Suspense>` の fallback として描かれるツリー
  *
@@ -75,41 +77,25 @@ const config = [
     // docs/frontend/design.md にも書いてあるが、**文書は人間が読まなければ効かない**
     // （#154 で同じ轍を踏んでいる。上の #156 の規則と同じ理由でここへ置く）。
     //
-    // 走査対象は文字列リテラルとテンプレート文字列。Tailwind のクラス名は
-    // JIT が検出できるよう完全なリテラルで書く規約なので、これで全経路を覆える
-    // （src/ 配下の .css に @apply は無い。2026-09-19 時点）。
+    // 走査対象は文字列リテラルとテンプレート文字列である。
+    // **コメントは AST に現れないので、この規則からは見えない。** 一方 Tailwind の
+    // ソース走査はテキスト走査でコメントも読むため、そこが死角になっていた（#230）。
+    // 残りは scripts/assert-no-restricted-colors.mjs が src/ の生テキストで受け持つ。
     //
-    // **@theme へ段を足したら、ここの禁止リストからその段を外すこと。**
+    // **@theme へ段を足したら、scripts/restricted-color-tokens.mjs から外すこと。**
     // 足したのに禁止されたままだと、正しい指定が lint で落ちる。
     files: ["src/**/*.{ts,tsx}"],
     rules: {
+      // 禁止リストの一次定義は scripts/restricted-color-tokens.mjs（#230）。
+      // 同じ定義を scripts/assert-no-restricted-colors.mjs も読むので、
+      // **@theme へ段を足したときに触るのはあちら1箇所だけでよい。**
+      // ここへ正規表現を書き戻すと、片方だけ直して片方がすり抜ける形へ戻る。
       "no-restricted-syntax": [
         "error",
-        {
-          // ブランドと色相差 7.5–11.6°。15° 未満は同一色として知覚されるうえ、
-          // 彩度が約40%高いため「ブランド紫を出そうとして外した色」に見える。
-          selector: "Literal[value=/(?:purple|violet|fuchsia)-(?:50|950|[1-9]00)(?![0-9])/]",
-          message:
-            "Tailwind 既定の purple / violet / fuchsia は使えません。ブランドと色相差が 15° 未満で、別色として認識されないためです。primary-* の同じ段へ置き換えてください（docs/frontend/design.md「紫はすべて primary-* を使う」）。",
-        },
-        {
-          selector:
-            "TemplateElement[value.raw=/(?:purple|violet|fuchsia)-(?:50|950|[1-9]00)(?![0-9])/]",
-          message:
-            "Tailwind 既定の purple / violet / fuchsia は使えません。ブランドと色相差が 15° 未満で、別色として認識されないためです。primary-* の同じ段へ置き換えてください（docs/frontend/design.md「紫はすべて primary-* を使う」）。",
-        },
-        {
-          // @theme のニュートラルは 50/100/200/400/500/600/700/900 の8段。
-          // 300 / 800 / 950 は欠番で、書くと既定の青みがかったスレートへ落ちる。
-          selector: "Literal[value=/gray-(?:300|800|950)(?![0-9])/]",
-          message:
-            "gray-300 / gray-800 / gray-950 は @theme に定義がなく、既定の青みがかったスレートへ落ちます。gray-200 など定義済みの段へ寄せるか、globals.css の @theme へ段を足してこの規則から外してください（docs/frontend/design.md「Tailwind 既定パレットを直接使わない」）。",
-        },
-        {
-          selector: "TemplateElement[value.raw=/gray-(?:300|800|950)(?![0-9])/]",
-          message:
-            "gray-300 / gray-800 / gray-950 は @theme に定義がなく、既定の青みがかったスレートへ落ちます。gray-200 など定義済みの段へ寄せるか、globals.css の @theme へ段を足してこの規則から外してください（docs/frontend/design.md「Tailwind 既定パレットを直接使わない」）。",
-        },
+        ...RESTRICTED_COLOR_TOKENS.flatMap(({ pattern, message }) => [
+          { selector: `Literal[value=/${pattern}/]`, message },
+          { selector: `TemplateElement[value.raw=/${pattern}/]`, message },
+        ]),
       ],
     },
   },

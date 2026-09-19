@@ -55,6 +55,13 @@ jobs:
       - name: Check doc links
         run: pnpm run check:doc-links
 
+      # Tailwind の走査範囲に、出力されうる禁止色ユーティリティが無いことを見る（#230）。
+      # **ESLint はコメントを見ないが Tailwind は読む。** その死角で、消したはずの紫と桃の
+      # ユーティリティが本番CSSへ出続けていた。git ls-files 以外に何も要求しないため、
+      # このジョブの「install だけで完結する」性質を崩さない。
+      - name: Check restricted colors
+        run: pnpm run check:colors
+
       # next build も型エラーで落ちる（ignoreBuildErrors 未設定）が、この検査は
       # 別に置く。secrets から独立していて数十秒で落ちること、そして
       # ignoreBuildErrors: true を1行足せば build 側の型検査だけは消せてしまうため。
