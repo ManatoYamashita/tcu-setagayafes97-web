@@ -25,9 +25,14 @@ describe("appImageLoader — microCMS の画像", () => {
     expect(url.searchParams.get("q")).toBe("60");
   });
 
-  it("フォーマットを WebP へ固定する（CloudFront が Accept を落とすため auto=format は効かない）", () => {
+  /*
+   * CloudFront が Accept を落とすため `auto=format` が効かず、形式は固定するしかない。
+   * AVIF を選んでいる理由（サポート下限・OGP 非経由・デコード実測）は image-loader.ts を参照。
+   * ここを webp へ戻すときは、同じコミットで docs/frontend/image-delivery.md も直すこと。
+   */
+  it("フォーマットを AVIF へ固定する", () => {
     const url = new URL(appImageLoader({ src: MICROCMS_IMAGE, width: 340 }));
-    expect(url.searchParams.get("fm")).toBe("webp");
+    expect(url.searchParams.get("fm")).toBe("avif");
   });
 
   it("fit=max で拡大を禁じる（原寸より大きい幅を要求されても水増ししない）", () => {
@@ -50,7 +55,7 @@ describe("appImageLoader — microCMS の画像", () => {
     const withQuery = `${MICROCMS_IMAGE}?rect=0,0,100,100`;
     const url = new URL(appImageLoader({ src: withQuery, width: 340 }));
     expect(url.searchParams.get("rect")).toBe("0,0,100,100");
-    expect(url.searchParams.get("fm")).toBe("webp");
+    expect(url.searchParams.get("fm")).toBe("avif");
   });
 });
 

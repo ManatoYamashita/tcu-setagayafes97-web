@@ -63,26 +63,49 @@ const DEFAULT_QUALITY = 75;
 /**
  * microCMS の画像URLへ imgix の変換パラメータを付与する。
  *
- * ## `auto=format` を使わず `fm=webp` を決め打ちする理由
+ * ## `auto=format` を使わず `fm=avif` を決め打ちする理由
  *
  * imgix の `auto=format` は Accept ヘッダを見て AVIF / WebP を出し分ける機能だが、
  * **microCMS の前段にある CloudFront が Accept を転送しないため機能しない。**
  * 2026-09-19 の実測では、`Accept: image/avif,image/webp,...` を明示して
  * `auto=format` を付けても応答は `image/jpeg` のままで、`Vary` ヘッダも返らなかった。
  *
- * 出し分けができない以上フォーマットは固定するしかなく、対応環境の広い WebP を選ぶ。
- * サポート下限（iOS Safari 16.4 / Chrome 111 / Firefox 128）はいずれも AVIF にも
- * 対応しているが、`<picture>` によるフォールバックを持てない固定指定では、
- * 画像プロキシや古い WebView のような想定外の環境で表示自体を失う損失のほうが大きい。
+ * 出し分けができない以上フォーマットは固定するしかない。**AVIF を選ぶ。**
  *
- * 実測（`写真部.jpg` 1081x1081 / 原寸 70,481B を `w=340` で変換）:
+ * | 指定                         | 応答         | サイズ  |
+ * | ---------------------------- | ------------ | ------- |
+ * | `auto=format`（Accept 明示） | `image/jpeg` | 15,772B |
+ * | `fm=webp&q=75`               | `image/webp` | 11,170B |
+ * | `fm=webp&q=75&auto=compress` | `image/webp` |  8,506B |
+ * | `fm=avif&q=75&auto=compress` | `image/avif` |  5,651B |
  *
- * | 指定                            | 応答          | サイズ  |
- * | ------------------------------- | ------------- | ------- |
- * | `auto=format`（Accept 明示）    | `image/jpeg`  | 15,772B |
- * | `fm=webp&q=75`                  | `image/webp`  | 11,170B |
- * | `fm=webp&q=75&auto=compress`    | `image/webp`  |  8,506B |
- * | `fm=avif&q=75&auto=compress`    | `image/avif`  |  5,651B |
+ * （`写真部.jpg` 1081x1081 / 原寸 70,481B を `w=340` で変換）
+ *
+ * ### フォールバックを失う代わりに何を得るか（2026-09-20 実測）
+ *
+ * 公開中の入稿画像30本（4ルート×2画面幅でブラウザが実際に取得したもの）で
+ * **1,568,048B → 996,780B、36.4% 減。** ページ別は `/` −38.2%、`/special` −39.1%、
+ * `/about/sponsors` −28.2%、`/events` −25.9%。30本すべてが `image/avif` を返した。
+ *
+ * ### なぜフォールバックを捨ててよいか
+ *
+ * 1. **サポート下限がすでに AVIF を要求している。** 下限（iOS Safari 16.4 /
+ *    Chrome 111 / Firefox 128）は TailwindCSS v4 の `@property` / `color-mix()` 由来で、
+ *    AVIF の下限（Safari 16.0 / Chrome 85 / Firefox 93）より高い。
+ *    **AVIF が読めない環境では、そもそも CSS が効かずレイアウトが崩れている。**
+ * 2. **本番はすでに全画像を AVIF で配っている。** `next.config.ts` の
+ *    `formats` は #107 から AVIF 優先で、実測でも本番は `image/avif` を返す。
+ *    PR #110 の Lighthouse 基準（Performance 98 / LCP 2.4秒）も AVIF 配信下の値。
+ * 3. **OGP は影響を受けない。** `src/lib/metadata.ts` は `thumbnail.url` から
+ *    `w=1200&h=630&fit=fill&fill=solid&fill-color=…` を独自に組み立てており
+ *    `fm=` を付けない。**AVIF 非対応のクローラ（X など）には原形式が届く。**
+ * 4. **デコードは重くならない。** 低性能Android相当（CPU 6x）の強制デコードで、
+ *    `w=828` で最大 +1.3ms、`w=1080` 以上ではむしろ AVIF のほうが速い
+ *    （データ量が少ないため）。`/events` を Slow 4G + CPU 6x で通しても
+ *    LCP は 1,444ms → 1,440ms で差が出なかった。
+ *
+ * 残るリスクは、企業プロキシの再エンコードのような**想定外の環境**だけである。
+ * 切り戻すときは下の `fm` の値と `image-loader.test.ts` の期待値を戻す。
  *
  * ## `fit=max` が必須である理由
  *
@@ -95,7 +118,7 @@ function toImgixUrl(src: string, width: number, quality: number): string {
   const url = new URL(src);
   url.searchParams.set("w", String(width));
   url.searchParams.set("q", String(quality));
-  url.searchParams.set("fm", "webp");
+  url.searchParams.set("fm", "avif");
   url.searchParams.set("auto", "compress");
   url.searchParams.set("fit", "max");
   return url.toString();

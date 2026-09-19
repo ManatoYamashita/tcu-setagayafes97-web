@@ -140,8 +140,8 @@ const nextConfig: NextConfig = {
     qualities: [40, 60, 75],
     // AVIF は同じ品質でも WebP より転送量を抑えられる画像を優先する。
     // 未対応ブラウザには既存の WebP をフォールバックとして返す。
-    // これが効くのは静的画像だけで、microCMS 側は imgix で WebP 固定になる
-    // （前段の CloudFront が Accept を落とすため出し分けができない）。
+    // これが効くのは静的画像だけである。microCMS 側は前段の CloudFront が Accept を
+    // 落とすため出し分けができず、imgix 側で AVIF 固定にしている。
     formats: ["image/avif", "image/webp"],
     /*
      * microCMS のホストを許可している。`loader` prop の渡し忘れでここへ回った画像も

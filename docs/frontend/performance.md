@@ -373,10 +373,10 @@ PR #107 の本番 mobile 計測（Performance 92、FCP 1.4 秒、LCP 2.9 秒、T
   CSS/アニメーションJSを初期HTMLから外しつつ、遅延・失敗時もロゴ表示とレイアウトを保つ。
 - `next/image` のAVIFを優先形式へ追加し、既存WebPを未対応ブラウザ向けフォールバックとして残す。
   ヘッダー・フッターの固定ロゴは品質を75から60へ下げ、表示寸法に対して過剰な転送を避ける。
-  （**2026-09-20 追記: 効く範囲が静的画像だけに狭まった。** microCMS の画像は imgix 側で
-  WebP 固定になる（前段の CloudFront が Accept を落とし出し分けができない）ため、
-  `formats` の AVIF 優先は `public/` の静的画像にしか効かない。#237 の経緯と
-  AVIF / WebP の実測差は [image-delivery.md](./image-delivery.md) を参照）
+  （**2026-09-20 追記: 効く範囲が静的画像だけに狭まった。** microCMS の画像は前段の
+  CloudFront が Accept を落とし出し分けができないため、imgix 側で AVIF 固定にしている。
+  結果としてサイト全体が AVIF で揃うが、`formats` の出し分けが効くのは `public/` の
+  静的画像だけである。#237 の経緯と実測差は [image-delivery.md](./image-delivery.md) を参照）
 
 下部セクションの見出しと本文はSSRを維持し、データ欠落時のレイアウトとSEOを変えない。今回の検証は
 ローカル本番ビルドと静的HTMLの参照確認までとし、マージ・本番反映後に同一URL・mobile presetで
