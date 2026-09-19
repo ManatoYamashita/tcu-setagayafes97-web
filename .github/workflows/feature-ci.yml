@@ -70,7 +70,7 @@ jobs:
   # CSS の百分率高さが解決されるかはレイアウトエンジンの仕事なので、
   # 型でもユニットテストでも表現できない。
   layout-e2e:
-    name: Layout E2E (Timetable)
+    name: Layout E2E
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
