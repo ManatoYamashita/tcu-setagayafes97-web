@@ -63,6 +63,56 @@ const config = [
       ],
     },
   },
+  {
+    // #179 B の再発防止装置。
+    //
+    // `@theme`（src/app/globals.css）に無い色名を書いても、Tailwind は
+    // **エラーも警告も出さずに既定パレットの値を出力する。** 書いた本人はブランドの紫や
+    // 中性の灰を指定したつもりでも、画面には別の紫・青みがかったスレートが出る。
+    //
+    // この事故は lint / format / 型 / ユニットテスト / build / Layout E2E のすべてを
+    // 通過する。#179 の監査で見つかったときには約50箇所まで広がっていた。
+    // docs/frontend/design.md にも書いてあるが、**文書は人間が読まなければ効かない**
+    // （#154 で同じ轍を踏んでいる。上の #156 の規則と同じ理由でここへ置く）。
+    //
+    // 走査対象は文字列リテラルとテンプレート文字列。Tailwind のクラス名は
+    // JIT が検出できるよう完全なリテラルで書く規約なので、これで全経路を覆える
+    // （src/ 配下の .css に @apply は無い。2026-09-19 時点）。
+    //
+    // **@theme へ段を足したら、ここの禁止リストからその段を外すこと。**
+    // 足したのに禁止されたままだと、正しい指定が lint で落ちる。
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          // ブランドと色相差 7.5–11.6°。15° 未満は同一色として知覚されるうえ、
+          // 彩度が約40%高いため「ブランド紫を出そうとして外した色」に見える。
+          selector: "Literal[value=/(?:purple|violet|fuchsia)-(?:50|950|[1-9]00)(?![0-9])/]",
+          message:
+            "Tailwind 既定の purple / violet / fuchsia は使えません。ブランドと色相差が 15° 未満で、別色として認識されないためです。primary-* の同じ段へ置き換えてください（docs/frontend/design.md「紫はすべて primary-* を使う」）。",
+        },
+        {
+          selector:
+            "TemplateElement[value.raw=/(?:purple|violet|fuchsia)-(?:50|950|[1-9]00)(?![0-9])/]",
+          message:
+            "Tailwind 既定の purple / violet / fuchsia は使えません。ブランドと色相差が 15° 未満で、別色として認識されないためです。primary-* の同じ段へ置き換えてください（docs/frontend/design.md「紫はすべて primary-* を使う」）。",
+        },
+        {
+          // @theme のニュートラルは 50/100/200/400/500/600/700/900 の8段。
+          // 300 / 800 / 950 は欠番で、書くと既定の青みがかったスレートへ落ちる。
+          selector: "Literal[value=/gray-(?:300|800|950)(?![0-9])/]",
+          message:
+            "gray-300 / gray-800 / gray-950 は @theme に定義がなく、既定の青みがかったスレートへ落ちます。gray-200 など定義済みの段へ寄せるか、globals.css の @theme へ段を足してこの規則から外してください（docs/frontend/design.md「Tailwind 既定パレットを直接使わない」）。",
+        },
+        {
+          selector: "TemplateElement[value.raw=/gray-(?:300|800|950)(?![0-9])/]",
+          message:
+            "gray-300 / gray-800 / gray-950 は @theme に定義がなく、既定の青みがかったスレートへ落ちます。gray-200 など定義済みの段へ寄せるか、globals.css の @theme へ段を足してこの規則から外してください（docs/frontend/design.md「Tailwind 既定パレットを直接使わない」）。",
+        },
+      ],
+    },
+  },
 ];
 
 export default config;
