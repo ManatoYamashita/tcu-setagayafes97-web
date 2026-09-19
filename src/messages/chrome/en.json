@@ -22,7 +22,8 @@
   "header": {
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "mainNav": "Main navigation"
+    "mainNav": "Main navigation",
+    "skipToContent": "Skip to content"
   },
   "footer": {
     "eventInfo": "Event Info",

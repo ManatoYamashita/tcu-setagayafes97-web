@@ -35,7 +35,11 @@ const pamphlets = [
  */
 export default function PamphletPage() {
   return (
-    <div className="min-h-screen bg-secondary">
+    <main
+      id="content"
+      tabIndex={-1}
+      className="min-h-screen bg-secondary focus-visible:outline-none"
+    >
       {/* ページヘッダー */}
       <div className="bg-secondary py-16 text-gray-900">
         <div className="container mx-auto px-4">
@@ -166,6 +170,6 @@ export default function PamphletPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

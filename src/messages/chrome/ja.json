@@ -22,7 +22,8 @@
   "header": {
     "openMenu": "メニューを開く",
     "closeMenu": "メニューを閉じる",
-    "mainNav": "メインナビゲーション"
+    "mainNav": "メインナビゲーション",
+    "skipToContent": "本文へスキップ"
   },
   "footer": {
     "eventInfo": "企画情報",

@@ -25,7 +25,7 @@ export default async function Home() {
     : [null, []];
 
   return (
-    <main className="overflow-x-clip">
+    <main id="content" tabIndex={-1} className="overflow-x-clip focus-visible:outline-none">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
