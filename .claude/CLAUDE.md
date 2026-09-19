@@ -89,6 +89,9 @@ pnpm format
 
 # ドキュメントの相対リンク切れ検査（追跡 .md のみを対象にする。設計は scripts/assert-doc-links.mjs 冒頭）
 pnpm check:doc-links
+
+# 禁止色ユーティリティが Tailwind の走査範囲に無いことの検査（コメントも見る。設計は scripts/assert-no-restricted-colors.mjs 冒頭）
+pnpm check:colors
 ```
 
 ### ブランチ戦略
@@ -126,7 +129,9 @@ refactor/<refactor-target> # リファクタリング
 push 時は head をそのまま、PR 時は head を base へマージした結果を検証する。**両方走る場合、それは重複ではなく別種の検証である。**
 
 `Static Checks` は **`pnpm install` だけで完結する検査**（lint / format / 型 / ユニットテスト /
-ドキュメントの相対リンク）を束ねたジョブである。
+ドキュメントの相対リンク / 禁止色ユーティリティ）を束ねたジョブである。
+**禁止色の検査が `Static Checks` にあるのは、ESLint がコメントを見ないからである**
+（Tailwind のソース走査はコメントも読むため、そこが死角になっていた。#230）。
 **リンク検査が見るのは相対リンクだけで、`#anchor` の存在と外部URLの到達性は射程外である**
 （見るもの・見ないものの一覧は `scripts/assert-doc-links.mjs` の冒頭）。
 `Layout E2E` は**実ブラウザでしか捕まえられない事故に対する再発防止装置の置き場**で、
