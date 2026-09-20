@@ -335,6 +335,9 @@ for (const entry of STATIC_IMAGES) {
     // sharp は AVIF を HEIF コンテナとして報告する
     problem(`AVIF として読めません: ${entry.path}（format=${meta.format}）`);
   }
+  if (entry.requiresAlpha && !meta.hasAlpha) {
+    problem(`透過画像として読めません: ${entry.path}（hasAlpha=${meta.hasAlpha}）`);
+  }
 }
 
 const firstViewTotal = FIRST_VIEW_IMAGES.reduce((sum, file) => sum + (sizes.get(file) ?? 0), 0);
