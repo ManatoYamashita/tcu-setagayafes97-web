@@ -146,6 +146,21 @@ export default async function PrivacyPolicyPage({
               </li>
             ))}
           </ul>
+
+          {/*
+            外部サービスへ実際に送信しているもの。
+            「原則として提供しない」の例外を具体的に書く欄で、送信先が増えたら
+            src/data/privacy.ts の externalServices へ足す
+          */}
+          <div className="mt-6 space-y-4">
+            {privacyPolicyConfig.thirdParty.externalServices.map((service) => (
+              <div key={service.provider} className="rounded-lg bg-gray-100 p-4">
+                <p className="mb-1 font-semibold text-gray-900">{service.purpose}</p>
+                <p className="text-sm text-gray-700">{service.provider}</p>
+                <p className="mt-2 text-sm text-gray-700">{service.sent}</p>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* Cookie・アクセス解析 */}

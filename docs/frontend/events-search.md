@@ -2,7 +2,9 @@
 
 `/events` のキーワード検索・建物フィルタの設計と、そう決めた理由をまとめる。
 **一覧の表示方式（無限スクロール・絞り込みの追従）は
-[events-infinite-scroll.md](./events-infinite-scroll.md) が扱う。**
+[events-infinite-scroll.md](./events-infinite-scroll.md) が扱う。
+リテラル照合が0件になったときの第4段（意味検索）は
+[events-semantic-search.md](./events-semantic-search.md) が扱う。**
 
 実装は次の5ファイルに分かれている。
 
@@ -71,6 +73,10 @@ PR #199 が `normalizeEvent()` の既定化で塞いだ）。
 | 1   | 正規化済みクエリ**全体**の部分一致                          | `のど自慢`、`こ`、`TCUホール` |
 | 2   | 全ての語を含む（AND）                                       | `9号館 ダンス`                |
 | 3   | いずれかの語を含む（OR）。**一致した語の数**→スコアで並べる | `9号館でやってるダンスのやつ` |
+
+段3まで落ちても0件になるクエリ（`食べ物` のような要望型）は、**第4段の意味検索へ渡る**。
+段1〜3で1件でも当たったら第4段は呼ばない（課金が発生するため）。
+[events-semantic-search.md](./events-semantic-search.md) を参照。
 
 ### トークン化の2つの規則
 
