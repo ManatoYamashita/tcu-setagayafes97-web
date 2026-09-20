@@ -43,8 +43,8 @@ import { appImageLoader, resolveDelivery } from "@/lib/image-loader";
  * #240 が差し戻しの根拠にした 4.67 倍（トップ1画面 139,856 B → 653,780 B）は、
  * **原画像を事前最適化していなかったことの帰結**であって、Vercel から外すことの
  * 必然的な代償ではなかった。`assets/source/` の原画像を表示寸法の AVIF へ焼くと
- * **724,228 B → 207,846 B（71% 減）** になり、ファーストビュー8枚は 176,719 B
- * （Vercel 経由の実測 139,856 B に対し +26%）に収まる。
+ * **724,228 B → 199,005 B（73% 減）** になり、ファーストビュー8枚は 167,878 B
+ * （Vercel 経由の実測 139,856 B に対し +20%）に収まる。
  *
  * 寸法・品質・バイト予算の一次定義は `scripts/static-image-manifest.mjs`、
  * 焼くのは `pnpm images:optimize`、守るのは `pnpm check:images` である。

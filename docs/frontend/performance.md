@@ -308,7 +308,7 @@ const shouldWaitForOpener = willRunOpener() && !hasOpenerFinished();
 - **`public/` の画像を `AppImage` 以外から参照するなら**（`<video poster>` / OGP /
   favicon / 構造化データ / サイトマップ）、manifest の `role` を `crawler` か `dual` に
   すること。AVIF 化の対象から外れる。逆引き検査が `src/` の実物を読んで照合している。
-- 静的画像の事前縮小は完了（#241）。原画像 724,228 B → 配信 207,846 B（71% 減）。
+- 静的画像の事前縮小は完了（#241）。原画像 724,228 B → 配信 199,005 B（73% 減）。
 
 ### 無限ロゴ列
 

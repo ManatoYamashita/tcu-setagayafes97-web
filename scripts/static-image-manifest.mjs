@@ -55,9 +55,17 @@ const APP_IMAGES = [
     box: { width: 500, height: 500 },
     fit: "inside",
     kind: "art",
-    // 旧 `quality={40}`（HeroSection.tsx）。トップページの LCP 要素。
-    quality: 40,
-    maxBytes: 30000,
+    /*
+     * 旧 `quality={40}`（HeroSection.tsx）。**トップページの LCP 要素である。**
+     *
+     * 一度 q=40（27,350 B / RMSE 5.08）で出したが、Vercel が配っていた 16,272 B に対して
+     * +68% であり、LCP 要素にそれを払う理由が無かった。q=30 と q=40 を 500px 実寸で並べて
+     * 比べても**見分けがつかない**（輪郭線と "SETAGAYA FES" の小さな文字を目視確認）。
+     * RMSE は 5.08 → 7.00 へ悪化するが、そのぶん 18,509 B（以前の配信量 +14%）に収まる。
+     * モバイルの低速回線では 8,841 B の差が LCP に直接効く。
+     */
+    quality: 30,
+    maxBytes: 21000,
     note: "HeroSection の回転アイコン。トップページの LCP 要素",
   },
   {
@@ -248,7 +256,7 @@ export const IMAGE_EXTENSIONS = [".avif", ".webp", ".png", ".jpg", ".jpeg", ".gi
  * 1ファイル1寸法になるぶん画面幅ごとの最適化は失うので、**43% の超過までは許す**
  * という判断で 200,000 B を上限に置いた。**これは実測ではなく判断である。**
  *
- * 2026-09-20 の実績は 176,719 B（Vercel 経由比 +26%、原画 724,228 B 比 −76%）。
+ * 2026-09-20 の実績は 167,878 B（Vercel 経由比 +20%、原画 724,228 B 比 −77%）。
  */
 export const FIRST_VIEW_BUDGET_BYTES = 200000;
 
