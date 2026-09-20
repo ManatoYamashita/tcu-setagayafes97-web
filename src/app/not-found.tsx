@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AppImage } from "@/components/ui/AppImage";
+import { notFoundPageContent } from "@/data/not-found";
 
 /**
  * 404ページのメタデータ
@@ -14,7 +16,7 @@ import Link from "next/link";
  * `canonical: null` で継承を打ち消す。
  */
 export const metadata: Metadata = {
-  title: "ページが見つかりません",
+  title: notFoundPageContent.metadataTitle,
   robots: {
     index: false,
     follow: true,
@@ -34,13 +36,41 @@ export default function NotFound() {
     <main
       id="content"
       tabIndex={-1}
-      className="container mx-auto flex min-h-screen flex-col items-center justify-center px-4 py-24 focus-visible:outline-none"
+      className="min-h-[calc(100svh-var(--header-height))] bg-primary-50 px-4 py-12 focus-visible:outline-none sm:px-6 sm:py-16 lg:px-8"
     >
-      <h2 className="mb-4 text-2xl font-bold">404 - ページが見つかりません</h2>
-      <p className="mb-8 text-gray-900/80">お探しのページは見つかりませんでした。</p>
-      <Link href="/" className="rounded-md bg-white px-4 py-2 text-primary hover:opacity-80">
-        トップページへ戻る
-      </Link>
+      <div className="mx-auto grid w-full max-w-5xl items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,28rem)] lg:gap-16">
+        <section aria-labelledby="not-found-title" className="flex flex-col items-start">
+          <h1 id="not-found-title" className="flex flex-col gap-3">
+            <span className="text-[clamp(6rem,24vw,11rem)] leading-[0.8] font-bold tracking-[-0.06em] text-primary-700">
+              {notFoundPageContent.code}
+            </span>
+            <span className="max-w-xl text-2xl leading-tight font-bold text-balance text-gray-900 sm:text-3xl">
+              {notFoundPageContent.title}
+            </span>
+          </h1>
+          <p className="mt-4 max-w-xl leading-relaxed text-pretty text-gray-600">
+            {notFoundPageContent.description}
+          </p>
+          <Link
+            href={notFoundPageContent.cta.href}
+            className="mt-8 inline-flex min-h-12 items-center justify-center rounded-full bg-primary-600 px-6 py-3 font-semibold text-white shadow-md transition-[background-color,box-shadow,scale] duration-150 ease-out hoverable:hover:bg-primary-700 hoverable:hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 active:scale-[0.96] motion-reduce:transition-none motion-reduce:active:scale-100"
+          >
+            {notFoundPageContent.cta.label}
+          </Link>
+        </section>
+
+        <div className="w-full max-w-[28rem] justify-self-center rounded-[2.5rem] bg-white p-2 shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_1px_2px_-1px_rgba(0,0,0,0.06),0_2px_4px_rgba(0,0,0,0.04)]">
+          <AppImage
+            src={notFoundPageContent.illustration.src}
+            alt={notFoundPageContent.illustration.alt}
+            width={notFoundPageContent.illustration.width}
+            height={notFoundPageContent.illustration.height}
+            fetchPriority="high"
+            priority
+            className="h-auto w-full rounded-[2rem] outline outline-1 -outline-offset-1 outline-black/10"
+          />
+        </div>
+      </div>
     </main>
   );
 }

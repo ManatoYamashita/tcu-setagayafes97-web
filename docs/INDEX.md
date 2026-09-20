@@ -304,7 +304,8 @@ docs/
   - **短時間しか DOM に無い画像は巡回で数えられない。** オープナーのロゴは2度、調査から漏れた
   - **`curl` で検証するときは `Accept` を付ける。** 付けないとキャッシュ済みでも 402 に見える
   - `auto=format` が効かない理由と、`fm=avif` / `fit=max` を決めた実測値
-  - 事前最適化の運用（`scripts/static-image-manifest.mjs` が一次定義、`pnpm check:images` が守る）
+  - 事前最適化の運用（原画像は `assets/source/`、`scripts/static-image-manifest.mjs` が一次定義、
+    `pnpm check:images` が守る）
   - `AppImage` というラッパーに至るまでに実測で否定した2案
   - 再発防止装置3つの射程の違い（ESLint / ユニットテスト / ビルド生成物）
 
@@ -456,4 +457,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-09-06
+**最終更新日**: 2026-09-20
