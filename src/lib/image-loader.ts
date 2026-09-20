@@ -9,8 +9,10 @@ import type { ImageLoaderProps } from "next/image";
  *
  * **microCMS 由来の画像を描く `<Image>` には必ず `loader={appImageLoader}` を渡すこと。**
  * 渡し忘れた画像は Vercel の変換枠を消費する。`pnpm build` の末尾で走る
- * `scripts/assert-remote-images-bypass-optimizer.mjs` が生成物を読んで検出する。
- * 逆に、`public/` の静的画像へ渡してはいけない（Vercel の最適化を素通りして原寸配信になる）。
+ * `scripts/assert-no-image-optimizer.mjs` が生成物を読んで検出する。
+ * 逆に、`public/` の静的画像へ渡してはいけない。静的画像は `unoptimized` で
+ * **事前最適化済みの実体をそのまま配る**ので、このローダーを通す意味が無い
+ * （通しても `isMicrocmsImage` が false で素通しになるが、意図が読めなくなる）。
  * 振り分けは `src/components/ui/AppImage.tsx` が実行時に行うので、呼び出し側は意識しなくてよい。
  *
  * ## 背景（#237）
@@ -26,14 +28,23 @@ import type { ImageLoaderProps } from "next/image";
  * 枠を焼いていた主体は microCMS 側である。2026-09-20 に本番HTMLの srcset を全数えした
  * 結果、変換数の上限は `public/` の静的画像11ファイルで 178通り×2形式＝**356**
  * （枠 5,000 の 7%）。対して microCMS は企画サムネイル93枚だけで約 3,348。
- * **ここだけ imgix へ逃がせば根治する。静的画像は Vercel の最適化に残す。**
+ *
+ * ただし **「だから静的画像は Vercel に残してよい」は誤りだった**（#241）。
+ * 枠はアカウント全体の総量で枯れるので、消費が 7% の利用者も**すでに枯れた枠の上では
+ * 402 になる**。実際トップページの静的画像 srcset 128通り中81通りが 402 で、
+ * オープナーのロゴは Retina で必ず消えていた。**静的画像も Vercel から外し、
+ * 手元で事前に AVIF へ焼いて配る**（`scripts/optimize-static-images.mjs`）。
  *
  * ## なぜ `next.config.ts` の `loaderFile` ではなく `loader` prop なのか
  *
  * **`images.loader: "custom"` を設定すると、`/_next/image` エンドポイントが 404 になる。**
  * 2026-09-19 に `loaderFile` 方式で実装して実測したところ、`dev` / `start` のいずれでも
  * ローカル静的画像が 404 になった（`loaderFile` を外すと同じURLが 200 を返す）。
- * グローバルに適用すると、**静的画像が巻き添えで最適化を失う。**
+ *
+ * 静的画像も Vercel から外したいまは「巻き添え」自体が起きないが、`loaderFile` は
+ * **すべての画像にこのローダーを通してしまう。** `public/` の画像まで
+ * `appImageLoader` の分岐を踏むことになり、`AppImage` が持っている
+ * 「どこで変換するか」の決定が2箇所に散る。`loader` prop のままにする。
  *
  * ## なぜ `AppImage` というラッパーが要るのか
  *
@@ -50,6 +61,24 @@ const MICROCMS_ASSETS_ORIGIN = "https://images.microcms-assets.io/";
 /** imgix の変換を掛けられる画像か。`AppImage` が `unoptimized` の切り替えに使う。 */
 export function isMicrocmsImage(src: string): boolean {
   return src.startsWith(MICROCMS_ASSETS_ORIGIN);
+}
+
+/** 画像をどこで変換して配るか。`raw` は事前最適化済みの実体をそのまま配る経路。 */
+export type ImageDelivery = "imgix" | "raw";
+
+/**
+ * `src` から配信経路を決める。`AppImage` の振り分けそのものである。
+ *
+ * **`AppImage` の中にインラインで書かない。** インラインだと、`loader` や
+ * `unoptimized` の指定が外れても `appImageLoader` は無傷なのでユニットテストは緑のまま通り、
+ * **枠の消費が静かに復活する**（#237 で実際に起きた形）。ここへ出しておけば
+ * 振り分け自体を `image-loader.test.ts` が固定できる。
+ *
+ * 文字列でない `src`（画像の静的 import）は `public/` 配下と同じ扱いにする。
+ * microCMS の画像が静的 import で入ることはありえないためである。
+ */
+export function resolveDelivery(src: unknown): ImageDelivery {
+  return typeof src === "string" && isMicrocmsImage(src) ? "imgix" : "raw";
 }
 
 /**

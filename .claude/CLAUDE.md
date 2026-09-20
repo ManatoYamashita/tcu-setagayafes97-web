@@ -92,6 +92,12 @@ pnpm check:doc-links
 
 # 禁止色ユーティリティが Tailwind の走査範囲に無いことの検査（コメントも見る。設計は scripts/assert-no-restricted-colors.mjs 冒頭）
 pnpm check:colors
+
+# public/ の画像が manifest の契約どおりかの検査（役割・形式・寸法・バイト予算・参照の解決）
+pnpm check:images
+
+# assets/source/ の原画像を表示寸法の AVIF へ焼き直す（生成物はコミットする）
+pnpm images:optimize
 ```
 
 ### ブランチ戦略
@@ -153,10 +159,10 @@ microCMS の secrets を要求するので fork PR では必ず落ちる）。�
 どちらも「ビルドは通るが壊れている」状態を落とすためにあり、ESLint でも Vitest でも
 代替できない（生成された HTML を読む以外に判定する方法が無い）。
 
-| スクリプト                                  | 落とすもの                                                                       | 参照                                                                                                  |
-| ------------------------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `assert-events-static-html.mjs`             | `/events` の本体がクライアント描画へ落ちる（#156）                               | [`docs/frontend/static-html-and-search-params.md`](../docs/frontend/static-html-and-search-params.md) |
-| `assert-remote-images-bypass-optimizer.mjs` | **リモート**画像が Vercel の画像最適化を通る（#237。ローカルの静的画像は対象外） | [`docs/frontend/image-delivery.md`](../docs/frontend/image-delivery.md)                               |
+| スクリプト                      | 落とすもの                                                                                  | 参照                                                                                                  |
+| ------------------------------- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `assert-events-static-html.mjs` | `/events` の本体がクライアント描画へ落ちる（#156）                                          | [`docs/frontend/static-html-and-search-params.md`](../docs/frontend/static-html-and-search-params.md) |
+| `assert-no-image-optimizer.mjs` | **どの画像でも** `/_next/image` を通る／`public/` の静的画像がHTMLから消える（#237 / #241） | [`docs/frontend/image-delivery.md`](../docs/frontend/image-delivery.md)                               |
 
 **どちらも検査対象が消えると空振りする。** 前者は `EVENTS_VISIBLE` が false のとき、
 後者は microCMS の画像が1枚もHTMLに出ないときで、いずれもログに `SKIP` / `NOTE` を出す。
@@ -313,8 +319,17 @@ microCMS の編集画面にある「画面プレビュー」から、**公開せ
 > 組み合わせ1つである。変換済みの結果は CDN に残るため、枯渇後は**未変換の組み合わせだけ**が
 > `402` になる。同じファイルでも幅によって表示されたりされなかったりする（#237）。
 >
-> **microCMS の画像は imgix、`public/` の静的画像は Vercel の Image Optimization** で
-> 変換する。枠を焼いていたのは microCMS 側だけで、静的画像は上限でも月356変換（枠の7%）。
+> **変換は2つとも Vercel の外でやる。** microCMS の画像は imgix で実行時に、
+> `public/` の静的画像は手元で事前に（`pnpm images:optimize`）。
+> **Vercel の変換枠の消費は 0 にする。**
+>
+> **「消費が少ないから大丈夫」は成り立たない。** 枠はアカウント全体の総量で枯れ、
+> すでに枯れた枠の上では消費が 7% の利用者も 402 になる。#240 でこれを誤り、
+> オープナーのロゴが Retina で表示されなくなった（#241）。
+>
+> **`public/` へ画像を足したら `scripts/static-image-manifest.mjs` へ1行足すこと。**
+> 足さないと `pnpm check:images` が落ちる。**OGP・favicon・`<video poster>`・
+> 構造化データが読む画像を AVIF 化してはいけない**（`role` を `crawler` / `dual` にする）。
 > **画像は [`src/components/ui/AppImage.tsx`](../src/components/ui/AppImage.tsx) の
 > `AppImage` で描くこと。`next/image` の直接 import は `eslint.config.mjs` が止める。**
 > 経路の設計と実測値は [`docs/frontend/image-delivery.md`](../docs/frontend/image-delivery.md) を参照。

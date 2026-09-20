@@ -163,14 +163,25 @@ export function Opener() {
       >
         {/* アイコンラッパー */}
         <div ref={iconWrapperRef} className="relative w-64 h-64 will-change-transform opacity-0">
+          {/*
+            オープナーはこのロゴ1枚を見せるためだけに 1.6 秒の尺を取る。演出は画像の到着を
+            待たない（下の startAnimation のコメント）ので、**`loading="lazy"` のままだと
+            紫の画面だけが流れて終わりうる。**
+          
+            `lazy` はモバイル初期表示の改善（c60e1f8）で入ったが、**同じコミットが
+            モバイルではオープナー自体を実行しないようにしている。** モバイルでこの画像が
+            描かれることはもう無く、モバイルの LCP を守るという根拠は失われている。
+          
+            `fetchPriority="low"` は残す。裏で Hero の LCP 画像（favicon-outline）が
+            走っており、そちらへ帯域を譲る意図は今も有効である。
+          */}
           <AppImage
-            src="/images/brand/favicon-white.webp"
+            src="/images/brand/favicon-white.avif"
             alt="世田谷祭ロゴ"
             fill
             sizes="256px"
-            loading="lazy"
+            loading="eager"
             fetchPriority="low"
-            quality={60}
             className="object-contain"
           />
         </div>

@@ -20,12 +20,11 @@ export function Footer() {
           {/* ロゴ: 左上 */}
           <div className="mb-6">
             <AppImage
-              src="/images/brand/logo-white.webp"
+              src="/images/brand/logo-white.avif"
               alt={siteConfig.shortName}
               width={192}
               height={77}
               sizes="192px"
-              quality={60}
               className="h-auto w-48"
             />
           </div>
@@ -48,12 +47,11 @@ export function Footer() {
 
           <div className="mt-8 flex flex-col items-center border-t border-white/20 pt-8 text-white/85">
             <AppImage
-              src="/images/brand/logo-white.webp"
+              src="/images/brand/logo-white.avif"
               alt={siteConfig.shortName}
               width={48}
               height={19}
               sizes="48px"
-              quality={60}
               className="mb-3 h-auto w-12"
             />
             <p className="mb-2">{siteConfig.name}</p>

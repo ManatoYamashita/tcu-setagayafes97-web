@@ -209,7 +209,7 @@ ScrollTrigger の読み込みを **IntersectionObserver 越しの動的 import**
 レイヤーが下へ開く。白ロゴからカラーロゴへのクロスフェードは、尺を詰めると認識しづらく
 段階として機能しなくなるため廃止した。
 
-**濃紫の上ではカラーロゴ（`favicon.webp`）を使わないこと。** 実物を撮って比較したところ、
+**濃紫の上ではカラーロゴ（`assets/source/images/brand/favicon.webp`）を使わないこと。** 実物を撮って比較したところ、
 淡い配色が背景に沈み、歯車の細部や色の差が判別できなかった。1.6 秒の提示では形として
 認識される前に消える。白ロゴ（`favicon-white.webp`）はシルエットが明瞭に立つ。
 
@@ -291,15 +291,24 @@ const shouldWaitForOpener = willRunOpener() && !hasOpenerFinished();
 ### 画像
 
 - **画像は `AppImage` で描く。`next/image` を直接 import してはいけない**
-  （`eslint.config.mjs` が error で止める）。microCMS の画像は imgix、
-  `public/` の静的画像は Vercel の Image Optimization で変換される。振り分けは
-  `AppImage` が実行時に行うので、呼び出し側は意識しなくてよい。変換枠が枯れて画像が
-  402 で壊れた経緯（#237）と経路の設計は [image-delivery.md](./image-delivery.md) を参照。
+  （`eslint.config.mjs` が error で止める）。**変換は2つとも Vercel の外でやる。**
+  microCMS の画像は imgix で実行時に、`public/` の静的画像は手元で事前に
+  （`pnpm images:optimize`）。振り分けは `AppImage` が実行時に行うので、呼び出し側は
+  意識しなくてよい。変換枠が枯れて画像が 402 で壊れた経緯（#237 / #241）と経路の設計は
+  [image-delivery.md](./image-delivery.md) を参照。
 - 固定表示サイズでも `width` / `height` / `sizes` を明示する。
-- **`next.config.ts` の `deviceSizes` / `imageSizes` へ幅を足さない。** 静的画像の
-  Vercel 変換数と microCMS の imgix URL の本数を同時に増やす。足すなら用途を PR に書く。
-- 静的画像の事前縮小は未了（`tcu-7.webp` 1100x620 / 202KB、`mon7a.webp` 1280x1280 / 137KB）。
-  Vercel が表示寸法へ縮めているので急ぎではない。
+- **`next.config.ts` の `deviceSizes` / `imageSizes` へ幅を足さない。** microCMS の
+  imgix URL の本数を増やす（`unoptimized` の静的画像には srcset が出ないので影響しない）。
+  足すなら用途を PR に書く。
+- **`public/` へ画像を足したら `scripts/static-image-manifest.mjs` へ1行足す。**
+  足さないと `pnpm check:images` が「manifest に無い画像がある」で落ちる。
+  `role` の宣言を強制して、OGP や favicon を誤って AVIF 化するのを防いでいる。
+- **`quality` prop は `public/` の静的画像に効かない。** 品質は manifest の `quality` で
+  決まり、`pnpm images:optimize` が実体へ焼き込む。開発時は `AppImage` が警告する。
+- **`public/` の画像を `AppImage` 以外から参照するなら**（`<video poster>` / OGP /
+  favicon / 構造化データ / サイトマップ）、manifest の `role` を `crawler` か `dual` に
+  すること。AVIF 化の対象から外れる。逆引き検査が `src/` の実物を読んで照合している。
+- 静的画像の事前縮小は完了（#241）。原画像 724,228 B → 配信 207,846 B（71% 減）。
 
 ### 無限ロゴ列
 
@@ -377,6 +386,10 @@ PR #107 の本番 mobile 計測（Performance 92、FCP 1.4 秒、LCP 2.9 秒、T
   CloudFront が Accept を落とし出し分けができないため、imgix 側で AVIF 固定にしている。
   結果としてサイト全体が AVIF で揃うが、`formats` の出し分けが効くのは `public/` の
   静的画像だけである。#237 の経緯と実測差は [image-delivery.md](./image-delivery.md) を参照）
+  （**2026-09-20 追記2: `formats` は削除した。** 静的画像も Vercel の最適化を通らなく
+  なったため、この設定が効く画像が 0 になった。`public/` の画像は手元で AVIF へ焼いて
+  そのまま配る＝**WebP のフォールバックは無い**。判断の根拠は
+  [image-delivery.md](./image-delivery.md) の「静的画像を AVIF 単独で配る判断」）
 
 下部セクションの見出しと本文はSSRを維持し、データ欠落時のレイアウトとSEOを変えない。今回の検証は
 ローカル本番ビルドと静的HTMLの参照確認までとし、マージ・本番反映後に同一URL・mobile presetで

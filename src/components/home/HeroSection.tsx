@@ -174,13 +174,12 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       {/* [z-20] ロゴ画像（中央配置） */}
       <div className="relative z-20 flex w-full max-w-[75vw] -translate-y-10 items-center justify-center sm:max-w-[50vw] sm:-translate-y-6 md:max-w-[35vw] md:translate-y-0 lg:max-w-[30vw]">
         <AppImage
-          src="/images/brand/favicon-outline.webp"
+          src="/images/brand/favicon-outline.avif"
           alt="世田谷祭のアイコン"
           width={500}
           height={500}
           sizes="(max-width: 639px) 75vw, (max-width: 767px) 50vw, (max-width: 1023px) 35vw, 30vw"
           fetchPriority="high"
-          quality={40}
           className="h-auto w-full animate-spin-slow"
           priority
         />

@@ -119,17 +119,24 @@ const nextConfig: NextConfig = {
   },
   images: {
     /*
-     * Vercel の Image Optimization で最適化されるのは `public/` 配下の静的画像だけである。
-     * microCMS の画像は `src/lib/image-loader.ts` を `loader` prop で渡して imgix へ
-     * 振り向けており、Vercel の変換枠を使わない。無料枠の枯渇で企画サムネイルが
-     * 402 で壊れた経緯と、`loaderFile`（全体適用）を採らなかった理由は
-     * docs/frontend/image-delivery.md を参照（#237）。
+     * **この設定はもう microCMS の画像にしか効かない。**
      *
-     * **この2つの幅の一覧は、両方の経路に効く。** `getImgProps` は `loader` の種類に
-     * 関係なくここから幅を決め、その幅をローダーへ渡すためである。つまり
-     * 静的画像の変換数と、microCMS の imgix URL の本数を、同時に決めている。
-     * `sizes` に固定 px を書いても srcset には全候補が並ぶので、
-     * **ここへ幅を足す行為は Vercel の変換数を掛け算で増やす。** 追加時は用途を PR に書くこと。
+     * `public/` の静的画像は `AppImage` が `unoptimized` で描くようになったため、
+     * `/_next/image` を一切通らない（srcset も出ない）。実体は
+     * `scripts/optimize-static-images.mjs` が表示寸法の AVIF へ焼いて `public/` へ置く。
+     * 寸法・品質・バイト予算の一次定義は `scripts/static-image-manifest.mjs`。
+     *
+     * 静的画像まで外した理由は **枠が総量で枯れるから**である。#240 では
+     * 「静的画像は枠の 7% しか使わないので残してよい」と判断したが、すでに枯れた枠の上では
+     * 消費の少なさは何も保護せず、実際 2026-09-20 にはトップページの静的画像 srcset
+     * 128通り中81通りが 402 だった（#241）。経緯は docs/frontend/image-delivery.md。
+     */
+
+    /*
+     * **imgix 経路の srcset の幅を決める。** `getImgProps` は `loader` の種類に関係なく
+     * ここから幅を取り、その幅をローダーへ渡す。`sizes` に固定 px を書いても
+     * srcset には全候補が並ぶので、**ここへ幅を足すと microCMS の imgix URL の本数が増える。**
+     * imgix には変換数の課金が無いので枠は焼かないが、HTML は太る。追加時は用途を PR に書くこと。
      *
      * 512 と 320 は隣接する 640 / 384 との差が小さく、丸め先との差はそれぞれ 25% / 20%
      * にとどまるので落とした。2048 と 3840 は残す。PageHero が `100vw` を使っており、
@@ -137,16 +144,23 @@ const nextConfig: NextConfig = {
      */
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [32, 48, 64, 96, 128, 256, 384, 420],
+    /*
+     * `getImgProps` は `loader` の種類に関係なく `quality` をこの一覧で検証し、
+     * 外れた値を渡すと落ちる。imgix 経路が既定の 75 を使うため残している。
+     * （静的画像側では `quality` そのものが無視されるので、値は manifest が持つ。）
+     */
     qualities: [40, 60, 75],
-    // AVIF は同じ品質でも WebP より転送量を抑えられる画像を優先する。
-    // 未対応ブラウザには既存の WebP をフォールバックとして返す。
-    // これが効くのは静的画像だけである。microCMS 側は前段の CloudFront が Accept を
-    // 落とすため出し分けができず、imgix 側で AVIF 固定にしている。
-    formats: ["image/avif", "image/webp"],
+    /*
+     * `formats` は **意図的に置いていない。** これは Vercel の Image Optimization が
+     * Accept を見て出し分けるための設定で、その経路を通る画像がもう1枚も無い。
+     * 置いたままにすると「静的画像には WebP のフォールバックがある」と読めてしまうが、
+     * **実際には AVIF 単独配信である**（判断の根拠は docs/frontend/image-delivery.md の
+     * 「静的画像を AVIF 単独で配る判断」）。
+     */
     /*
      * microCMS のホストを許可している。`loader` prop の渡し忘れでここへ回った画像も
      * 表示自体はできてしまうが、その場合は枠を消費する。渡し忘れは
-     * `scripts/assert-remote-images-bypass-optimizer.mjs` がビルド時に落とす。
+     * `scripts/assert-no-image-optimizer.mjs` がビルド時に落とす。
      */
     remotePatterns: [
       {
@@ -154,6 +168,32 @@ const nextConfig: NextConfig = {
         hostname: "images.microcms-assets.io",
       },
     ],
+  },
+  /**
+   * `public/` 配下の画像に明示的なキャッシュ期間を与える。
+   *
+   * **これは `unoptimized` へ移ったことの必須の後始末である。** Vercel は `/_next/image`
+   * の応答には長期 immutable を付けるが、`public/` の静的ファイルには
+   * `public, max-age=0, must-revalidate` を返す（2026-09-20 に本番で実測）。
+   * このまま静的画像を `public/` から配ると、**402 を「画像ごと・ページ遷移ごとの
+   * 再検証往復」と取り替えるだけ**になる。学園祭当日の同時アクセスで効いてくる。
+   *
+   * ファイル名にハッシュを入れれば `immutable` にできるが、焼き直すたびに `src/` の
+   * リテラルが全部変わる。学祭までの運用では日次の鮮度で足り、差し替えたい日は
+   * 1日待てばよい（7日間は stale を配りつつ裏で取り直す）。
+   */
+  async headers() {
+    return [
+      {
+        source: "/:dir(images|materials)/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, stale-while-revalidate=604800",
+          },
+        ],
+      },
+    ];
   },
   experimental: {
     optimizePackageImports: [

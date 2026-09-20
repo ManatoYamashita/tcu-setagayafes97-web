@@ -1,12 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { appImageLoader, isMicrocmsImage } from "@/lib/image-loader";
+import { appImageLoader, isMicrocmsImage, resolveDelivery } from "@/lib/image-loader";
 
 /**
- * 画像配信経路の契約（#237）
+ * 画像配信経路の契約（#237 / #241）
  *
  * ここで固定するのは「どの画像がどこへ行くか」であり、変換後の見た目ではない。
- * 本体は 1 点に尽きる。**microCMS の画像が `/_next/image` を通らないこと。**
- * 通れば Vercel の変換枠を消費し、枯渇すれば 402 で画像が壊れる。
+ * 本体は 1 点に尽きる。**どの画像も `/_next/image` を通らないこと。**
+ * 通れば Vercel の変換枠を消費し、枯渇すれば 402 でその画像だけが壊れる。
+ *
+ * 2026-09-20 に `public/` の静的画像も対象へ入った。「静的画像は枠の 7% しか
+ * 使わないので Vercel に残してよい」という #240 の判断は誤りで、**枠は総量で枯れる**
+ * ため、消費の少なさは何も保護しなかった（オープナーのロゴが Retina で消えた）。
  */
 
 const MICROCMS_IMAGE =
@@ -62,13 +66,12 @@ describe("appImageLoader — microCMS の画像", () => {
 describe("appImageLoader — それ以外の画像", () => {
   /*
    * このローダーは microCMS の画像にしか渡らない（`AppImage` が振り分ける）。
-   * `public/` の静的画像は `loader` 無し = next/image の既定ローダーで
-   * Vercel の最適化へ回る。ここで固定するのは「直接使われたときに
-   * imgix のパラメータを勝手に足さない」という保険の挙動である。
+   * `public/` の静的画像は `unoptimized` で実体をそのまま配る。ここで固定するのは
+   * 「直接使われたときに imgix のパラメータを勝手に足さない」という保険の挙動である。
    */
   it("public 配下の静的画像は素通しする（imgix のパラメータを足さない）", () => {
-    expect(appImageLoader({ src: "/images/brand/logo.webp", width: 208, quality: 60 })).toBe(
-      "/images/brand/logo.webp"
+    expect(appImageLoader({ src: "/images/brand/logo.avif", width: 208, quality: 60 })).toBe(
+      "/images/brand/logo.avif"
     );
   });
 
@@ -80,15 +83,47 @@ describe("appImageLoader — それ以外の画像", () => {
 
 describe("isMicrocmsImage — AppImage の振り分け条件", () => {
   /*
-   * `AppImage` はこの判定だけでローダーを渡すかを決める。true なら imgix、
-   * false なら Vercel の最適化。**枠を焼いていたのは microCMS 側だけ**なので、
-   * ここが false の画像まで最適化から外してはいけない（LCP 要素が 4.7 倍になる）。
+   * `AppImage` はこの判定だけで配信経路を決める。true なら imgix で実行時変換、
+   * false なら `unoptimized` で事前最適化済みの実体をそのまま配る。
+   * **どちらも Vercel の変換枠を使わない。**
    */
   it("microCMS の配信ホストだけを true にする", () => {
     expect(isMicrocmsImage(MICROCMS_IMAGE)).toBe(true);
-    expect(isMicrocmsImage("/images/brand/logo.webp")).toBe(false);
-    expect(isMicrocmsImage("/materials/geers.webp")).toBe(false);
+    expect(isMicrocmsImage("/images/brand/logo.avif")).toBe(false);
+    expect(isMicrocmsImage("/materials/geers.avif")).toBe(false);
     expect(isMicrocmsImage("https://images.microcms-assets.io.example.com/a.jpg")).toBe(false);
     expect(isMicrocmsImage("http://images.microcms-assets.io/a.jpg")).toBe(false);
+  });
+});
+
+describe("resolveDelivery — 配信経路の決定", () => {
+  /*
+   * `AppImage` の振り分けそのもの。**`AppImage` の中にインラインで書くと、
+   * `loader` や `unoptimized` の指定が外れてもこのファイルは緑のまま通り、
+   * 枠の消費が静かに復活する**（#237 で実際に起きた形）。ここで固定しておく。
+   */
+  it("microCMS の画像は imgix へ回す", () => {
+    expect(resolveDelivery(MICROCMS_IMAGE)).toBe("imgix");
+  });
+
+  it("public/ の静的画像は実体をそのまま配る", () => {
+    expect(resolveDelivery("/images/brand/favicon-white.avif")).toBe("raw");
+    expect(resolveDelivery("/ogp.webp")).toBe("raw");
+  });
+
+  /*
+   * 画像の静的 import は `{ src, width, height }` のオブジェクトで渡る。
+   * microCMS の画像が静的 import で入ることはありえないので raw でよい。
+   * （静的 import 自体は eslint.config.mjs の no-restricted-imports が禁じている。）
+   */
+  it("文字列でない src（静的 import）も実体配信の側へ落とす", () => {
+    expect(resolveDelivery({ src: "/_next/static/media/a.avif", width: 10, height: 10 })).toBe(
+      "raw"
+    );
+    expect(resolveDelivery(undefined)).toBe("raw");
+  });
+
+  it("ホスト名の前方一致で騙されない", () => {
+    expect(resolveDelivery("https://images.microcms-assets.io.example.com/a.jpg")).toBe("raw");
   });
 });

@@ -251,7 +251,7 @@ export function NewsSectionInteractive({ newsList }: NewsSectionProps) {
         style={{ clipPath: "inset(0% 100% 0% 0%)" }}
       >
         <AppImage
-          src="/images/photos/tcu-7.webp"
+          src="/images/photos/tcu-7.avif"
           alt="キャンパス風景"
           fill
           className="object-cover will-change-transform"
@@ -335,11 +335,11 @@ export function NewsSectionInteractive({ newsList }: NewsSectionProps) {
             {/* 歯車装飾: 右下（複数歯車） */}
             <AppImage
               ref={gear1Ref}
-              src="/materials/geers.webp"
+              src="/materials/geers.avif"
               alt=""
               aria-hidden="true"
-              width={500}
-              height={500}
+              width={384}
+              height={384}
               sizes="(max-width: 767px) 112px, (max-width: 1023px) 160px, 192px"
               className="pointer-events-none absolute -bottom-8 right-8 z-20 w-28 select-none opacity-0 will-change-transform md:w-40 lg:w-48"
               draggable={false}
@@ -348,11 +348,11 @@ export function NewsSectionInteractive({ newsList }: NewsSectionProps) {
             {/* 歯車装飾: 左下（単体歯車） */}
             <AppImage
               ref={gear2Ref}
-              src="/materials/geer1.webp"
+              src="/materials/geer1.avif"
               alt=""
               aria-hidden="true"
-              width={500}
-              height={500}
+              width={192}
+              height={192}
               sizes="(max-width: 767px) 56px, (max-width: 1023px) 80px, 96px"
               className="pointer-events-none absolute -bottom-6 left-12 z-20 w-14 select-none opacity-0 will-change-transform md:w-20 lg:w-24"
               draggable={false}

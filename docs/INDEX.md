@@ -46,7 +46,7 @@ docs/
 │   ├── events-infinite-scroll.md  # /events の無限スクロールと絞り込みの追従
 │   ├── layout-e2e.md              # 実ブラウザの再発防止装置（盤面 / ランドマーク1周）
 │   ├── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
-│   ├── image-delivery.md          # 画像変換の委譲先（microCMS=imgix / 静的=Vercel）
+│   ├── image-delivery.md          # 画像変換の委譲先（microCMS=imgix / 静的=事前AVIF）
 │   ├── performance.md             # Lighthouse基準値とフロントエンド性能ルール
 │   └── page-transition.md         # ページ遷移アニメーションとView Transitions API
 └── requires/         # 要件定義・仕様関連
@@ -281,6 +281,8 @@ docs/
     食い違う。**既定パレットの比は grep ではなく canvas の実ピクセルで測る**
   - **規約を破れないようにしてある** — 上記3節は `eslint.config.mjs` の `no-restricted-syntax`
     と `scripts/assert-no-restricted-colors.mjs`（`pnpm check:colors`）が二段で守る。
+    画像は `scripts/assert-static-image-budget.mjs`（`pnpm check:images`）が
+    役割・形式・寸法・バイト予算・参照の解決を守る。
     **ESLint はコメントを見ないが Tailwind は読む**ため、生テキストを見る検査を別に置いた（#230）。
     禁止リストの一次定義は `scripts/restricted-color-tokens.mjs` の1箇所で、
     `@theme` へ段を足したらそこから外す
@@ -294,10 +296,15 @@ docs/
   - リッチテキスト（`prose`）の扱い — typography プラグイン未導入と `@layer` の選び方
 
 - **[image-delivery.md](./frontend/image-delivery.md)** - 画像配信の経路（変換をどこにやらせるか）
-  - microCMS は imgix、`public/` の静的画像は Vercel。枠を焼いていたのは前者だけ（7% : 93%）
+  - **変換は2つとも Vercel の外。** microCMS は imgix、`public/` は `pnpm images:optimize` で
+    事前に AVIF 化。**Vercel の変換枠の消費は 0**
   - 変換枠が枯れると「一部の画像だけ」が 402 で壊れる。同じ画像でも幅で生死が分かれる（#237）
+  - **枠は総量で枯れる。消費が 7% の利用者も、枯れた枠の上では 402 になる**（#241。
+    「静的画像は枠の 7% しか使わないので残してよい」という #240 の判断は誤りだった）
+  - **短時間しか DOM に無い画像は巡回で数えられない。** オープナーのロゴは2度、調査から漏れた
   - **`curl` で検証するときは `Accept` を付ける。** 付けないとキャッシュ済みでも 402 に見える
-  - `auto=format` が効かない理由と、`fm=webp` / `fit=max` を決めた実測値
+  - `auto=format` が効かない理由と、`fm=avif` / `fit=max` を決めた実測値
+  - 事前最適化の運用（`scripts/static-image-manifest.mjs` が一次定義、`pnpm check:images` が守る）
   - `AppImage` というラッパーに至るまでに実測で否定した2案
   - 再発防止装置3つの射程の違い（ESLint / ユニットテスト / ビルド生成物）
 
