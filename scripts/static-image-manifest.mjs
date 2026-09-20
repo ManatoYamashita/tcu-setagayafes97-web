@@ -173,6 +173,17 @@ const APP_IMAGES = [
     note: "SpecialGuestSection の出演者名ロゴ（h2 のアクセシブル名を alt が担う）",
   },
   {
+    path: "public/images/illustrations/404.avif",
+    source: "assets/source/images/illustrations/404.webp",
+    // 原画 1200x1200。404ページは最大448pxで表示するため、DPR2に合わせて896pxへ縮小する。
+    box: { width: 896, height: 896 },
+    fit: "inside",
+    kind: "art",
+    quality: 50,
+    maxBytes: 6000,
+    note: "グローバル404ページの歯車イラスト（ファーストビューのLCP候補）",
+  },
+  {
     path: "public/materials/geer1.avif",
     source: "assets/source/materials/geer1.webp",
     // 原画 500x500。最大 96px（`lg:w-24`）x 2 = 192。
