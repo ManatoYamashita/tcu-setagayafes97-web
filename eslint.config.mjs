@@ -6,8 +6,9 @@ import { RESTRICTED_COLOR_TOKENS } from "./scripts/restricted-color-tokens.mjs";
 /**
  * `<Suspense>` の fallback として描かれるツリー
  *
- * `src/app/events/page.tsx` の fallback は `EventsView` を起点に、この5ファイルだけを描く。
+ * `src/app/events/(list)/page.tsx` の fallback は `EventsView` を起点に、この6ファイルだけを描く。
  * クエリを読んでよいのは境界の内側にいる `EventsContent` だけなので、ここには含めない。
+ * 意味検索を叩く `useSemanticSearch.ts` も `EventsContent` からだけ呼ばれるため含めない。
  */
 const EVENTS_FALLBACK_TREE = [
   "src/components/events/EventsView.tsx",
@@ -15,7 +16,63 @@ const EVENTS_FALLBACK_TREE = [
   "src/components/events/EventInfiniteList.tsx",
   "src/components/events/EventGrid.tsx",
   "src/components/events/EventCard.tsx",
+  "src/components/events/SemanticSearchNotice.tsx",
 ];
+
+/**
+ * `next/image` と画像の静的 import の禁止（#237 / #241）
+ *
+ * **定義をここへ出しているのは、flat config が同じ規則名を後勝ちで「丸ごと」置き換えるため。**
+ * `no-restricted-imports` を別のブロックでもう一度書くと、先に書いた側の設定は
+ * エラーも警告も出さずに消える。実際 2026-09-20 まで、EVENTS_FALLBACK_TREE の
+ * `useSearchParams` 禁止（#156）はこのブロックに上書きされて**一度も効いていなかった**
+ * （`eslint --print-config` で確認。退行を注入しても exit 0 だった）。
+ *
+ * 規則名がぶつかるブロックを足すときは、必ずこの定義を展開して合成すること。
+ */
+const RESTRICTED_IMAGE_IMPORTS = {
+  paths: [
+    {
+      name: "next/image",
+      message:
+        "next/image を直接使うと Vercel の画像最適化を通り、変換枠を消費します。枠が枯れると 402 でその画像だけが壊れます（#237）。@/components/ui/AppImage の AppImage を使ってください。",
+    },
+  ],
+  /*
+   * 画像の静的 import（`import logo from "./logo.avif"`）を禁じる。
+   *
+   * 静的 import の画像は `/_next/static/media/<hash>` へ出るため、
+   * **`public/` を歩く `pnpm check:images` の射程から完全に外れる。**
+   * 寸法もバイト数も予算も誰も見ておらず、原寸のまま配信される
+   * （`AppImage` は文字列でない `src` も `unoptimized` 側へ落とす）。
+   *
+   * 2026-09-20 時点で該当は 0 件。増える前に塞いでおく。
+   */
+  patterns: [
+    {
+      group: ["*.avif", "*.webp", "*.png", "*.jpg", "*.jpeg", "*.gif"],
+      message:
+        "画像を静的 import すると pnpm check:images の射程（public/ 配下）から外れ、寸法もバイト予算も検査されないまま配信されます。public/ へ置き、scripts/static-image-manifest.mjs へ登録して、パス文字列で参照してください（#241）。",
+    },
+  ],
+};
+
+/**
+ * 禁止色トークンのセレクタ（#179 B / #230）
+ *
+ * 一次定義は scripts/restricted-color-tokens.mjs。同じ定義を
+ * scripts/assert-no-restricted-colors.mjs も読むので、**@theme へ段を足したときに
+ * 触るのはあちら1箇所だけでよい。** ここへ正規表現を書き戻すと、片方だけ直して
+ * 片方がすり抜ける形へ戻る。
+ *
+ * 上の RESTRICTED_IMAGE_IMPORTS と同じ理由でここへ出す。`no-restricted-syntax` は
+ * EventInfiniteList.tsx 用のブロック（#239）でも使うため、あちらでもこれを展開する。
+ * **展開を忘れると、そのファイルだけ色の検査が黙って消える**（2026-09-20 まで実際に消えていた）。
+ */
+const RESTRICTED_COLOR_SELECTORS = RESTRICTED_COLOR_TOKENS.flatMap(({ pattern, message }) => [
+  { selector: `Literal[value=/${pattern}/]`, message },
+  { selector: `TemplateElement[value.raw=/${pattern}/]`, message },
+]);
 
 /** @type {import('eslint').Linter.Config[]} */
 const config = [
@@ -30,40 +87,6 @@ const config = [
     // e2e に React は無いので、このディレクトリでだけ無効にする。
     files: ["e2e/**"],
     rules: { "react-hooks/rules-of-hooks": "off" },
-  },
-  {
-    // #156 の再発防止装置。
-    //
-    // `useSearchParams()` は静的レンダリング時に、最も近い <Suspense> 境界より内側を
-    // クライアント描画へ落とす。`src/app/events/page.tsx` はその fallback に
-    // 「クエリ無しで着地したときの完成形」（EventsView）を置くことで、企画カードの
-    // リンクを静的HTMLへ載せている。**fallback の中で useSearchParams() を呼ぶと、
-    // それ以上落ちる先が無いため fallback 自身が bailout し、ページ本体が
-    // 静的HTMLから丸ごと消える。**
-    //
-    // この事故はエラーにならない。lint / format / 型 / ユニットテスト / build /
-    // Layout E2E のすべてを通過したまま、/events のクロール経路だけが失われる。
-    // #154 は同じ不変条件を JSDoc とドキュメントで守ろうとしたが、
-    // それらは人間が読まなければ効かない（docs/dev/testing.md「なぜ入れたか」）。
-    //
-    // useRouter() は bailout を起こさないため制限しない。
-    // 背景と実測は docs/frontend/static-html-and-search-params.md を参照。
-    files: EVENTS_FALLBACK_TREE,
-    rules: {
-      "no-restricted-imports": [
-        "error",
-        {
-          paths: [
-            {
-              name: "next/navigation",
-              importNames: ["useSearchParams"],
-              message:
-                "このツリーは /events の <Suspense> fallback として描かれます。ここでクエリを読むと fallback 自身が bailout し、ページ本体が静的HTMLから消えます（#156）。クエリは EventsContent で読み、props で渡してください。",
-            },
-          ],
-        },
-      ],
-    },
   },
   {
     // #179 B の再発防止装置。
@@ -86,17 +109,9 @@ const config = [
     // 足したのに禁止されたままだと、正しい指定が lint で落ちる。
     files: ["src/**/*.{ts,tsx}"],
     rules: {
-      // 禁止リストの一次定義は scripts/restricted-color-tokens.mjs（#230）。
-      // 同じ定義を scripts/assert-no-restricted-colors.mjs も読むので、
-      // **@theme へ段を足したときに触るのはあちら1箇所だけでよい。**
-      // ここへ正規表現を書き戻すと、片方だけ直して片方がすり抜ける形へ戻る。
-      "no-restricted-syntax": [
-        "error",
-        ...RESTRICTED_COLOR_TOKENS.flatMap(({ pattern, message }) => [
-          { selector: `Literal[value=/${pattern}/]`, message },
-          { selector: `TemplateElement[value.raw=/${pattern}/]`, message },
-        ]),
-      ],
+      // セレクタの組み立ては RESTRICTED_COLOR_SELECTORS（このファイル冒頭）。
+      // 一次定義は scripts/restricted-color-tokens.mjs（#230）。
+      "no-restricted-syntax": ["error", ...RESTRICTED_COLOR_SELECTORS],
     },
   },
   {
@@ -123,33 +138,49 @@ const config = [
     files: ["src/**/*.tsx", "src/**/*.ts"],
     ignores: ["src/components/ui/AppImage.tsx", "src/lib/image-loader.ts"],
     rules: {
+      // 定義はこのファイル冒頭の RESTRICTED_IMAGE_IMPORTS。
+      // **ここへ直接書き戻さないこと。** 下の EVENTS_FALLBACK_TREE 用ブロックが
+      // 同じ規則名を使うため、定義が1箇所に無いと片方が黙って消える。
+      "no-restricted-imports": ["error", RESTRICTED_IMAGE_IMPORTS],
+    },
+  },
+  {
+    // #156 の再発防止装置。
+    //
+    // `useSearchParams()` は静的レンダリング時に、最も近い <Suspense> 境界より内側を
+    // クライアント描画へ落とす。`src/app/events/page.tsx` はその fallback に
+    // 「クエリ無しで着地したときの完成形」（EventsView）を置くことで、企画カードの
+    // リンクを静的HTMLへ載せている。**fallback の中で useSearchParams() を呼ぶと、
+    // それ以上落ちる先が無いため fallback 自身が bailout し、ページ本体が
+    // 静的HTMLから丸ごと消える。**
+    //
+    // この事故はエラーにならない。lint / format / 型 / ユニットテスト / build /
+    // Layout E2E のすべてを通過したまま、/events のクロール経路だけが失われる。
+    // #154 は同じ不変条件を JSDoc とドキュメントで守ろうとしたが、
+    // それらは人間が読まなければ効かない（docs/dev/testing.md「なぜ入れたか」）。
+    //
+    // useRouter() は bailout を起こさないため制限しない。
+    // 背景と実測は docs/frontend/static-html-and-search-params.md を参照。
+    //
+    // **このブロックは、上の画像ブロックより後に置くこと。** flat config は同じ規則名を
+    // 後勝ちで丸ごと置き換えるため、前に置くと `no-restricted-imports` の設定ごと
+    // 消える。2026-09-20 まで実際に消えており、この規則は一度も効いていなかった。
+    // 画像側の制限もここで展開して合成する。
+    files: EVENTS_FALLBACK_TREE,
+    rules: {
       "no-restricted-imports": [
         "error",
         {
           paths: [
+            ...RESTRICTED_IMAGE_IMPORTS.paths,
             {
-              name: "next/image",
+              name: "next/navigation",
+              importNames: ["useSearchParams"],
               message:
-                "next/image を直接使うと Vercel の画像最適化を通り、変換枠を消費します。枠が枯れると 402 でその画像だけが壊れます（#237）。@/components/ui/AppImage の AppImage を使ってください。",
+                "このツリーは /events の <Suspense> fallback として描かれます。ここでクエリを読むと fallback 自身が bailout し、ページ本体が静的HTMLから消えます（#156）。クエリは EventsContent で読み、props で渡してください。",
             },
           ],
-          /*
-           * 画像の静的 import（`import logo from "./logo.avif"`）を禁じる。
-           *
-           * 静的 import の画像は `/_next/static/media/<hash>` へ出るため、
-           * **`public/` を歩く `pnpm check:images` の射程から完全に外れる。**
-           * 寸法もバイト数も予算も誰も見ておらず、原寸のまま配信される
-           * （`AppImage` は文字列でない `src` も `unoptimized` 側へ落とす）。
-           *
-           * 2026-09-20 時点で該当は 0 件。増える前に塞いでおく。
-           */
-          patterns: [
-            {
-              group: ["*.avif", "*.webp", "*.png", "*.jpg", "*.jpeg", "*.gif"],
-              message:
-                "画像を静的 import すると pnpm check:images の射程（public/ 配下）から外れ、寸法もバイト予算も検査されないまま配信されます。public/ へ置き、scripts/static-image-manifest.mjs へ登録して、パス文字列で参照してください（#241）。",
-            },
-          ],
+          patterns: RESTRICTED_IMAGE_IMPORTS.patterns,
         },
       ],
     },
@@ -185,8 +216,11 @@ const config = [
     files: ["src/components/events/EventInfiniteList.tsx"],
     rules: {
       "react-hooks/exhaustive-deps": "error",
+      // **色のセレクタを必ず展開すること。** flat config は後勝ちで丸ごと置き換えるため、
+      // 展開を落とすとこのファイルだけ禁止色が素通りする（2026-09-20 まで素通りしていた）。
       "no-restricted-syntax": [
         "error",
+        ...RESTRICTED_COLOR_SELECTORS,
         {
           selector: "CallExpression[callee.name='useEffect'] Identifier[name='hasMore']",
           message:
