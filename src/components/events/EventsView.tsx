@@ -3,6 +3,7 @@ import { buildEventsQuery, type FilterParams } from "@/lib/filters";
 import type { BuildingFilterOption } from "@/data/filter-options";
 import { EventFilters } from "./EventFilters";
 import { EventInfiniteList } from "./EventInfiniteList";
+import { SemanticSearchNotice, type SemanticSearchNoticeProps } from "./SemanticSearchNotice";
 
 interface EventsViewProps {
   /**
@@ -25,6 +26,13 @@ interface EventsViewProps {
   initialVisibleCount: number;
   /** 1回の追加で増やす件数 */
   step: number;
+  /**
+   * 意味検索（第4段）の状態
+   *
+   * `undefined` は「リテラル検索で当たったので第4段は関与していない」という意味です。
+   * `<Suspense>` の fallback としてこのツリーが描かれるときも `undefined` になります。
+   */
+  semantic?: SemanticSearchNoticeProps;
 }
 
 /**
@@ -45,6 +53,7 @@ export function EventsView({
   buildingOptions,
   initialVisibleCount,
   step,
+  semantic,
 }: EventsViewProps) {
   /**
    * 絞り込みが変わったら表示件数を先頭へ戻すための key
@@ -56,8 +65,13 @@ export function EventsView({
    * `?page=N` を書き戻すため、含めると1回追加するごとに一覧全体が作り直され、
    * 表示件数が12件へ巻き戻ります。`buildEventsQuery(filters)` は第2引数を省くと
    * `page` を付けないので、絞り込みだけの指紋になります。
+   *
+   * **意味検索の到着は含めます。** `EventInfiniteList` は表示件数を `useState` の
+   * 初期化子で1度だけ決め、props の変化では上書きしません。第4段が走るのは
+   * リテラル検索が0件のときだけなので、初回の表示件数は必ず0になります。
+   * ここで作り直さないと、結果が返っても**一覧が0件のまま動きません。**
    */
-  const listKey = buildEventsQuery(filters) || "all";
+  const listKey = `${buildEventsQuery(filters) || "all"}${semantic?.status === "done" ? "|semantic" : ""}`;
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -95,6 +109,9 @@ export function EventsView({
           ここはサイドバー（aside）と並ぶ一区画であり、ページの main ではない
         */}
         <div>
+          {/* 意味検索（第4段）の状態。リテラル検索で当たったときは描かれない */}
+          {semantic && <SemanticSearchNotice {...semantic} />}
+
           {/* 検索結果件数 */}
           <div className="mb-6 flex items-center justify-between">
             <p className="text-sm text-gray-700" role="status" aria-live="polite">

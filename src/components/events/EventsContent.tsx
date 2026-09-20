@@ -10,7 +10,9 @@ import {
   resolveVisibleCount,
   EVENTS_PER_PAGE,
 } from "@/lib/filters";
+import { selectSemanticEvents, shouldAskSemanticSearch } from "@/lib/semantic-search";
 import { EventsView } from "./EventsView";
+import { useSemanticSearch } from "./useSemanticSearch";
 
 interface EventsContentProps {
   initialEvents: Event[];
@@ -41,8 +43,39 @@ export function EventsContent({ initialEvents }: EventsContentProps) {
   // 効いていないように見える。
   const buildingOptions = listBuildingOptions(initialEvents, filters.building);
 
-  // フィルタリング
-  const filteredEvents = filterEvents(initialEvents, filters);
+  // フィルタリング（段1〜3のリテラル検索まで）
+  const literalEvents = filterEvents(initialEvents, filters);
+
+  /*
+   * 第4段（意味検索）のゲート
+   *
+   * **段1〜3のどれかが当たったら呼ばない。** `/api/search` は認証の無い従量課金口で、
+   * 1リクエストがそのまま TypeSafe への課金になる。`たこ焼き` や `9号館 ダンス` は
+   * リテラル照合が同じ答えを無料・0msで出すため、そこへ課金する理由がない。
+   *
+   * 判定は**絞り込み前の全企画**に対して行う。日程や建物で0件になっただけのケースまで
+   * 落とすと、どのみち下の積集合で消える結果に課金することになる。
+   */
+  const keyword = filters.keyword ?? "";
+  const semanticEnabled = shouldAskSemanticSearch(initialEvents, keyword);
+  const semantic = useSemanticSearch(keyword, semanticEnabled);
+
+  /*
+   * ランキングと現在の絞り込みの積集合
+   *
+   * `/api/search` は日程・種別・建物を知らず、常に全企画のランキングを返す。そのぶん
+   * URLの種類が減ってCDNに載る。絞り込みはここで掛け直す。`selectSemanticEvents` は
+   * 手元に無いIDを黙って捨てるため、削除済みの企画が返っても壊れない。
+   */
+  const semanticEvents =
+    semanticEnabled && semantic.result?.hasMatch
+      ? selectSemanticEvents(
+          semantic.result.ranking,
+          filterEvents(initialEvents, { ...filters, keyword: "" })
+        )
+      : [];
+
+  const events = semanticEvents.length > 0 ? semanticEvents : literalEvents;
 
   /*
    * ページ分割はしない。絞り込み後の全件をそのまま降ろし、表示範囲は
@@ -54,11 +87,20 @@ export function EventsContent({ initialEvents }: EventsContentProps) {
    */
   return (
     <EventsView
-      events={filteredEvents}
+      events={events}
       filters={filters}
       buildingOptions={buildingOptions}
-      initialVisibleCount={resolveVisibleCount(currentPage, EVENTS_PER_PAGE, filteredEvents.length)}
+      initialVisibleCount={resolveVisibleCount(currentPage, EVENTS_PER_PAGE, events.length)}
       step={EVENTS_PER_PAGE}
+      semantic={
+        semanticEnabled
+          ? {
+              status: semantic.status,
+              query: keyword,
+              noMatch: semantic.status === "done" && semanticEvents.length === 0,
+            }
+          : undefined
+      }
     />
   );
 }
