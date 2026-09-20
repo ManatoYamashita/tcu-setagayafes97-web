@@ -44,7 +44,7 @@ docs/
 │   ├── timetable-gantt.md         # タイムテーブル盤面（ガントチャート）の設計
 │   ├── events-search.md           # /events の検索と絞り込み（正規化・建物導出）
 │   ├── events-infinite-scroll.md  # /events の無限スクロールと絞り込みの追従
-│   ├── layout-e2e.md              # 実ブラウザの再発防止装置（盤面 / ランドマーク1周）
+│   ├── layout-e2e.md              # 実ブラウザの再発防止装置（盤面 / ランドマーク / 404モバイル）
 │   ├── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
 │   ├── image-delivery.md          # 画像変換の委譲先（microCMS=imgix / 静的=事前AVIF）
 │   ├── performance.md             # Lighthouse基準値とフロントエンド性能ルール
@@ -401,8 +401,8 @@ docs/
     （実測: 一覧表示中に画面外 15/16 回）。**lint / 型 / テスト / build のすべてを通過する**
   - **`--header-height`（88px）をそのまま `top` に使わない。** スクロール中のヘッダー実高は 77px で、11px の隙間からカードが透ける
 
-- **[layout-e2e.md](./frontend/layout-e2e.md)** - 実ブラウザの再発防止装置（Playwright / #157 / #177 A）
-  - 盤面の実測（#148）とランドマークの1周検査（#177 A）の2つが載る
+- **[layout-e2e.md](./frontend/layout-e2e.md)** - 実ブラウザの再発防止装置（Playwright / #157 / #177 A / #249）
+  - 盤面の実測（#148）、ランドマークの1周検査（#177 A）、404モバイル配置（#249）が載る
   - 生HTMLでは数えられない理由（`/events` は生HTML 2個・ライブDOM 1個）
   - **jsdom も Vitest Browser Mode も #148 を検出できない。** 前者はレイアウトエンジンが無く、後者は祖先の連鎖が本物と別物になる
   - **`pnpm build && pnpm start` は原理的に使えない。** フィクスチャ分岐が `NODE_ENV !== "production"` に閉じており、本番ビルドではチャンクごと落ちる

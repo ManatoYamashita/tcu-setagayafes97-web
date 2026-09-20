@@ -1,12 +1,13 @@
 # レイアウトの実測アサーション（Playwright）
 
 実ブラウザでしか捕まえられない事故に対する、**再発防止装置の置き場**です。
-**「E2E を増やしていく基盤」ではありません。** 現在2つの装置が載っています。
+**「E2E を増やしていく基盤」ではありません。** 現在3つの装置が載っています。
 
 | 装置             | 対象              | 防いでいる事故                                          |
 | ---------------- | ----------------- | ------------------------------------------------------- |
 | `e2e/timetable/` | `/timetable`      | #148 — 盤面が `height: 100%` の解決失敗で 0px に潰れる  |
 | `e2e/landmarks/` | 全ルート＋404画面 | #177 A — `<main id="content">` の付け忘れ・二重・空振り |
+| `e2e/not-found/` | グローバル404画面 | #249 — モバイルの読み順とイラスト寸法の退行             |
 
 関連: [timetable-gantt.md](./timetable-gantt.md)（盤面の設計） /
 [landmarks-and-skip-link.md](./landmarks-and-skip-link.md)（ランドマークの契約） /
@@ -144,6 +145,8 @@ const USE_FIXTURE =
 ```
 e2e/
 ├── fixtures.ts                      # 測定系の生存確認・共通フィクスチャ
+├── not-found/
+│   └── responsive-parity.spec.ts    # 読み順・見出し間隔・画像幅             [mobile]
 └── timetable/
     ├── board-geometry.spec.ts       # 盤面高さ・座標の写像・レーン分割・レンジ  [desktop]
     ├── card-density.spec.ts         # カード実寸 24px・内容の溢れ              [desktop]
@@ -156,7 +159,8 @@ e2e/
 スクローラが約 1070px となり、**横スクロールの検証が実際に成立する**幅として選んでいます。
 
 `mobile` の 320px は対応下限かつ `lg`(1024px) 未満で、盤面ではなく
-`TimetableStackedList` が出ます。カード本文幅250px以上もこの条件で検証します。
+`TimetableStackedList` が出ます。カード本文幅250px以上と404画面の読み順・画像幅も
+この条件で検証します。
 `desktop` project は `testIgnore` で `responsive-parity.spec.ts` を除外しています
 （除外しないと desktop 幅でモバイル用の検証が走って落ちます）。
 
@@ -216,6 +220,7 @@ CI では `webServer.stdout: "pipe"` により **dev サーバのコンパイル
   `/events` は生HTML 2個・ライブDOM 1個（`<Suspense>` の fallback と解決済みが両方載る）、
   `/events/<存在しないID>` は生HTML 0個・ライブDOM 1個（`notFound()` がシェル送出後に
   差し込まれる）。`curl | grep -c` も `assert-*.mjs` も使えない
+- #249（404モバイル）— 要素の上下関係と画像の実表示幅はレイアウトエンジンが解決する
 
 ### ランドマークの1周検査（`e2e/landmarks/route-sweep.spec.ts`）
 

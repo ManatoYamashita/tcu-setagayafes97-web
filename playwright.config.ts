@@ -12,6 +12,8 @@ import { defineConfig, devices } from "@playwright/test";
  * - e2e/landmarks/ — #177 A。<main id="content"> の付け忘れ・二重・空振り。
  *   **生HTMLを数えると答えが違う**ため（/events は生HTML 2個・ライブDOM 1個、
  *   動的404は生HTML 0個・ライブDOM 1個）、curl や生成物の検査では代替できない
+ * - e2e/not-found/ — #249。モバイルの読み順・見出し間隔・画像幅。
+ *   実際の上下関係と表示幅はブラウザのレイアウト結果を測らないと保証できない
  *
  * 設計判断は docs/frontend/layout-e2e.md を参照。
  */
@@ -68,11 +70,11 @@ export default defineConfig({
       // 実際に検証できる幅だからです。
       name: "desktop",
       use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 900 } },
-      // 縦スタックの検証はモバイル幅でしか成立しない
+      // responsive-parity はモバイル幅でしか成立しない
       testIgnore: /responsive-parity\.spec\.ts/,
     },
     {
-      // 対応下限の320px。lg 未満なので盤面ではなく縦スタックが出ます。
+      // 対応下限の320px。lg 未満なので盤面ではなく縦スタックが出て、404もモバイル配置になります。
       name: "mobile",
       use: { ...devices["Desktop Chrome"], viewport: { width: 320, height: 640 } },
       testMatch: /responsive-parity\.spec\.ts/,
