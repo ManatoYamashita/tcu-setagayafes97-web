@@ -2,39 +2,52 @@
 
 import type { Ref } from "react";
 import Image, { type ImageProps } from "next/image";
-import { appImageLoader, isMicrocmsImage } from "@/lib/image-loader";
+import { appImageLoader, resolveDelivery } from "@/lib/image-loader";
 
 /**
  * このプロジェクトで画像を描くための `next/image`。
  *
- * **`next/image` を直接使わず、必ずこれを使うこと。** microCMS の画像を直接描くと
- * Vercel の Image Optimization を通り、Free Plan の変換枠を消費する。枠が枯れると
- * `402` が返り、**その画像だけが壊れる**（#237）。素の `next/image` の混入は
- * `pnpm build` の末尾で走る `scripts/assert-remote-images-bypass-optimizer.mjs` が
- * 生成物を読んで落とす。
+ * **`next/image` を直接使わず、必ずこれを使うこと。** `eslint.config.mjs` の
+ * `no-restricted-imports` が error で止める（例外はこのファイルと
+ * `src/lib/image-loader.ts` のみ）。
  *
- * 画像の出どころで扱いを変える。
+ * 画像の出どころで扱いを変える。判定は実行時に `src` を見て行うので、
+ * 呼び出し側は Server / Client も、microCMS / 静的も区別しなくてよい。
+ * 同じ箇所に microCMS の画像とローカルのフォールバックの両方が入りうるため
+ * （`FeaturedCarousel` と `NewsCard` がその例）、これは必要な性質である。
  *
  * | 出どころ                 | 扱い                                       |
  * | ------------------------ | ------------------------------------------ |
  * | microCMS（imgix 配信）   | `appImageLoader` が imgix で変換させる     |
- * | `public/` 配下の静的画像 | Vercel の Image Optimization（既定の動作） |
+ * | `public/` 配下の静的画像 | **`unoptimized` で事前最適化済みの実体をそのまま配る** |
  *
- * 判定は実行時に `src` を見て行う。同じ箇所に microCMS の画像とローカルのフォールバックの
- * 両方が入りうるため（`FeaturedCarousel` と `NewsCard` がその例）、呼び出し側が
- * 区別する必要は無い。
+ * **どちらも Vercel の Image Optimization を通らない。変換枠の消費は 0 である。**
  *
- * ## なぜ静的画像は Vercel に残すのか
+ * ## なぜ静的画像も Vercel から外すのか
  *
- * **枠を焼いていたのは microCMS 側だけだからである。** 2026-09-20 に本番HTMLの
- * srcset を全数えしたところ、変換数の上限は静的画像11ファイルで 178通り×2形式＝356、
- * 対して microCMS は企画サムネイル93枚だけで約3,348（#237）。静的画像は枠 5,000 の
- * 7% しか使っていない。
+ * **枠は総量で枯れるからである。**
  *
- * 静的画像まで `unoptimized` にすると、docs が LCP 要素と名指しする
- * `favicon-outline.webp` が 16,272B → 76,520B（4.7倍）になり、`quality` 指定も死ぬ。
- * トップページ1画面の画像転送量は 139,856B → 653,780B（4.67倍）だった（実測）。
- * **払う必要のない代償なので払わない。**
+ * 2026-09-19、Vercel Hobby の変換枠（月5,000）が枯れて `402` が返り始めた。
+ * 焼いていた主体は microCMS 側（企画サムネイル93枚で約3,348変換）で、
+ * 静的画像は上限でも月356（枠の7%）しか使っていなかった。そのため #240 では
+ * 「消費が少ないのだから静的画像は Vercel に残してよい」と判断した。**これが誤りだった。**
+ *
+ * 消費が 7% の利用者も、**すでに枯れた枠の上では 402 になる。** 変換数の少なさは
+ * 何も保護しない。2026-09-20 の実測では、トップページの静的画像 srcset 128通りのうち
+ * **81通りが 402** で、オープナーのロゴは DPR2 のブラウザが選ぶ w=640 が未変換のため
+ * **Retina では必ず表示されなかった**（#241）。枠は直近30日のローリング窓なので、
+ * 一度枯れると約1か月戻らない。
+ *
+ * ## 「外すと LCP 要素が 4.7 倍になる」はどうなったか
+ *
+ * #240 が差し戻しの根拠にした 4.67 倍（トップ1画面 139,856 B → 653,780 B）は、
+ * **原画像を事前最適化していなかったことの帰結**であって、Vercel から外すことの
+ * 必然的な代償ではなかった。`assets/source/` の原画像を表示寸法の AVIF へ焼くと
+ * **724,228 B → 207,846 B（71% 減）** になり、ファーストビュー8枚は 176,719 B
+ * （Vercel 経由の実測 139,856 B に対し +26%）に収まる。
+ *
+ * 寸法・品質・バイト予算の一次定義は `scripts/static-image-manifest.mjs`、
+ * 焼くのは `pnpm images:optimize`、守るのは `pnpm check:images` である。
  *
  * ## なぜラッパーが要るのか
  *
@@ -43,29 +56,39 @@ import { appImageLoader, isMicrocmsImage } from "@/lib/image-loader";
  * **ビルドが落ちる**（2026-09-19、`/about/sponsors` の prerender で実測）。開発サーバーでは
  * 顕在化せず、`next build` で初めて出る。
  *
- * このコンポーネントが `"use client"` を持つことで、呼び出し側は Server / Client を
- * 問わなくなる。
- *
  * 設計と実測値は docs/frontend/image-delivery.md を参照。
  */
 /**
  * `next/image` の `ImageProps` は `ref` を含まないが、GSAP の演出で要る箇所がある
  * （`AboutSection` と `NewsSectionInteractive` の計3箇所）。React 19 では関数
  * コンポーネントが `ref` を通常の prop として受け取れるので、型だけ足して素通しする。
+ *
+ * `loader` と `unoptimized` は **`Omit` で塞いでいる。** `{...props}` が後ろにある以上、
+ * 型で消さないと呼び出し側が個別に Vercel の最適化へ戻せてしまい、
+ * 枠の消費がまた静かに復活する。配信経路の決定権はこのコンポーネントだけが持つ。
  */
-type AppImageProps = ImageProps & { ref?: Ref<HTMLImageElement> };
+type AppImageProps = Omit<ImageProps, "loader" | "unoptimized"> & {
+  ref?: Ref<HTMLImageElement>;
+};
 
 // `alt` を明示的に受けて渡している。スプレッドに含めたままだと jsx-a11y/alt-text が
 // 「alt が無い」と誤って警告する（静的解析ではスプレッドの中身を追えないため）。
 export function AppImage({ src, alt, ref, ...props }: AppImageProps) {
+  const useImgix = resolveDelivery(src) === "imgix";
+
   /*
-   * microCMS の画像だけ imgix へ回す。それ以外（`public/` の静的画像と、
-   * 文字列でない `src` = 静的インポート）は Vercel の最適化に残す。
-   *
-   * `loader` を渡さなければ next/image は既定のローダーへ落ちる
-   * （`get-img-props.js` の `rest.loader || defaultLoader`）。`unoptimized` は使わない。
+   * `quality` は `unoptimized` の経路で完全に無視される。渡されていても何も起きないので
+   * 型では落とせず、かつ `src` が実行時に決まる箇所（microCMS とローカルのフォールバックが
+   * 同居する `FeaturedCarousel` / `NewsCard`）があるため ESLint でも判定できない。
+   * 実行時に気づかせるのがここしかない。本番ビルドでは丸ごと落ちる。
    */
-  const useImgix = typeof src === "string" && isMicrocmsImage(src);
+  if (process.env.NODE_ENV !== "production" && !useImgix && props.quality !== undefined) {
+    console.warn(
+      `[AppImage] ${String(src)}: quality は public/ の静的画像には効きません。` +
+        "品質は scripts/static-image-manifest.mjs の quality で決め、" +
+        "pnpm images:optimize で実体へ焼き込みます。"
+    );
+  }
 
   return (
     <Image
@@ -73,6 +96,7 @@ export function AppImage({ src, alt, ref, ...props }: AppImageProps) {
       src={src}
       alt={alt}
       loader={useImgix ? appImageLoader : undefined}
+      unoptimized={!useImgix}
       {...props}
     />
   );

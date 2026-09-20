@@ -21,7 +21,6 @@ const pamphlets = [
     title: "第97回 世田谷祭 公式パンフレット",
     description:
       "企画一覧、タイムテーブル、キャンパスマップなど、世田谷祭を楽しむための情報が満載です。",
-    coverImage: "/images/pamphlet-cover-placeholder.jpg",
     fileUrl: "/pamphlets/setagayafes97_pamphlet_placeholder.pdf",
     fileSize: "5.2MB",
     pages: 24,

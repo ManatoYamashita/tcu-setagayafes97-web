@@ -115,7 +115,6 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
                   width={nameLogo.width}
                   height={nameLogo.height}
                   sizes="(min-width: 1024px) 360px, (min-width: 640px) 300px, 240px"
-                  quality={75}
                   className="h-auto w-full max-w-[240px] sm:max-w-[300px] lg:max-w-[360px]"
                 />
               </span>
@@ -176,7 +175,6 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
               width={image.width}
               height={image.height}
               sizes={imageSizes}
-              quality={75}
               className="h-auto w-full"
             />
           </div>

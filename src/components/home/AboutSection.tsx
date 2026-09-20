@@ -192,11 +192,11 @@ export function AboutSection() {
               {/* 歯車装飾: 右下に1個 */}
               <AppImage
                 ref={gearRef}
-                src="/materials/geer1.webp"
+                src="/materials/geer1.avif"
                 alt=""
                 aria-hidden="true"
-                width={500}
-                height={500}
+                width={192}
+                height={192}
                 sizes="(max-width: 639px) 64px, (max-width: 1023px) 80px, 96px"
                 className="pointer-events-none absolute bottom-[2%] right-[2%] h-auto w-16 select-none opacity-0 will-change-transform sm:w-20 lg:w-24"
                 draggable={false}

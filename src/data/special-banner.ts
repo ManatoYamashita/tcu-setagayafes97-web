@@ -73,15 +73,15 @@ export const specialBanner: SpecialBannerData = {
   label: "著名人スペシャル企画決定！",
   name: "MON7A",
   nameLogo: {
-    src: "/images/special/mon7a-logo.webp",
-    width: 1524,
-    height: 405,
+    src: "/images/special/mon7a-logo.avif",
+    width: 719,
+    height: 191,
   },
   image: {
-    src: "/images/special/mon7a.webp",
+    src: "/images/special/mon7a.avif",
     alt: "MON7A のアーティスト写真",
-    width: 1280,
-    height: 1280,
+    width: 920,
+    height: 920,
   },
   // 販売開始が早い順。一般券（9/3）→ 学内生券（9/28）
   details: [

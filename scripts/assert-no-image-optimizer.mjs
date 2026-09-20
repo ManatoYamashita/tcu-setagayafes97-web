@@ -1,18 +1,17 @@
 #!/usr/bin/env node
 /**
- * 画像が Vercel の Image Optimization を通っていないことを検査する（#237 の再発防止装置）
+ * どの画像も Vercel の Image Optimization を通っていないことを検査する（#237 / #241）
  *
  * `pnpm build` の末尾で走る。
  *
  * ## なぜ必要か
  *
  * 2026-09-19、本番の `/_next/image` が `402 Payment Required` を返し、企画サムネイルの
- * 一部が壊れた。Vercel Free Plan の変換枠（Image Transformations）の枯渇である。
- * `src/lib/image-loader.ts` の `appImageLoader` を `loader` prop で渡すことで根治したが、
+ * 一部が壊れた。Vercel Free Plan の変換枠（Hobby は月5,000変換）の枯渇である。
  * **この仕組みは静かに外れる。**
  *
- * - 新しく `<Image>` を書いた人が `loader` prop を渡し忘れる
- * - 既存の `<Image>` から `loader` prop が消える
+ * - 新しく画像を描いた人が `AppImage` ではなく `next/image` を直接使う
+ * - `AppImage` から `loader` / `unoptimized` の指定が消える
  * - 新しいリモート画像ホストを増やし、ローダーの分岐に入れ忘れる
  *
  * どれもビルドは通り、画面も（枠が残っているうちは）正常に見える。**枠を使い切った
@@ -20,21 +19,27 @@
  * `src/lib/image-loader.test.ts` はローダー関数の契約しか見ないため、
  * **関数が呼ばれないこと自体を1つも検出できない。** 生成物を読む以外に方法が無い。
  *
- * `loader` prop はコンポーネントごとに渡す必要がある。`next.config.ts` の `loaderFile` で
- * 全体へ適用すれば渡し忘れは起きないが、**その設定は `/_next/image` を 404 にするため
- * `public/` の静的画像が最適化を失う**（2026-09-19 実測）。渡し忘れを機械で拾う
- * この検査は、その代償を払わないための装置である。
+ * ## 2026-09-20 に射程を広げた
+ *
+ * 以前はリモート画像だけを見ていた。「静的画像は枠の 7% しか使わないので Vercel に
+ * 残してよい」という #240 の判断に合わせていたためである。**その判断が誤りだった。**
+ * 枠は総量で枯れるので、消費が 7% の利用者もすでに枯れた枠の上では 402 になる。
+ * 実際、2026-09-20 のトップページは静的画像 srcset 128通り中81通りが 402 で、
+ * オープナーのロゴは Retina で必ず消えていた（#241）。
+ *
+ * **いまはローカルの静的画像も含め、`/_next/image` が1本でも出たら落とす。**
  *
  * ## 何を見ているか
  *
- * 事前描画されたHTMLに、**リモート画像**を `/_next/image?url=` へ渡すURLが
- * **1本も**現れないこと。
+ * 事前描画されたHTMLについて、次の2つ。
  *
- * **ローカルの静的画像は対象外である。意図して Vercel の最適化に残している。**
- * 枠を焼いていたのは microCMS 側だけで、2026-09-20 に本番HTMLの srcset を全数えした
- * 結果は静的画像11ファイルで 178通り×2形式＝上限 356 変換（枠 5,000 の 7%）。
- * 一方 microCMS は企画サムネイル93枚だけで約3,348（#237）。静的画像まで外すと
- * LCP 要素が 4.7倍になるので、そちらは Vercel に残す。
+ * 1. `/_next/image?url=` へ画像を渡すURLが **1本も** 現れないこと
+ * 2. `public/` の静的画像が**実体のパスで**出ていること（0本なら検査の空振り）
+ *
+ * 2 が要る。`AppImage` から `unoptimized` が外れると静的画像は全部 `/_next/image` へ回り、
+ * **`public/` のパスがHTMLから消える。** 1 だけでも捕まるが、逆に「静的画像を
+ * 描かなくなった」種類の退行は 1 では見えない。静的画像は公開フラグに依存しないので、
+ * 0本は常に異常である。
  *
  * 背景と設計は docs/frontend/image-delivery.md を参照。
  */
@@ -53,17 +58,23 @@ const { loadEnvConfig } = nextEnv;
 const APP_DIR = path.resolve(process.cwd(), ".next/server/app");
 
 /**
- * Vercel の最適化エンドポイントへ画像を渡すURL。
- *
- * **ここで落とすのはリモート画像だけである。** ローカルの静的画像（`/images/...` など）は
- * 意図して Vercel の最適化に残しているので、出ていても正常。
+ * Vercel の最適化エンドポイントへ画像を渡すURL。**出どころを問わず1本でも落とす。**
  */
 const OPTIMIZER_PATTERN = /\/_next\/image\?url=([^&"']+)/g;
 
 /** `src/lib/image-loader.ts` が生成する imgix URL の目印 */
 const IMGIX_MARKER = "images.microcms-assets.io/";
 
-const LABEL = "[assert-remote-images-bypass-optimizer]";
+/**
+ * `public/` の静的画像が実体のパスで出ている目印。
+ *
+ * `AppImage` から `unoptimized` が外れるとこれが 0 本になり、同時に
+ * `/_next/image` が増える。公開フラグに依存しないので 0 本は常に異常である。
+ */
+const STATIC_IMAGE_PATTERN =
+  /(?:src|href)="\/(?:images|materials)\/[^"]+\.(?:avif|webp|png|jpe?g)"/;
+
+const LABEL = "[assert-no-image-optimizer]";
 
 function fail(message, hint) {
   console.error(`${LABEL} FAIL: ${message}`);
@@ -116,11 +127,13 @@ if (htmlFiles.length === 0) {
 /** 違反を `ファイル → ホスト集合` で集める。同じホストの大量出力で画面を潰さない */
 const violations = new Map();
 let imgixCount = 0;
+let staticImageCount = 0;
 
 for (const file of htmlFiles) {
   const html = readFileSync(file, "utf8");
 
   if (html.includes(IMGIX_MARKER)) imgixCount += 1;
+  if (STATIC_IMAGE_PATTERN.test(html)) staticImageCount += 1;
 
   const hosts = new Set();
   for (const match of html.matchAll(OPTIMIZER_PATTERN)) {
@@ -134,9 +147,11 @@ for (const file of htmlFiles) {
     } catch {
       decoded = match[1];
     }
-    // ローカルの静的画像は Vercel の最適化に残しているので対象外
-    if (!decoded.startsWith("http")) continue;
-    hosts.add(new URL(decoded).host);
+    /*
+     * ローカルの静的画像（`/images/...`）にはホストが無いので `new URL()` が投げる。
+     * 出どころを問わず落とすようになったため、先頭 60 文字をそのまま識別子に使う。
+     */
+    hosts.add(decoded.startsWith("http") ? new URL(decoded).host : decoded.slice(0, 60));
   }
   if (hosts.size > 0) violations.set(path.relative(APP_DIR, file), hosts);
 }
@@ -147,7 +162,7 @@ if (violations.size > 0) {
     .map(([file, hosts]) => `    ${file} → ${[...hosts].join(", ")}`)
     .join("\n");
   fail(
-    `リモート画像が Vercel の Image Optimization を通っています（${violations.size} ファイル）。#237 の再発です。`,
+    `画像が Vercel の Image Optimization を通っています（${violations.size} ファイル）。#237 / #241 の再発です。`,
     [
       detail,
       violations.size > 10 ? `    ...ほか ${violations.size - 10} ファイル` : "",
@@ -155,7 +170,7 @@ if (violations.size > 0) {
       "  よくある原因:",
       "    1. AppImage ではなく next/image を直接使った（最も多い）",
       "       → 通常は eslint.config.mjs の no-restricted-imports が先に止めます",
-      "    2. AppImage から loader の指定が外れた",
+      "    2. AppImage から loader / unoptimized の指定が外れた",
       "    3. 新しいリモート画像ホストを追加し、src/lib/image-loader.ts の分岐に入れ忘れた",
       "",
       "  手で確かめる:",
@@ -165,6 +180,21 @@ if (violations.size > 0) {
     ]
       .filter(Boolean)
       .join("\n")
+  );
+}
+
+if (staticImageCount === 0) {
+  fail(
+    "public/ の静的画像が実体のパスで1本も出ていません。",
+    [
+      "  AppImage から unoptimized が外れると、静的画像は全部 /_next/image へ回り",
+      "  このパターンがHTMLから消えます（枠が生きているうちは画面も正常に見えます）。",
+      "",
+      "  手で確かめる:",
+      '    grep -rho \'src="/\\(images\\|materials\\)/[^"]*"\' .next/server/app | sort -u | head',
+      "",
+      "  詳細: docs/frontend/image-delivery.md",
+    ].join("\n")
   );
 }
 
@@ -193,7 +223,7 @@ if (imgixCount === 0) {
 }
 
 console.log(
-  `${LABEL} OK: Vercel の画像最適化を通るリモート画像はありません` +
-    `（HTML ${htmlFiles.length} 枚中 ${imgixCount} 枚が imgix 経由の画像を含む）。` +
-    ` ローカルの静的画像は意図して Vercel の最適化に残しています。`
+  `${LABEL} OK: Vercel の画像最適化を通る画像は1本もありません` +
+    `（HTML ${htmlFiles.length} 枚中 ${imgixCount} 枚が imgix 経由、` +
+    `${staticImageCount} 枚が public/ の静的画像を含む）。`
 );

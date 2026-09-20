@@ -109,10 +109,11 @@ const config = [
     // 壊れる。画面幅と DPR で表示される画像が入れ替わり、再現しにくい形で出る。
     //
     // 画像は `src/components/ui/AppImage.tsx` の `AppImage` で描く。microCMS のものは
-    // imgix へ、静的画像は `unoptimized` で原寸のまま配信され、どちらも枠を使わない。
+    // imgix へ、`public/` の静的画像は `unoptimized` で事前最適化済みの実体をそのまま
+    // 配る。どちらも枠を使わない。
     //
     // この事故は lint 以外のすべてを通過する。型も通り、ビルドも通り、枠が残っている
-    // うちは画面も正常に見える。生成物を読む `scripts/assert-remote-images-bypass-optimizer.mjs`
+    // うちは画面も正常に見える。生成物を読む `scripts/assert-no-image-optimizer.mjs`
     // が最後の砦だが、**そちらはビルドしないと分からない。** import の時点で止めるため
     // ここへ置く（#156 / #179 の規則と同じ理由）。
     //
@@ -130,6 +131,23 @@ const config = [
               name: "next/image",
               message:
                 "next/image を直接使うと Vercel の画像最適化を通り、変換枠を消費します。枠が枯れると 402 でその画像だけが壊れます（#237）。@/components/ui/AppImage の AppImage を使ってください。",
+            },
+          ],
+          /*
+           * 画像の静的 import（`import logo from "./logo.avif"`）を禁じる。
+           *
+           * 静的 import の画像は `/_next/static/media/<hash>` へ出るため、
+           * **`public/` を歩く `pnpm check:images` の射程から完全に外れる。**
+           * 寸法もバイト数も予算も誰も見ておらず、原寸のまま配信される
+           * （`AppImage` は文字列でない `src` も `unoptimized` 側へ落とす）。
+           *
+           * 2026-09-20 時点で該当は 0 件。増える前に塞いでおく。
+           */
+          patterns: [
+            {
+              group: ["*.avif", "*.webp", "*.png", "*.jpg", "*.jpeg", "*.gif"],
+              message:
+                "画像を静的 import すると pnpm check:images の射程（public/ 配下）から外れ、寸法もバイト予算も検査されないまま配信されます。public/ へ置き、scripts/static-image-manifest.mjs へ登録して、パス文字列で参照してください（#241）。",
             },
           ],
         },

@@ -21,7 +21,7 @@ export const aboutConfig = {
       "多くの人の力が重なり合い、知的好奇心と前向きなエネルギーが共鳴する特別な空間となることを願っています。",
     ],
     cta: { label: "委員会について", href: "/about" },
-    image: { src: "/images/photos/setagayafe97-image.webp", alt: "世田谷祭の様子" },
+    image: { src: "/images/photos/setagayafe97-image.avif", alt: "世田谷祭の様子" },
   },
 
   // 共通テーマの解説 + 委員長挨拶（同一セクション内の2ブロック構成）
@@ -36,8 +36,8 @@ export const aboutConfig = {
     messageHeading: "委員長挨拶",
     name: "髙野雄司",
     position: "第97回東京都市大学世田谷祭実行委員会 実行委員長",
-    image: "/images/photos/setagayafe97-image.webp",
-    subImage: "/images/photos/setagayafes97-leader.webp",
+    image: "/images/photos/setagayafe97-image.avif",
+    subImage: "/images/photos/setagayafes97-leader.avif",
     imageAlt: "世田谷祭の様子",
     message: `
 第97回東京都市大学世田谷祭にご来場いただき、誠にありがとうございます。実行委員一同、皆様をこの世田谷キャンパスでお迎えできる今日という日を、心待ちにしておりました。

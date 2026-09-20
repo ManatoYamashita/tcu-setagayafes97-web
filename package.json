@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/assert-events-static-html.mjs && node scripts/assert-remote-images-bypass-optimizer.mjs",
+    "build": "next build && node scripts/assert-events-static-html.mjs && node scripts/assert-no-image-optimizer.mjs",
     "start": "next start",
     "lint": "eslint src/ e2e/ playwright.config.ts",
     "type-check": "next typegen && tsc --noEmit",
@@ -16,6 +16,8 @@
     "format:check": "prettier --check .",
     "check:doc-links": "node scripts/assert-doc-links.mjs",
     "check:colors": "node scripts/assert-no-restricted-colors.mjs",
+    "check:images": "node scripts/assert-static-image-budget.mjs",
+    "images:optimize": "node scripts/optimize-static-images.mjs",
     "prepare": "husky",
     "analyze": "ANALYZE=true next build --webpack"
   },
@@ -56,6 +58,7 @@
     "lint-staged": "^15.2.11",
     "postcss": "^8",
     "prettier": "^3.4.2",
+    "sharp": "0.34.5",
     "tailwindcss": "^4.0.0",
     "typescript": "^5",
     "vitest": "^4.1.11"

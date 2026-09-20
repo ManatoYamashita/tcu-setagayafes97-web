@@ -114,12 +114,11 @@ export function Header() {
             aria-label={siteConfig.shortName}
           >
             <AppImage
-              src="/images/brand/logo.webp"
+              src="/images/brand/logo.avif"
               alt="世田谷祭ロゴ"
               width={208}
               height={83}
               sizes="208px"
-              quality={60}
               className={`absolute left-0 top-0 h-auto w-52 max-w-none origin-top-left object-contain transition-transform duration-300 ${
                 isAtTop ? "scale-100" : "scale-[0.538]"
               }`}
