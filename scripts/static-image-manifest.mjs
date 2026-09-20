@@ -174,13 +174,15 @@ const APP_IMAGES = [
   },
   {
     path: "public/images/illustrations/404.avif",
-    source: "assets/source/images/illustrations/404.webp",
-    // 原画 1200x1200。404ページは最大448pxで表示するため、DPR2に合わせて896pxへ縮小する。
+    source: "assets/source/images/illustrations/404-transparent.png",
+    // 透過原画 1254x1254。404ページは最大448pxで表示するため、DPR2に合わせて896pxへ縮小する。
     box: { width: 896, height: 896 },
     fit: "inside",
     kind: "art",
+    requiresAlpha: true,
     quality: 50,
-    maxBytes: 6000,
+    // アルファ面を保持するため、不透明版（4,620 B）より配信量が増える。実測 18,596 B。
+    maxBytes: 21000,
     note: "グローバル404ページの歯車イラスト（ファーストビューのLCP候補）",
   },
   {

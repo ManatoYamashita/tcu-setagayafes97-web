@@ -59,7 +59,7 @@ export default function NotFound() {
           </Link>
         </section>
 
-        <div className="w-full max-w-[28rem] justify-self-center rounded-[2.5rem] bg-white p-2 shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_1px_2px_-1px_rgba(0,0,0,0.06),0_2px_4px_rgba(0,0,0,0.04)]">
+        <div className="w-full max-w-[28rem] justify-self-center">
           <AppImage
             src={notFoundPageContent.illustration.src}
             alt={notFoundPageContent.illustration.alt}
@@ -67,7 +67,7 @@ export default function NotFound() {
             height={notFoundPageContent.illustration.height}
             fetchPriority="high"
             priority
-            className="h-auto w-full rounded-[2rem] outline outline-1 -outline-offset-1 outline-black/10"
+            className="h-auto w-full"
           />
         </div>
       </div>
