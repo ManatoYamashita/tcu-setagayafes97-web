@@ -48,6 +48,61 @@ const LOADING: SemanticSearchState = { status: "loading", result: null };
 const cache = new Map<string, SemanticSearchResult>();
 
 /**
+ * 実行中の問い合わせ（正規化済みクエリ → その Promise）
+ *
+ * **キャッシュだけでは二重発火を防げません。** キャッシュが埋まるのは応答が返ったあとで、
+ * それまでに効果がもう一度走ると、同じクエリで2本目が飛びます。実測（2026-09-21、
+ * 絞り込み付きURLからの入力）で2本飛んだため、実行中のものを共有して1本に畳みます。
+ * **1本が 0.097円なので、二重発火はそのまま二重課金です。**
+ */
+const inflight = new Map<string, Promise<SemanticSearchResult>>();
+
+/**
+ * 1クエリぶんの問い合わせ。同じキーが実行中ならそれを共有する
+ *
+ * **中断しません。** リクエストを送った時点で課金は発生しており、途中で切っても
+ * 費用は戻りません。最後まで走らせてキャッシュへ入れるほうが、次の入力で得になります。
+ */
+function request(key: string, rawQuery: string): Promise<SemanticSearchResult> {
+  const running = inflight.get(key);
+
+  if (running) return running;
+
+  /*
+   * 正規化前の生入力を送る。`normalizeText()` はカタカナをひらがなへ寄せ長音符を
+   * 落とすため、`スケボー` が `すけぼ` になって手がかりが減る。正規化済みの値は
+   * 検証とキャッシュのキーにだけ使う。
+   */
+  const promise = fetch(`/api/search?q=${encodeURIComponent(rawQuery)}`)
+    .then(async (response) => {
+      if (!response.ok) throw new Error(`status ${response.status}`);
+
+      const json = (await response.json()) as Partial<SemanticSearchResult> & {
+        success?: boolean;
+      };
+
+      if (!json.success || !json.ranking) throw new Error("unsuccessful response");
+
+      return {
+        hasMatch: !!json.hasMatch,
+        matchProbability: json.matchProbability ?? 0,
+        ranking: json.ranking,
+      } satisfies SemanticSearchResult;
+    })
+    .then((result) => {
+      cache.set(key, result);
+      return result;
+    })
+    .finally(() => {
+      inflight.delete(key);
+    });
+
+  inflight.set(key, promise);
+
+  return promise;
+}
+
+/**
  * 取得が終わった1件ぶん
  *
  * **`status: "loading"` をここへ持ちません。** 効果の本体で同期的に `setState` すると
@@ -71,47 +126,22 @@ export function useSemanticSearch(query: string, enabled: boolean): SemanticSear
     if (key === null) return;
     if (cache.has(key)) return;
 
-    const controller = new AbortController();
+    let stale = false;
 
     const timer = setTimeout(() => {
-      /*
-       * 正規化前の生入力を送る。`normalizeText()` はカタカナをひらがなへ寄せ長音符を
-       * 落とすため、`スケボー` が `すけぼ` になって手がかりが減る。正規化済みの値は
-       * 検証とキャッシュのキーにだけ使う。
-       */
-      fetch(`/api/search?q=${encodeURIComponent(query)}`, { signal: controller.signal })
-        .then(async (response) => {
-          if (!response.ok) throw new Error(`status ${response.status}`);
-
-          const json = (await response.json()) as Partial<SemanticSearchResult> & {
-            success?: boolean;
-          };
-
-          if (!json.success || !json.ranking) throw new Error("unsuccessful response");
-
-          return {
-            hasMatch: !!json.hasMatch,
-            matchProbability: json.matchProbability ?? 0,
-            ranking: json.ranking,
-          } satisfies SemanticSearchResult;
-        })
+      request(key, query)
         .then((result) => {
-          if (controller.signal.aborted) return;
-
-          cache.set(key, result);
-          setFetched({ key, status: "done", result });
+          if (!stale) setFetched({ key, status: "done", result });
         })
         .catch(() => {
-          if (controller.signal.aborted) return;
-
           // 失敗は表に出さない。既存のリテラル検索の結果を出したまま静かに戻る
-          setFetched({ key, status: "failed", result: null });
+          if (!stale) setFetched({ key, status: "failed", result: null });
         });
     }, SEMANTIC_DEBOUNCE_MS);
 
     return () => {
+      stale = true;
       clearTimeout(timer);
-      controller.abort();
     };
   }, [key, query]);
 

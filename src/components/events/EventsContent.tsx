@@ -10,7 +10,11 @@ import {
   resolveVisibleCount,
   EVENTS_PER_PAGE,
 } from "@/lib/filters";
-import { selectSemanticEvents, shouldAskSemanticSearch } from "@/lib/semantic-search";
+import {
+  resolveSemanticOutcome,
+  selectSemanticEvents,
+  shouldAskSemanticSearch,
+} from "@/lib/semantic-search";
 import { EventsView } from "./EventsView";
 import { useSemanticSearch } from "./useSemanticSearch";
 
@@ -95,9 +99,12 @@ export function EventsContent({ initialEvents }: EventsContentProps) {
       semantic={
         semanticEnabled
           ? {
-              status: semantic.status,
+              outcome: resolveSemanticOutcome(
+                semantic.status,
+                semantic.result?.hasMatch ?? false,
+                semanticEvents.length
+              ),
               query: keyword,
-              noMatch: semantic.status === "done" && semanticEvents.length === 0,
             }
           : undefined
       }

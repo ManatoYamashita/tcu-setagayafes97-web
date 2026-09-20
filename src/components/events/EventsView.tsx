@@ -66,12 +66,12 @@ export function EventsView({
    * 表示件数が12件へ巻き戻ります。`buildEventsQuery(filters)` は第2引数を省くと
    * `page` を付けないので、絞り込みだけの指紋になります。
    *
-   * **意味検索の到着は含めます。** `EventInfiniteList` は表示件数を `useState` の
+   * **意味検索の状態遷移は含めます。** `EventInfiniteList` は表示件数を `useState` の
    * 初期化子で1度だけ決め、props の変化では上書きしません。第4段が走るのは
    * リテラル検索が0件のときだけなので、初回の表示件数は必ず0になります。
    * ここで作り直さないと、結果が返っても**一覧が0件のまま動きません。**
    */
-  const listKey = `${buildEventsQuery(filters) || "all"}${semantic?.status === "done" ? "|semantic" : ""}`;
+  const listKey = `${buildEventsQuery(filters) || "all"}${semantic?.outcome ? `|${semantic.outcome}` : ""}`;
 
   return (
     <div className="container mx-auto px-4 py-12">

@@ -339,6 +339,46 @@ export function interpretSemanticAnswers(
 }
 
 /**
+ * 来場者へ何を伝えるか
+ *
+ * | 値             | 意味                                                       |
+ * | -------------- | ---------------------------------------------------------- |
+ * | `loading`      | 問い合わせ中                                                |
+ * | `no-match`     | 意味検索も「該当なし」と判定した                            |
+ * | `filtered-out` | **近い企画はあるが、現在の絞り込みで全部消えた**             |
+ * | `replaced`     | 近い企画を表示している                                      |
+ */
+export type SemanticOutcome = "loading" | "no-match" | "filtered-out" | "replaced";
+
+/**
+ * 第4段の結果を、来場者への案内文の種類へ落とす
+ *
+ * > [!IMPORTANT]
+ * > **「表示できる件数が0」と「意味検索も該当なし」を混ぜてはいけません。**
+ * > 日程や建物の絞り込みで消えただけなのに「別の言葉でお試しください」と案内すると、
+ * > 来場者は**存在する企画を探し続けることになります。** 正しい助言は「絞り込みを外す」です。
+ *
+ * @param status 問い合わせの状態
+ * @param hasMatch モデルが「該当あり」と判定したか
+ * @param matchedCount 現在の絞り込みを適用したあとに残った件数
+ * @returns 案内の種類。何も出さないときは null
+ */
+export function resolveSemanticOutcome(
+  status: "idle" | "loading" | "done" | "failed",
+  hasMatch: boolean,
+  matchedCount: number
+): SemanticOutcome | null {
+  if (status === "loading") return "loading";
+
+  // 失敗は表に出さない。既存のリテラル検索の結果を出したまま静かに戻る
+  if (status !== "done") return null;
+
+  if (!hasMatch) return "no-match";
+
+  return matchedCount > 0 ? "replaced" : "filtered-out";
+}
+
+/**
  * ランキングを手元の企画へ引き当てる
  *
  * **知らないIDは黙って捨てます。** `/api/search` は毎回 microCMS を読み直すため、

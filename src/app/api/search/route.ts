@@ -46,12 +46,19 @@ export const dynamic = "force-dynamic";
 const EVENTS_LIMIT = 200;
 
 /**
- * CDN のキャッシュ
+ * キャッシュ
  *
  * `600` は本文の保険 ISR（各ページの `export const revalidate = 600`）と同じ値です。
  * 同じ要望で再訪した来場者には課金が発生しません。
+ *
+ * > [!IMPORTANT]
+ * > **`max-age` を落としてはいけません。** `s-maxage` は共有キャッシュ専用でブラウザは無視し、
+ * > `max-age` が無いと応答は**取得直後から陳腐**として扱われます。そこへ
+ * > `stale-while-revalidate` があると、ブラウザはキャッシュを見せながら**毎回背後で
+ * > 再検証を投げます**（2026-09-21 実測。同じクエリで2本目が飛んだ）。
+ * > 本番では CDN が受けるので TypeSafe への課金にはなりませんが、無駄な往復が残ります。
  */
-const CACHE_CONTROL = "public, s-maxage=600, stale-while-revalidate=3600";
+const CACHE_CONTROL = "public, max-age=600, s-maxage=600, stale-while-revalidate=3600";
 
 /** 失敗時は絶対にキャッシュさせない。エラーを10分配り続けることになる */
 const NO_STORE = "no-store";

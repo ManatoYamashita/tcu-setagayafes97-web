@@ -11,6 +11,7 @@ import {
   SEMANTIC_MAX_EVENTS,
   SEMANTIC_MAX_RESULTS,
   SEMANTIC_NOUL_ID,
+  resolveSemanticOutcome,
   shouldAskSemanticSearch,
 } from "@/lib/semantic-search";
 import type { TypeSafeAnswer } from "@/lib/typesafe";
@@ -417,5 +418,35 @@ describe("selectSemanticEvents", () => {
 
   it("空のランキングは空を返す", () => {
     expect(selectSemanticEvents([], events)).toEqual([]);
+  });
+});
+
+describe("resolveSemanticOutcome", () => {
+  it("問い合わせ中は loading", () => {
+    expect(resolveSemanticOutcome("loading", false, 0)).toBe("loading");
+  });
+
+  it("未発火と失敗では何も出さない", () => {
+    expect(resolveSemanticOutcome("idle", false, 0)).toBeNull();
+    // 失敗を来場者へ見せない。段3の結果を出したまま静かに戻る
+    expect(resolveSemanticOutcome("failed", false, 0)).toBeNull();
+  });
+
+  it("モデルが該当なしと判定したら no-match", () => {
+    expect(resolveSemanticOutcome("done", false, 0)).toBe("no-match");
+  });
+
+  it("近い企画を表示できたら replaced", () => {
+    expect(resolveSemanticOutcome("done", true, 5)).toBe("replaced");
+  });
+
+  /*
+   * **「表示できる件数が0」と「意味検索も該当なし」を混ぜてはいけない。**
+   *
+   * 日程や建物の絞り込みで消えただけなのに「別の言葉でお試しください」と案内すると、
+   * 来場者は存在する企画を探し続けることになる。正しい助言は「絞り込みを外す」。
+   */
+  it("該当はあるが絞り込みで全部消えたら filtered-out（no-match と混ぜない）", () => {
+    expect(resolveSemanticOutcome("done", true, 0)).toBe("filtered-out");
   });
 });
