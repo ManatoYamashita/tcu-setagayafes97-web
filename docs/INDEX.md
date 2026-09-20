@@ -393,6 +393,19 @@ docs/
     発火順の違いで環境によって検索が動かなくなる
   - **ハイドレーション完了前に合成イベントを流すと検証が嘘をつく**（実測で3回誤った）
 
+- **[events-semantic-search.md](./frontend/events-semantic-search.md)** - `/events` の意味検索（第4段・TypeSafe Jev）（#253）
+  - **段1〜3が0件のときだけ呼ぶ。** `/api/search` は認証の無い従量課金口で、1リクエスト ≒ 0.097円（実測）
+  - **足切りは `has_match`（Noul）。`confidence` を使ってはいけない。** 該当なしの `スキー場` の
+    confidence 0.79 は、該当ありの `体を動かしたい` 0.39 を上回る（2026-09-20 実測・98件）
+  - **Issue #253 の「該当なし群 0.02〜0.06」は再現しない。** `スキー場` は 0.24。閾値 0.5 は動かさない
+  - **判定は絞り込み前の全企画に対して行う。** フィルタ起因の0件で呼ぶと、積集合で消える結果に課金する
+  - **レート制限の第一層は Vercel WAF で、コードではない。** マージしただけでは有効にならない
+  - **来場者の検索語は米国の TypeSafe へ送られ、ZDR はエンタープライズ限定。**
+    `src/data/privacy.ts` の `thirdParty.externalServices` に明記した
+  - **`eslint.config.mjs` の `no-restricted-imports` / `no-restricted-syntax` は後勝ちで丸ごと置き換わる。**
+    #156 の `useSearchParams` 禁止と #230 の禁止色（EventInfiniteList のみ）は、それぞれ後続ブロックに
+    消されて**一度も効いていなかった**（2026-09-20 に `--print-config` と退行注入で確認し、合成へ直した）
+
 - **[events-infinite-scroll.md](./frontend/events-infinite-scroll.md)** - `/events` の無限スクロールと絞り込みの追従（#239）
   - **ページ分割は撤去済み。** 旧 `Pagination` は `href` を持たない `<button>` だったため、SEO の損失はゼロ
   - **監視は発火即 `disconnect()` し、`visibleCount` の変化でだけ張り直す。** 依存から落とすと
