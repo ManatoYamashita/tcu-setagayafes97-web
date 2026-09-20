@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useCallback, useEffect } from "react";
-import Image from "next/image";
+import { AppImage } from "@/components/ui/AppImage";
 import { LogoLoop, type LogoItem } from "@/components/ui/LogoLoop";
 import { SponsorModal } from "./SponsorModal";
 import type { Information } from "@/types/informations";
@@ -61,7 +61,7 @@ export function SponsorLogoLoop({ sponsors, onReady }: SponsorLogoLoopProps) {
       const alt = imgItem.alt ?? "";
       const displayWidth = Math.max(1, Math.round((imgItem.width / imgItem.height) * 40));
       const logoImage = (
-        <Image
+        <AppImage
           src={src}
           alt={copyIndex === 0 ? alt : ""}
           width={displayWidth}

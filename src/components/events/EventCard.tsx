@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import type { Event } from "@/types/events";
 import { Badge } from "@/components/ui/Badge";
 import { CircleImage } from "@/components/ui/CircleImage";

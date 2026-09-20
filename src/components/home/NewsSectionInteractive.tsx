@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { AppImage } from "@/components/ui/AppImage";
 import { gsap } from "gsap";
 import type { News } from "@/types/news";
 import { CircularText } from "@/components/ui/CircularText";
@@ -250,7 +250,7 @@ export function NewsSectionInteractive({ newsList }: NewsSectionProps) {
         className="relative h-[40vh] w-full overflow-hidden will-change-transform sm:h-[50vh] md:h-[60vh]"
         style={{ clipPath: "inset(0% 100% 0% 0%)" }}
       >
-        <Image
+        <AppImage
           src="/images/photos/tcu-7.webp"
           alt="キャンパス風景"
           fill
@@ -333,7 +333,7 @@ export function NewsSectionInteractive({ newsList }: NewsSectionProps) {
             </div>
 
             {/* 歯車装飾: 右下（複数歯車） */}
-            <Image
+            <AppImage
               ref={gear1Ref}
               src="/materials/geers.webp"
               alt=""
@@ -346,7 +346,7 @@ export function NewsSectionInteractive({ newsList }: NewsSectionProps) {
             />
 
             {/* 歯車装飾: 左下（単体歯車） */}
-            <Image
+            <AppImage
               ref={gear2Ref}
               src="/materials/geer1.webp"
               alt=""

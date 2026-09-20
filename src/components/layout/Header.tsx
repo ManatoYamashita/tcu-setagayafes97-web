@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { AppImage } from "@/components/ui/AppImage";
 import { Menu } from "lucide-react";
 import { siteConfig } from "@/data/site";
 import { DesktopNav } from "@/components/layout/DesktopNav";
@@ -113,7 +113,7 @@ export function Header() {
             }`}
             aria-label={siteConfig.shortName}
           >
-            <Image
+            <AppImage
               src="/images/brand/logo.webp"
               alt="世田谷祭ロゴ"
               width={208}

@@ -100,6 +100,43 @@ const config = [
     },
   },
   {
+    // #237 の再発防止装置。
+    //
+    // `next/image` を直接使うと Vercel の Image Optimization を通る。Free Plan の
+    // 変換枠（Hobby は月5,000変換）が枯れると `402` が返り、**その画像だけが壊れる。**
+    // 課金単位は画像1枚ではなく変換1回、すなわち (元画像, 幅, 品質, フォーマット) の
+    // 組み合わせ1つで、変換済みは CDN に残るため、枯渇後は未変換の組み合わせだけが
+    // 壊れる。画面幅と DPR で表示される画像が入れ替わり、再現しにくい形で出る。
+    //
+    // 画像は `src/components/ui/AppImage.tsx` の `AppImage` で描く。microCMS のものは
+    // imgix へ、静的画像は `unoptimized` で原寸のまま配信され、どちらも枠を使わない。
+    //
+    // この事故は lint 以外のすべてを通過する。型も通り、ビルドも通り、枠が残っている
+    // うちは画面も正常に見える。生成物を読む `scripts/assert-remote-images-bypass-optimizer.mjs`
+    // が最後の砦だが、**そちらはビルドしないと分からない。** import の時点で止めるため
+    // ここへ置く（#156 / #179 の規則と同じ理由）。
+    //
+    // 背景と実測は docs/frontend/image-delivery.md を参照。
+    // `.ts` も含める。JSX は書けないが re-export や `getImageProps` の利用で迂回できる。
+    // 例外はラッパー本体と、型だけを使うローダー（`import type` のみ）。
+    files: ["src/**/*.tsx", "src/**/*.ts"],
+    ignores: ["src/components/ui/AppImage.tsx", "src/lib/image-loader.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "next/image",
+              message:
+                "next/image を直接使うと Vercel の画像最適化を通り、変換枠を消費します。枠が枯れると 402 でその画像だけが壊れます（#237）。@/components/ui/AppImage の AppImage を使ってください。",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     // #239 の再発防止装置。
     //
     // `EventInfiniteList` の IntersectionObserver は、発火したら即 disconnect し、

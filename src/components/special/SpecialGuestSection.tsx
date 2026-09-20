@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { AppImage } from "@/components/ui/AppImage";
 import Link from "next/link";
 
 import { specialBanner } from "@/data/special-banner";
@@ -109,7 +109,7 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
                 {label}
               </span>
               <span className="mt-4 block">
-                <Image
+                <AppImage
                   src={nameLogo.src}
                   alt={name}
                   width={nameLogo.width}
@@ -170,7 +170,7 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
             className="order-first w-full max-w-sm shrink-0 overflow-hidden rounded-3xl md:order-none md:w-[42%] md:max-w-none lg:w-[45%]"
             data-special-guest-reveal
           >
-            <Image
+            <AppImage
               src={image.src}
               alt={image.alt}
               width={image.width}

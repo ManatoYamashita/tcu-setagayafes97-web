@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { AppImage } from "@/components/ui/AppImage";
 import type { MicroCMSImage } from "microcms-js-sdk";
 
 interface SpecialProfileProps {
@@ -45,7 +45,7 @@ export function SpecialProfile({ content, photos }: SpecialProfileProps) {
                 高さの上限を 70dvh とし、超過分は中心を基準にクロップする。
                 アスペクト比は object-cover が維持する。
               */}
-              <Image
+              <AppImage
                 src={photo.url}
                 alt=""
                 width={photo.width ?? 800}

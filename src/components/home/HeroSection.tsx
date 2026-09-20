@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Image from "next/image";
+import { AppImage } from "@/components/ui/AppImage";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { siteConfig } from "@/data/site";
@@ -173,7 +173,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
     >
       {/* [z-20] ロゴ画像（中央配置） */}
       <div className="relative z-20 flex w-full max-w-[75vw] -translate-y-10 items-center justify-center sm:max-w-[50vw] sm:-translate-y-6 md:max-w-[35vw] md:translate-y-0 lg:max-w-[30vw]">
-        <Image
+        <AppImage
           src="/images/brand/favicon-outline.webp"
           alt="世田谷祭のアイコン"
           width={500}
