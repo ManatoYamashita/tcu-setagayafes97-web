@@ -40,9 +40,17 @@ export function TimetableStackedList({ groups }: TimetableStackedListProps) {
   return (
     <div data-timetable-list>
       <p className="mb-3 text-sm font-semibold text-gray-700">開始時刻順</p>
-      <ol className="space-y-3" role="list">
+      <ol
+        className="relative space-y-3 before:absolute before:inset-y-5 before:-left-3 before:w-0.5 before:rounded-full before:bg-primary-200"
+        role="list"
+      >
         {items.map(({ event, stageName }) => (
-          <li key={event.id} data-timetable-list-item data-start-time={event.startTime}>
+          <li
+            key={event.id}
+            data-timetable-list-item
+            data-start-time={event.startTime}
+            className="relative after:absolute after:top-5 after:-left-[0.9375rem] after:size-2 after:rounded-full after:bg-primary-600 after:ring-4 after:ring-white"
+          >
             <TimetableEventCard event={event} stageName={stageName} />
           </li>
         ))}

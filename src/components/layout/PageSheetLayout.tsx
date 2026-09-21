@@ -1,15 +1,16 @@
-import { PageHero } from "@/components/ui/PageHero";
+import { PageHero, type PageHeroSize } from "@/components/ui/PageHero";
 import type { PageHeroData } from "@/data/page-heroes";
 
 interface PageSheetLayoutProps {
   hero: PageHeroData;
+  heroSize?: PageHeroSize;
   children: React.ReactNode;
 }
 
-export function PageSheetLayout({ hero, children }: PageSheetLayoutProps) {
+export function PageSheetLayout({ hero, heroSize = "default", children }: PageSheetLayoutProps) {
   return (
     <div className="min-h-screen bg-secondary">
-      <PageHero {...hero} />
+      <PageHero {...hero} size={heroSize} />
       {/*
         スキップリンク（Header）の遷移先。tabIndex={-1} はスキップリンク経由で
         フォーカスを受けるために要る（キーボードの順送りには入らない）。

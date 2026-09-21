@@ -54,6 +54,15 @@ test.describe("モバイル幅", () => {
     expect(cardWidth).toBeGreaterThanOrEqual(250);
   });
 
+  test("日程選択を初期画面内に完全表示する", async ({ timetablePage: page }) => {
+    const metrics = await page.locator("[data-timetable-date-tabs]").evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      return { bottom: Math.round(rect.bottom), viewportHeight: window.innerHeight };
+    });
+
+    expect(metrics.bottom).toBeLessThanOrEqual(metrics.viewportHeight);
+  });
+
   test("横スクロールがページ全体へ漏れていない", async ({ timetablePage: page }) => {
     const metrics = await page.evaluate(() => ({
       documentScrollWidth: document.documentElement.scrollWidth,

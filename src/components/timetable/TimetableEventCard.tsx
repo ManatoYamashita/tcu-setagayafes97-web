@@ -47,8 +47,12 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
   // 外向きの outline / ring がクリップされて見えなくなるため。
   const base =
     "block h-full overflow-hidden rounded-lg bg-white border border-gray-200 transition-colors " +
-    "hoverable:hover:border-gray-400 border-l-4 border-l-primary-600 hoverable:hover:border-l-primary-700 " +
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-600";
+    "hoverable:hover:border-gray-400 focus-visible:outline-none focus-visible:ring-2 " +
+    "focus-visible:ring-inset focus-visible:ring-primary-600";
+  const ganttAccent = density
+    ? "border-l-4 border-l-primary-600 hoverable:hover:border-l-primary-700"
+    : "";
+  const cardClass = `${base} ${ganttAccent}`;
 
   const timeText = `${event.startTime}–${event.endTime}`;
 
@@ -56,7 +60,7 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
   // 「主催が途中で切れたカード」になり、読めない情報が場所だけ占めてしまう。
   if (density === "minimal") {
     return (
-      <Link href={href} aria-label={label} className={`${base} px-2 py-1`}>
+      <Link href={href} aria-label={label} className={`${cardClass} px-2 py-1`}>
         <p className="text-xs font-bold leading-tight text-gray-900 line-clamp-1">{event.title}</p>
       </Link>
     );
@@ -64,7 +68,7 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
 
   if (density === "compact") {
     return (
-      <Link href={href} aria-label={label} className={`${base} px-2 py-1`}>
+      <Link href={href} aria-label={label} className={`${cardClass} px-2 py-1`}>
         <p className="text-sm font-bold leading-tight text-gray-900 line-clamp-1">{event.title}</p>
         <p className="truncate text-xs font-medium text-primary-700">{timeText}</p>
       </Link>
@@ -77,7 +81,7 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
   // 1時間企画が compact へ落ちて場所が表示されなくなる。
   if (density === "full") {
     return (
-      <Link href={href} aria-label={label} className={`${base} px-3 py-1.5`}>
+      <Link href={href} aria-label={label} className={`${cardClass} px-3 py-1.5`}>
         <p className="mb-1 text-[0.9375rem] font-bold leading-[1.2] text-gray-900 line-clamp-2">
           {event.title}
         </p>
@@ -91,9 +95,20 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
 
   // 密度指定なし = モバイルの縦スタック。高さが自由なので全項目を出す
   return (
-    <Link href={href} className={`${base} p-4`}>
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <p className="text-sm font-bold text-primary-700 tabular-nums">{timeText}</p>
+    <Link href={href} className={`${cardClass} p-4`}>
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+        <p className="flex items-baseline gap-1 font-sans tabular-nums">
+          <time dateTime={event.startTime} className="text-lg font-bold text-gray-900">
+            {event.startTime}
+          </time>
+          <span className="sr-only">から</span>
+          <span className="text-sm text-gray-400" aria-hidden="true">
+            –
+          </span>
+          <time dateTime={event.endTime} className="text-sm font-semibold text-gray-700">
+            {event.endTime}
+          </time>
+        </p>
         {stageName && (
           <span className="rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700">
             {stageName}
@@ -101,7 +116,9 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
         )}
       </div>
 
-      <p className="mt-2 text-base font-bold leading-snug text-gray-900">{event.title}</p>
+      <p className="mt-2 text-base font-bold leading-snug text-pretty text-gray-900">
+        {event.title}
+      </p>
       <p className="mt-2 text-sm leading-relaxed text-gray-700">{event.place}</p>
 
       {event.organizer ? (

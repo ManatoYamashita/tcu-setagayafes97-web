@@ -81,8 +81,12 @@ export function TimetableContent({ initialEvents }: TimetableContentProps) {
           >
             {selectedDateLabel}の企画
           </h2>
-          <p data-timetable-summary role="status" className="text-sm font-medium text-gray-700">
-            {eventCount}企画を表示中
+          <p
+            data-timetable-summary
+            role="status"
+            className="rounded-full bg-primary-50 px-3 py-1.5 text-sm font-semibold text-primary-700"
+          >
+            {eventCount}企画・{groups.length}会場
           </p>
         </div>
 

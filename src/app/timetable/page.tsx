@@ -56,7 +56,7 @@ const USE_FIXTURE =
 export default async function TimetablePage() {
   if (!EVENTS_VISIBLE) {
     return (
-      <PageSheetLayout hero={pageHeroes.timetable}>
+      <PageSheetLayout hero={pageHeroes.timetable} heroSize="compact">
         <ComingSoon
           title="タイムテーブルは準備中です"
           description="第97回 世田谷祭のタイムテーブルは現在準備中です。公開までもうしばらくお待ちください。"
@@ -74,7 +74,7 @@ export default async function TimetablePage() {
   const stageEvents = filterStageEvents(sourceEvents);
 
   return (
-    <PageSheetLayout hero={pageHeroes.timetable}>
+    <PageSheetLayout hero={pageHeroes.timetable} heroSize="compact">
       {/*
         TimetableContent は useSearchParams() を使うため Suspense 境界が要る。
         境界が無いと bailout の範囲がこのページ全体へ広がり、静的HTMLから本体が消える（#154）。

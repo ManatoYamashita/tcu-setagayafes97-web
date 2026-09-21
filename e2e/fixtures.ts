@@ -32,8 +32,8 @@ export const test = base.extend<TimetableFixtures>({
       ).toBe(viewport?.width);
 
       // スタイルが当たるまで待つ。dev サーバは CSS を JS で注入するため、
-      // 素の DOM を測ると全要素が 0px になる。ヒーローは h-[70svh] min-h-[400px] を
-      // 持つので、可視になった時点でスタイルの適用は完了している。
+      // 素の DOM を測ると全要素が 0px になる。ヒーローは default / compact の
+      // どちらも確定した高さを持つので、可視になった時点でスタイルの適用は完了している。
       //
       // **測ろうとしている値そのものを待ってはいけない**（盤面の高さを
       // waitForFunction で待つと、#148 は「検出できない」に化ける）。ここで待つのは
