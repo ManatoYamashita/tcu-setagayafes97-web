@@ -27,6 +27,18 @@ const MIN_LEFT_LENGTH = 2;
 /** 区切り語の暴走を止める上限（1クエリあたりの分割回数） */
 const MAX_SPLITS = 50;
 
+/** 切り出した断片を捨てる長さの上限（これ以下かつひらがなだけなら捨てる） */
+const FRAGMENT_MAX_LENGTH = 2;
+
+/**
+ * ひらがなだけで構成されているか
+ *
+ * `normalizeText()` がカタカナをひらがなへ寄せたあとで判定するため、
+ * `ダンス` 由来の `だんす` もここでは「ひらがなだけ」になります。長さで弾くので
+ * 3文字以上の `だんす` は残ります。
+ */
+const HIRAGANA_ONLY = /^[\u3041-\u3096]+$/;
+
 /** 正規化済みの区切り語。長いものから試す */
 const separators = [...searchParticles, ...searchStopwords]
   .map(normalizeText)
@@ -66,11 +78,37 @@ interface SearchField {
 }
 
 /**
+ * 切り出した断片が、意味を持たないゴミかどうか
+ *
+ * **区切り語で切った右側が意味を持つ保証はありません。** `MIN_LEFT_LENGTH` は
+ * 「左に2文字残せるときだけ切る」規則で `のど自慢` を守りますが、右側は無防備です。
+ * `なところ` を `と` で切ると `ころ` が残り、それが「計測研のジュ〜シ〜サイコロ」へ
+ * 部分一致して**0件のはずのクエリが1件になります**（#251）。
+ *
+ * 判定を「短い」かつ「ひらがなだけ」の両方にしているのは、片方だけでは行きすぎるためです。
+ *
+ * | 断片     | 長さ | ひらがなだけ | 判定 | 理由                          |
+ * | -------- | ---- | ------------ | ---- | ----------------------------- |
+ * | `ころ`   | 2    | はい         | 捨てる | `サイコロ` へ誤爆する         |
+ * | `れる`   | 2    | はい         | 捨てる | 活用語尾。無数に当たる        |
+ * | `ぷる`   | 2    | はい         | 捨てる | `プール` が長音符を失った残骸 |
+ * | `友達`   | 2    | いいえ       | 残す | 短いが意味のある語            |
+ * | `静か`   | 2    | いいえ       | 残す | 同上                          |
+ * | `だんす` | 3    | はい         | 残す | `ダンス`。長さで守られる      |
+ */
+function isMeaninglessFragment(part: string): boolean {
+  return part.length <= FRAGMENT_MAX_LENGTH && HIRAGANA_ONLY.test(part);
+}
+
+/**
  * 1つの語句を、区切り語で分割する
  *
  * 区切り語が3文字以上なら先頭からでも切ります（`やってるだんす` → `だんす`）。
  * 1〜2文字（助詞など）は、**左側に2文字以上を残せるときだけ**切ります。
  * この制限が無いと `のど自慢` が `ど自慢` に割れて、意図した企画が引けなくなります。
+ *
+ * **実際に切ったときだけ、断片のふるいに掛けます**（#251）。切っていない語句は
+ * 来場者が自分で区切って入力したものなので、`すし` のような短いひらがな語も尊重します。
  */
 function splitBySeparators(segment: string): string[] {
   const parts: string[] = [];
@@ -97,7 +135,13 @@ function splitBySeparators(segment: string): string[] {
   }
 
   parts.push(rest);
-  return parts.filter(Boolean);
+
+  const split = parts.filter(Boolean);
+
+  // 切れていない = 来場者が入力したままの語句。ふるいに掛けない
+  if (split.length <= 1) return split;
+
+  return split.filter((part) => !isMeaninglessFragment(part));
 }
 
 /**

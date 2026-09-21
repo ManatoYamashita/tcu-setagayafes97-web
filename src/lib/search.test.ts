@@ -183,3 +183,93 @@ describe("searchEvents", () => {
     expect(ids(events)).toEqual(before);
   });
 });
+
+/*
+ * #251 の再発防止
+ *
+ * 区切り語で切った**右側**が意味を持つ保証は無く、無意味な断片が別の語へ部分一致して
+ * 「0件のはずが1件出る」誤爆を作っていた。来場者は誤りに気づけない。
+ *
+ * 2026-09-20 に本番データ99件で実測した表を、ここで固定する。
+ */
+const fragmentEvents: Event[] = [
+  event("dice", {
+    place: "テント２",
+    type: "store",
+    title: "計測研のジュ〜シ〜サイコロ",
+    organizer: "計測研究部",
+    description: "サイコロステーキを販売します。",
+  }),
+  event("pool-free", {
+    place: "TCUホール",
+    title: "アカペラステージ",
+    organizer: "アカペラサークル",
+    description: "歌を披露します。",
+  }),
+  event("friends", {
+    place: "9号館アリーナ",
+    title: "UPBEAT ダンスステージ",
+    organizer: "ダンスサークル UPBEAT",
+    description: "友達と盛り上がれる企画です。",
+  }),
+];
+
+describe("tokenizeQuery: 無意味な断片を作らない（#251）", () => {
+  it("『雨でも大丈夫なところ』が ころ を作らない", () => {
+    expect(tokenizeQuery("雨でも大丈夫なところ")).not.toContain("ころ");
+  });
+
+  it("『プールで泳ぎたい』が ぷる を作らない", () => {
+    // 長音符は normalizeText が落とすため、プール は ぷる になって短いひらがな断片になる
+    expect(tokenizeQuery("プールで泳ぎたい")).not.toContain("ぷる");
+    expect(tokenizeQuery("プールで泳ぎたい")).toContain("泳ぎたい");
+  });
+
+  it("『友達と盛り上がれるやつ』が れる を作らない", () => {
+    expect(tokenizeQuery("友達と盛り上がれるやつ")).not.toContain("れる");
+    expect(tokenizeQuery("友達と盛り上がれるやつ")).toContain("友達");
+  });
+
+  it("2文字でもひらがなだけでなければ残す", () => {
+    // 「友達」「静か」を落とすと、意味のある語まで消える
+    expect(tokenizeQuery("友達と盛り上がれるやつ")).toContain("友達");
+    expect(tokenizeQuery("静かに座って見られる企画")).toContain("静か");
+  });
+
+  it("3文字のひらがなは残す", () => {
+    // ダンス → だんす。長さで守る
+    expect(tokenizeQuery("9号館でやってるダンスのやつ")).toContain("だんす");
+  });
+
+  it("切っていない語句はふるいに掛けない", () => {
+    // 来場者が自分で区切って入力した短い語は尊重する
+    expect(tokenizeQuery("すし さしみ")).toEqual(["すし", "さしみ"]);
+  });
+
+  it("のど自慢は今までどおり割らない", () => {
+    expect(tokenizeQuery("のど自慢")).toEqual(["のど自慢"]);
+  });
+
+  it("9号館 ダンスは今までどおり2語へ割る", () => {
+    expect(tokenizeQuery("9号館 ダンス")).toEqual(["9号館", "だんす"]);
+  });
+});
+
+describe("searchEvents: 断片による誤爆を返さない（#251）", () => {
+  it("『雨でも大丈夫なところ』がサイコロを返さない", () => {
+    // ころ が「ジュ〜シ〜サイコロ」へ部分一致していた
+    expect(ids(searchEvents(fragmentEvents, "雨でも大丈夫なところ"))).not.toContain("dice");
+  });
+
+  it("『プールで泳ぎたい』が無関係な企画を返さない", () => {
+    expect(searchEvents(fragmentEvents, "プールで泳ぎたい")).toEqual([]);
+  });
+
+  it("意味のある語での一致は残る", () => {
+    expect(ids(searchEvents(fragmentEvents, "友達と盛り上がれるやつ"))).toEqual(["friends"]);
+  });
+
+  it("段1（クエリ全体の部分一致）は無傷", () => {
+    expect(ids(searchEvents(fragmentEvents, "サイコロ"))).toEqual(["dice"]);
+  });
+});
