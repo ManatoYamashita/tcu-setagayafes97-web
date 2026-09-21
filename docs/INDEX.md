@@ -409,6 +409,8 @@ docs/
     6本だけ叩くと、3本目から `deny`。復元は `finally` + 別コマンドでの読み戻し）
   - **来場者の検索語は米国の TypeSafe へ送られ、ZDR はエンタープライズ限定。**
     `src/data/privacy.ts` の `thirdParty.externalServices` に明記した
+  - **費用の歯止めはプリペイド $5（クレカ未登録）で、請求は暴走しない。** 使い切っても
+    意味検索が消えるだけで、リテラル検索は動く。**残高追加やカード登録でこの安全装置は外れる**
   - **`eslint.config.mjs` の `no-restricted-imports` / `no-restricted-syntax` は後勝ちで丸ごと置き換わる。**
     #156 の `useSearchParams` 禁止と #230 の禁止色（EventInfiniteList のみ）は、それぞれ後続ブロックに
     消されて**一度も効いていなかった**（2026-09-20 に `--print-config` と退行注入で確認し、合成へ直した）
