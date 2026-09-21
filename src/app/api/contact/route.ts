@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
-import { contactFormSchema, contactTypeLabels, type ContactType } from "@/types/contact";
+import { decideMailerAction, evaluateSubmission, RETRY_HINT } from "@/lib/contact-guard";
+import { createRateLimiter, getClientIp } from "@/lib/rate-limit";
+import { contactSubmissionSchema, contactTypeLabels, type ContactType } from "@/types/contact";
 
 /**
  * お問い合わせフォーム送信APIエンドポイント
@@ -14,62 +16,63 @@ import { contactFormSchema, contactTypeLabels, type ContactType } from "@/types/
  * - CONTACT_FROM_EMAIL: 送信元メールアドレス
  */
 
-// レート制限用のシンプルなインメモリストア
-const rateLimitStore = new Map<string, { count: number; timestamp: number }>();
-const RATE_LIMIT_WINDOW = 60 * 1000; // 1分
-const RATE_LIMIT_MAX_REQUESTS = 3; // 1分あたり最大3リクエスト
-
 /**
- * レート制限チェック
+ * IP 単位のレート制限（**補助**）
+ *
+ * > [!IMPORTANT]
+ * > **これは厳密な上限になりません。** サーバーレスでは状態がインスタンスごとに別で、
+ * > 2026-09-21 の実測では **429 を返した約3秒後に、上限を超えたはずの同じIPが通りました**（#260）。
+ * > 実効の上限は「設定値 × 同時に生きているインスタンス数」で、**負荷が上がるほど緩くなります。**
+ * >
+ * > 主防御は `src/lib/contact-guard.ts`（状態を持たない）です。ここは素朴な連打を鈍らせるだけの保険です。
+ *
+ * **30本/分は「1人あたりの妥当な回数」ではありません。** 学園祭当日は大学構内の Wi-Fi から
+ * 数千人が同じ出口IPで出てきます。1人基準（数本/分）で置くと、**落とし物を届け出ようとした来場者が、
+ * 自分ではなく他人の送信で弾かれます。** 誤爆を避ける側へ倒し、連打は上の主防御で落とします。
+ *
+ * 以前はこのファイルに独自の `Map` がありましたが、**期限切れのエントリを一度も消しませんでした。**
+ * 掃除つきの共通モジュールへ寄せてあります。
  */
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const record = rateLimitStore.get(ip);
+const limiter = createRateLimiter({ limit: 30, windowMs: 60_000 });
 
-  if (!record) {
-    rateLimitStore.set(ip, { count: 1, timestamp: now });
-    return true;
-  }
-
-  // ウィンドウが過ぎていたらリセット
-  if (now - record.timestamp > RATE_LIMIT_WINDOW) {
-    rateLimitStore.set(ip, { count: 1, timestamp: now });
-    return true;
-  }
-
-  // 制限チェック
-  if (record.count >= RATE_LIMIT_MAX_REQUESTS) {
-    return false;
-  }
-
-  // カウント増加
-  record.count++;
-  return true;
+/** 送信に必要な設定が揃っているか。欠けている環境変数の名前を返す */
+function missingMailEnv(): string[] {
+  return [
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_USER",
+    "SMTP_PASS",
+    // **宛先には既定値を置かない。** 以前は `contact@setagayafes.com` へ落ちていたが、
+    // このサイトのドメインは `setagayafes.org` であり、届かない先へ静かに送る形だった
+    "CONTACT_TO_EMAIL",
+  ].filter((name) => !process.env[name]);
 }
 
 /**
- * メール送信用のトランスポーター作成
+ * メール送信用のトランスポーターと宛先を作る
+ *
+ * @returns 設定が欠けていれば null
  */
-function createTransporter() {
-  // 環境変数が設定されていない場合はnullを返す
-  if (
-    !process.env.SMTP_HOST ||
-    !process.env.SMTP_PORT ||
-    !process.env.SMTP_USER ||
-    !process.env.SMTP_PASS
-  ) {
-    return null;
-  }
+function resolveMailer() {
+  if (missingMailEnv().length > 0) return null;
 
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT, 10),
-    secure: process.env.SMTP_PORT === "465",
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
+  const port = Number.parseInt(process.env.SMTP_PORT as string, 10);
+
+  return {
+    transporter: nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port,
+      // 465 のときだけ SSL/TLS で張る。587 は STARTTLS なので secure は false
+      secure: port === 465,
+      auth: {
+        user: process.env.SMTP_USER as string,
+        pass: process.env.SMTP_PASS as string,
+      },
+    }),
+    to: process.env.CONTACT_TO_EMAIL as string,
+    // 差出人は認証したアカウントへ落とす。別ドメインの既定値を書くと SPF/DMARC で弾かれる
+    from: process.env.CONTACT_FROM_EMAIL || (process.env.SMTP_USER as string),
+  };
 }
 
 /**
@@ -175,17 +178,19 @@ ${data.message}
 
 /**
  * POST: お問い合わせ送信
+ *
+ * **検証の順序に意味がある。** レート制限を本文のパースより前に置いてあるのは、
+ * 安い検査を先に終えるためと、**空ボディ `{}` で副作用なしにレート制限を試せる**ようにするためである
+ * （空ボディは下の zod 検証で 400 になり、メールは出ない。#260 の実測で使った手）。
  */
 export async function POST(request: NextRequest) {
   try {
-    // IPアドレス取得（レート制限用）
-    const ip =
-      request.headers.get("x-forwarded-for")?.split(",")[0] ||
-      request.headers.get("x-real-ip") ||
-      "unknown";
+    // 1. レート制限（補助）。詳細は limiter の宣言を参照
+    const ip = getClientIp(request.headers);
 
-    // レート制限チェック
-    if (!checkRateLimit(ip)) {
+    if (!limiter.take(ip)) {
+      console.error(`[contact] レート制限に到達しました ip=${ip}`);
+
       return NextResponse.json(
         {
           success: false,
@@ -195,29 +200,73 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // リクエストボディ取得
-    const body = await request.json();
+    // 2. 本文のパース
+    let body: unknown;
 
-    // バリデーション
-    const validationResult = contactFormSchema.safeParse(body);
-    if (!validationResult.success) {
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { success: false, error: "入力内容に誤りがあります。" },
+        { status: 400 }
+      );
+    }
+
+    // 3. 検証
+    const parsed = contactSubmissionSchema.safeParse(body);
+
+    if (!parsed.success) {
       return NextResponse.json(
         {
           success: false,
           error: "入力内容に誤りがあります。",
-          details: validationResult.error.flatten().fieldErrors,
+          details: parsed.error.flatten().fieldErrors,
         },
         { status: 400 }
       );
     }
 
-    const data = validationResult.data;
+    const data = parsed.data;
 
-    // メールトランスポーター作成
-    const transporter = createTransporter();
+    // 4. 自動投稿よけ（主防御）。状態を持たないので、どのインスタンスでも同じ判定になる
+    const verdict = evaluateSubmission({ botField: data.botField, elapsedMs: data.elapsedMs });
 
-    if (!transporter) {
-      // 開発環境または環境変数未設定の場合はログ出力のみ
+    if (verdict !== "ok") {
+      // **来場者の入力内容は出さない。** どの経路で落ちたかだけ残す
+      console.error(`[contact] 自動投稿として拒否しました verdict=${verdict} ip=${ip}`);
+
+      return NextResponse.json({ success: false, error: RETRY_HINT }, { status: 400 });
+    }
+
+    // 5. 送信設定。**欠けていたら受け付けない**
+    const missing = missingMailEnv();
+    const action = decideMailerAction(missing, process.env.NODE_ENV === "production");
+
+    if (action !== "send") {
+      /*
+       * 本番で設定が欠けているのは事故である。**成功を返してはいけない。**
+       *
+       * 2026-09-21 まで、ここは本番でも `success: true` を返しており、来場者には
+       * 「送信完了。3営業日以内にご返信いたします。」と表示されていた。実際には
+       * 関数ログへ出力されるだけで、委員会には届いていなかった（#261）。
+       * **落とし物の届け出もここで消えていた。**
+       */
+      if (action === "reject") {
+        console.error(
+          `[contact] 送信設定が未完了のため受け付けられません。未設定: ${missing.join(", ")}`
+        );
+
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              "ただいまお問い合わせフォームからの送信ができません。お急ぎの場合は、X（旧Twitter）@setagayafes_tcu のダイレクトメッセージからご連絡ください。",
+          },
+          { status: 503 }
+        );
+      }
+
+      // 開発時のみ、内容をログへ出して受け付けたことにする
       console.log("=".repeat(50));
       console.log("[Contact Form Submission - Dev Mode]");
       console.log("=".repeat(50));
@@ -235,7 +284,14 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // メール内容生成
+    // 6. 送信
+    const mailer = resolveMailer();
+
+    if (!mailer) {
+      // decideMailerAction が "send" を返した以上ここへは来ない。型を閉じるためだけの分岐
+      throw new Error("送信設定の解決に失敗しました");
+    }
+
     const emailContent = generateEmailContent({
       type: data.type,
       name: data.name,
@@ -245,22 +301,27 @@ export async function POST(request: NextRequest) {
       message: data.message,
     });
 
-    // メール送信
-    await transporter.sendMail({
-      from: process.env.CONTACT_FROM_EMAIL || "noreply@setagayafes.com",
-      to: process.env.CONTACT_TO_EMAIL || "contact@setagayafes.com",
+    await mailer.transporter.sendMail({
+      from: mailer.from,
+      to: mailer.to,
       replyTo: data.email,
       subject: emailContent.subject,
       text: emailContent.text,
       html: emailContent.html,
     });
 
+    /*
+     * 成功時も1行残す。Vercel の Functions ログで、届いているかを確認する唯一の手段になる。
+     * **氏名・メールアドレス・本文は出さない。** 種別と本文の長さがあれば、量と傾向は追える。
+     */
+    console.log(`[contact] 送信しました type=${data.type} len=${data.message.length}`);
+
     return NextResponse.json({
       success: true,
       message: "お問い合わせを受け付けました",
     });
   } catch (error) {
-    console.error("Contact form submission error:", error);
+    console.error("[contact] 送信中にエラーが発生しました:", error);
 
     return NextResponse.json(
       {

@@ -20,6 +20,32 @@ export function ContactForm() {
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
 
   /**
+   * サーバーが返した案内文
+   *
+   * **固定文言だけを出してはいけません。** 送信設定が未完了のとき（#261）や自動投稿よけに
+   * 掛かったときは「時間をおいて再度お試しください」では直らず、来場者が何をすべきか分かりません。
+   * サーバーが具体的な案内を返したらそれを出し、無ければ従来の文言へ落とします。
+   */
+  const [serverError, setServerError] = useState<string | null>(null);
+
+  /**
+   * ハニーポット
+   *
+   * 画面外にあり、人には見えません。**自動投稿だけが値を入れます。**
+   * `react-hook-form` の管理下へ置かないのは、`zodResolver` が
+   * **来場者に見えない欄のエラーを画面へ出してしまう**ためです。
+   */
+  const [botField, setBotField] = useState("");
+
+  /**
+   * フォームが描画された時刻
+   *
+   * 送信までの経過時間をサーバーへ渡します。**描画を経ずに直接 POST する相手はこれを送れません。**
+   * `useRef` の初期化子ではなく効果の中で入れるのは、サーバー描画時の時刻を混ぜないためです。
+   */
+  const mountedAtRef = useRef<number | null>(null);
+
+  /**
    * 送信結果バナー。結果が出たらここへフォーカスを移す。
    *
    * 成功時は `reset()` で入力内容が消えるため、フォーカスを動かさないと
@@ -48,12 +74,19 @@ export function ContactForm() {
   });
 
   useEffect(() => {
+    mountedAtRef.current = Date.now();
+  }, []);
+
+  useEffect(() => {
     if (submitStatus) statusRef.current?.focus();
   }, [submitStatus]);
 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
     setSubmitStatus(null);
+    setServerError(null);
+
+    const mountedAt = mountedAtRef.current;
 
     try {
       const response = await fetch("/api/contact", {
@@ -61,7 +94,12 @@ export function ContactForm() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          botField,
+          // 未描画（= 効果が走っていない）なら送らない。サーバー側が「描画を経ていない」と判定する
+          ...(mountedAt === null ? {} : { elapsedMs: Date.now() - mountedAt }),
+        }),
       });
 
       const result = await response.json();
@@ -72,8 +110,12 @@ export function ContactForm() {
 
       setSubmitStatus("success");
       reset();
+      setBotField("");
+      // 連続送信でも経過時間を測り直せるようにする
+      mountedAtRef.current = Date.now();
     } catch (error) {
       console.error("Form submission error:", error);
+      setServerError(error instanceof Error ? error.message : null);
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
@@ -115,7 +157,7 @@ export function ContactForm() {
             <div>
               <p className="font-semibold text-red-900">送信エラー</p>
               <p className="text-sm text-red-700">
-                送信中にエラーが発生しました。時間をおいて再度お試しください。
+                {serverError ?? "送信中にエラーが発生しました。時間をおいて再度お試しください。"}
               </p>
             </div>
           </div>
@@ -124,6 +166,32 @@ export function ContactForm() {
 
       {/* フォーム */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/*
+          ハニーポット（自動投稿よけ）
+
+          **来場者からも支援技術からも隠します。** `aria-hidden` で読み上げから外し、
+          `tabIndex={-1}` でキーボードの移動順からも外します。両方やらないと、
+          スクリーンリーダーの利用者や Tab で辿る人が「入力してはいけない欄」に到達します。
+
+          `display: none` ではなく画面外へ飛ばしているのは、そのほうが自動投稿に
+          埋められやすいためです（見えない＝入力される、が狙い）。
+
+          `autoComplete="off"` はブラウザの自動入力による誤爆を減らすためです。
+          それでも埋まる可能性はあるので、**拒否時の案内は「再読み込み」を促す文言**にしてあります
+          （`src/lib/contact-guard.ts` の `RETRY_HINT`）。
+        */}
+        <div aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
+          <label htmlFor="contact-bot-field">この欄は入力しないでください</label>
+          <input
+            id="contact-bot-field"
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            value={botField}
+            onChange={(event) => setBotField(event.target.value)}
+          />
+        </div>
+
         {/* お問い合わせ種別 */}
         <div>
           <label htmlFor="type" className="mb-2 block text-sm font-semibold text-gray-900/90">
