@@ -113,9 +113,20 @@ export function createRateLimiter({
 /**
  * リクエスト元のIPを取り出す
  *
- * **`x-forwarded-for` は詐称できます。** 上限を厳密に守る手段ではありません
- * （その役割は WAF にあります）。フォールバックの `"unknown"` は全員で1つの
- * バケットを共有するため、ヘッダを落とす経路が増えると巻き添えが出ます。
+ * **Vercel 上では `x-forwarded-for` を詐称できません。** Vercel は外部から来た値を転送せず、
+ * ヘッダを上書きします（https://vercel.com/docs/headers/request-headers）。2026-09-21 に
+ * `/api/contact` へ毎回違う偽の `X-Forwarded-For` を付けて空ボディで送ったところ、
+ * 同じ実IPのバケットに溜まって 4本目から 429 になりました。**この値は上限のキーとして信頼できます。**
+ * （Enterprise の trusted proxy を契約すると、この保証は変わります。）
+ *
+ * このリミッタの限界は詐称ではなく、次の2つです。
+ *
+ * - **IP は人ではありません。** 大学の Wi-Fi やキャリアの NAT の背後では、多数の来場者が同じIPになります
+ * - **状態がインスタンスごとに別です。** 同じ実測で、429 を返した約3秒後に別インスタンスへ振られ、
+ *   上限を超えたはずの同じIPが再び通りました
+ *
+ * フォールバックの `"unknown"` は全員で1つのバケットを共有しますが、Vercel 上では通常
+ * `x-forwarded-for` が付くため到達しません。ヘッダの無いローカル開発での挙動です。
  */
 export function getClientIp(headers: Headers): string {
   return (
