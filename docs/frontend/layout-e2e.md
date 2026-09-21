@@ -152,7 +152,7 @@ e2e/
     ├── card-density.spec.ts         # カード実寸 24px・内容の溢れ              [desktop]
     ├── tabs-and-filtering.spec.ts   # 押下状態・その他タブ・レンジの算出元      [desktop]
     ├── scroll-containment.spec.ts   # 横スクロールが盤面内で完結               [desktop]
-    └── responsive-parity.spec.ts    # 縦スタックへの切替と件数の一致           [mobile]
+    └── responsive-parity.spec.ts    # 縦スタック・件数一致・初期画面の操作到達 [mobile]
 ```
 
 ビューポートは2つです。`desktop` の **1280px** は、盤面の最小幅 1152px（`72 + 6列 × 180`）に対して
@@ -160,7 +160,8 @@ e2e/
 
 `mobile` の 320px は対応下限かつ `lg`(1024px) 未満で、盤面ではなく
 `TimetableStackedList` が出ます。カード本文幅250px以上と404画面の読み順・画像幅も
-この条件で検証します。
+この条件で検証します。タイムテーブル固有の `compact` ヒーローにより、日程選択の下端が
+初期ビューポート内へ収まることも同じ実測で固定します。
 `desktop` project は `testIgnore` で `responsive-parity.spec.ts` を除外しています
 （除外しないと desktop 幅でモバイル用の検証が走って落ちます）。
 

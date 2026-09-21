@@ -4,11 +4,20 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { PageHeroData } from "@/data/page-heroes";
 
+export type PageHeroSize = "default" | "compact";
+
+interface PageHeroProps extends PageHeroData {
+  /** 一覧・検索など、初期画面から操作へ早く到達させたいページ向け */
+  size?: PageHeroSize;
+}
+
 /**
  * セクションページ共通ヒーローコンポーネント
  *
- * - 画像あり: 70svh高、画像70vw右寄せ、テキスト左下オーバーレイ
- * - 画像なし: 70svh高、テキストセンター表示
+ * - default: 70svh高。ブランド訴求を優先する通常ページ向け
+ * - compact: 52svh高（lg以上は50svh）。一覧・検索など操作を優先するページ向け
+ * - 画像あり: 画像70vw右寄せ、テキスト左下オーバーレイ
+ * - 画像なし: テキストセンター表示
  * - Server Component（"use client" 不要）
  */
 export function PageHero({
@@ -21,8 +30,11 @@ export function PageHero({
   badgeAlt,
   ctaHref,
   ctaLabel = "View More",
-}: PageHeroData) {
+  size = "default",
+}: PageHeroProps) {
   const hasImage = !!imageSrc;
+  const heightClass =
+    size === "compact" ? "h-[52svh] min-h-[360px] lg:h-[50svh]" : "h-[70svh] min-h-[400px]";
 
   const renderedTitle = Array.isArray(title)
     ? title.map((line, i) => (
@@ -35,8 +47,9 @@ export function PageHero({
 
   return (
     <section
-      className="relative h-[70svh] min-h-[400px] w-full overflow-hidden bg-secondary"
+      className={`relative w-full overflow-hidden bg-secondary ${heightClass}`}
       data-page-hero
+      data-page-hero-size={size}
     >
       {/* 画像レイヤー */}
       {hasImage && (

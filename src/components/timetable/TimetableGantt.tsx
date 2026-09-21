@@ -57,7 +57,12 @@ export function TimetableGantt({ groups, range }: TimetableGanttProps) {
       <div className="grid" style={{ gridTemplateColumns }}>
         {/* 時刻ラベル列。横スクロール中も残るため面は不透明でなければならない */}
         <div className="sticky left-0 z-20 border-r border-gray-200 bg-white">
-          <div className={HEADER_HEIGHT_CLASS} />
+          <div
+            data-timetable-time-heading
+            className={`flex ${HEADER_HEIGHT_CLASS} items-center border-b border-gray-200 bg-gray-50 px-2 text-xs font-semibold text-gray-600`}
+          >
+            時刻
+          </div>
           <TimeAxisColumn range={range} hourHeightPx={HOUR_HEIGHT_PX} />
         </div>
 
@@ -65,9 +70,13 @@ export function TimetableGantt({ groups, range }: TimetableGanttProps) {
         {groups.map((group) => (
           <section key={group.id} className="min-w-0">
             <h3
-              className={`flex ${HEADER_HEIGHT_CLASS} items-center px-2 text-sm font-bold text-gray-900`}
+              data-timetable-stage-heading
+              className={`flex ${HEADER_HEIGHT_CLASS} items-center justify-between gap-2 border-b border-gray-200 bg-gray-50 px-2 text-sm font-bold text-gray-900`}
             >
               <span className="truncate">{group.name}</span>
+              <span className="shrink-0 rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700">
+                {group.events.length}件
+              </span>
             </h3>
 
             <div
