@@ -59,6 +59,24 @@ export const contactFormSchema = z.object({
 export type ContactFormData = z.infer<typeof contactFormSchema>;
 
 /**
+ * `/api/contact` が受け取る本文
+ *
+ * 人が入力する項目（`contactFormSchema`）に、自動投稿よけの2項目を足したものです。
+ *
+ * **`contactFormSchema` 側へ足してはいけません。** あちらは react-hook-form の
+ * `zodResolver` が使うため、足すと**来場者に見えない欄のエラーが画面へ出ます。**
+ * 判定は `src/lib/contact-guard.ts` が行い、ここでは型だけを受け取ります。
+ */
+export const contactSubmissionSchema = contactFormSchema.extend({
+  /** ハニーポット。画面外にあり、人は入力できない */
+  botField: z.string().max(200).optional(),
+  /** フォームが描画されてから送信までのミリ秒。描画を経ない POST では欠落する */
+  elapsedMs: z.number().int().nonnegative().optional(),
+});
+
+export type ContactSubmission = z.infer<typeof contactSubmissionSchema>;
+
+/**
  * お問い合わせ種別ラベル
  */
 export const contactTypeLabels: Record<ContactType, string> = {
