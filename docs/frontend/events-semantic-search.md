@@ -246,6 +246,72 @@ Jev に埋め込みも事前計算も無い。全件を毎回リクエストへ�
 > 1IPからの最悪は 300 × 0.097円 ≒ 29円/分（1,750円/時）で、これを許容する代わりに
 > 誤爆をゼロに寄せている。**費用の本丸はレート制限ではなく、ゲート・CDN・コンソール側の上限。**
 
+#### 適用状況（2026-09-21）
+
+| 項目               | 状態                                                                                        |
+| ------------------ | ------------------------------------------------------------------------------------------- |
+| ルール             | `semantic-search-rate-limit` を作成済み（`path eq /api/search` / 300本 / 60秒 / IP / deny） |
+| 設定の読み戻し     | `active: true` / `valid: true` / ルール総数1（Hobby の上限どおり）                          |
+| **実際に弾くこと** | **未検証。** 下の「bot 対策とぶつかる」を参照                                               |
+
+ダッシュボードの代わりに REST API で作った。**再作成・変更の手順:**
+
+```bash
+# トークンは Vercel CLI のものを流用する（値を画面や履歴へ出さない）
+TOKEN=$(python3 -c "import json,os;print(json.load(open(os.path.expanduser('~/Library/Application Support/com.vercel.cli/auth.json')))['token'])")
+PID=$(python3 -c "import json;print(json.load(open('.vercel/project.json'))['projectId'])")
+OID=$(python3 -c "import json;print(json.load(open('.vercel/project.json'))['orgId'])")
+
+# 作成: action は rules.insert、id は null
+curl -sS -X PATCH -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  "https://api.vercel.com/v1/security/firewall/config?projectId=$PID&teamId=$OID" --data-binary @- <<'JSON'
+{ "action": "rules.insert", "id": null,
+  "value": { "name": "semantic-search-rate-limit", "active": true,
+    "conditionGroup": [{ "conditions": [{ "type": "path", "op": "eq", "value": "/api/search" }] }],
+    "action": { "mitigate": { "action": "rate_limit",
+      "rateLimit": { "algo": "fixed_window", "window": 60, "limit": 300, "keys": ["ip"], "action": "deny" } } } } }
+JSON
+
+# 読み戻し（必ずやる）
+curl -sS -H "Authorization: Bearer $TOKEN" \
+  "https://api.vercel.com/v1/security/firewall/config/active?projectId=$PID&teamId=$OID"
+```
+
+> [!WARNING]
+> **公式ドキュメントのページ（`/docs/rest-api/reference/endpoints/security/update-firewall-configuration`）は
+> 描画が壊れている。** `action` の値とその説明が1行ずつずれ、`rateLimit` の形は載っていない。
+> **正しい形は機械可読の仕様 <https://vercel.com/openapi.json>（11MB）から読むこと。**
+> `mitigate.action` は `rate_limit`、その中身は `rateLimit.{algo, window, limit, keys, action}`。
+> 更新は `rules.update`（`id` は読み戻しで得たルールID）。
+
+#### bot 対策とぶつかる — この検証は本番へ連打しても成立しない
+
+WAF の実効性を確かめるため、同一URL（CDN に載っているので課金は0）を連打した（2026-09-21）。
+**上限 300 より手前で、Vercel 標準の bot 対策が先に反応した。**
+
+| 試行                                          | 観測したこと                                                                            |
+| --------------------------------------------- | --------------------------------------------------------------------------------------- |
+| UA 無しの Python から 17本/秒                 | **51本目で `403` + `X-Vercel-Mitigated: challenge`**（自分のルールではない。上限は300） |
+| その直後、ブラウザ UA を付けた Python         | **1本目から `challenge`**（本文32KBのHTML）。**UA を付けても通らなかった**              |
+| 同じ頃の `curl`（ブラウザ UA）                | `200`                                                                                   |
+| 上限を 15本/10秒へ一時的に下げ、`curl` で叩く | 途中の1本が30秒で応答せず打ち切られた。**何本目かは記録しておらず、判定に至らなかった** |
+
+**Python だけが弾かれ、curl は通った理由は測っていない。** クライアントの TLS 指紋など
+UA 以外の要素で判定された可能性はあるが、**仮説であって確認していない。**
+
+**`X-Vercel-Mitigated` の値で切り分けること。** `challenge` はプラットフォームの bot 対策であり、
+`docs/dev/content-revalidation.md` が警告している「連続ポーリング禁止」と同じ現象である。
+**自分のルールが発火したのか、bot 対策が発火したのかを、ステータスだけで判断してはいけない。**
+
+したがって実効性は**ダッシュボードの Firewall → トラフィックで、ルール名 `semantic-search-rate-limit`
+のヒットを見て確かめる**（本番の実トラフィックで、または実ブラウザ1本で確認する）。
+**「設定を読み戻せた」は「弾く」の証明ではない。**
+
+> [!NOTE]
+> 一時的に上限を下げる検証をした場合は、**必ず元へ戻し、読み戻しで一致を確認する。**
+> 2026-09-21 の検証では `finally` で復元し、`limit=300 / window=60 / keys=[ip] / action=deny` へ
+> 戻っていることを読み戻しで確認した。スクリプトが例外で落ちても復元が走る形にしておくこと。
+
 層2は**厳密には効かない。** サーバーレスではインスタンスごとに Map が分かれるため、
 実効の上限は「設定値 × 同時に生きているインスタンス数」になる。それでも置いてあるのは、
 WAF の設定漏れと Preview 環境を素通りさせないためである。
@@ -256,7 +322,30 @@ WAF の設定漏れと Preview 環境を素通りさせないためである。
 ### TypeSafe コンソール側の上限
 
 **公式ドキュメントに記載が無い。** 設定できるかどうかはコンソールにログインしないと分からない。
+
+**API からは読み書きできない**（2026-09-21 実測。`GET /v1/models` は 200 だが、
+`/v1/usage` `/v1/account` `/v1/limits` `/v1/billing` `/v1/keys` `/v1/organization` はすべて 404）。
+**人が [console.typesafe.ai](https://console.typesafe.ai) で確認するしかなく、現時点では未確認。**
+費用の最悪値は上の「1IPからの最悪」がすべてで、それ以上を止める装置は**まだ無い。**
 確認して、可能なら設定すること。
+
+## 鍵の登録とデプロイ
+
+`TYPESAFE_API_KEY` は **Production にだけ登録している**（2026-09-21）。
+
+| 環境        | 鍵           | `/api/search` の挙動                                                               |
+| ----------- | ------------ | ---------------------------------------------------------------------------------- |
+| Production  | あり         | 動作する                                                                           |
+| Preview     | **無い**     | `503`（fail closed）。**Preview の `/events` では第4段が動かない**（意図した挙動） |
+| Development | `.env.local` | 動作する（`node scripts/measure-semantic-search.mjs` も同じ鍵を読む）              |
+
+> [!IMPORTANT]
+> **環境変数を足しても、既存のデプロイには反映されない。** 再デプロイが要る。
+> `vercel redeploy <デプロイURL> --scope yamashitamanato`（`--scope` が無いと
+> `Deployment belongs to a different team` で落ちる）。
+> 鍵の登録は標準入力から流すと値が履歴と画面に残らない:
+> `printf '%s' "$VALUE" | vercel env add TYPESAFE_API_KEY production`。
+> **鍵を `NEXT_PUBLIC_` 付きで登録してはいけない**（クライアントバンドルへ焼き込まれ、従量課金口の鍵が公開される）。
 
 ## プライバシーポリシー
 

@@ -403,6 +403,8 @@ docs/
   - **Issue #253 の「該当なし群 0.02〜0.06」は再現しない。** `スキー場` は 0.24。閾値 0.5 は動かさない
   - **判定は絞り込み前の全企画に対して行う。** フィルタ起因の0件で呼ぶと、積集合で消える結果に課金する
   - **レート制限の第一層は Vercel WAF で、コードではない。** マージしただけでは有効にならない
+    （2026-09-21 に REST API で作成済み。**設定の読み戻しまでで、実際に弾くことは未検証**。
+    連打すると自分のルールより先に Vercel の bot 対策 `X-Vercel-Mitigated: challenge` が反応する）
   - **来場者の検索語は米国の TypeSafe へ送られ、ZDR はエンタープライズ限定。**
     `src/data/privacy.ts` の `thirdParty.externalServices` に明記した
   - **`eslint.config.mjs` の `no-restricted-imports` / `no-restricted-syntax` は後勝ちで丸ごと置き換わる。**
