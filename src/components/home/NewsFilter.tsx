@@ -44,7 +44,7 @@ export function NewsFilter({ newsList, header }: NewsFilterProps) {
                 className={cn(
                   "rounded-full px-5 py-2 text-sm font-medium transition-colors lg:rounded-lg lg:px-3 lg:py-2 lg:text-left",
                   activeFilter === tab.value
-                    ? "bg-primary-400 text-white lg:bg-primary-400/10 lg:font-semibold lg:text-primary-500"
+                    ? "bg-primary-600 text-white lg:bg-primary-400/10 lg:font-semibold lg:text-primary-500"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200 lg:bg-transparent lg:text-gray-500 lg:hover:bg-gray-50 lg:hover:text-gray-900"
                 )}
               >

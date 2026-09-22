@@ -202,7 +202,7 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
       <div className="mt-12 flex flex-wrap justify-center gap-4 px-8">
         <Link
           href="/events"
-          className="inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-80"
+          className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-8 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-80"
         >
           企画一覧
           <svg

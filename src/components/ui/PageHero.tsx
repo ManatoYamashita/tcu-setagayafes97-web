@@ -100,6 +100,18 @@ export function PageHero({
             )}
             {ctaHref && (
               <Link href={ctaHref} className="group mt-6 inline-flex items-center gap-4 lg:mt-8">
+                {/*
+                  この円の中身は ArrowRight アイコンだけで、文字を持たない。
+                  白と primary-400（実配信 #bf73e3）の比は 3.10:1 で、通常テキストの
+                  4.5:1 には届かないが、**非テキストコントラスト（WCAG 1.4.11）の
+                  要求は 3:1** であり満たしている。ラベルは隣の <span> にあり、
+                  そちらは text-gray-900 で地の上に置かれている。
+
+                  #95 の規則は className の文字列しか見られず、中身がアイコンか
+                  文字かを判別できない。ここだけ射程外であることを明示して外す。
+                  **余裕は 0.10 しかないため、この円の色を薄くしてはいけない。**
+                */}
+                {/* eslint-disable-next-line no-restricted-syntax -- アイコンのみ。1.4.11 の 3:1 を満たす（上のコメント） */}
                 <span className="flex h-14 w-14 items-center justify-center rounded-full border border-primary-500 bg-primary-400 text-white transition-colors group-hover:bg-primary-500 lg:h-16 lg:w-16">
                   <ArrowRight className="h-5 w-5 lg:h-6 lg:w-6" aria-hidden="true" />
                 </span>

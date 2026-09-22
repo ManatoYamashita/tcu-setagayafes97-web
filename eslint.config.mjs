@@ -74,6 +74,54 @@ const RESTRICTED_COLOR_SELECTORS = RESTRICTED_COLOR_TOKENS.flatMap(({ pattern, m
   { selector: `TemplateElement[value.raw=/${pattern}/]`, message },
 ]);
 
+/**
+ * ブランドカラーの上の白文字の禁止（#95）
+ *
+ * `--color-primary` の実配信値 `#bf73e3` と白のコントラストは **3.10:1** で、
+ * WCAG AA（通常テキスト 4.5:1）に届かない。`--color-accent` と `--color-primary`
+ * はどちらも `primary-400` の別名であり、`primary-300` 以下はさらに淡い。
+ *
+ * | 背景          | 白文字との比 | 判定 |
+ * | ------------- | ------------ | ---- |
+ * | `primary-400` | 3.10:1       | NG   |
+ * | `primary-500` | 4.88:1       | 可   |
+ * | `primary-600` | 7.45:1       | 推奨 |
+ * | `primary-700` | 11.2:1       | 推奨 |
+ *
+ * `globals.css` の `--color-primary` にも `docs/frontend/design.md` にも
+ * 「前景テキストに使ってはいけない」と書いてあったが、**文書は人間が読まなければ効かない。**
+ * 2026-09-22 の監査で5箇所（privacy / faq / FeaturedCarousel / SponsorModal /
+ * TicketTable）が残っていた。#95 は同じ欠陥を 2026-08-24 に起票し、
+ * そこに列挙された3件だけが直って Issue は開いたままだった。
+ *
+ * **射程外（意図的）**
+ *
+ * - `hover:bg-primary text-white` — 基底状態ではないので落とさない
+ * - 親要素に `bg-primary`、子要素に `text-white` — className が別文字列なので見えない
+ * - `` `bg-primary ${x} text-white` `` — TemplateElement が分割され、片方ずつになる
+ *
+ * いずれも「1つの className 文字列に両方が入る」という最頻の形を塞ぐことを優先した。
+ * **射程を広げるより、確実に落ちる形を1つ持つほうがよい。**
+ */
+const WHITE_ON_BRAND_PATTERN =
+  "(?=[\\s\\S]*(?:^|\\s)bg-(?:primary|accent)(?:-(?:400|300|200|100|50))?(?![-\\w]))(?=[\\s\\S]*(?:^|\\s)text-white(?![-\\w]))";
+
+const WHITE_ON_BRAND_MESSAGE =
+  "ブランドカラー（--color-primary / --color-accent = 実配信 #bf73e3）の上に白文字を置くと 3.10:1 で、WCAG AA の 4.5:1 に届きません（#95）。bg-primary-600（7.45:1）か bg-primary-700（11.2:1）を使ってください。値の一覧は docs/frontend/design.md「コントラスト比」。";
+
+/**
+ * 上の2つと同じ理由でここへ出す。`no-restricted-syntax` は
+ * `src/**` 用と `EventInfiniteList.tsx` 用の2ブロックで使うため、**両方で展開すること。**
+ * 片方に足し忘れると、そのファイルだけ検査が黙って消える。
+ */
+const RESTRICTED_CONTRAST_SELECTORS = [
+  { selector: `Literal[value=/${WHITE_ON_BRAND_PATTERN}/]`, message: WHITE_ON_BRAND_MESSAGE },
+  {
+    selector: `TemplateElement[value.raw=/${WHITE_ON_BRAND_PATTERN}/]`,
+    message: WHITE_ON_BRAND_MESSAGE,
+  },
+];
+
 /** @type {import('eslint').Linter.Config[]} */
 const config = [
   ...nextConfig,
@@ -111,7 +159,12 @@ const config = [
     rules: {
       // セレクタの組み立ては RESTRICTED_COLOR_SELECTORS（このファイル冒頭）。
       // 一次定義は scripts/restricted-color-tokens.mjs（#230）。
-      "no-restricted-syntax": ["error", ...RESTRICTED_COLOR_SELECTORS],
+      // RESTRICTED_CONTRAST_SELECTORS は #95（ブランドカラーの上の白文字）。
+      "no-restricted-syntax": [
+        "error",
+        ...RESTRICTED_COLOR_SELECTORS,
+        ...RESTRICTED_CONTRAST_SELECTORS,
+      ],
     },
   },
   {
@@ -216,11 +269,13 @@ const config = [
     files: ["src/components/events/EventInfiniteList.tsx"],
     rules: {
       "react-hooks/exhaustive-deps": "error",
-      // **色のセレクタを必ず展開すること。** flat config は後勝ちで丸ごと置き換えるため、
-      // 展開を落とすとこのファイルだけ禁止色が素通りする（2026-09-20 まで素通りしていた）。
+      // **色とコントラストのセレクタを必ず展開すること。** flat config は後勝ちで丸ごと
+      // 置き換えるため、展開を落とすとこのファイルだけ検査が素通りする
+      // （2026-09-20 まで禁止色が実際に素通りしていた）。
       "no-restricted-syntax": [
         "error",
         ...RESTRICTED_COLOR_SELECTORS,
+        ...RESTRICTED_CONTRAST_SELECTORS,
         {
           selector: "CallExpression[callee.name='useEffect'] Identifier[name='hasMore']",
           message:

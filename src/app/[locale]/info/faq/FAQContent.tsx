@@ -220,7 +220,7 @@ export function FAQContent({ initialFAQ }: FAQContentProps) {
           </div>
           <Link
             href="/info/contact"
-            className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-500"
+            className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg bg-primary-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
           >
             {tNav("contact")}
             <ArrowRight aria-hidden="true" className="h-4 w-4" />
