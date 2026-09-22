@@ -60,7 +60,7 @@ pnpm install
 # 開発サーバー起動
 pnpm dev
 
-# ビルド（末尾に生成物の検査が2本連結されている。下記「ビルド末尾の検査」を参照）
+# ビルド（末尾に生成物の検査が3本連結されている。下記「ビルド末尾の検査」を参照）
 pnpm build
 
 # プロダクションサーバー起動
@@ -155,20 +155,22 @@ microCMS の secrets を要求するので fork PR では必ず落ちる）。�
 
 ### ビルド末尾の検査
 
-`pnpm build` は `next build` のあとに、**生成物を読む検査を2本**流す。
-どちらも「ビルドは通るが壊れている」状態を落とすためにあり、ESLint でも Vitest でも
+`pnpm build` は `next build` のあとに、**生成物を読む検査を3本**流す。
+いずれも「ビルドは通るが壊れている」状態を落とすためにあり、ESLint でも Vitest でも
 代替できない（生成された HTML を読む以外に判定する方法が無い）。
 
 | スクリプト                      | 落とすもの                                                                                  | 参照                                                                                                  |
 | ------------------------------- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | `assert-events-static-html.mjs` | `/events` の本体がクライアント描画へ落ちる（#156）                                          | [`docs/frontend/static-html-and-search-params.md`](../docs/frontend/static-html-and-search-params.md) |
 | `assert-no-image-optimizer.mjs` | **どの画像でも** `/_next/image` を通る／`public/` の静的画像がHTMLから消える（#237 / #241） | [`docs/frontend/image-delivery.md`](../docs/frontend/image-delivery.md)                               |
+| `assert-font-preloads.mjs`      | 1ルートのフォントpreloadが10本以上になる（#90）                                             | [`docs/frontend/performance.md`](../docs/frontend/performance.md)                                     |
 
-**どちらも検査対象が消えると空振りする。** 前者は `EVENTS_VISIBLE` が false のとき、
-後者は microCMS の画像が1枚もHTMLに出ないときで、いずれもログに `SKIP` / `NOTE` を出す。
+**先頭2本は検査対象が消えると空振りする。** 1本目は `EVENTS_VISIBLE` が false のとき、
+2本目は microCMS の画像が1枚もHTMLに出ないときで、それぞれログに `SKIP` / `NOTE` を出す。
 **その行が出ているときは、検査が効いていないと考えること。**
-なお後者は**公開フラグが全て false でも空振りしない**（協賛企業はフラグ非依存）。
+なお2本目は**公開フラグが全て false でも空振りしない**（協賛企業はフラグ非依存）。
 `NOTE` が出たら「協賛の取得が0件」を疑うこと。
+3本目は全事前描画HTMLの `<head>` を対象にするため、HTMLが1枚でもあれば空振りしない。
 
 `pnpm type-check` が `next typegen` を前置しているのは、**`.next/types/validator.ts` が
 `.d.ts` ではなく `.ts` だから**である。`skipLibCheck: true` はこのファイルを守らないため、

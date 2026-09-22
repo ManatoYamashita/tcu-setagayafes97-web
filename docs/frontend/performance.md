@@ -337,6 +337,35 @@ const shouldWaitForOpener = willRunOpener() && !hasOpenerFinished();
 - **端末標準フォントで代替しない。** `Hiragino Kaku Gothic ProN` などは macOS / iOS にしか
   無く、Windows と Android では全く別の書体になる。ブランド要素には使わない。
 
+## 2026-09-22 Issue #90 完了確認と回帰防止
+
+2026-08-24 の本番は Kaisei Opti の `preload: true` によりフォントを244本・約4.6 MiB先読みし、
+モバイル Performance が34まで低下していた。その後のPR #102、#106、#107でpreload停止、
+フォントCSSの遅延配信、未使用フォントの削除まで進んだため、本番を同条件で再確認した。
+
+Lighthouse 13.4.1 のmobile presetを `https://setagayafes.org/` へ3回実行した中央値:
+
+| 指標               | 2026-08-24 |  2026-09-22 | Issue #90 完了条件 |
+| ------------------ | ---------: | ----------: | -----------------: |
+| Performance        |         34 |          98 |             70以上 |
+| FCP                |     1.8 秒 |     1.08 秒 |                  - |
+| LCP                |    28.6 秒 |     2.26 秒 |                  - |
+| TBT                |   3,870 ms |       14 ms |                  - |
+| Speed Index        |    24.2 秒 |     1.99 秒 |                  - |
+| CLS                |          0 |           0 |                  - |
+| 総転送量           |  5,995 KiB |     632 KiB |      2,000 KiB未満 |
+| Webフォント        |      250本 | 1本 / 2 KiB |                  - |
+| HTML内font preload |      244本 |           0 |           10本未満 |
+
+390×844の実ブラウザでは、初期HTMLにフォントpreloadが無いこと、ホームのスクロール後と
+`/events` の見出し（`h1`〜`h3`）が `Kaisei Opti` へ解決され、使用文字のフォントフェースが
+`loaded` になること、ページエラーが無いことを確認した。
+
+再発防止として `scripts/assert-font-preloads.mjs` を `pnpm build` の末尾へ追加した。
+全事前描画HTMLの `<head>` を検査し、1ルートでもフォントpreloadが10本以上なら失敗する。
+設定ファイルの形ではなく最終生成HTMLを判定するため、フォントの追加場所やNext.jsの生成仕様が
+変わっても、利用者へ届く先読み本数を契約として固定できる。
+
 ## 検証
 
 1. `pnpm lint`、`pnpm format:check`、`pnpm build` を通す。
