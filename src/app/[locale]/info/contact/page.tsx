@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import { Mail, Phone, MapPin } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
 import { pageHeroes, type PageHeroData } from "@/data/page-heroes";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
-import { ContactForm } from "./ContactForm";
+import { ContactForm, type ContactTypeOption } from "./ContactForm";
 import { createPageMetadata } from "@/lib/metadata";
 
 /**
@@ -54,61 +53,55 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
     description: t("subtitle"),
   };
 
+  /**
+   * 種別の選択肢
+   *
+   * 以前はこの3件を「説明カード」として描いたうえで、フォーム側の `<select>` に
+   * 同じ3件をもう一度並べていた。来場者は同じ選択を2度読むことになり、
+   * カードのほうは押しても何も起きない飾りだった。
+   *
+   * 現在はカードが選択そのものを担う。翻訳はサーバー側で解決してから渡す
+   * （`ContactForm` はクライアントコンポーネントであり、next-intl のサーバー API を呼べない）。
+   * 並び順は `contactTypes` と揃えること。
+   */
+  const typeOptions: ContactTypeOption[] = [
+    {
+      value: "general",
+      title: t("types.general.title"),
+      description: t("types.general.description"),
+    },
+    {
+      value: "media",
+      title: t("types.media.title"),
+      description: t("types.media.description"),
+    },
+    {
+      value: "lost-and-found",
+      title: t("types.lostFound.title"),
+      description: t("types.lostFound.description"),
+    },
+  ];
+
   return (
     <PageSheetLayout hero={hero}>
-      <div className="mx-auto max-w-4xl space-y-12">
-        {/* お問い合わせ種別説明 */}
-        <section>
-          <div className="grid gap-6 md:grid-cols-3">
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm">
-              <div className="mb-3 flex items-center gap-2">
-                <Mail className="h-5 w-5 text-blue-500" />
-                <h2 className="font-bold text-gray-900">{t("types.general.title")}</h2>
-              </div>
-              <p className="text-sm text-gray-700">{t("types.general.description")}</p>
-            </div>
+      <div className="mx-auto max-w-4xl space-y-10 pb-6">
+        {/*
+          FAQ への導線。文言が「お問い合わせの前に」と言っている以上、
+          フォームより前に置かないと意味が通らない（以前は最下部にあった）。
+          ここは本題ではないので、囲みを持たせず1行の地の文として置く。
+        */}
+        <p className="text-sm leading-relaxed text-gray-600">
+          {t("beforeContact.prefix")}{" "}
+          <Link
+            href="/info/faq"
+            className="font-semibold text-primary-600 underline underline-offset-4 hoverable:hover:no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+          >
+            {t("beforeContact.faqLink")}
+          </Link>{" "}
+          {t("beforeContact.suffix")}
+        </p>
 
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm">
-              <div className="mb-3 flex items-center gap-2">
-                <Phone className="h-5 w-5 text-green-500" />
-                <h2 className="font-bold text-gray-900">{t("types.media.title")}</h2>
-              </div>
-              <p className="text-sm text-gray-700">{t("types.media.description")}</p>
-            </div>
-
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm">
-              <div className="mb-3 flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-orange-500" />
-                <h2 className="font-bold text-gray-900">{t("types.lostFound.title")}</h2>
-              </div>
-              <p className="text-sm text-gray-700">{t("types.lostFound.description")}</p>
-            </div>
-          </div>
-        </section>
-
-        {/* お問い合わせフォーム */}
-        <section className="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm md:p-8">
-          <h2 className="mb-6 text-2xl font-bold text-gray-900">{t("form.title")}</h2>
-
-          <ContactForm />
-        </section>
-
-        {/* よくある質問へのリンク */}
-        <section className="rounded-lg border border-blue-200 bg-blue-50 p-6">
-          <div className="flex items-start gap-3">
-            <Mail aria-hidden="true" className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
-            <div>
-              <p className="font-semibold text-blue-900">{t("beforeContact.title")}</p>
-              <p className="mt-1 text-sm text-blue-700">
-                {t("beforeContact.prefix")}{" "}
-                <Link href="/info/faq" className="underline hover:text-blue-900">
-                  {t("beforeContact.faqLink")}
-                </Link>{" "}
-                {t("beforeContact.suffix")}
-              </p>
-            </div>
-          </div>
-        </section>
+        <ContactForm typeOptions={typeOptions} />
       </div>
     </PageSheetLayout>
   );
