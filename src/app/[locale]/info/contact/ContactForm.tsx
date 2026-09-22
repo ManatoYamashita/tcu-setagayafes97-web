@@ -25,11 +25,14 @@ export interface ContactTypeOption {
  * どこを触ればよいのか分かりにくい。淡い藤色（primary-50）で面を作り、
  * フォーカス時に白へ抜けることで「いま入力している欄」を1つだけ際立たせる。
  *
- * ホバーで面の色を変えてはいけない。同じ `background-color` を争うことになり、
- * Tailwind の並び順ではホバーが `aria-invalid` に勝つ。入力漏れの欄にカーソルが
- * 乗っているあいだだけ赤い面が消え、境界線だけが赤い状態になる（実測）。 同じ理由で
- * フォーカス時に境界線の色も変えない。3px のアウトラインが既にフォーカスを示しており、
- * 境界線まで紫にすると `aria-invalid` の赤が隠れる。
+ * **ホバーで面の色を変えてはいけない。** 同じ `background-color` を争ううえ、
+ * Tailwind は `hover:` を `aria-[invalid=true]:` より後ろへ出力する（詳細度はどちらも
+ * (0,2,0) なので後勝ち）。入力漏れの欄にカーソルが乗っているあいだだけ赤い面が消える。
+ *
+ * フォーカス時に境界線の色を変えないのは、これとは別の理由である。3px のアウトラインが
+ * 既にフォーカスを示しており、その内側に紫の境界線を重ねても情報が増えない。
+ * `aria-invalid` を隠すからではない（`aria-*` は `focus:` より後ろに出るので赤が残る）。
+ * 出力順の実測値は docs/frontend/contact-form.md を参照。
  */
 const FIELD_CLASS =
   "w-full rounded-xl border border-transparent bg-primary-50 px-4 py-3 text-gray-900 transition-colors placeholder:text-gray-500 focus:bg-white focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600 aria-[invalid=true]:border-red-600 aria-[invalid=true]:bg-red-50 motion-reduce:transition-none";
