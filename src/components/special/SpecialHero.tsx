@@ -8,6 +8,8 @@ interface SpecialHeroProps {
   logo?: MicroCMSImage;
   /** メインビジュアル（Event.thumbnail） */
   photo?: MicroCMSImage;
+  /** モバイル固定CTAぶん、下端のコピーを上へ逃がす */
+  hasMobileTicketCta?: boolean;
 }
 
 /**
@@ -31,9 +33,19 @@ interface SpecialHeroProps {
  * `data-special-hero-*` は SpecialPageMotion が入場アニメーションの対象を探すための
  * フックです。この属性を消すと、該当要素だけ演出が無くなります（エラーにはなりません）。
  */
-export function SpecialHero({ title, organizer, logo, photo }: SpecialHeroProps) {
+export function SpecialHero({
+  title,
+  organizer,
+  logo,
+  photo,
+  hasMobileTicketCta = false,
+}: SpecialHeroProps) {
   return (
-    <section className="relative isolate flex min-h-[calc(100svh-var(--header-height))] items-end overflow-hidden bg-primary-dark pb-10 pt-20 md:pb-16">
+    <section
+      className={`relative isolate flex min-h-[calc(100svh-var(--header-height))] items-end overflow-hidden bg-primary-dark pt-20 ${
+        hasMobileTicketCta ? "pb-32 md:pb-16" : "pb-10 md:pb-16"
+      }`}
+    >
       {/* 背景写真
           ラッパーを挟んでいるのは、SpecialPageMotion が中の <img> だけを拡大縮小するため。
           `fill` は position 指定のある親を必要とするので absolute inset-0 を持たせている。 */}

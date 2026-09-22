@@ -35,6 +35,7 @@ docs/
 │   └── draft-preview.md # microCMS 画面プレビューによる下書きの実機確認
 ├── frontend/         # フロントエンド関連ドキュメント
 │   ├── design.md                  # デザインシステム（カラー・タイポグラフィトークン）
+│   ├── special-ticket-cta.md      # 著名人企画LPのモバイルチケット導線
 │   ├── access-page-design.md      # Accessページの情報設計・UI実装方針
 │   ├── agent-browser-workflow.md      # agent-browserを使用したデザイン再現とデバッグフロー
 │   ├── browser-observation-limits.md  # ブラウザ観測の前提と限界（何が測れるか）
@@ -294,6 +295,12 @@ docs/
     開催概要リスト限定の規約であり、白いシート全体の規約ではない**）
   - CSS 変数まとめ
   - リッチテキスト（`prose`）の扱い — typography プラグイン未導入と `@layer` の選び方
+
+- **[special-ticket-cta.md](./frontend/special-ticket-cta.md)** - 著名人企画LPのモバイルチケット導線
+  - 購入可能な券種数に応じた固定CTAの遷移先
+  - モバイル縦カードとデスクトップ比較表の表示分担
+  - safe area、レイヤー、ヒーロー下余白、本文CTA・フッター表示時の退避条件
+  - 320px幅・キーボードフォーカス・コントラストの検証契約
 
 - **[image-delivery.md](./frontend/image-delivery.md)** - 画像配信の経路（変換をどこにやらせるか）
   - **変換は2つとも Vercel の外。** microCMS は imgix、`public/` は `pnpm images:optimize` で
