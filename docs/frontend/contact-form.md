@@ -60,18 +60,34 @@
 **キーボードでも読み上げでも到達できなくなる。** フォーカスリングは `peer-focus-visible:`
 で `<span>` 側へ出す。
 
-### 入力欄の面の色は `aria-invalid` に譲る
+### 入力欄にホバーの背景色を書かない
 
-`src/app/[locale]/info/contact/ContactForm.tsx` の `FIELD_CLASS` には
-**ホバー時の背景色と、フォーカス時の境界線色を書いてはいけない。**
+`src/app/[locale]/info/contact/ContactForm.tsx` の `FIELD_CLASS` に
+**`hoverable:hover:bg-*` を書いてはいけない。** `aria-[invalid=true]:bg-*` と
+同じ `background-color` を争い、**入力漏れの欄にカーソルが乗っているあいだだけ
+赤い面が消える**（2026-09-22 実測）。lint も型もテストも通る。
 
-| 書いてはいけないもの   | 起きること                                                            |
-| ---------------------- | --------------------------------------------------------------------- |
-| `hoverable:hover:bg-*` | 入力漏れの欄にカーソルが乗るあいだ、赤い面が消える（2026-09-22 実測） |
-| `focus:border-*`       | 3px のアウトラインと重なり、`aria-invalid` の赤い境界線が隠れる       |
+勝敗を決めているのは詳細度ではなく**出力順**である。5つとも `.cls:hover` /
+`.cls[aria-invalid="true"]` で詳細度は (0,2,0) であり、後に出たほうが勝つ。
+出力CSSのバイト位置（2026-09-22 / standalone postcss で実測）:
 
-どちらも同じプロパティを争うことになり、Tailwind の並び順では
-ホバー・フォーカス側が `aria-[invalid=true]:` に勝つ。**lint も型もテストも通る。**
+| 位置 | ユーティリティ                       |
+| ---- | ------------------------------------ |
+| 4855 | `focus:border-primary-600`           |
+| 4956 | `focus:bg-white`                     |
+| 5045 | `aria-[invalid=true]:border-red-600` |
+| 5170 | `aria-[invalid=true]:bg-red-50`      |
+| 5304 | `hoverable:hover:bg-primary-100`     |
+
+つまり **`aria-*` は `focus:` に勝ち、`hover:` に負ける。**
+
+> [!WARNING]
+> **`focus:border-*` は `aria-invalid` の赤い境界線を隠さない。**
+> 本ファイルには 2026-09-22 まで「隠す」と書かれていたが誤りで、上の実測が反証する。
+> 誤診の原因は、`focus-visible:outline-3 outline-primary-600` が描く**3px の紫の
+> アウトラインを境界線と読み違えた**こと。`FIELD_CLASS` から `focus:border-*` を
+> 外しているのは「アウトラインと二重になって情報が増えない」ためであり、
+> アクセシビリティ上の必須事項ではない。
 
 ### 必須ではなく任意のほうに印を付ける
 
