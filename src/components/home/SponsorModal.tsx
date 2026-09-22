@@ -37,7 +37,7 @@ export function SponsorModal({ sponsor, isOpen, onClose }: SponsorModalProps) {
             href={sponsor.url}
             target="_blank"
             rel="noreferrer noopener"
-            className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90"
+            className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary-600 px-6 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90"
           >
             <span>Webサイトを見る</span>
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

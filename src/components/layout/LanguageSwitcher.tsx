@@ -188,7 +188,7 @@ export function LanguageSwitcherInline({ className, onNavigate }: LanguageSwitch
               onClick={onNavigate}
               className={`inline-flex min-h-11 flex-col justify-center rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${focusRing} ${
                 item.isCurrent
-                  ? "border-transparent bg-primary-400 text-white"
+                  ? "border-transparent bg-primary-600 text-white"
                   : "border-gray-200/40 text-gray-900/80 hover:bg-white/20 hover:text-gray-900"
               }`}
             >
