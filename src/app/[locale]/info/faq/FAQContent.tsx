@@ -130,7 +130,7 @@ export function FAQContent({ initialFAQ }: FAQContentProps) {
           <p className="text-gray-500">{t("empty.title")}</p>
           <p className="mt-2 text-sm text-gray-400">
             {t("empty.prefix")}{" "}
-            <Link href="/info/contact" className="text-primary hover:underline">
+            <Link href="/info/contact" className="text-primary-600 hover:underline">
               {t("empty.contactLink")}
             </Link>{" "}
             {t("empty.suffix")}

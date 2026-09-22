@@ -64,7 +64,7 @@ export default async function PrivacyPolicyPage({
         {/* 基本情報 */}
         <section className="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm md:p-8">
           <div className="mb-6 flex items-center gap-3">
-            <Info className="h-6 w-6 text-primary" />
+            <Info className="h-6 w-6 text-primary-400" />
             <h2 className="text-2xl font-bold text-gray-900">{t("sections.basicInfo")}</h2>
           </div>
           <div className="space-y-3">
@@ -181,7 +181,7 @@ export default async function PrivacyPolicyPage({
                 href={privacyPolicyConfig.cookies.optOutUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-primary hover:underline"
+                className="inline-flex items-center gap-2 text-primary-600 hover:underline"
               >
                 {t("analyticsOptOut")}
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

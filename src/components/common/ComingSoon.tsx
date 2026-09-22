@@ -28,7 +28,7 @@ export function ComingSoon({
         {/* 背景の薄い歯車装飾 */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-12 -top-12 text-primary/5 md:-right-16 md:-top-16"
+          className="pointer-events-none absolute -right-12 -top-12 text-primary-400/5 md:-right-16 md:-top-16"
         >
           <Cog className="h-48 w-48 motion-safe:animate-[spin_24s_linear_infinite] md:h-64 md:w-64" />
         </div>
@@ -40,7 +40,7 @@ export function ComingSoon({
         </div>
 
         {/* メインアイコン */}
-        <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary md:h-20 md:w-20">
+        <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary-600 md:h-20 md:w-20">
           {icon ?? (
             <Cog className="h-8 w-8 motion-safe:animate-[spin_8s_linear_infinite] md:h-10 md:w-10" />
           )}
@@ -48,7 +48,7 @@ export function ComingSoon({
 
         {/* テキスト */}
         <div className="relative space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary-600">
             Coming Soon
           </p>
           <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">{title}</h2>
@@ -57,7 +57,7 @@ export function ComingSoon({
 
         {/* 公開予定バッジ */}
         {eta && (
-          <div className="relative inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+          <div className="relative inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-medium text-primary-600">
             <span className="h-1.5 w-1.5 rounded-full bg-primary motion-safe:animate-pulse" />
             <span>{eta}</span>
           </div>

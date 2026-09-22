@@ -142,7 +142,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
               <a
                 key={item.id}
                 href={`#${item.id}`}
-                className="flex-shrink-0 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hoverable:hover:border-primary-300 hoverable:hover:bg-primary-50 hoverable:hover:text-primary focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
+                className="flex-shrink-0 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hoverable:hover:border-primary-300 hoverable:hover:bg-primary-50 hoverable:hover:text-primary-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
               >
                 {item.label}
               </a>
@@ -155,7 +155,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
           <div className="rounded-2xl border border-primary-200 bg-gradient-to-br from-primary-50 via-white to-primary-100 p-8 shadow-md">
             <div className="mb-6 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100">
-                <Info className="h-5 w-5 text-primary" />
+                <Info className="h-5 w-5 text-primary-400" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900">{t("sections.admission")}</h2>
             </div>
@@ -165,7 +165,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
                   <p className="mb-1 text-sm font-semibold text-gray-500">
                     {t("labels.admissionFee")}
                   </p>
-                  <p className="text-4xl font-bold text-primary">{guideConfig.admission.fee}</p>
+                  <p className="text-4xl font-bold text-primary-400">{guideConfig.admission.fee}</p>
                 </div>
                 <div className="rounded-xl bg-white/70 p-5 text-center backdrop-blur-sm">
                   <p className="mb-1 text-sm font-semibold text-gray-500">
@@ -444,7 +444,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
               className="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 transition-[color,background-color,border-color,box-shadow] hover:border-primary-300 hover:shadow-md"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-50 transition-colors group-hover:bg-primary-100">
-                <Map className="h-5 w-5 text-primary" />
+                <Map className="h-5 w-5 text-primary-400" />
               </div>
               <div>
                 <p className="font-semibold text-gray-900">{tNav("access")}</p>
@@ -456,7 +456,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
               className="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 transition-[color,background-color,border-color,box-shadow] hover:border-primary-300 hover:shadow-md"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-50 transition-colors group-hover:bg-primary-100">
-                <Mail className="h-5 w-5 text-primary" />
+                <Mail className="h-5 w-5 text-primary-400" />
               </div>
               <div>
                 <p className="font-semibold text-gray-900">{tNav("contact")}</p>
@@ -468,7 +468,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
               className="group flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 transition-[color,background-color,border-color,box-shadow] hover:border-primary-300 hover:shadow-md"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-50 transition-colors group-hover:bg-primary-100">
-                <HelpCircle className="h-5 w-5 text-primary" />
+                <HelpCircle className="h-5 w-5 text-primary-400" />
               </div>
               <div>
                 <p className="font-semibold text-gray-900">{tNav("faq")}</p>

@@ -120,7 +120,7 @@ export function FestivalIntroSection({ locale }: { locale: Locale }) {
                   <Link
                     href={href}
                     hrefLang={hrefLang}
-                    className="text-sm text-primary underline underline-offset-4 hover:opacity-80 sm:text-base"
+                    className="text-sm text-primary-600 underline underline-offset-4 hover:opacity-80 sm:text-base"
                   >
                     {link.label}
                   </Link>

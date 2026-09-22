@@ -110,6 +110,55 @@ const WHITE_ON_BRAND_MESSAGE =
   "ブランドカラー（--color-primary / --color-accent = 実配信 #bf73e3）の上に白文字を置くと 3.10:1 で、WCAG AA の 4.5:1 に届きません（#95）。bg-primary-600（7.45:1）か bg-primary-700（11.2:1）を使ってください。値の一覧は docs/frontend/design.md「コントラスト比」。";
 
 /**
+ * 前景色に別名 `text-primary` / `text-accent` を使うことの禁止（#270）
+ *
+ * `--color-primary` と `--color-accent` はどちらも `primary-400`（実配信 `#bf73e3`）の
+ * 別名である。白地の通常テキストで **3.10:1** しかなく AA（4.5:1）に届かない。
+ * `globals.css` の定義にも「前景テキスト・アイコンに使ってはいけない」と書いてあるが、
+ * 2026-09-22 の監査時点で**別名だけで19箇所**あった。
+ *
+ * ## なぜ「別名の禁止」という形なのか
+ *
+ * **本来守りたいのは「ブランド紫を通常テキストに使わない」だが、それは装置にできない。**
+ * 同じ `#bf73e3` でも可否が下地で変わり、**下地は同じ className に書かれていない。**
+ *
+ * 2026-09-22 に「アイコン（`h-<数字>` と `w-<数字>` が両方ある）と大テキスト
+ * （`text-2xl` 以上）を除外する」近似規則を実装して走らせたところ、20件中5件が
+ * **正しいコードを落とす偽陽性**だった。
+ *
+ * | 偽陽性 | 実際の下地 | 実際の比 |
+ * | --- | --- | --- |
+ * | `AccessPageContent.tsx:161` | 親が `bg-gray-900` | 約 13:1 |
+ * | `ContactForm.tsx:318` | 親が `bg-primary-700` | 9.57:1 |
+ * | `ComingSoon.tsx:31` | `text-primary/5` の装飾SVG | 装飾 |
+ * | `HeroSection.tsx:41` | 子が `text-5xl`（大テキスト） | 3:1 で可 |
+ * | `NewsSection.tsx:20` | `w-72` だけの装飾SVG | 装飾 |
+ *
+ * **初回から5件の disable を要求する装置は、disable を習慣にするだけで機能しない。**
+ * そこで射程を「別名を使わない」へ狭めた。下地に一切依存しないので偽陽性が出ない。
+ *
+ * **これはコントラストの保証ではない。** `text-primary-400` と明示的に書けば通る。
+ * 保証するのは「どの段を選んだかがコードに書いてある」ことだけで、
+ * これにより**以降の監査が数値トークンの正確な grep で済む。**
+ * 残っている実際のコントラスト不足は #270 で追跡する。
+ */
+const BRAND_TEXT_ALIAS_PATTERN = "(?:^|\\s)(?:[a-z-]+:)*text-(?:primary|accent)(?![-\\w])";
+
+const BRAND_TEXT_ALIAS_MESSAGE =
+  "前景色に別名 text-primary / text-accent を使わないでください（#270）。どちらも primary-400（実配信 #bf73e3）で、白地の通常テキストでは 3.10:1 となり AA の 4.5:1 に届きません。通常テキストは text-primary-600（7.45:1）、アイコンや大テキスト（要求 3:1）で意図して使う場合は text-primary-400 と明示的に書いてください。";
+
+/**
+ * 上の2つと同じ理由でここへ出す。`no-restricted-syntax` を使うブロックすべてで展開すること。
+ */
+const RESTRICTED_BRAND_TEXT_SELECTORS = [
+  { selector: `Literal[value=/${BRAND_TEXT_ALIAS_PATTERN}/]`, message: BRAND_TEXT_ALIAS_MESSAGE },
+  {
+    selector: `TemplateElement[value.raw=/${BRAND_TEXT_ALIAS_PATTERN}/]`,
+    message: BRAND_TEXT_ALIAS_MESSAGE,
+  },
+];
+
+/**
  * 上の2つと同じ理由でここへ出す。`no-restricted-syntax` は
  * `src/**` 用と `EventInfiniteList.tsx` 用の2ブロックで使うため、**両方で展開すること。**
  * 片方に足し忘れると、そのファイルだけ検査が黙って消える。
@@ -164,6 +213,7 @@ const config = [
         "error",
         ...RESTRICTED_COLOR_SELECTORS,
         ...RESTRICTED_CONTRAST_SELECTORS,
+        ...RESTRICTED_BRAND_TEXT_SELECTORS,
       ],
     },
   },
@@ -276,6 +326,7 @@ const config = [
         "error",
         ...RESTRICTED_COLOR_SELECTORS,
         ...RESTRICTED_CONTRAST_SELECTORS,
+        ...RESTRICTED_BRAND_TEXT_SELECTORS,
         {
           selector: "CallExpression[callee.name='useEffect'] Identifier[name='hasMore']",
           message:
