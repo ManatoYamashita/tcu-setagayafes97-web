@@ -16,11 +16,13 @@ interface NavDropdownProps {
  * - ホバー: 300ms遅延後に開く
  * - クリック: 即座にトグル
  * - クリック外/Escape: 閉じる
- * - アクセシビリティ対応（ARIA属性、キーボード操作）
+ * - Escape で閉じたときはトリガーへフォーカスを戻す（パネル内のリンクから押しても）
+ * - Enter / Space は `<button>` のネイティブな click に任せる
  */
 export function NavDropdown({ item }: NavDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // ホバー時: 300ms後に開く
@@ -60,14 +62,18 @@ export function NavDropdown({ item }: NavDropdownProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // キーボード操作
+  /*
+   * Escape はトリガーではなく外側の div で受ける。パネル内のリンクにフォーカスが
+   * あるときも閉じられるようにするため。閉じるとパネルが DOM から消えるので、
+   * フォーカスを戻さないと <body> へ落ち、次の Tab がページ先頭からやり直しになる（#37）。
+   *
+   * Enter / Space は扱わない。<button> はどちらでもネイティブに click を発火するので、
+   * ここで処理すると handleClick と二重にトグルする。
+   */
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Escape") {
-      setIsOpen(false);
-    } else if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      setIsOpen(!isOpen);
-    }
+    if (event.key !== "Escape" || !isOpen) return;
+    setIsOpen(false);
+    triggerRef.current?.focus();
   };
 
   // コンポーネントのクリーンアップ時にタイマーをクリア
@@ -84,14 +90,16 @@ export function NavDropdown({ item }: NavDropdownProps) {
       ref={dropdownRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onKeyDown={handleKeyDown}
       className="relative"
     >
       <button
+        ref={triggerRef}
+        type="button"
         onClick={handleClick}
-        onKeyDown={handleKeyDown}
         aria-expanded={isOpen}
         aria-haspopup="true"
-        className="flex items-center gap-1 text-gray-900/80 transition-colors hover:text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+        className="flex items-center gap-1 text-gray-900/80 transition-colors hover:text-gray-900 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
       >
         {item.label}
         <ChevronDown
@@ -107,7 +115,7 @@ export function NavDropdown({ item }: NavDropdownProps) {
               key={child.id}
               href={child.href}
               hrefLang={child.hrefLang}
-              className="block px-4 py-2 text-sm text-gray-900/80 transition-colors hover:bg-gray-100 hover:text-gray-900"
+              className="block px-4 py-2 text-sm text-gray-900/80 transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-primary-600"
               onClick={() => setIsOpen(false)}
             >
               {child.label}
