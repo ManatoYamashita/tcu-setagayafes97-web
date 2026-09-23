@@ -51,10 +51,15 @@ export default function EventDetailNotFound() {
           <p className="mb-8 text-gray-900/80">
             お探しの企画は存在しないか、削除された可能性があります。
           </p>
+          {/*
+           * フォーカス枠は2つとも白にする。枠はボタンの外側（offset 3px）に描かれるため、
+           * 比べる相手はボタンの地色ではなく暗色グラデーション（primary-600 → primary-400）である。
+           * primary-600 の枠はこの下地とほぼ同色になり見えない（#176）。
+           */}
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
             <Link
               href="/events"
-              className="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 text-base font-semibold text-primary-600 shadow-md transition-[color,background-color,border-color,box-shadow] duration-200 hover:bg-white/90 hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
+              className="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 text-base font-semibold text-primary-600 shadow-md transition-[color,background-color,border-color,box-shadow] duration-200 hover:bg-white/90 hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-white"
             >
               企画一覧へ戻る
             </Link>

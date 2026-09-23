@@ -171,6 +171,46 @@ const RESTRICTED_CONTRAST_SELECTORS = [
   },
 ];
 
+/**
+ * `focus:` でネイティブのフォーカス表示を消すことの禁止（#176）
+ *
+ * `focus:outline-none` はキーボードでもマウスでも UA 既定のアウトラインを消す。
+ * 2026-09-05 の監査では、共有プリミティブ `Button` を含む10ファイルがこれで消したうえで
+ * `ring-white` / `ring-white/20` / `ring-primary/20` を代わりに描いており、
+ * **白いシート上で 1.00〜1.23:1** と、WCAG 1.4.11 の 3:1 に全箇所で届いていなかった。
+ * `focus:` なのでマウスクリックでもリングが出ていた。
+ *
+ * 正しい形は `focus-visible:outline-3 focus-visible:outline-offset-3
+ * focus-visible:outline-primary-600`（暗色の下地では `outline-white`）。
+ * 値の選び方は docs/frontend/access-page-design.md「フォーカスリング」。
+ *
+ * **射程外（意図的）**
+ *
+ * - `focus-visible:outline-none` — スキップリンクの着地点（`<main tabIndex={-1}>`）で
+ *   意図的に使っている。これを落とすと全ページが disable を要求する
+ * - 代替リングの色が下地に対して 3:1 あるか — 下地は同じ className に無いので判定できない
+ *   （#270 の偽陽性の実測を参照）。そこは #176 の手順どおり実測で確かめる
+ */
+const FOCUS_OUTLINE_REMOVAL_PATTERN =
+  "(?:^|\\s)(?:[a-z-]+:)*focus:outline-(?:none|hidden)(?![-\\w])";
+
+const FOCUS_OUTLINE_REMOVAL_MESSAGE =
+  "focus:outline-none / focus:outline-hidden でネイティブのフォーカス表示を消さないでください（#176）。代替リングが 3:1 に届かない事故が10ファイルで起きていました。focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600（暗色の下地では outline-white）を使ってください。詳細は docs/frontend/access-page-design.md。";
+
+/**
+ * 上の3つと同じ理由でここへ出す。`no-restricted-syntax` を使うブロックすべてで展開すること。
+ */
+const RESTRICTED_FOCUS_SELECTORS = [
+  {
+    selector: `Literal[value=/${FOCUS_OUTLINE_REMOVAL_PATTERN}/]`,
+    message: FOCUS_OUTLINE_REMOVAL_MESSAGE,
+  },
+  {
+    selector: `TemplateElement[value.raw=/${FOCUS_OUTLINE_REMOVAL_PATTERN}/]`,
+    message: FOCUS_OUTLINE_REMOVAL_MESSAGE,
+  },
+];
+
 /** @type {import('eslint').Linter.Config[]} */
 const config = [
   ...nextConfig,
@@ -209,11 +249,13 @@ const config = [
       // セレクタの組み立ては RESTRICTED_COLOR_SELECTORS（このファイル冒頭）。
       // 一次定義は scripts/restricted-color-tokens.mjs（#230）。
       // RESTRICTED_CONTRAST_SELECTORS は #95（ブランドカラーの上の白文字）。
+      // RESTRICTED_FOCUS_SELECTORS は #176（focus: でフォーカス表示を消す）。
       "no-restricted-syntax": [
         "error",
         ...RESTRICTED_COLOR_SELECTORS,
         ...RESTRICTED_CONTRAST_SELECTORS,
         ...RESTRICTED_BRAND_TEXT_SELECTORS,
+        ...RESTRICTED_FOCUS_SELECTORS,
       ],
     },
   },
@@ -319,7 +361,7 @@ const config = [
     files: ["src/components/events/EventInfiniteList.tsx"],
     rules: {
       "react-hooks/exhaustive-deps": "error",
-      // **色とコントラストのセレクタを必ず展開すること。** flat config は後勝ちで丸ごと
+      // **色・コントラスト・フォーカスのセレクタを必ず展開すること。** flat config は後勝ちで丸ごと
       // 置き換えるため、展開を落とすとこのファイルだけ検査が素通りする
       // （2026-09-20 まで禁止色が実際に素通りしていた）。
       "no-restricted-syntax": [
@@ -327,6 +369,7 @@ const config = [
         ...RESTRICTED_COLOR_SELECTORS,
         ...RESTRICTED_CONTRAST_SELECTORS,
         ...RESTRICTED_BRAND_TEXT_SELECTORS,
+        ...RESTRICTED_FOCUS_SELECTORS,
         {
           selector: "CallExpression[callee.name='useEffect'] Identifier[name='hasMore']",
           message:
