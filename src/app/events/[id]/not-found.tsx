@@ -1,77 +1,41 @@
 import Link from "next/link";
+import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
+import { pageHeroes } from "@/data/page-heroes";
 
 /**
  * 企画詳細ページの404ページ
+ *
+ * エラーページ（`error.tsx`）と同じく `PageSheetLayout` の白いシートに載せる。
+ * 以前の濃紫グラデーションの上では、本文が 3.4〜3.6:1、「404」の数字（primary-700）が
+ * 1.75:1 しかなかった（#149。2026-09-23 に本番の画素で実測）。
+ * スキップリンクの遷移先 `<main id="content">` は `PageSheetLayout` が出す。
  */
 export default function EventDetailNotFound() {
-  /*
-   * スキップリンク（Header）の遷移先。Header は全ルートで描画されるため、この画面にも
-   * 「本文へスキップ」が出る。main を出さないと押しても遷移先が無く、次の Tab が
-   * ヘッダー先頭へ戻ってしまう（docs/frontend/landmarks-and-skip-link.md）。
-   */
   return (
-    <main
-      id="content"
-      tabIndex={-1}
-      className="min-h-screen bg-gradient-to-b from-primary-dark to-primary focus-visible:outline-none"
-    >
-      {/* パンくずリスト */}
-      <nav className="border-b border-gray-200/20 bg-white/10 py-4">
-        <div className="container mx-auto px-4">
-          <ol className="flex items-center gap-2 text-sm text-gray-900/80">
-            <li>
-              <a href="/" className="hover:text-gray-900 hover:underline">
-                トップ
-              </a>
-            </li>
-            <li>
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </li>
-            <li>
-              <a href="/events" className="hover:text-gray-900 hover:underline">
-                企画を探す
-              </a>
-            </li>
-          </ol>
-        </div>
-      </nav>
-
-      {/* 404メッセージ */}
+    <PageSheetLayout hero={pageHeroes.events}>
       <div className="container mx-auto px-4 py-24">
         <div className="mx-auto max-w-md text-center">
           <div className="mb-6 text-6xl font-bold text-primary-700">404</div>
           <h2 className="mb-4 text-2xl font-bold text-gray-900">企画が見つかりません</h2>
-          <p className="mb-8 text-gray-900/80">
+          <p className="mb-8 text-gray-700">
             お探しの企画は存在しないか、削除された可能性があります。
           </p>
-          {/*
-           * フォーカス枠は2つとも白にする。枠はボタンの外側（offset 3px）に描かれるため、
-           * 比べる相手はボタンの地色ではなく暗色グラデーション（primary-600 → primary-400）である。
-           * primary-600 の枠はこの下地とほぼ同色になり見えない（#176）。
-           */}
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
             <Link
               href="/events"
-              className="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 text-base font-semibold text-primary-600 shadow-md transition-[color,background-color,border-color,box-shadow] duration-200 hover:bg-white/90 hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-white"
+              className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-6 py-3 text-base font-semibold text-white shadow-md transition-[color,background-color,border-color,box-shadow] duration-200 hoverable:hover:bg-primary-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
             >
               企画一覧へ戻る
             </Link>
             <Link
               href="/"
-              className="inline-flex items-center justify-center rounded-lg bg-white/10 px-6 py-3 text-base font-semibold text-gray-900 shadow-md transition-[color,background-color,border-color,box-shadow] duration-200 hover:bg-white/20 hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-white"
+              className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 px-6 py-3 text-base font-semibold text-gray-700 shadow-md transition-[color,background-color,border-color,box-shadow] duration-200 hoverable:hover:border-gray-400 hoverable:hover:bg-white focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
             >
               トップページへ戻る
             </Link>
           </div>
         </div>
       </div>
-    </main>
+    </PageSheetLayout>
   );
 }
