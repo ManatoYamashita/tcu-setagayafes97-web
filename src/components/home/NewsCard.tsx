@@ -146,7 +146,7 @@ export function NewsCard({ news, variant = "default", className }: NewsCardProps
       {/* タイトル */}
       <h3
         className={cn(
-          "font-sans font-bold leading-snug text-gray-900 line-clamp-2 transition-colors duration-300 group-hover:text-primary-400",
+          "font-sans font-bold leading-snug text-gray-900 line-clamp-2 transition-colors duration-300 group-hover:text-primary-600",
           isLarge ? "mt-2 text-base sm:text-lg" : "mt-1.5 text-sm"
         )}
       >

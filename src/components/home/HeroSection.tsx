@@ -38,7 +38,7 @@ function DateBlock({ dateStr }: { dateStr: string }) {
   const { month, day, dayOfWeek } = getDateParts(dateStr);
 
   return (
-    <div className="flex items-center text-primary-400">
+    <div className="flex items-center text-primary-700">
       <span className="text-5xl md:text-6xl lg:text-7xl font-serif italic leading-none -translate-y-1.5 md:-translate-y-2">
         {month}
       </span>
@@ -260,14 +260,14 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
         className="absolute left-0 bottom-0 z-30 px-6 lg:px-8 pb-12 lg:pb-16 will-change-transform hero-entrance-target"
         aria-label={`開催日: ${siteConfig.dates.day1} - ${siteConfig.dates.day2}`}
       >
-        <p className="text-sm md:text-base font-serif italic tracking-[0.3em] text-primary-400 mb-2 md:mb-3">
+        <p className="text-sm md:text-base font-serif italic tracking-[0.3em] text-primary-700 mb-2 md:mb-3">
           {getDateParts(siteConfig.dates.day1).year}
         </p>
         <div className="flex items-center gap-4 md:gap-6 lg:gap-8">
           <DateBlock dateStr={siteConfig.dates.day1} />
           <DateBlock dateStr={siteConfig.dates.day2} />
         </div>
-        <p className="text-xs md:text-sm tracking-[0.2em] text-primary-400/70 mt-2 md:mt-3">
+        <p className="text-xs md:text-sm tracking-[0.2em] text-primary-600 mt-2 md:mt-3">
           {siteConfig.openTime} - {siteConfig.closeTime}
         </p>
         {/*
