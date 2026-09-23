@@ -79,7 +79,12 @@ export default function EventDetailError({
             企画詳細の読み込み中にエラーが発生しました。しばらく経ってから再度お試しください。
           </p>
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <Button onClick={reset} variant="primary">
+            {/*
+             * Button の既定のフォーカス枠（primary-600）は、この暗色グラデーション
+             * （primary-600 → primary-400）の上では下地とほぼ同色になり見えない（#176）。
+             * 白の枠なら下地のどの位置でも 3:1 以上を確保できる。
+             */}
+            <Button onClick={reset} variant="primary" className="focus-visible:outline-white">
               再試行
             </Button>
             <Link
