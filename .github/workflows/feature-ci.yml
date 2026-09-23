@@ -1,6 +1,7 @@
 name: Feature Branch CI
 
-# トリガは .claude/CLAUDE.md のブランチ命名規則とマージ経路（作業ブランチ → dev → main）に対応させる。
+# トリガは .claude/CLAUDE.md のブランチ命名規則とマージ経路（作業ブランチ → main）に対応させる。
+# かつてあった dev ブランチは 2026-09-23 に削除した（main から364コミット遅れの放置ブランチだった）。
 # push は作業ブランチへの直接の変更を、pull_request は base へマージした結果を検証する。
 # 両方が走るケースでは検証対象が異なる（前者は head、後者は head を base へマージしたもの）ため、
 # 重複ではなく別種の検証として扱う。
@@ -18,7 +19,6 @@ on:
   pull_request:
     branches:
       - main
-      - dev
 
 permissions:
   contents: read

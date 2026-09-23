@@ -103,6 +103,7 @@ pnpm images:optimize
 ### ブランチ戦略
 
 - **main ブランチへの直接 push は禁止**
+- **PR の base は `main`。`dev` ブランチは存在しない**（2026-09-23 に削除。`dev` へマージされた PR が main へ届かず取り残されていた）
 - すべての作業は専用のフィーチャーブランチで実施
 - GitHub Actions による自動 PR 作成を活用
 - PR マージ後に main ブランチを更新
@@ -130,7 +131,7 @@ refactor/<refactor-target> # リファクタリング
 | イベント       | 対象                                                             |
 | -------------- | ---------------------------------------------------------------- |
 | `push`         | `feature/**`, `bugfix/**`, `hotfix/**`, `docs/**`, `refactor/**` |
-| `pull_request` | base が `main` または `dev`                                      |
+| `pull_request` | base が `main`                                                   |
 
 push 時は head をそのまま、PR 時は head を base へマージした結果を検証する。**両方走る場合、それは重複ではなく別種の検証である。**
 
