@@ -92,13 +92,13 @@ export default async function EventsPage() {
           className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-primary/30 bg-primary/5 px-5 py-4 transition-colors hover:bg-primary/10 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
         >
           <span>
-            <span className="block text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            <span className="block text-xs font-semibold uppercase tracking-[0.2em] text-primary-600">
               Special
             </span>
             <span className="block font-bold text-gray-900">著名人企画</span>
           </span>
           <svg
-            className="h-5 w-5 shrink-0 text-primary"
+            className="h-5 w-5 shrink-0 text-primary-400"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

@@ -30,7 +30,7 @@ export default function Error({
       </p>
       <button
         onClick={() => reset()}
-        className="rounded-md bg-white px-4 py-2 text-primary hover:opacity-80"
+        className="rounded-md bg-white px-4 py-2 text-primary-600 hover:opacity-80"
       >
         再試行
       </button>
