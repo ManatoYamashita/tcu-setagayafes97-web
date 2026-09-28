@@ -63,6 +63,12 @@ const lineNames = {
   },
 } as const satisfies Record<string, LocalizedText>;
 
+/**
+ * 駅名と出発ノードに付ける路線カラー。値は globals.css の `--color-line-*` に対応する。
+ * 複数の路線が乗り入れる駅は、来場者が主に使う1路線の色に決めている。
+ */
+export type LineColor = "oimachi" | "toyoko" | "denentoshi";
+
 const tokyuBus = {
   ja: "東急バス",
   en: "Tokyu Bus",
@@ -74,6 +80,7 @@ const tokyuBus = {
 export interface TrainRouteSource {
   line: LocalizedText;
   station: LocalizedText;
+  lineColor: LineColor;
   walkTime: number;
   description: LocalizedText;
   /** 一覧で「おすすめ」バッジを表示する経路かどうか */
@@ -92,6 +99,8 @@ export interface BusRouteSource {
   /** バスの行き先。「◯◯ゆき」の語順は言語ごとに異なるため、表記はUI側で組み立てる */
   destination: LocalizedText;
   from: LocalizedText;
+  /** 乗り場の駅の路線カラー */
+  fromLineColor: LineColor;
   stop: LocalizedText;
   rideTime: number;
   walkTime: number;
@@ -117,6 +126,7 @@ const trainRoutes = [
   {
     line: lineNames.oimachi,
     station: stationNames.oyamadai,
+    lineColor: "oimachi",
     walkTime: 12,
     description: {
       ja: "「東京都市大学 世田谷キャンパス前」尾山台駅から徒歩約12分です。",
@@ -129,6 +139,7 @@ const trainRoutes = [
   {
     line: lineNames.oimachi,
     station: stationNames.todoroki,
+    lineColor: "oimachi",
     walkTime: 15,
     description: {
       ja: "尾山台駅の隣駅です。環八通りを渡り、多摩川方面へ向かうと到着します。",
@@ -146,6 +157,7 @@ const busRoutes = [
     lineCode: "玉11",
     destination: stationNames.futakoTamagawa,
     from: stationNames.tamagawa,
+    fromLineColor: "toyoko",
     stop: busStopNames.tcuSouth,
     rideTime: 6,
     walkTime: 3,
@@ -155,6 +167,7 @@ const busRoutes = [
     lineCode: "玉11",
     destination: stationNames.tamagawa,
     from: stationNames.futakoTamagawa,
+    fromLineColor: "denentoshi",
     stop: busStopNames.tcuSouth,
     rideTime: 7,
     walkTime: 3,
@@ -164,6 +177,7 @@ const busRoutes = [
     lineCode: "園01",
     destination: stationNames.chitoseFunabashi,
     from: stationNames.denenchofu,
+    fromLineColor: "toyoko",
     stop: busStopNames.tcuNorth,
     rideTime: 5,
     walkTime: 5,
@@ -179,6 +193,7 @@ export function resolveTrainRoutes(locale: Locale): TrainRoute[] {
   return trainRoutes.map((route) => ({
     line: localize(route.line, locale),
     station: localize(route.station, locale),
+    lineColor: route.lineColor,
     walkTime: route.walkTime,
     description: localize(route.description, locale),
     recommended: route.recommended,
@@ -191,6 +206,7 @@ export function resolveBusRoutes(locale: Locale): BusRoute[] {
     lineCode: route.lineCode,
     destination: localize(route.destination, locale),
     from: localize(route.from, locale),
+    fromLineColor: route.fromLineColor,
     stop: localize(route.stop, locale),
     rideTime: route.rideTime,
     walkTime: route.walkTime,

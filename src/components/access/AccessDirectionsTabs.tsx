@@ -1,7 +1,7 @@
 "use client";
 
 import { Bus, Train } from "lucide-react";
-import { type KeyboardEvent, useRef, useState } from "react";
+import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import {
   RideSegmentLabel,
   TimelineStep,
@@ -36,7 +36,16 @@ const cardClassName = "relative flex h-full flex-col rounded-2xl bg-white p-5 sm
 
 const cardBorderClassName = "border border-gray-200";
 
-const recommendedBorderClassName = "border-2 border-primary-600";
+// おすすめカードも枠線の幅は他と同じ 1px に揃え、太い枠は下の重ね要素で描く。
+// 枠線そのものを太くすると、その差だけタイムラインの開始位置が他のカードとずれる
+const recommendedBorderClassName = "border border-transparent";
+
+// -inset-px で 1px の透明な枠線まで覆い、カードの外形と角丸を一致させる
+const recommendedFrameClassName =
+  "pointer-events-none absolute -inset-px rounded-2xl border-4 border-primary-600";
+
+/** 枠の点滅を始める、カードの見えている割合 */
+const RECOMMENDED_BLINK_THRESHOLD = 0.6;
 
 const recommendedBadgeClassName =
   "absolute -top-3 right-5 inline-flex items-center rounded-full bg-primary-600 px-3 py-1 text-xs font-bold text-white shadow-sm";
@@ -153,6 +162,29 @@ interface TrainRouteListProps {
 }
 
 function TrainRouteList({ content, venue, routes }: TrainRouteListProps) {
+  const recommendedFrameRef = useRef<HTMLSpanElement>(null);
+  const [shouldBlink, setShouldBlink] = useState(false);
+
+  // おすすめカードが初めて画面に入ったときに一度だけ枠を点滅させる。
+  // 点滅はクラスの付与で始まるため、JavaScript が無い環境では枠が表示されたまま残る。
+  // モーション軽減時は globals.css 側でアニメーションを止める
+  useEffect(() => {
+    const frame = recommendedFrameRef.current;
+    if (!frame || !("IntersectionObserver" in window)) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setShouldBlink(true);
+        observer.disconnect();
+      },
+      { threshold: RECOMMENDED_BLINK_THRESHOLD }
+    );
+    observer.observe(frame);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <ol role="list" className={listClassName}>
       {routes.map((route) => (
@@ -163,7 +195,17 @@ function TrainRouteList({ content, venue, routes }: TrainRouteListProps) {
           }`}
         >
           {route.recommended && (
-            <span className={recommendedBadgeClassName}>{content.recommended}</span>
+            <>
+              {/* バッジより先に置き、バッジが枠の上に重なるようにする */}
+              <span
+                ref={recommendedFrameRef}
+                aria-hidden="true"
+                className={`${recommendedFrameClassName} ${
+                  shouldBlink ? "recommended-frame-blink" : ""
+                }`}
+              />
+              <span className={recommendedBadgeClassName}>{content.recommended}</span>
+            </>
           )}
 
           <ol>
@@ -171,6 +213,7 @@ function TrainRouteList({ content, venue, routes }: TrainRouteListProps) {
               marker="departure"
               title={route.station}
               subtitle={route.line}
+              lineColor={route.lineColor}
               lineVariant="walk"
               segment={
                 <WalkSegmentLabel
@@ -208,6 +251,7 @@ function BusRouteList({ content, venue, routes }: BusRouteListProps) {
             <TimelineStep
               marker="departure"
               title={route.from}
+              lineColor={route.fromLineColor}
               lineVariant="ride"
               segment={
                 <RideSegmentLabel

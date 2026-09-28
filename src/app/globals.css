@@ -45,6 +45,18 @@
   --color-border: var(--color-gray-200); /* 区切り線 */
   --color-accent: var(--color-primary-400); /* CTA・強調 */
 
+  /* ===== Railway Line Colors（アクセスページの経路カード） =====
+     公式のラインカラーは出発ノードの丸（装飾）にだけ使う。駅名の文字には -text を使う。
+     大井町線のオレンジは白背景で 2.45:1、田園都市線の緑は 3.19:1 しかなく、
+     文字に使うと 4.5:1 に届かないため、同じ色相で明度だけを下げた段を別に持つ。
+     HEX は Lightning CSS が出力した実配信値、比率はいずれも白背景に対する値（2026-09-28 実測）。 */
+  --color-line-oimachi: oklch(73.6% 0.15 53.6deg); /* 東急大井町線 実配信 #f18c43 */
+  --color-line-oimachi-text: oklch(56.4% 0.149 50deg); /* 実配信 #b85500 — 4.84:1 */
+  --color-line-toyoko: oklch(56.4% 0.225 17.3deg); /* 東急東横線 実配信 #da0242 — 5.16:1 */
+  --color-line-toyoko-text: var(--color-line-toyoko); /* 公式色のままで 4.5:1 を満たす */
+  --color-line-denentoshi: oklch(63.9% 0.113 175deg); /* 東急田園都市線 実配信 #21a288 */
+  --color-line-denentoshi-text: oklch(50.4% 0.091 173.7deg); /* 実配信 #137560 — 5.61:1 */
+
   /* ===== Alias（後方互換性のため残す） ===== */
   --color-primary: var(--color-primary-400);
   /* 前景テキスト・アイコンに使ってはいけない。ページ背景 --color-secondary との
@@ -357,6 +369,17 @@ body {
   }
 
   /*
+   * アクセスページの「おすすめ」経路カードの枠。カードが画面に入ったときに
+   * AccessDirectionsTabs が付与し、3回点滅して不透明のまま止まる。
+   * 0.6秒周期（1秒あたり約1.7回）で WCAG 2.3.1 の「1秒あたり3回以下」を満たし、
+   * 合計約2.3秒で止まるため 2.2.2 の停止手段も要らない。
+   * 遅延は、親の data-access-reveal="up"（0.72秒のフェード）とのぶつかりを避けるため。
+   */
+  .recommended-frame-blink {
+    animation: recommended-frame-blink 0.6s ease-in-out 0.5s 3;
+  }
+
+  /*
    * ヒーロー入場の対象。初期状態を不可視にしたうえで、GSAP が走らなかった
    * 場合の保険として遅れて表示する。
    *
@@ -539,6 +562,12 @@ body {
   }
   to {
     rotate: 360deg;
+  }
+}
+
+@keyframes recommended-frame-blink {
+  50% {
+    opacity: 0.15;
   }
 }
 
@@ -862,6 +891,11 @@ body {
    * そもそも出さない方針（FeaturedGearScene の loading: () => null）で対応する。
    */
   .animate-spin-slow {
+    animation: none !important;
+  }
+
+  /* おすすめ枠の点滅。止めても枠は不透明のまま残るため、強調は失われない */
+  .recommended-frame-blink {
     animation: none !important;
   }
 
