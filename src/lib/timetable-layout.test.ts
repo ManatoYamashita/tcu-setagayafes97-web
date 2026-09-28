@@ -327,18 +327,23 @@ describe("layoutStageEvents", () => {
 });
 
 describe("generateTimeAxis", () => {
-  it("endHour を含む閉区間でゼロ埋めして返す", () => {
+  it("30分刻みで endHour を含む閉区間をゼロ埋めして返す", () => {
     const axis = generateTimeAxis({ startHour: 9, endHour: 19 });
-    expect(axis).toHaveLength(11);
+    expect(axis).toHaveLength(21);
     expect(axis[0]).toBe("09:00");
+    expect(axis[1]).toBe("09:30");
+    expect(axis[2]).toBe("10:00");
     expect(axis[axis.length - 1]).toBe("19:00");
   });
 
   it("24時以降を 00:00 へ折り返す", () => {
     expect(generateTimeAxis({ startHour: 22, endHour: 25 })).toEqual([
       "22:00",
+      "22:30",
       "23:00",
+      "23:30",
       "00:00",
+      "00:30",
       "01:00",
     ]);
   });

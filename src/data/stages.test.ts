@@ -21,6 +21,12 @@ describe("extractStageId", () => {
     expect(extractStageId("体育館 メインアリーナ")).toBe("体育館");
   });
 
+  it("アリーナ表記を体育館と同じステージへ解決し、号館内のアリーナとは区別する", () => {
+    expect(extractStageId("アリーナ")).toBe("体育館");
+    expect(extractStageId("世田谷キャンパス第１アリーナ")).toBe("体育館");
+    expect(extractStageId("９号館アリーナ")).toBeNull();
+  });
+
   it("id の完全一致を name の部分一致より優先する", () => {
     // "中庭特設ステージ" は id "中庭" と name "中庭特設ステージ" の両方に一致するが、
     // 探索順により id 側で解決される
@@ -69,6 +75,10 @@ describe("isKnownStageId", () => {
 });
 
 describe("getStageName", () => {
+  it("体育館のステージをアリーナと表示する", () => {
+    expect(getStageName("体育館")).toBe("アリーナ");
+  });
+
   it("「その他」の名前を返す", () => {
     expect(getStageName(OTHER_STAGE_ID)).toBe(OTHER_STAGE_NAME);
   });

@@ -34,7 +34,7 @@ test.describe("タブと絞り込み", () => {
 
     await expect(page.locator(`${DATE_TABS} button[aria-pressed="true"]`)).toHaveCount(1);
     await expect(page.locator(`${STAGE_TABS} button[aria-pressed="true"]`)).toHaveCount(1);
-    await expect(page.locator(`${STAGE_TABS} button[aria-pressed="true"]`)).toHaveText("体育館");
+    await expect(page.locator(`${STAGE_TABS} button[aria-pressed="true"]`)).toHaveText("アリーナ");
     await expect(page.locator("[data-timetable-event]")).toHaveCount(0);
   });
 
@@ -67,5 +67,13 @@ test.describe("タブと絞り込み", () => {
     await expect(page.locator(`${STAGE_TABS} button[aria-pressed="true"]`)).toHaveText(
       "7号館A（7A）"
     );
+  });
+
+  test("アリーナのタブで体育館メインアリーナの企画に絞られる", async ({ timetablePage: page }) => {
+    await page.locator(`${STAGE_TABS} button`, { hasText: "アリーナ" }).click();
+
+    await expect(page.locator(`${STAGE_TABS} button[aria-pressed="true"]`)).toHaveText("アリーナ");
+    await expect(page.locator("[data-timetable-column]")).toHaveCount(1);
+    await expect(page.locator("[data-timetable-event]")).toHaveCount(2);
   });
 });

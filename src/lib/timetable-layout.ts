@@ -275,14 +275,23 @@ export function layoutStageEvents(
   return positioned;
 }
 
+/** 時間軸の目盛り間隔（分）。ラベルと罫線で共有する */
+export const TIME_AXIS_STEP_MINUTES = 30;
+
 /**
  * 時間軸の目盛りを生成
- * @returns `["10:00", "11:00", ...]`（endHour を含む）
+ * @returns `["10:00", "10:30", "11:00", ...]`（endHour を含む）
  */
 export function generateTimeAxis(range: TimeRange): string[] {
   const axis: string[] = [];
-  for (let hour = range.startHour; hour <= range.endHour; hour++) {
-    axis.push(`${String(hour % 24).padStart(2, "0")}:00`);
+  for (
+    let minutes = range.startHour * 60;
+    minutes <= range.endHour * 60;
+    minutes += TIME_AXIS_STEP_MINUTES
+  ) {
+    const hour = Math.floor(minutes / 60) % 24;
+    const minute = minutes % 60;
+    axis.push(`${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`);
   }
   return axis;
 }
