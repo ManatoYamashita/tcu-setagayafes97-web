@@ -36,6 +36,12 @@
       "name": "本文",
       "kind": "richEditorV2",
       "required": true
+    },
+    {
+      "fieldId": "cta",
+      "name": "CTAリンク先URL",
+      "kind": "text",
+      "required": false
     }
   ],
   "customFields": []

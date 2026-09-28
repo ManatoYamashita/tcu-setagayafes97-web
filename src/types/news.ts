@@ -22,6 +22,7 @@ export interface RawNews {
   thumbnail?: MicroCMSImage;
   description: string;
   content: string;
+  cta?: string;
 }
 
 /**
@@ -41,6 +42,7 @@ export interface News {
   thumbnail?: MicroCMSImage;
   description: string;
   content: string;
+  cta?: string;
 }
 
 /**

@@ -73,7 +73,7 @@ else links.website = sns;
 
 ### News API (news.json)
 
-**実機と照合済み（2026-08-16）**
+**現行フィールド（CTA追加: 2026-09-28）**
 
 | フィールドID | 表示名         | 型           | 必須 | 備考                                                                   |
 | ------------ | -------------- | ------------ | ---- | ---------------------------------------------------------------------- |
@@ -82,6 +82,7 @@ else links.website = sns;
 | thumbnail    | サムネイル画像 | media        |      | 解像度と縦横比の要件 → [docs/dev/microcms.md](../docs/dev/microcms.md) |
 | description  | 概要           | textArea     | ✓    |                                                                        |
 | content      | 本文           | richEditorV2 | ✓    |                                                                        |
+| cta          | CTAリンク先URL | text         |      | 記事詳細の「詳しくはこちら」に使う内部パスまたはHTTP(S) URL            |
 
 ### Events API (events.json)
 
