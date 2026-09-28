@@ -87,21 +87,22 @@ else links.website = sns;
 
 **実機と照合済み（2026-08-16）**
 
-| フィールドID | 表示名           | 型           | 必須 | 備考                                                                                                                                                       |
-| ------------ | ---------------- | ------------ | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| date         | 開催日           | select       | ✓    | `day1 : 10月31日（土）` 形式（値 : ラベル）                                                                                                                |
-| type         | 企画タイプ       | select       | ✓    | room / stage / store / special / other                                                                                                                     |
-| place        | 場所             | text         | ✓    |                                                                                                                                                            |
-| building     | 建物番号         | text         |      | **未入力運用。** 実データ18件すべてが空のため、検索・絞り込みは `place` から導出する → [docs/frontend/events-search.md](../docs/frontend/events-search.md) |
-| title        | タイトル         | text         | ✓    |                                                                                                                                                            |
-| organizer    | 主催団体         | text         | ✓    |                                                                                                                                                            |
-| thumbnail    | サムネイル       | media        |      | 正方形ロゴは 624px 四方、写真は 1400px 幅を推奨。縦横比が表示の分岐を決める → [docs/dev/microcms.md](../docs/dev/microcms.md)                              |
-| description  | 概要             | textArea     | ✓    |                                                                                                                                                            |
-| content      | 詳細             | richEditorV2 | ✓    |                                                                                                                                                            |
-| startTime    | 開始時刻         | text         |      |                                                                                                                                                            |
-| endTime      | 終了時刻         | text         |      |                                                                                                                                                            |
-| sns          | SNS              | text         |      | カスタムフィールドではない（上記参照）                                                                                                                     |
-| special      | 著名人企画の詳細 | custom       |      | → `specialDetail`。#70                                                                                                                                     |
+| フィールドID | 表示名           | 型           | 必須 | 備考                                                                                                                                                                                           |
+| ------------ | ---------------- | ------------ | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| date         | 開催日           | select       | ✓    | `day1 : 10月31日（土）` 形式（値 : ラベル）                                                                                                                                                    |
+| type         | 企画タイプ       | select       | ✓    | room / stage / store / special / other                                                                                                                                                         |
+| place        | 場所             | text         | ✓    |                                                                                                                                                                                                |
+| building     | 建物番号         | text         |      | **未入力運用。** 実データ18件すべてが空のため、検索・絞り込みは `place` から導出する → [docs/frontend/events-search.md](../docs/frontend/events-search.md)                                     |
+| title        | タイトル         | text         | ✓    |                                                                                                                                                                                                |
+| organizer    | 主催団体         | text         | ✓    |                                                                                                                                                                                                |
+| thumbnail    | サムネイル       | media        |      | 正方形ロゴは 624px 四方、写真は 1400px 幅を推奨。縦横比が表示の分岐を決める → [docs/dev/microcms.md](../docs/dev/microcms.md)                                                                  |
+| description  | 概要             | textArea     | ✓    |                                                                                                                                                                                                |
+| content      | 詳細             | richEditorV2 | ✓    |                                                                                                                                                                                                |
+| startTime    | 開始時刻         | text         |      |                                                                                                                                                                                                |
+| endTime      | 終了時刻         | text         |      |                                                                                                                                                                                                |
+| sessions     | 開催枠           | repeater     |      | → `session`。**任意のまま運用する**（必須にすると既存企画が保存できなくなる）。値があれば `startTime` / `endTime` より優先 → [docs/dev/event-sessions.md](../docs/dev/event-sessions.md)。#281 |
+| sns          | SNS              | text         |      | カスタムフィールドではない（上記参照）                                                                                                                                                         |
+| special      | 著名人企画の詳細 | custom       |      | → `specialDetail`。#70                                                                                                                                                                         |
 
 > [!NOTE]
 > `select` の値は `day1 : 10月31日（土）` のように **`値 : ラベル`** 形式で登録されています。
@@ -118,6 +119,15 @@ else links.website = sns;
 > ホワイトリストから漏れて**エラーも警告も出さずに `other` へ落ちていました。**
 > 選択肢を増やしたら `src/types/events.ts` / `src/lib/events.ts` / `src/data/filter-options.ts`
 > の3箇所を必ず同時に直してください。
+
+**カスタムフィールド（開催枠 / #281）**
+
+`session` — 開催枠1つ（`events.sessions` から参照）
+
+| フィールドID | 表示名   | 型   | 必須 |
+| ------------ | -------- | ---- | ---- |
+| startTime    | 開始時刻 | text |      |
+| endTime      | 終了時刻 | text |      |
 
 **カスタムフィールド（著名人企画LP用 / #70）**
 
