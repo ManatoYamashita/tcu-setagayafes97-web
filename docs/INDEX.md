@@ -31,6 +31,7 @@ docs/
 │   ├── seo-metadata.md # 共通metadata・canonical・構造化データ・sitemap の方針
 │   ├── legacy-site-deindex.md # 過去回サイト群を検索結果から恒久除外する運用手順
 │   ├── microcms.md   # microCMS API 制約と実装パターン
+│   ├── event-sessions.md # 企画の開催枠（2部制）の入稿と正規化の契約
 │   ├── content-revalidation.md # microCMS Webhook によるオンデマンド再検証と運用手順
 │   └── draft-preview.md # microCMS 画面プレビューによる下書きの実機確認
 ├── frontend/         # フロントエンド関連ドキュメント
@@ -201,6 +202,12 @@ docs/
   - **削除リクエストの失効は 2027-03-05 前後。** その1ヶ月前に `noindex` の生存を再確認する
   - プロパティは `sc-domain:setagayafes.org`。**Google のマルチアカウントで `/u/1/` 配下**にあり、既定アカウントには存在しない
   - Search Console をブラウザ自動操作する際の落とし穴（1回目のクリックが無視される・ダイアログのフェードイン・縦位置の揺れ）
+
+- **[event-sessions.md](./dev/event-sessions.md)** - 企画の開催枠（`sessions`）。2部制の企画（#281）
+  - **`sessions` に値があれば `startTime` / `endTime` は無視する。** 無ければ従来の欄から1枠を作るので、既存の企画は入稿し直さなくてよい
+  - **`sessions` は任意のまま運用する。** 必須にすると既存の企画が保存できなくなる
+  - **正規化後の `Event` に `startTime` / `endTime` は無い。** 先頭の枠だけを読むコードは型エラーになる
+  - タイムテーブルは枠ごとに別ブロック。件数は企画単位で数える
 
 - **[microcms.md](./dev/microcms.md)** - microCMS API 制約と実装パターン
   - 公開サイトの API キーに下書き・公開終了の全取得権限を付けない。`/info/[id]` と `/events/[id]` の HTTP 404 はローディングによるストリーミングに注意する

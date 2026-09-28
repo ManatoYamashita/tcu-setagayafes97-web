@@ -1,0 +1,166 @@
+import { describe, expect, it } from "vitest";
+import {
+  buildEventScheduleJsonLd,
+  formatSessions,
+  getSessionLabel,
+  labelSessions,
+} from "@/lib/event-sessions";
+
+const TWO_PARTS = [
+  { startTime: "10:40", endTime: "11:25" },
+  { startTime: "14:45", endTime: "15:45" },
+];
+
+describe("getSessionLabel", () => {
+  it("枠が2つ以上のときだけ「第n部」と呼ぶ", () => {
+    expect(getSessionLabel(0, 1)).toBeUndefined();
+    expect(getSessionLabel(0, 2)).toBe("第1部");
+    expect(getSessionLabel(1, 2)).toBe("第2部");
+  });
+});
+
+describe("labelSessions", () => {
+  it("開始の無い枠を落としてから数える", () => {
+    // 落とす前の数で数えると、1枠しか見えないのに「第1部」と付く
+    expect(
+      labelSessions([
+        { startTime: "10:40", endTime: "11:25" },
+        { startTime: "", endTime: "15:45" },
+      ])
+    ).toEqual([{ startTime: "10:40", endTime: "11:25", label: undefined }]);
+  });
+
+  it("HH:mm として読めない開始時刻も数に入れる（詳細ページは入稿どおりに出すため）", () => {
+    expect(
+      labelSessions([
+        { startTime: "10:00", endTime: "11:00" },
+        { startTime: "1400", endTime: "15:00" },
+      ]).map((session) => session.label)
+    ).toEqual(["第1部", "第2部"]);
+  });
+});
+
+describe("formatSessions", () => {
+  it("1枠は「第1部」を付けずに出す", () => {
+    expect(formatSessions([{ startTime: "10:40", endTime: "11:25" }])).toEqual(["10:40 〜 11:25"]);
+  });
+
+  it("2部制は枠ごとに「第n部」を付けて出す", () => {
+    expect(formatSessions(TWO_PARTS)).toEqual(["第1部 10:40 〜 11:25", "第2部 14:45 〜 15:45"]);
+  });
+
+  it("開始だけの枠は「○○〜」、開始の無い枠は出さない（従来の表示を踏襲）", () => {
+    expect(formatSessions([{ startTime: "13:00", endTime: "" }])).toEqual(["13:00〜"]);
+    expect(formatSessions([{ startTime: "", endTime: "14:00" }])).toEqual([]);
+    expect(formatSessions([])).toEqual([]);
+  });
+
+  it("カード向けの指定では、終了の無い枠を落とし「第n部」を付けない", () => {
+    const options = { separator: " - ", requireEnd: true, withLabel: false };
+    expect(formatSessions([...TWO_PARTS, { startTime: "17:00", endTime: "" }], options)).toEqual([
+      "10:40 - 11:25",
+      "14:45 - 15:45",
+    ]);
+  });
+});
+
+describe("buildEventScheduleJsonLd", () => {
+  const base = { title: "カレッジフェスタ", dateIso: "2026-10-31", location: { name: "ホール" } };
+
+  it("1枠は親の開始・終了だけを出し、subEvent を付けない", () => {
+    expect(
+      buildEventScheduleJsonLd({ ...base, sessions: [{ startTime: "10:40", endTime: "11:25" }] })
+    ).toEqual({
+      startDate: "2026-10-31T10:40:00+09:00",
+      endDate: "2026-10-31T11:25:00+09:00",
+      subEvent: undefined,
+    });
+  });
+
+  it("2部制は親の範囲に加えて、枠ごとの subEvent を出す", () => {
+    const result = buildEventScheduleJsonLd({ ...base, sessions: TWO_PARTS });
+
+    expect(result.startDate).toBe("2026-10-31T10:40:00+09:00");
+    expect(result.endDate).toBe("2026-10-31T15:45:00+09:00");
+    expect(result.subEvent).toEqual([
+      {
+        "@type": "Event",
+        name: "カレッジフェスタ（第1部）",
+        startDate: "2026-10-31T10:40:00+09:00",
+        endDate: "2026-10-31T11:25:00+09:00",
+        location: { name: "ホール" },
+      },
+      {
+        "@type": "Event",
+        name: "カレッジフェスタ（第2部）",
+        startDate: "2026-10-31T14:45:00+09:00",
+        endDate: "2026-10-31T15:45:00+09:00",
+        location: { name: "ホール" },
+      },
+    ]);
+  });
+
+  it("親の終了は最後に終わる枠から取る（最後に始まる枠とは限らない）", () => {
+    const result = buildEventScheduleJsonLd({
+      ...base,
+      sessions: [
+        { startTime: "10:00", endTime: "16:00" },
+        { startTime: "13:00", endTime: "13:30" },
+      ],
+    });
+    expect(result.endDate).toBe("2026-10-31T16:00:00+09:00");
+  });
+
+  it("時が1桁の時刻を2桁に揃えて出す", () => {
+    // 入稿値を埋め込むと 2026-10-31T9:30:00+09:00 という不正な日時になる
+    expect(
+      buildEventScheduleJsonLd({ ...base, sessions: [{ startTime: "9:30", endTime: "9:50" }] })
+    ).toMatchObject({
+      startDate: "2026-10-31T09:30:00+09:00",
+      endDate: "2026-10-31T09:50:00+09:00",
+    });
+  });
+
+  it("親の終了を分で比べる（文字列で比べると 9:50 が 11:00 より後になる）", () => {
+    const result = buildEventScheduleJsonLd({
+      ...base,
+      sessions: [
+        { startTime: "9:00", endTime: "9:50" },
+        { startTime: "10:00", endTime: "11:00" },
+      ],
+    });
+    expect(result.endDate).toBe("2026-10-31T11:00:00+09:00");
+  });
+
+  it("最後の枠に終了が無いときは親の終了を出さない（subEvent が親の期間からはみ出すため）", () => {
+    const result = buildEventScheduleJsonLd({
+      ...base,
+      sessions: [
+        { startTime: "10:40", endTime: "11:25" },
+        { startTime: "14:45", endTime: "" },
+      ],
+    });
+    expect(result.startDate).toBe("2026-10-31T10:40:00+09:00");
+    expect(result.endDate).toBeUndefined();
+    expect(result.subEvent).toHaveLength(2);
+  });
+
+  it("読めない時刻を日時として出さない", () => {
+    expect(
+      buildEventScheduleJsonLd({ ...base, sessions: [{ startTime: "1000", endTime: "11:00" }] })
+    ).toEqual({});
+    expect(
+      buildEventScheduleJsonLd({
+        ...base,
+        sessions: [{ startTime: "10:00", endTime: "未定" }],
+      })
+    ).toEqual({ startDate: "2026-10-31T10:00:00+09:00", endDate: undefined, subEvent: undefined });
+  });
+
+  it("時刻が無いときは fallbackStartDate を使う（省略時は何も出さない）", () => {
+    expect(buildEventScheduleJsonLd({ ...base, sessions: [] })).toEqual({});
+    expect(
+      buildEventScheduleJsonLd({ ...base, sessions: [], fallbackStartDate: "2026-10-31" })
+    ).toEqual({ startDate: "2026-10-31" });
+  });
+});

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/Badge";
 import { CircleImage } from "@/components/ui/CircleImage";
 import { EventMediaPlaceholder } from "./EventMediaPlaceholder";
 import { displayEventText, EVENT_DISPLAY_FALLBACKS } from "@/lib/event-display";
+import { formatSessions } from "@/lib/event-sessions";
 
 interface EventCardProps {
   event: Event;
@@ -40,6 +41,15 @@ export function EventCard({ event, variant = "default" }: EventCardProps) {
     [event.building?.trim(), event.place?.trim()].filter(Boolean).join(" ") ||
     EVENT_DISPLAY_FALLBACKS.venue;
   const hasThumbnail = Boolean(event.thumbnail?.url);
+  // カードは幅が限られるため「第1部」を付けない。
+  // 1枠の企画は従来どおり、開始・終了の両方があるときだけ出す（既存の企画の見え方を変えない）。
+  // 2枠以上では終了の無い枠も「14:45〜」で出す。落とすと、詳細ページでは2部制なのに
+  // カードでは1部制に見える
+  const timeText = formatSessions(event.sessions, {
+    separator: " - ",
+    requireEnd: event.sessions.length < 2,
+    withLabel: false,
+  }).join(" / ");
 
   return (
     <Link
@@ -117,7 +127,7 @@ export function EventCard({ event, variant = "default" }: EventCardProps) {
             </div>
 
             {/* 開催時間 */}
-            {event.startTime && event.endTime && (
+            {timeText && (
               <div className="flex items-center gap-1">
                 <svg
                   className="h-4 w-4"
@@ -133,9 +143,7 @@ export function EventCard({ event, variant = "default" }: EventCardProps) {
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <span>
-                  {event.startTime} - {event.endTime}
-                </span>
+                <span>{timeText}</span>
               </div>
             )}
           </div>

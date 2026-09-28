@@ -16,6 +16,7 @@ import { siteConfig, SPECIAL_GOODS_VISIBLE, SPECIAL_VISIBLE } from "@/data/site"
 import { readDraftPreviewContext } from "@/lib/draft-mode";
 import { createPageMetadata } from "@/lib/metadata";
 import { createBreadcrumbStructuredData, serializeJsonLd } from "@/lib/structured-data";
+import { buildEventScheduleJsonLd } from "@/lib/event-sessions";
 import { resolveMobileTicketCta } from "@/lib/special-ticket-cta";
 
 interface SpecialPageProps {
@@ -116,6 +117,17 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
   const eventDateIso = event.date === "day2" ? siteConfig.dates.day2 : siteConfig.dates.day1;
 
   // 構造化データ（JSON-LD）
+  const location = {
+    "@type": "Place",
+    name: [event.building, event.place].filter(Boolean).join(" "),
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: siteConfig.address,
+      addressLocality: "世田谷区",
+      addressRegion: "東京都",
+      addressCountry: "JP",
+    },
+  };
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "MusicEvent",
@@ -125,19 +137,15 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
       "@type": "Organization",
       name: event.organizer,
     },
-    location: {
-      "@type": "Place",
-      name: [event.building, event.place].filter(Boolean).join(" "),
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: siteConfig.address,
-        addressLocality: "世田谷区",
-        addressRegion: "東京都",
-        addressCountry: "JP",
-      },
-    },
-    startDate: event.startTime ? `${eventDateIso}T${event.startTime}:00+09:00` : eventDateIso,
-    endDate: event.endTime ? `${eventDateIso}T${event.endTime}:00+09:00` : undefined,
+    location,
+    // 開演時刻が未定でも startDate は Event の必須項目なので、開催日だけは出す
+    ...buildEventScheduleJsonLd({
+      title: event.title,
+      sessions: event.sessions,
+      dateIso: eventDateIso,
+      location,
+      fallbackStartDate: eventDateIso,
+    }),
     doorTime: special?.openTime,
     image: event.thumbnail?.url,
     eventStatus: "https://schema.org/EventScheduled",
@@ -241,8 +249,7 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
               <SpecialSchedule
                 date={event.date}
                 openTime={special?.openTime}
-                startTime={event.startTime}
-                endTime={event.endTime}
+                sessions={event.sessions}
                 building={event.building}
                 place={event.place}
               />

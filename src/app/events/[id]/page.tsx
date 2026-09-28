@@ -3,13 +3,14 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getEventById, getEventsList } from "@/lib/events";
-import { SPECIAL_VISIBLE } from "@/data/site";
+import { siteConfig, SPECIAL_VISIBLE } from "@/data/site";
 import { EventDetail } from "@/components/events/EventDetail";
 import { RelatedEvents } from "@/components/events/RelatedEvents";
 import { DraftPreviewBanner } from "@/components/layout/DraftPreviewBanner";
 import { readDraftPreviewContext } from "@/lib/draft-mode";
 import { createPageMetadata } from "@/lib/metadata";
 import { createBreadcrumbStructuredData, serializeJsonLd } from "@/lib/structured-data";
+import { buildEventScheduleJsonLd } from "@/lib/event-sessions";
 interface EventPageProps {
   params: Promise<{ id: string }>;
 }
@@ -92,6 +93,20 @@ export default async function EventPage({ params }: EventPageProps) {
   }
 
   // 構造化データ（JSON-LD）
+  const location = {
+    "@type": "Place",
+    // building は実データで全件未入力。normalizeEvent() が空文字へ既定化しているので、
+    // テンプレート結合のままだと " 11D" のように先頭へ空白が残る（既定化前は
+    // "undefined 11D" だった）。空の項目を落としてから繋ぐ
+    // （src/app/special/[id]/page.tsx と同じ扱い）
+    name: [event.building, event.place].filter(Boolean).join(" ") || "会場未定",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "世田谷区",
+      addressRegion: "東京都",
+      addressCountry: "JP",
+    },
+  };
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Event",
@@ -101,26 +116,16 @@ export default async function EventPage({ params }: EventPageProps) {
       "@type": "Organization",
       name: event.organizer,
     },
-    location: {
-      "@type": "Place",
-      // building は実データで全件未入力。normalizeEvent() が空文字へ既定化しているので、
-      // テンプレート結合のままだと " 11D" のように先頭へ空白が残る（既定化前は
-      // "undefined 11D" だった）。空の項目を落としてから繋ぐ
-      // （src/app/special/[id]/page.tsx と同じ扱い）
-      name: [event.building, event.place].filter(Boolean).join(" ") || "会場未定",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: "世田谷区",
-        addressRegion: "東京都",
-        addressCountry: "JP",
-      },
-    },
-    startDate: event.startTime
-      ? `2026-${event.date === "day1" ? "10-31" : "11-01"}T${event.startTime}:00+09:00`
-      : undefined,
-    endDate: event.endTime
-      ? `2026-${event.date === "day1" ? "10-31" : "11-01"}T${event.endTime}:00+09:00`
-      : undefined,
+    location,
+    // 2部制の企画は、枠ごとの日時を subEvent として出す
+    ...buildEventScheduleJsonLd({
+      title: event.title,
+      sessions: event.sessions,
+      // 日付は siteConfig.dates を唯一の出典にする（src/app/special/[id]/page.tsx と同じ）。
+      // day1 以外（both / other）を day2 に寄せるのは従来どおり。両日開催の扱いは #289
+      dateIso: event.date === "day1" ? siteConfig.dates.day1 : siteConfig.dates.day2,
+      location,
+    }),
     image: event.thumbnail?.url,
     eventStatus: "https://schema.org/EventScheduled",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",

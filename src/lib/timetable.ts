@@ -1,4 +1,5 @@
-import type { Event, EventDate } from "@/types/events";
+import type { Event, EventDate, EventSession } from "@/types/events";
+import type { TimetableEntry } from "@/types/timetable";
 import {
   stages,
   extractStageId,
@@ -9,6 +10,7 @@ import {
 } from "@/data/stages";
 import { parseTimeToMinutes } from "@/lib/timetable-layout";
 import { matchesEventDate } from "@/lib/filters";
+import { labelSessions } from "@/lib/event-sessions";
 
 /**
  * タイムテーブルのデータ選択
@@ -18,38 +20,77 @@ import { matchesEventDate } from "@/lib/filters";
  */
 
 /**
- * タイムテーブルに載せる企画を抽出
+ * タイムテーブルに載せる企画を抽出し、開催枠ごとのブロックへ展開する
  *
- * type === "stage" または "special" で、かつ **"HH:mm" として解釈できる** startTime と
- * endTime を持つ企画のみ。
+ * type === "stage" または "special" の企画について、**"HH:mm" として解釈できる**開始・終了を持つ
+ * 開催枠を1つずつ `TimetableEntry` にします。2部制の企画は2ブロックになります（#281）。
+ * 1ブロックにまとめると、第1部の開始から第2部の終了までの空き時間も開催中として盤面を占めます。
  *
  * 時刻の形式検査をここで済ませるのは、ガント盤面と縦スタックで表示が食い違わないように
  * するためです。盤面は座標を計算できない企画を描けませんが、縦スタックは描けてしまうため、
  * 入口で揃えないと「デスクトップには無いのにモバイルには出る企画」が生まれます。
+ * 読めない枠はその枠だけを落とし、同じ企画の他の枠は残します。
  *
  * 著名人企画（special）を含めるのは、それが開場・開演のあるステージイベントであり、
  * 来場者が「何時から」をタイムテーブルで探すためです。未解禁の著名人企画は
  * `getEventsList()` の時点で除外されるため、ここでの追加判定は不要です。
  */
-export function filterStageEvents(events: Event[]): Event[] {
-  return events.filter((event) => {
-    if (event.type !== "stage" && event.type !== "special") return false;
+export function filterStageEvents(events: Event[]): TimetableEntry[] {
+  return events.flatMap((event) => {
+    if (event.type !== "stage" && event.type !== "special") return [];
 
-    const start = parseTimeToMinutes(event.startTime);
-    const end = parseTimeToMinutes(event.endTime);
-    if (start !== null && end !== null && end > start) return true;
-
-    // startTime が空の企画（時刻未定）は正常な状態なので黙って落とす。
-    // 入力はあるのに読めない場合だけ、入稿ミスとして知らせる
-    if (event.startTime || event.endTime) {
+    // 時刻未定の企画は sessions が空なので、警告も出さずに落ちる。
+    // ここで警告するのは、入力はあるのに読めない枠（入稿ミス）だけ
+    const warnUnreadable = (session: EventSession, label: string | undefined) =>
       warnOnce(
-        `[timetable] 企画「${event.title}」の時刻を解釈できません` +
-          `（startTime: "${event.startTime ?? ""}" / endTime: "${event.endTime ?? ""}"）。` +
+        `[timetable] 企画「${event.title}」${label ? `の${label}` : ""}の時刻を解釈できません` +
+          `（startTime: "${session.startTime}" / endTime: "${session.endTime}"）。` +
           `HH:mm 形式で、終了が開始より後になるよう入稿してください。タイムテーブルには出しません。`
       );
+
+    // 開始の無い枠は labelSessions() が落とす（詳細ページにも出ない）。警告だけ出す
+    for (const session of event.sessions) {
+      if (session.startTime === "") warnUnreadable(session, undefined);
     }
-    return false;
+
+    // 呼び名は詳細ページと同じ labelSessions() から取る。
+    // 読めない枠を落とした後の数で付け直すと、詳細ページと「第n部」が食い違う
+    return labelSessions(event.sessions).flatMap((session, index): TimetableEntry[] => {
+      const start = parseTimeToMinutes(session.startTime);
+      const end = parseTimeToMinutes(session.endTime);
+      if (start === null || end === null || end <= start) {
+        warnUnreadable(session, session.label);
+        return [];
+      }
+
+      // Event 全体を展開しない。タイムテーブルは Client Component へ渡るため、
+      // content（本文の HTML）や special まで枠の数だけ直列化されてしまう
+      return [
+        {
+          id: event.id,
+          type: event.type,
+          date: event.date,
+          title: event.title,
+          place: event.place,
+          organizer: event.organizer,
+          startTime: session.startTime,
+          endTime: session.endTime,
+          entryKey: `${event.id}#${index}`,
+          sessionLabel: session.label,
+        },
+      ];
+    });
   });
+}
+
+/**
+ * ブロックの集合に含まれる企画の数
+ *
+ * 2部制の企画はブロックが2つでも1企画です。`entries.length` で数えると、
+ * 「n企画」「n件」の表示が開催枠の数だけ膨らみます。
+ */
+export function countDistinctEvents(entries: TimetableEntry[]): number {
+  return new Set(entries.map((entry) => entry.id)).size;
 }
 
 /**
@@ -61,7 +102,10 @@ export function filterStageEvents(events: Event[]): Event[] {
  * 企画一覧の絞り込みと同じ規則を2箇所に書くと、片方だけ変えたときに
  * 「同じ日なのに件数が食い違う」が起きます。
  */
-export function filterEventsByDate(events: Event[], date: EventDate | "all"): Event[] {
+export function filterEventsByDate(
+  events: TimetableEntry[],
+  date: EventDate | "all"
+): TimetableEntry[] {
   if (date === "all") return events;
   return events.filter((event) => matchesEventDate(event, date));
 }
@@ -73,7 +117,10 @@ export function filterEventsByDate(events: Event[], date: EventDate | "all"): Ev
  * グループ化では「その他」へ入る企画が、絞り込みでは `null !== "other"` で必ず外れるため、
  * 「その他」タブが常に空になります。
  */
-export function filterEventsByStage(events: Event[], stageId: string | "all"): Event[] {
+export function filterEventsByStage(
+  events: TimetableEntry[],
+  stageId: string | "all"
+): TimetableEntry[] {
   if (stageId === "all") return events;
   return events.filter((event) => resolveStageId(event.place) === stageId);
 }
@@ -84,7 +131,8 @@ export function filterEventsByStage(events: Event[], stageId: string | "all"): E
 export interface StageGroup {
   id: string;
   name: string;
-  events: Event[];
+  /** 開催枠ごとのブロック。2部制の企画は2つ入る */
+  events: TimetableEntry[];
 }
 
 /**
@@ -99,8 +147,8 @@ export interface StageGroup {
  * 返り値が `Record` ではなく配列なのは、呼び出し側が `Object.keys()` の順序に
  * 依存しないようにするためです。
  */
-export function groupEventsByStage(events: Event[]): StageGroup[] {
-  const byStage = new Map<string, Event[]>();
+export function groupEventsByStage(events: TimetableEntry[]): StageGroup[] {
+  const byStage = new Map<string, TimetableEntry[]>();
 
   for (const event of events) {
     const stageId = resolveStageId(event.place);
@@ -121,8 +169,9 @@ export function groupEventsByStage(events: Event[]): StageGroup[] {
       name: getStageName(stageId),
       // 引数の配列を破壊しないよう複製してから並べ替える。
       // 旧実装は props で受け取った配列をそのまま sort しており、呼び出し元の順序を変えていた。
-      events: [...byStage.get(stageId)!].sort((a, b) =>
-        (a.startTime ?? "").localeCompare(b.startTime ?? "")
+      // 時刻は filterStageEvents() で検査済みなので null にはならない
+      events: [...byStage.get(stageId)!].sort(
+        (a, b) => (parseTimeToMinutes(a.startTime) ?? 0) - (parseTimeToMinutes(b.startTime) ?? 0)
       ),
     }));
 }
@@ -145,7 +194,7 @@ export type StageOption = Pick<StageGroup, "id" | "name">;
  * 実在しないステージIDは無視します。`getStageName()` は未知のIDをそのまま返すため、
  * 素通しにするとURLの任意の文字列がタブのラベルとして表示されます。
  */
-export function listStageTabs(events: Event[], selectedStageId: string): StageOption[] {
+export function listStageTabs(events: TimetableEntry[], selectedStageId: string): StageOption[] {
   const withEvents: StageOption[] = groupEventsByStage(events).map(({ id, name }) => ({
     id,
     name,
@@ -186,7 +235,7 @@ function warnOnce(message: string): void {
   console.warn(message);
 }
 
-export function warnUnresolvedStagePlaces(events: Event[]): void {
+export function warnUnresolvedStagePlaces(events: Pick<Event, "place" | "title">[]): void {
   if (process.env.NODE_ENV === "production") return;
 
   for (const event of events) {

@@ -87,7 +87,7 @@ export interface NoticeSection {
  * 企画にのみ入力されます。
  *
  * アーティスト写真（メイン）・紹介文・開演時刻・会場は Event の既存フィールド
- * （`thumbnail` / `content` / `startTime` / `place` / `building`）を使うため、
+ * （`thumbnail` / `content` / `sessions` / `place` / `building`）を使うため、
  * ここには含まれません。
  *
  * すべて任意です。未入力の項目はページ側でセクションごと非表示にします。
@@ -104,6 +104,30 @@ export interface SpecialDetail {
   /** リッチエディタのHTML */
   ticketNote?: string;
   notices?: NoticeSection[];
+}
+
+/**
+ * 開催枠1つ（microCMS の生データ）
+ *
+ * microCMS カスタムフィールド `session` に対応し、繰り返しフィールド `sessions` の1行になります。
+ * 管理画面で行を追加しただけで値を入れていない場合もあるため、どちらも任意です。
+ */
+export interface RawEventSession {
+  fieldId: "session";
+  startTime?: string;
+  endTime?: string;
+}
+
+/**
+ * 開催枠1つ（正規化済み）
+ *
+ * 値は trim 済みの文字列で、未入力は空文字です。**HH:mm として読めることは保証しません。**
+ * 詳細ページは入稿されたとおりに表示し、タイムテーブルは読めない枠を警告して落とします
+ * （`filterStageEvents()`）。
+ */
+export interface EventSession {
+  startTime: string;
+  endTime: string;
 }
 
 /**
@@ -127,8 +151,11 @@ export interface RawEvent {
   thumbnail?: MicroCMSImage;
   description: string;
   content: string;
+  // 開催枠が1つだけだった頃の欄。`sessions` が未入力のときだけ使う（`normalizeEvent()`）
   startTime?: string;
   endTime?: string;
+  // 開催枠の繰り返し。未入力だとキーごと返らないことがある
+  sessions?: RawEventSession[];
   sns?: string; // microCMSでは単一の文字列で返される可能性がある
   special?: SpecialDetail; // type が special の企画にのみ入力される
 }
@@ -154,8 +181,14 @@ export interface Event {
   thumbnail?: MicroCMSImage;
   description: string;
   content: string;
-  startTime?: string; // 開始時刻（HH:mm形式）
-  endTime?: string; // 終了時刻（HH:mm形式）
+  /**
+   * 開催枠（開始時刻の昇順）。時刻未定なら空配列
+   *
+   * **`startTime` / `endTime` はこの型に存在しません。** 2部制の企画（#281）を表せるよう
+   * `normalizeEvent()` がここへ一本化しています。先頭の枠だけを読むと第2部以降が消えるため、
+   * 表示には `src/lib/event-sessions.ts` のヘルパーを使ってください。
+   */
+  sessions: EventSession[];
   sns?: SNSLinks;
   special?: SpecialDetail; // 著名人企画LP用の追加情報（type が special のときのみ）
 }

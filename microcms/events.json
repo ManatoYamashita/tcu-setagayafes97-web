@@ -84,6 +84,13 @@
       "required": false
     },
     {
+      "fieldId": "sessions",
+      "name": "開催枠",
+      "kind": "repeater",
+      "required": false,
+      "customFieldIds": ["session"]
+    },
+    {
       "fieldId": "sns",
       "name": "SNS",
       "kind": "text",
@@ -99,6 +106,14 @@
     }
   ],
   "customFields": [
+    {
+      "fieldId": "session",
+      "name": "開催枠",
+      "fields": [
+        { "fieldId": "startTime", "name": "開始時刻", "kind": "text", "required": false },
+        { "fieldId": "endTime", "name": "終了時刻", "kind": "text", "required": false }
+      ]
+    },
     {
       "fieldId": "goodsItem",
       "name": "物販商品",

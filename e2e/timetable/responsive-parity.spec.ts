@@ -13,14 +13,14 @@ test.describe("モバイル幅", () => {
     await expect(page.locator("[data-timetable-list]")).toBeVisible();
   });
 
-  test("盤面と同じ9件を出す（時刻不正の企画を含めない）", async ({ timetablePage: page }) => {
-    // デスクトップの盤面も 9 件。入口の filterStageEvents() で揃えているため一致する。
+  test("盤面と同じ11件を出す（時刻不正の企画を含めない）", async ({ timetablePage: page }) => {
+    // デスクトップの盤面も 11 件（2部制の企画は2件）。入口の filterStageEvents() で揃えているため一致する。
     // 著名人企画のカードは /special/[id] を指すため、両方のプレフィックスを数える
     await expect(
       page.locator(
         "[data-timetable-list] a[href^='/events/'], [data-timetable-list] a[href^='/special/']"
       )
-    ).toHaveCount(9);
+    ).toHaveCount(11);
     await expect(page.locator("[data-timetable-list]")).not.toContainText("時刻が壊れている企画");
   });
 
@@ -34,15 +34,24 @@ test.describe("モバイル幅", () => {
     expect(startTimes).toEqual([
       "09:30",
       "10:30",
+      "10:40", // 2部制の第1部
       "11:00",
       "11:00",
       "12:00",
       "13:00",
       "13:30",
+      "14:45", // 2部制の第2部
       "15:00",
       "17:30",
     ]);
     await expect(page.locator("[data-timetable-list-item]").first()).toContainText("体育館");
+  });
+
+  test("2部制の企画は、どちらの部かを添えて2件出す（#281）", async ({ timetablePage: page }) => {
+    const items = page.locator("[data-timetable-list-item]", { hasText: "2部制ステージ" });
+    await expect(items).toHaveCount(2);
+    await expect(items.nth(0)).toContainText("第1部");
+    await expect(items.nth(1)).toContainText("第2部");
   });
 
   test("320px幅でもカード本文に250px以上を確保する", async ({ timetablePage: page }) => {

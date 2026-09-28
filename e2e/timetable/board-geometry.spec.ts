@@ -9,7 +9,8 @@ import { HOUR_HEIGHT_PX, calculateBoardHeight } from "@/lib/timetable-layout";
  */
 const EXPECTED_BOARD_HEIGHT = calculateBoardHeight({ startHour: 9, endHour: 19 });
 const EXPECTED_COLUMNS = 6; // 7A / 7B / 体育館 / ホール / 中庭 / その他
-const EXPECTED_EVENTS = 9;
+/** ブロック数。10企画のうち2部制の1企画が2ブロックになる（#281） */
+const EXPECTED_EVENTS = 11;
 
 test.describe("盤面の幾何", () => {
   test("盤面に高さがある（#148 本体）", async ({ timetablePage: page }) => {
@@ -62,6 +63,34 @@ test.describe("盤面の幾何", () => {
 
     expect(boxes).toHaveLength(2);
     expect(boxes[0].right, "レーンが左右に分かれていない").toBeLessThanOrEqual(boxes[1].left);
+  });
+
+  test("2部制の企画が空き時間を挟んだ2ブロックになり、レーンを割らない（#281）", async ({
+    timetablePage: page,
+  }) => {
+    // 1ブロックにまとめる実装へ戻すと、10:40-15:45 の帯が同じ列の 12:00-12:30 と重なって
+    // レーンが2つに割れ、ブロック数も1つ減る
+    const pxPerMinute = HOUR_HEIGHT_PX / 60;
+    const blocks = await page.locator("[data-timetable-event]").evaluateAll((els) =>
+      els
+        .filter((el) => (el.textContent ?? "").includes("2部制ステージ"))
+        .map((el) => {
+          const column = el.closest("[data-timetable-column]")!;
+          const rect = el.getBoundingClientRect();
+          const columnRect = column.getBoundingClientRect();
+          return {
+            top: Math.round(rect.top - columnRect.top),
+            // レーン分割されていなければ列幅いっぱいに広がる
+            fullWidth: Math.abs(rect.width - columnRect.width) <= 1,
+            href: el.querySelector("a")?.getAttribute("href"),
+          };
+        })
+    );
+
+    expect(blocks).toEqual([
+      { top: 100 * pxPerMinute, fullWidth: true, href: "/events/fx-hall-2" }, // 10:40 は 9:00 から100分
+      { top: 345 * pxPerMinute, fullWidth: true, href: "/events/fx-hall-2" }, // 14:45 は345分
+    ]);
   });
 
   test("時間レンジが企画から算出されている", async ({ timetablePage: page }) => {

@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import type { Event, EventDate } from "@/types/events";
+import type { EventDate } from "@/types/events";
+import type { TimetableEntry } from "@/types/timetable";
 import {
+  countDistinctEvents,
   filterEventsByDate,
   filterEventsByStage,
   groupEventsByStage,
@@ -16,7 +18,8 @@ import { getTimetableDateLabel, TimetableTabs } from "./TimetableTabs";
 import { TimetableChart } from "./TimetableChart";
 
 interface TimetableContentProps {
-  initialEvents: Event[];
+  /** `filterStageEvents()` で開催枠ごとに展開済みのブロック */
+  initialEvents: TimetableEntry[];
 }
 
 /**
@@ -61,7 +64,8 @@ export function TimetableContent({ initialEvents }: TimetableContentProps) {
   }, [initialEvents]);
 
   const hasEvents = groups.length > 0;
-  const eventCount = groups.reduce((count, group) => count + group.events.length, 0);
+  // 2部制の企画はブロックが2つでも1企画として数える
+  const eventCount = countDistinctEvents(groups.flatMap((group) => group.events));
   const selectedDateLabel = getTimetableDateLabel(selectedDate);
 
   return (

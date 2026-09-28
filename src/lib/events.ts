@@ -1,5 +1,6 @@
 import { client, isMicrocmsConfigured } from "./microcms";
 import { EVENTS_VISIBLE, SPECIAL_VISIBLE } from "@/data/site";
+import { normalizeEventSessions } from "./event-sessions";
 import type {
   Event,
   EventListResponse,
@@ -112,8 +113,12 @@ function normalizeSNSLinks(sns: string | undefined): SNSLinks | undefined {
  * @returns 正規化されたEvent
  */
 export function normalizeEvent(rawEvent: RawEvent): Event {
+  // 時刻の3欄は sessions へ一本化する。spread に残すと、型からは消えた startTime が
+  // 実行時には残り、先頭の枠だけを読むコードが型検査をすり抜けて動いてしまう
+  const { startTime, endTime, sessions, ...rest } = rawEvent;
+
   return {
-    ...rawEvent,
+    ...rest,
     // microCMS側で必須設定にしていても、入力漏れがあれば undefined が返り得る。
     // filterEvents 等の内部コードがこれらを常に string だと信頼できるよう、
     // 外部データの境界であるここで一度だけ空文字へ既定化する。
@@ -128,6 +133,7 @@ export function normalizeEvent(rawEvent: RawEvent): Event {
     date: normalizeEventDate(rawEvent.date),
     type: normalizeEventType(rawEvent.type),
     sns: typeof rawEvent.sns === "string" ? normalizeSNSLinks(rawEvent.sns) : undefined,
+    sessions: normalizeEventSessions({ sessions, startTime, endTime }),
   };
 }
 

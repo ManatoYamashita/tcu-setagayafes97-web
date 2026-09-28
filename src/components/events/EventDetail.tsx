@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/Badge";
 import { SNSLinks } from "./SNSLinks";
 import { EventMediaPlaceholder } from "./EventMediaPlaceholder";
 import { displayEventText, EVENT_DISPLAY_FALLBACKS } from "@/lib/event-display";
+import { formatSessions } from "@/lib/event-sessions";
 
 interface EventDetailProps {
   event: Event;
@@ -11,7 +12,8 @@ interface EventDetailProps {
 
 interface EventFactProps {
   label: string;
-  value: string;
+  /** 配列は1要素ずつ行を分けて出す（2部制の開催時間など） */
+  value: string | string[];
 }
 
 const dateLabels: Record<Event["date"], string> = {
@@ -42,7 +44,15 @@ function EventFact({ label, value }: EventFactProps) {
   return (
     <div className="border-t border-gray-200 pt-4 first:border-t-0 first:pt-0 sm:border-t-0 sm:pt-0">
       <dt className="text-sm font-semibold text-gray-600">{label}</dt>
-      <dd className="mt-1 text-base font-semibold leading-relaxed text-gray-900">{value}</dd>
+      <dd className="mt-1 text-base font-semibold leading-relaxed text-gray-900">
+        {Array.isArray(value)
+          ? value.map((line) => (
+              <span key={line} className="block">
+                {line}
+              </span>
+            ))
+          : value}
+      </dd>
     </div>
   );
 }
@@ -68,12 +78,8 @@ export function EventDetail({ event }: EventDetailProps) {
       thumbnailHeight > 0 &&
       Math.abs(thumbnailWidth - thumbnailHeight) / Math.max(thumbnailWidth, thumbnailHeight) <=
         SQUARE_IMAGE_TOLERANCE);
-  const time =
-    event.startTime && event.endTime
-      ? `${event.startTime} 〜 ${event.endTime}`
-      : event.startTime
-        ? `${event.startTime}〜`
-        : "時間未定";
+  const sessionLines = formatSessions(event.sessions);
+  const time = sessionLines.length > 0 ? sessionLines : "時間未定";
 
   return (
     <article className="space-y-12">

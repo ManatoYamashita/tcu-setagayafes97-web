@@ -1,4 +1,4 @@
-import type { Event } from "@/types/events";
+import type { TimetableEntry } from "@/types/timetable";
 import { siteConfig } from "@/data/site";
 
 /**
@@ -117,7 +117,7 @@ export const DEFAULT_TIME_RANGE: TimeRange = {
  * （絞り込み後だとタブを切り替えるたびにスケールが動きます）。
  */
 export function calculateTimeRange(
-  events: Event[],
+  events: TimetableEntry[],
   fallback: TimeRange = DEFAULT_TIME_RANGE
 ): TimeRange {
   let earliest: number | null = null;
@@ -184,7 +184,7 @@ export function calculateEventOffset(
 }
 
 export interface PositionedEvent {
-  event: Event;
+  event: TimetableEntry;
   topPx: number;
   heightPx: number;
   /** 0 始まりのレーン番号。重なりが無ければ常に 0 */
@@ -194,7 +194,7 @@ export interface PositionedEvent {
 }
 
 interface LayoutCandidate {
-  event: Event;
+  event: TimetableEntry;
   offset: { topPx: number; heightPx: number };
   startMinutes: number;
   endMinutes: number;
@@ -209,11 +209,15 @@ interface LayoutCandidate {
  *
  * 重なり判定は実時刻（分）で行い、`MIN_EVENT_HEIGHT_PX` でクランプした描画高さは使いません。
  *
+ * 2部制の企画は開催枠ごとの別ブロックとして渡されます（`filterStageEvents()`）。
+ * ここでは別の企画と区別せずに扱うため、枠どうしが重なるように入稿されていれば
+ * 他の重なりと同じくレーンが分かれ、入稿ミスとして目に見えます。
+ *
  * 返り値は開始時刻の昇順です。絶対配置でも Tab 順・読み上げ順は DOM 順に従うため、
  * この順序がそのまま操作順の保証になります。
  */
 export function layoutStageEvents(
-  events: Event[],
+  events: TimetableEntry[],
   range: TimeRange,
   hourHeightPx: number = HOUR_HEIGHT_PX
 ): PositionedEvent[] {

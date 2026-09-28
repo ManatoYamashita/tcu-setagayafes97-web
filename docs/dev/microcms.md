@@ -308,6 +308,8 @@ microCMS 管理画面のフィールド種類選択ダイアログは、**実マ
 
 ## 関連ドキュメント
 
+- [event-sessions.md](./event-sessions.md) - 企画の開催枠（`sessions`）。2部制の企画の入稿と正規化の契約
+
 - [docs/dev/content-revalidation.md](./content-revalidation.md) — Webhook によるオンデマンド再検証と運用手順
 - [.claude/CLAUDE.md](../../.claude/CLAUDE.md) — microCMS API 設計（フィールド定義）
 - [docs/requires/require.md](../requires/require.md) — 要件定義書

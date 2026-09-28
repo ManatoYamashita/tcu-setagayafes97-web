@@ -1,4 +1,4 @@
-import type { StageGroup } from "@/lib/timetable";
+import { countDistinctEvents, type StageGroup } from "@/lib/timetable";
 import {
   CARD_GAP_PX,
   HOUR_HEIGHT_PX,
@@ -75,7 +75,7 @@ export function TimetableGantt({ groups, range }: TimetableGanttProps) {
             >
               <span className="truncate">{group.name}</span>
               <span className="shrink-0 rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700">
-                {group.events.length}件
+                {countDistinctEvents(group.events)}件
               </span>
             </h3>
 
@@ -88,7 +88,7 @@ export function TimetableGantt({ groups, range }: TimetableGanttProps) {
 
               {layoutStageEvents(group.events, range, HOUR_HEIGHT_PX).map((positioned) => (
                 <div
-                  key={positioned.event.id}
+                  key={positioned.event.entryKey}
                   data-timetable-event
                   // px-1 が隣り合う列の間隔。下の余白は密度判定が引く値と同一でなければ
                   // ならないため、Tailwind の pb-1 ではなく CARD_GAP_PX を直接載せている

@@ -13,7 +13,8 @@ const STAGE_TABS = "[data-timetable-stage-tabs]";
 test.describe("タブと絞り込み", () => {
   test("選択日と絞り込み後の件数を盤面の直前に表示する", async ({ timetablePage: page }) => {
     await expect(page.getByRole("heading", { name: "10月31日（土）の企画" })).toBeVisible();
-    await expect(page.locator("[data-timetable-summary]")).toHaveText("9企画・6会場");
+    // 2部制の企画はブロックが2つでも1企画として数える（#281）
+    await expect(page.locator("[data-timetable-summary]")).toHaveText("10企画・6会場");
   });
 
   test("盤面の時刻列と各ステージの企画数を表示する", async ({ timetablePage: page }) => {
@@ -22,6 +23,8 @@ test.describe("タブと絞り込み", () => {
     const stageHeadings = page.locator("[data-timetable-stage-heading]");
     await expect(stageHeadings).toHaveCount(6);
     await expect(stageHeadings.first()).toContainText(/\d+件/);
+    // ホールは2部制（2ブロック）と 12:00 の企画で、2件
+    await expect(stageHeadings.filter({ hasText: "ホール" })).toContainText("2件");
   });
 
   test("選択中のステージが当日0件でも押下状態で残る", async ({ page, gotoTimetable }) => {
