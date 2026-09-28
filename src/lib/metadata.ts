@@ -84,7 +84,7 @@ const OGP_FILL_COLOR = "8E3AB0";
  * 上下）をブランドカラーで埋める。トリミングしないので、どの比率で入稿されても
  * 被写体が欠けない。
  *
- * microCMS 以外のURL（`/ogp.webp` などの静的ファイル）は変換せずに返す。
+ * microCMS 以外のURL（`/ogp-v2.webp` などの静的ファイル）は変換せずに返す。
  */
 function toOgpImageUrl(url: string): string {
   let parsed: URL;

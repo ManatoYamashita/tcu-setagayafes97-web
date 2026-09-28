@@ -108,7 +108,7 @@ describe("resolveDelivery — 配信経路の決定", () => {
 
   it("public/ の静的画像は実体をそのまま配る", () => {
     expect(resolveDelivery("/images/brand/favicon-white.avif")).toBe("raw");
-    expect(resolveDelivery("/ogp.webp")).toBe("raw");
+    expect(resolveDelivery("/ogp-v2.webp")).toBe("raw");
   });
 
   /*

@@ -57,7 +57,7 @@ export const STATIC_PAGES: readonly StaticPageEntry[] = [
     pathname: "/",
     changeFrequency: "daily",
     priority: 1.0,
-    images: ["/ogp.webp", siteConfig.metadata.searchThumbnail],
+    images: [siteConfig.metadata.ogImage, siteConfig.metadata.searchThumbnail],
   },
   { pathname: "/events", changeFrequency: "daily", priority: 0.9 },
   { pathname: "/special", changeFrequency: "daily", priority: 0.8 },

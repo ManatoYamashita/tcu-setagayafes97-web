@@ -219,7 +219,7 @@ const APP_IMAGES = [
  */
 const NON_APP_IMAGES = [
   {
-    path: "public/ogp.webp",
+    path: "public/ogp-v2.webp",
     role: "crawler",
     maxBytes: 40000,
     note: "OGP / twitter:image。X・Slack・LINE のクローラは AVIF を読まない（src/data/site.ts の ogImage）",

@@ -115,7 +115,7 @@ describe("createPageMetadata の OG画像", () => {
   it("microCMS 以外の画像は変換せず実寸を保つ", () => {
     const meta = createPageMetadata({
       ...base,
-      image: { url: "/ogp.webp", width: 800, height: 400 },
+      image: { url: "/ogp-v2.webp", width: 800, height: 400 },
     });
     const image = (meta.openGraph?.images as { url: string; width?: number; height?: number }[])[0];
     expect(image.url).not.toContain("fit=fill");
