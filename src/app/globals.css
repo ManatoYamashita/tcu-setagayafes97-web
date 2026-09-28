@@ -357,6 +357,17 @@ body {
   }
 
   /*
+   * アクセスページの「おすすめ」経路カードの枠。カードが画面に入ったときに
+   * AccessDirectionsTabs が付与し、3回点滅して不透明のまま止まる。
+   * 0.6秒周期（1秒あたり約1.7回）で WCAG 2.3.1 の「1秒あたり3回以下」を満たし、
+   * 合計約2.3秒で止まるため 2.2.2 の停止手段も要らない。
+   * 遅延は、親の data-access-reveal="up"（0.72秒のフェード）とのぶつかりを避けるため。
+   */
+  .recommended-frame-blink {
+    animation: recommended-frame-blink 0.6s ease-in-out 0.5s 3;
+  }
+
+  /*
    * ヒーロー入場の対象。初期状態を不可視にしたうえで、GSAP が走らなかった
    * 場合の保険として遅れて表示する。
    *
@@ -539,6 +550,12 @@ body {
   }
   to {
     rotate: 360deg;
+  }
+}
+
+@keyframes recommended-frame-blink {
+  50% {
+    opacity: 0.15;
   }
 }
 
@@ -862,6 +879,11 @@ body {
    * そもそも出さない方針（FeaturedGearScene の loading: () => null）で対応する。
    */
   .animate-spin-slow {
+    animation: none !important;
+  }
+
+  /* おすすめ枠の点滅。止めても枠は不透明のまま残るため、強調は失われない */
+  .recommended-frame-blink {
     animation: none !important;
   }
 

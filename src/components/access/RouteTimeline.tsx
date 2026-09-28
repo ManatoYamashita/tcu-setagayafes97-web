@@ -64,13 +64,21 @@ interface DurationTextProps {
   minutes: number;
   unit: string;
   className?: string;
+  /** 数字だけに掛けるクラス。既定は周囲より一段大きい text-base */
+  numberClassName?: string;
 }
 
 /** 所要時間。数字だけを一段大きくして視線が止まるようにする */
-function DurationText({ label, minutes, unit, className }: DurationTextProps) {
+function DurationText({
+  label,
+  minutes,
+  unit,
+  className,
+  numberClassName = "text-base",
+}: DurationTextProps) {
   return (
     <span className={className}>
-      {label} <span className="text-base">{minutes}</span>
+      {label} <span className={numberClassName}>{minutes}</span>
       {unit}
     </span>
   );
@@ -121,7 +129,14 @@ export function WalkSegmentLabel({ walkTimeLabel, minutes, minuteUnit }: WalkSeg
   return (
     <div className={segmentLabelClassName}>
       <Footprints aria-hidden="true" className="h-4 w-4 shrink-0 text-gray-600" />
-      <DurationText label={walkTimeLabel} minutes={minutes} unit={minuteUnit} />
+      {/* 経路で最も知りたい値なので、数字を大きくしてブランドの紫で示す。
+          leading-none は行の高さを変えず、乗車区間のラベルと縦位置を揃えるため */}
+      <DurationText
+        label={walkTimeLabel}
+        minutes={minutes}
+        unit={minuteUnit}
+        numberClassName="text-xl leading-none text-primary-600"
+      />
     </div>
   );
 }

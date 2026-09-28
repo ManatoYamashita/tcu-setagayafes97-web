@@ -248,7 +248,7 @@ const NON_APP_IMAGES = [
     path: "public/images/video-posters/access-tcu-setagaya.webp",
     role: "dual",
     maxBytes: 20000,
-    note: "AccessRouteMedia が AppImage と <video poster> の両方で使う。poster の AVIF 解決は未実測で、12.9KB なので得も無い",
+    note: "AccessRouteMedia が AppImage と <video poster> の両方で使う。poster の AVIF 解決は未実測で、17.0KB なので得も無い。動画の約1.0秒のコマ（線とラベルだけで駅名はまだ無い）を 1280×720 で抜いたもの",
   },
 ];
 
