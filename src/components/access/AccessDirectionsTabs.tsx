@@ -213,7 +213,6 @@ function TrainRouteList({ content, venue, routes }: TrainRouteListProps) {
               marker="departure"
               title={route.station}
               subtitle={route.line}
-              lineColor={route.lineColor}
               lineVariant="walk"
               segment={
                 <WalkSegmentLabel
@@ -251,7 +250,6 @@ function BusRouteList({ content, venue, routes }: BusRouteListProps) {
             <TimelineStep
               marker="departure"
               title={route.from}
-              lineColor={route.fromLineColor}
               lineVariant="ride"
               segment={
                 <RideSegmentLabel

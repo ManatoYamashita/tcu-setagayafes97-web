@@ -1,6 +1,5 @@
 import { Bus, Footprints } from "lucide-react";
 import type { ReactNode } from "react";
-import type { LineColor } from "@/data/access";
 
 /** ノードの種類。出発＝塗り丸、経由＝白抜き丸、到着＝二重丸で区別する */
 type MarkerVariant = "departure" | "via" | "arrival";
@@ -8,9 +7,8 @@ type MarkerVariant = "departure" | "via" | "arrival";
 /** ノードから下へ伸びる区間の種類。乗車＝実線、徒歩＝点線 */
 type LineVariant = "ride" | "walk";
 
-// 塗り丸の色は路線カラーで差し替えるため、形だけを持たせて色は markerFillClassName に分ける
 const markerClassName: Record<MarkerVariant, string> = {
-  departure: "mt-1.5 h-4 w-4 shrink-0 rounded-full",
+  departure: "mt-1.5 h-4 w-4 shrink-0 rounded-full bg-primary-600",
   via: "mt-1.5 h-4 w-4 shrink-0 rounded-full border-4 border-primary-600 bg-white",
   arrival:
     "mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-primary-600 bg-white",
@@ -22,22 +20,6 @@ const lineClassName: Record<LineVariant, string> = {
   walk: "min-h-8 w-1 flex-1 border-l-4 border-dotted border-gray-400",
 };
 
-/**
- * 塗り丸の路線カラー（globals.css の `--color-line-*`）。駅名の文字は塗らない。
- * Tailwind がソースから拾えるよう、クラス名は組み立てずに静的な文字列で持つ。
- */
-const lineColorClassName: Record<LineColor, string> = {
-  oimachi: "bg-line-oimachi",
-  toyoko: "bg-line-toyoko",
-  denentoshi: "bg-line-denentoshi",
-};
-
-const defaultMarkerFillClassName: Record<MarkerVariant, string> = {
-  departure: "bg-primary-600",
-  via: "",
-  arrival: "",
-};
-
 const segmentLabelClassName =
   "mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-bold text-gray-700";
 
@@ -45,8 +27,6 @@ interface TimelineStepProps {
   marker: MarkerVariant;
   title: string;
   subtitle?: string;
-  /** 駅のノードに指定すると、塗り丸をその路線の色で描く（出発ノード専用。駅名の文字色は変えない） */
-  lineColor?: LineColor;
   /** 省略するとこのノードから下へ線を引かない（＝経路の終点） */
   lineVariant?: LineVariant;
   segment?: ReactNode;
@@ -59,24 +39,11 @@ interface TimelineStepProps {
  * 読み上げ順が経路順と一致する。縦線はステップごとに独立した要素なので、
  * 先頭ノードの上と終点ノードの下に線がはみ出すことがない。
  */
-export function TimelineStep({
-  marker,
-  title,
-  subtitle,
-  lineColor,
-  lineVariant,
-  segment,
-}: TimelineStepProps) {
-  // 路線カラーは塗り丸にしか載せない。白抜き丸・二重丸の色は経路の種類を表すため変えない
-  const markerFillClassName =
-    lineColor && marker === "departure"
-      ? lineColorClassName[lineColor]
-      : defaultMarkerFillClassName[marker];
-
+export function TimelineStep({ marker, title, subtitle, lineVariant, segment }: TimelineStepProps) {
   return (
     <li className="grid grid-cols-[1.25rem_minmax(0,1fr)] gap-x-3">
       <div aria-hidden="true" className="flex flex-col items-center">
-        <span className={`${markerClassName[marker]} ${markerFillClassName}`}>
+        <span className={markerClassName[marker]}>
           {marker === "arrival" && <span className="h-2 w-2 rounded-full bg-primary-600" />}
         </span>
         {lineVariant && <span className={lineClassName[lineVariant]} />}
