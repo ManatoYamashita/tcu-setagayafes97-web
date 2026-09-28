@@ -51,7 +51,7 @@ describe("serializeJsonLd", () => {
   });
 
   it("退避しても JSON として元の値へ戻る", () => {
-    const value = { name: "MON7A <東京都市大学 第97回世田谷祭>" };
+    const value = { name: "MON7A <第97回東京都市大学世田谷祭>" };
     expect(JSON.parse(serializeJsonLd(value))).toEqual(value);
   });
 });
@@ -66,8 +66,8 @@ describe("createHomeStructuredData", () => {
     const website = graph.find((node) => node["@type"] === "WebSite") as {
       alternateName: string[];
     };
-    // 「第N回 世田谷祭」は毎年変わるので、値ではなく形だけを見る
-    expect(website.alternateName.some((name) => /^第\d+回 世田谷祭$/.test(name))).toBe(true);
+    // 「第N回世田谷祭」は毎年変わるので、値ではなく形だけを見る
+    expect(website.alternateName.some((name) => /^第\d+回世田谷祭$/.test(name))).toBe(true);
     expect(website.alternateName).toContain("東京都市大学 世田谷祭");
   });
 

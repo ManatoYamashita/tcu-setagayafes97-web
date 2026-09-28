@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## プロジェクト概要
 
-東京都市大学 第97回 世田谷祭 公式Webサイトの開発プロジェクト。Next.js 16.1 (App Router) + TypeScript + TailwindCSS + microCMS を使用した、学園祭の情報提供と企画検索を目的としたWebサイト。
+第97回東京都市大学世田谷祭 公式Webサイトの開発プロジェクト。Next.js 16.1 (App Router) + TypeScript + TailwindCSS + microCMS を使用した、学園祭の情報提供と企画検索を目的としたWebサイト。
 
 - **開催日程**: 2026年10月31日（土）〜11月1日（日）
 - **公開予定**: 2026年2月28日
@@ -19,7 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | 言語             | TypeScript                                                             |
 | スタイリング     | TailwindCSS                                                            |
 | アニメーション   | GSAP                                                                   |
-| 3Dグラフィックス | Three.js / React Three Fiber（3Dマップは見送り。カラクリ演出用に残置） |
+| 3Dグラフィックス | Three.js / React Three Fiber（3Dマップは見送り。カラクり演出用に残置） |
 | CMS              | microCMS                                                               |
 | 多言語対応       | next-intl または next-i18next                                          |
 | ホスティング     | Vercel (Free Plan)                                                     |
@@ -373,7 +373,7 @@ microCMS の編集画面にある「画面プレビュー」から、**公開せ
 
 **新規に 3D 関連のコードを追加しないでください。** 第98回以降で再検討する場合は、`docs/requires/todo.md` の Phase 3「3Dマップ実装 — 見送り」節に打ち消し線で残してあるチェックリストを復活させたうえで判断してください。
 
-`three` / `@react-three/fiber` はカラクリのギア演出（`src/components/three/`）用です。3Dマップとは無関係で、おすすめ企画セクションの背景装飾として稼働しています（2026-08-10 復活）。
+`three` / `@react-three/fiber` はカラクりのギア演出（`src/components/three/`）用です。3Dマップとは無関係で、おすすめ企画セクションの背景装飾として稼働しています（2026-08-10 復活）。
 
 - 読み込みは `next/dynamic` の `ssr: false`。クライアントチャンクは 860K（brotli 185K）で全チャンク中最大
 - `EVENTS_VISIBLE=false` の間はセクションごと非表示のため、チャンクも読み込まれない

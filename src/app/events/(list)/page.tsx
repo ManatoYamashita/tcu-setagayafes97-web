@@ -25,13 +25,13 @@ export const metadata: Metadata = EVENTS_VISIBLE
   ? createPageMetadata({
       title: "企画を探す",
       description:
-        "東京都市大学 第97回 世田谷祭の企画一覧ページ。教室企画、ステージ企画、スペシャル企画など、様々な企画を検索・閲覧できます。",
+        "第97回東京都市大学世田谷祭の企画一覧ページ。教室企画、ステージ企画、スペシャル企画など、様々な企画を検索・閲覧できます。",
       pathname: "/events",
     })
   : createPageMetadata({
       title: "企画を探す",
       description:
-        "東京都市大学 第97回 世田谷祭の企画情報は現在準備中です。公開までもうしばらくお待ちください。",
+        "第97回東京都市大学世田谷祭の企画情報は現在準備中です。公開までもうしばらくお待ちください。",
       pathname: "/events",
     });
 
@@ -67,7 +67,7 @@ export default async function EventsPage() {
       <PageSheetLayout hero={pageHeroes.events}>
         <ComingSoon
           title="企画情報は準備中です"
-          description="第97回 世田谷祭の企画情報は現在準備中です。公開までもうしばらくお待ちください。"
+          description="第97回東京都市大学世田谷祭の企画情報は現在準備中です。公開までもうしばらくお待ちください。"
         />
         {/* 準備中でも著名人企画だけは出す。上部の細いリンクは、ここでは一覧を挟まず
             すぐ下にこのセクションが来るため重複になるので付けない */}

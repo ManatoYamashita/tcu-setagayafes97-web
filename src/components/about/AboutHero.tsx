@@ -22,13 +22,12 @@ const Grainient = dynamic(() => import("@/components/ui/Grainient"), {
  * - 右下にページタイトル + スクロールインジケーター
  */
 export function AboutHero() {
-  const { title, description, scrollIndicator } = aboutConfig.hero;
+  const { university, scrollIndicator } = aboutConfig.hero;
 
   const sectionRef = useRef<HTMLElement>(null);
   const upperMaskRef = useRef<HTMLDivElement>(null);
   const lowerMaskRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const descRef = useRef<HTMLParagraphElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const ctxRef = useRef<gsap.Context | null>(null);
 
@@ -83,8 +82,8 @@ export function AboutHero() {
           }
         );
 
-        // タイトル・description: フェードイン + 上昇
-        const textTargets = [descRef.current, titleRef.current].filter(Boolean) as HTMLElement[];
+        // タイトル: フェードイン + 上昇
+        const textTargets = [titleRef.current].filter(Boolean) as HTMLElement[];
         gsap.set(textTargets, { opacity: 0, y: 20 });
         gsap.to(textTargets, {
           opacity: 1,
@@ -173,12 +172,6 @@ export function AboutHero() {
 
       {/* Layer 2: 右下テキストブロック — 「97」を主役にした縦積みレイアウト */}
       <div className="absolute bottom-20 right-6 z-10 text-right sm:bottom-16 sm:right-8 lg:bottom-20 lg:right-12">
-        <p
-          ref={descRef}
-          className="mb-3 text-[10px] font-medium uppercase tracking-[0.3em] text-gray-400 sm:mb-4 sm:text-xs"
-        >
-          {description}
-        </p>
         <h1 ref={titleRef} className="leading-tight" style={{ fontFamily: "var(--font-sans)" }}>
           <span className="block text-2xl font-semibold tracking-[0.08em] text-gray-900 sm:text-3xl lg:text-4xl">
             第
@@ -217,6 +210,13 @@ export function AboutHero() {
               97
             </span>
             <span className="ml-1 sm:ml-2">回</span>
+          </span>
+          {/*
+            正式名は「第97回東京都市大学世田谷祭実行委員会」。大学名を見出しの外へ出すと
+            表示の語順も h1 のアクセシブルネームも崩れるため、見出しの中の1段として置く。
+          */}
+          <span className="block text-2xl font-semibold tracking-[0.08em] text-gray-900 sm:text-3xl lg:text-4xl">
+            {university}
           </span>
           <span className="block text-2xl font-semibold tracking-[0.08em] text-gray-900 sm:text-3xl lg:text-4xl">
             世田谷祭実行委員会

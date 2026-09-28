@@ -439,7 +439,7 @@ export const accessPageContents = {
   ko: {
     introduction: {
       label: "Setagaya Campus",
-      title: "헤매지 않고 세타가야 축제로.",
+      title: "헤매지 않고 세타가야사이로.",
       description:
         "행사장은 도쿄도시대학 세타가야 캠퍼스입니다. 가장 가까운 오야마다이역에서 도보 약 12분이므로 여유 있게 방문해 주세요.",
       mapLinkLabel: "Google 지도에서 열기",

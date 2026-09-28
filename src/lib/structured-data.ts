@@ -35,12 +35,12 @@ function createSearchThumbnailNode() {
 /**
  * 検索での呼ばれ方
  *
- * 年次で変わる「第97回 世田谷祭」と、年次をまたいで一貫する「世田谷祭」の両方を
+ * 年次で変わる「第97回世田谷祭」と、年次をまたいで一貫する「世田谷祭」の両方を
  * 同じエンティティとして認識させる。かな表記を入れているのは、日本語の検索で
  * 漢字を確定させずに引かれることがあるため。
  */
 const FESTIVAL_ALTERNATE_NAMES = [
-  `第${siteConfig.edition}回 世田谷祭`,
+  `第${siteConfig.edition}回世田谷祭`,
   siteConfig.metadata.siteName,
   "東京都市大学 世田谷祭",
   "せたがやさい",
@@ -101,7 +101,7 @@ export function createFestivalEventNode() {
     "@type": "Event",
     "@id": festivalId,
     name: siteConfig.name,
-    alternateName: `第${siteConfig.edition}回 世田谷祭`,
+    alternateName: `第${siteConfig.edition}回世田谷祭`,
     description: siteConfig.description,
     url: siteUrl,
     image: [absoluteSiteUrl(siteConfig.metadata.ogImage)],

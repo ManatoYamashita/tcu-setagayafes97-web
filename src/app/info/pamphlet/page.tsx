@@ -7,7 +7,7 @@ import { createPageMetadata } from "@/lib/metadata";
 export const metadata: Metadata = createPageMetadata({
   title: "パンフレットダウンロード",
   description:
-    "東京都市大学 第97回 世田谷祭の公式パンフレットをダウンロードいただけます。企画情報、タイムテーブル、マップなどを掲載しています。",
+    "第97回東京都市大学世田谷祭の公式パンフレットをダウンロードいただけます。企画情報、タイムテーブル、マップなどを掲載しています。",
   pathname: "/info/pamphlet",
 });
 
@@ -18,7 +18,7 @@ export const metadata: Metadata = createPageMetadata({
 const pamphlets = [
   {
     id: "main",
-    title: "第97回 世田谷祭 公式パンフレット",
+    title: "第97回東京都市大学世田谷祭 公式パンフレット",
     description:
       "企画一覧、タイムテーブル、キャンパスマップなど、世田谷祭を楽しむための情報が満載です。",
     fileUrl: "/pamphlets/setagayafes97_pamphlet_placeholder.pdf",
@@ -46,7 +46,7 @@ export default function PamphletPage() {
             <h1 className="text-4xl font-bold md:text-5xl">パンフレット</h1>
           </div>
           <p className="mt-4 text-center text-lg opacity-90">
-            第97回 世田谷祭の公式パンフレットをダウンロード
+            第97回東京都市大学世田谷祭の公式パンフレットをダウンロード
           </p>
         </div>
       </div>

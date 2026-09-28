@@ -4,20 +4,20 @@
 export const aboutConfig = {
   // Aboutページ ヒーロー（ミニマルデザイン）
   hero: {
-    title: "第97回世田谷祭実行委員会",
-    description: "東京都市大学",
+    // 見出しは「第97回 / 東京都市大学 / 世田谷祭実行委員会」の3段で描く（AboutHero）
+    university: "東京都市大学",
     scrollIndicator: "( scroll down )",
   },
 
   // トップページ用Aboutセクション
   topSection: {
-    label: "東京都市大学 第97回 世田谷祭",
-    heading: "カラクリ",
+    label: "第97回東京都市大学世田谷祭",
+    heading: "カラクり",
     tagline: "2026年10月31日(土)〜11月1日(日)",
     paragraphs: [
-      "第97回東京都市大学世田谷祭のキャンパステーマは『カラクリ』です。",
-      "このテーマには、精緻な仕掛けが連鎖して大きな動きを生み出す「カラクリ細工」のように、一人ひとりの個性や想いが結びつき、世田谷祭という大きな舞台を創り上げていくという意味が込められています。",
-      "一つでも欠けてしまっては成立しないカラクリのように、参加団体、ご来場者、そして歴史をつないできた先達の皆様など、学園祭に関わるすべての存在が欠かせない要素です。",
+      "第97回東京都市大学世田谷祭のキャンパステーマは『カラクり』です。",
+      "このテーマには、精緻な仕掛けが連鎖して大きな動きを生み出す「からくり細工」のように、一人ひとりの個性や想いが結びつき、世田谷祭という大きな舞台を創り上げていくという意味が込められています。",
+      "一つでも欠けてしまっては成立しないカラクりのように、参加団体、ご来場者、そして歴史をつないできた先達の皆様など、学園祭に関わるすべての存在が欠かせない要素です。",
       "多くの人の力が重なり合い、知的好奇心と前向きなエネルギーが共鳴する特別な空間となることを願っています。",
     ],
     cta: { label: "委員会について", href: "/about" },
@@ -42,13 +42,13 @@ export const aboutConfig = {
     message: `
 第97回東京都市大学世田谷祭にご来場いただき、誠にありがとうございます。実行委員一同、皆様をこの世田谷キャンパスでお迎えできる今日という日を、心待ちにしておりました。
 
-今年度の世田谷祭のテーマは「カラクリ」です。 多様な個性が緻密に組み合わさり、一つの大きなものを動かしていく、そんな美しさと調和を表現したいという想いを込めています。
+今年度の世田谷祭のテーマは「カラクり」です。 多様な個性が緻密に組み合わさり、一つの大きなものを動かしていく、そんな美しさと調和を表現したいという想いを込めています。
 
-今年度は有り難いことに参加団体や模擬店の数が増加し、世田谷キャンパス全体を舞台としてお楽しみいただけるよう、キャンパスの隅々まで多彩な装飾を施しました。活気あふれるステージから各所の個性豊かな模擬店まで、一つひとつの企画がまるで「カラクリ」の精緻な仕掛けのように学内の至る所で連鎖し、心地よく響き合っています。この日のために学生たちが情熱を注いで準備した、創意工夫に満ちた企画の数々をぜひ肌で感じてください。
+今年度は有り難いことに参加団体や模擬店の数が増加し、世田谷キャンパス全体を舞台としてお楽しみいただけるよう、キャンパスの隅々まで多彩な装飾を施しました。活気あふれるステージから各所の個性豊かな模擬店まで、一つひとつの企画がまるで「カラクり」の精緻な仕掛けのように学内の至る所で連鎖し、心地よく響き合っています。この日のために学生たちが情熱を注いで準備した、創意工夫に満ちた企画の数々をぜひ肌で感じてください。
 
 また、本学園祭の開催にあたり、日頃より温かいご理解をいただいている地域の皆様、多大なるご支援を賜りました協賛企業の皆様、そして開催を支えてくださった大学関係者の皆様に、この場をお借りして厚く御礼申し上げます。
 
-すべての想いが「カラクリ」のように動き出す今日という日が、皆様にとって驚きと感動に満ちた、忘れられない一日となりますように。 どうぞ最後まで、第97回世田谷祭を存分にお楽しみください。
+すべての想いが「カラクり」のように動き出す今日という日が、皆様にとって驚きと感動に満ちた、忘れられない一日となりますように。 どうぞ最後まで、第97回東京都市大学世田谷祭を存分にお楽しみください。
     `.trim(),
   },
 
@@ -89,16 +89,7 @@ export const aboutConfig = {
     memberCount: 150, // 実行委員数（仮）
     description:
       "世田谷祭実行委員会は、東京都市大学の学生によって組織され、学園祭の企画・運営を行う団体です。毎年10月末〜11月初旬に開催される世田谷祭を通じて、学生の自主性・創造性を育み、地域社会との交流を深めることを目的としています。",
-    departments: [
-      "総務局",
-      "渉外局",
-      "企画局",
-      "広報局",
-      "制作局",
-      "会場局",
-      "ステージ局",
-      "システム局",
-    ],
+    departments: ["広報部", "管理部", "企画部"],
   },
 
   // SNSリンク
@@ -126,7 +117,7 @@ export const aboutConfig = {
       { label: "名称", value: "第97回東京都市大学世田谷祭" },
       {
         label: "共通テーマ\nキャンパステーマ",
-        value: "「期待を超える瞬間へ、ともに進もう」\n「カラクリ」",
+        value: "「期待を超える瞬間へ、ともに進もう」\n「カラクり」",
       },
       {
         label: "日時",
@@ -258,7 +249,7 @@ export const festivalIntroContents = {
       organizer: "Organizer",
     },
     admissionValue: "Free",
-    festivalName: "The 97th Setagaya Festival, Tokyo City University",
+    festivalName: "The 97th Tokyo City University Setagaya Festival",
     venueName: "Tokyo City University Setagaya Campus",
     venueAddress: "1-28-1 Tamatsutsumi, Setagaya-ku, Tokyo 158-8557, Japan",
     organizerName: "The 97th Tokyo City University Setagaya Festival Organizing Committee",
@@ -267,16 +258,7 @@ export const festivalIntroContents = {
       "The Setagaya Festival Organizing Committee is a student body of Tokyo City University that plans and runs the festival. It prepares throughout the year with the aim of fostering student initiative and creativity while deepening ties with the local community.",
     ],
     departmentsLabel: "Departments",
-    departments: [
-      "General Affairs",
-      "External Relations",
-      "Programme Planning",
-      "Public Relations",
-      "Production",
-      "Venue",
-      "Stage",
-      "Systems",
-    ],
+    departments: ["Public Relations", "Administration", "Planning"],
     linksHeading: "Related pages",
     links: [
       { label: "Venue and access", href: "/access" },
@@ -301,7 +283,7 @@ export const festivalIntroContents = {
       organizer: "主办",
     },
     admissionValue: "免费",
-    festivalName: "东京都市大学 第97届 世田谷祭",
+    festivalName: "第97届东京都市大学世田谷祭",
     venueName: "东京都市大学 世田谷校区",
     venueAddress: "〒158-8557 东京都世田谷区玉堤1-28-1",
     organizerName: "第97届东京都市大学世田谷祭执行委员会",
@@ -310,7 +292,7 @@ export const festivalIntroContents = {
       "世田谷祭执行委员会由东京都市大学的学生组成，负责本文化节的策划与运营。以培养学生的自主性与创造力、加深与当地社会的交流为目标，用一整年的时间进行筹备。",
     ],
     departmentsLabel: "组织构成",
-    departments: ["总务局", "涉外局", "企划局", "宣传局", "制作局", "会场局", "舞台局", "系统局"],
+    departments: ["宣传部", "管理部", "企划部"],
     linksHeading: "相关页面",
     links: [
       { label: "会场与交通", href: "/access" },
@@ -335,7 +317,7 @@ export const festivalIntroContents = {
       organizer: "주최",
     },
     admissionValue: "무료",
-    festivalName: "도쿄도시대학 제97회 세타가야사이",
+    festivalName: "제97회 도쿄도시대학 세타가야사이",
     venueName: "도쿄도시대학 세타가야 캠퍼스",
     venueAddress: "〒158-8557 도쿄도 세타가야구 다마쓰쓰미 1-28-1",
     organizerName: "제97회 도쿄도시대학 세타가야사이 실행위원회",
@@ -344,16 +326,7 @@ export const festivalIntroContents = {
       "세타가야사이 실행위원회는 도쿄도시대학 학생들로 구성되어 축제의 기획과 운영을 담당하는 단체입니다. 학생의 자주성과 창의성을 기르고 지역 사회와의 교류를 넓히는 것을 목표로 1년에 걸쳐 준비를 진행합니다.",
     ],
     departmentsLabel: "조직 구성",
-    departments: [
-      "총무국",
-      "섭외국",
-      "기획국",
-      "홍보국",
-      "제작국",
-      "회장국",
-      "스테이지국",
-      "시스템국",
-    ],
+    departments: ["홍보부", "관리부", "기획부"],
     linksHeading: "관련 페이지",
     links: [
       { label: "장소와 오시는 길", href: "/access" },

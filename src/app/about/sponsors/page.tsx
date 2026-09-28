@@ -11,7 +11,7 @@ import { createPageMetadata } from "@/lib/metadata";
 export const metadata: Metadata = createPageMetadata({
   title: "協賛企業一覧",
   description:
-    "東京都市大学 第97回 世田谷祭を支援してくださる協賛企業様をご紹介します。心より感謝申し上げます。",
+    "第97回東京都市大学世田谷祭を支援してくださる協賛企業様をご紹介します。心より感謝申し上げます。",
   pathname: "/about/sponsors",
 });
 
@@ -41,7 +41,7 @@ export default async function SponsorsPage() {
             <h1 className="text-4xl font-bold md:text-5xl">協賛企業</h1>
           </div>
           <p className="mt-4 text-center text-lg opacity-90">
-            第97回 世田谷祭を支援してくださる企業様
+            第97回東京都市大学世田谷祭を支援してくださる企業様
           </p>
         </div>
       </div>
