@@ -49,6 +49,21 @@ test.describe("盤面の幾何", () => {
     expect(await topWithinColumn(page, "著名人ステージ")).toBe(360 * pxPerMinute);
   });
 
+  test("最初の時刻ラベルが見出し下の罫線に重ならない", async ({ timetablePage: page }) => {
+    const bounds = await page.evaluate(() => {
+      const heading = document.querySelector("[data-timetable-time-heading]");
+      const firstLabel = document.querySelector("[data-timetable-time-axis] span:first-child");
+      if (!heading || !firstLabel) throw new Error("時刻見出しまたは最初のラベルが見つかりません");
+
+      return {
+        headingBottom: heading.getBoundingClientRect().bottom,
+        firstLabelTop: firstLabel.getBoundingClientRect().top,
+      };
+    });
+
+    expect(bounds.firstLabelTop).toBeGreaterThanOrEqual(bounds.headingBottom);
+  });
+
   test("重なる企画が左右のレーンへ分かれる", async ({ timetablePage: page }) => {
     // 7A の 13:00-14:30 と 13:30-14:00
     const boxes = await page.locator("[data-timetable-event]").evaluateAll((els) =>
