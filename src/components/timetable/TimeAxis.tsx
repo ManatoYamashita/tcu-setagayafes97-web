@@ -1,8 +1,17 @@
-import { calculateBoardHeight, generateTimeAxis, type TimeRange } from "@/lib/timetable-layout";
+import {
+  calculateBoardHeight,
+  generateTimeAxis,
+  TIME_AXIS_STEP_MINUTES,
+  type TimeRange,
+} from "@/lib/timetable-layout";
 
 interface TimeAxisProps {
   range: TimeRange;
   hourHeightPx: number;
+}
+
+function tickTopPx(index: number, hourHeightPx: number): number {
+  return (index * TIME_AXIS_STEP_MINUTES * hourHeightPx) / 60;
 }
 
 /**
@@ -35,7 +44,7 @@ export function TimeAxisColumn({ range, hourHeightPx }: TimeAxisProps) {
           className={`absolute right-3 text-xs font-medium text-gray-700 tabular-nums${
             index > 0 ? " -translate-y-1/2" : ""
           }`}
-          style={{ top: index * hourHeightPx }}
+          style={{ top: tickTopPx(index, hourHeightPx) }}
         >
           {time}
         </span>
@@ -45,7 +54,7 @@ export function TimeAxisColumn({ range, hourHeightPx }: TimeAxisProps) {
 }
 
 /**
- * 毎正時の罫線
+ * 30分刻みの罫線
  *
  * ステージ列の内側に敷きます。列ごとに置くことで、隣り合う列の線が突き合わさって
  * 盤面全幅を横断し、かつ sticky な時刻ラベル列の手前で自然に止まります。
@@ -56,7 +65,7 @@ export function TimeAxisColumn({ range, hourHeightPx }: TimeAxisProps) {
  * 3:1 を満たす必要がある。白いシート上では border-gray-400（#8f8f8f / 3.23:1）を使う。
  * border-gray-200 は 1.53:1 しかなく、かつての border-gray-200/20 は 1.08:1 で消えていた。
  */
-export function HourLines({ range, hourHeightPx }: TimeAxisProps) {
+export function TimeGridLines({ range, hourHeightPx }: TimeAxisProps) {
   const timeAxis = generateTimeAxis(range);
 
   return (
@@ -64,8 +73,9 @@ export function HourLines({ range, hourHeightPx }: TimeAxisProps) {
       {timeAxis.map((time, index) => (
         <div
           key={time}
+          data-timetable-time-line
           className="absolute inset-x-0 border-t border-gray-400"
-          style={{ top: index * hourHeightPx }}
+          style={{ top: tickTopPx(index, hourHeightPx) }}
         />
       ))}
     </div>

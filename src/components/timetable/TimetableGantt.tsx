@@ -9,7 +9,7 @@ import {
   layoutStageEvents,
   type TimeRange,
 } from "@/lib/timetable-layout";
-import { HourLines, TimeAxisColumn } from "./TimeAxis";
+import { TimeAxisColumn, TimeGridLines } from "./TimeAxis";
 import { TimetableEventCard } from "./TimetableEventCard";
 
 interface TimetableGanttProps {
@@ -84,7 +84,7 @@ export function TimetableGantt({ groups, range }: TimetableGanttProps) {
               className="relative border-l border-gray-200"
               style={{ height: boardHeight }}
             >
-              <HourLines range={range} hourHeightPx={HOUR_HEIGHT_PX} />
+              <TimeGridLines range={range} hourHeightPx={HOUR_HEIGHT_PX} />
 
               {layoutStageEvents(group.events, range, HOUR_HEIGHT_PX).map((positioned) => (
                 <div

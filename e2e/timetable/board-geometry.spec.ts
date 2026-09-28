@@ -8,7 +8,7 @@ import { HOUR_HEIGHT_PX, calculateBoardHeight } from "@/lib/timetable-layout";
  * 盤面高さは (19 - 9) × HOUR_HEIGHT_PX = 960px になります。
  */
 const EXPECTED_BOARD_HEIGHT = calculateBoardHeight({ startHour: 9, endHour: 19 });
-const EXPECTED_COLUMNS = 6; // 7A / 7B / 体育館 / ホール / 中庭 / その他
+const EXPECTED_COLUMNS = 6; // 7A / 7B / アリーナ / ホール / 中庭 / その他
 /** ブロック数。10企画のうち2部制の1企画が2ブロックになる（#281） */
 const EXPECTED_EVENTS = 11;
 
@@ -115,8 +115,27 @@ test.describe("盤面の幾何", () => {
       .locator("[data-timetable-time-axis] span")
       .evaluateAll((els) => els.map((el) => (el.textContent ?? "").trim()));
 
-    expect(labels).toHaveLength(11);
+    expect(labels).toHaveLength(21);
     expect(labels[0]).toBe("09:00");
+    expect(labels[1]).toBe("09:30");
     expect(labels[labels.length - 1]).toBe("19:00");
+
+    const labelOffsets = await page
+      .locator("[data-timetable-time-axis] span")
+      .evaluateAll((els) =>
+        els.map((el) => Number((el as HTMLElement).style.top.replace("px", "")))
+      );
+    const lineOffsets = await page
+      .locator("[data-timetable-column]")
+      .first()
+      .locator("[data-timetable-time-line]")
+      .evaluateAll((els) =>
+        els.map((el) => Number((el as HTMLElement).style.top.replace("px", "")))
+      );
+
+    expect(labelOffsets).toEqual(
+      Array.from({ length: 21 }, (_, index) => index * (HOUR_HEIGHT_PX / 2))
+    );
+    expect(lineOffsets).toEqual(labelOffsets);
   });
 });

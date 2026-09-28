@@ -18,8 +18,8 @@ import { defineConfig, devices } from "@playwright/test";
  * 設計判断は docs/frontend/layout-e2e.md を参照。
  */
 
-/** 開発者が 3000 で回している dev サーバと衝突させない */
-const PORT = 3100;
+/** 開発者の dev サーバや別 worktree の E2E サーバと衝突させない */
+const PORT = Number(process.env.E2E_PORT ?? "3100");
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 
 export default defineConfig({

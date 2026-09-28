@@ -44,7 +44,7 @@ test.describe("モバイル幅", () => {
       "15:00",
       "17:30",
     ]);
-    await expect(page.locator("[data-timetable-list-item]").first()).toContainText("体育館");
+    await expect(page.locator("[data-timetable-list-item]").first()).toContainText("アリーナ");
   });
 
   test("2部制の企画は、どちらの部かを添えて2件出す（#281）", async ({ timetablePage: page }) => {

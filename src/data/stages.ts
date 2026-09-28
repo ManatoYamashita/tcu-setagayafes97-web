@@ -24,7 +24,7 @@ export const stages: Stage[] = [
   },
   {
     id: "体育館",
-    name: "体育館",
+    name: "アリーナ",
     description: "メインアリーナでの大型ステージ",
   },
   {
@@ -75,8 +75,11 @@ export function extractStageId(place: string): string | null {
   const exactMatch = stages.find((s) => place.includes(s.id));
   if (exactMatch) return exactMatch.id;
 
-  // 部分マッチング（ステージ名が含まれている場合）
-  const partialMatch = stages.find((s) => place.includes(s.name));
+  // 「体育館」と「アリーナ」は同じ会場。ただし「9号館アリーナ」は体育館ではない。
+  // 体育館表記は上の ID 判定で拾い、アリーナ表記は建物番号が無いときだけ拾う。
+  const partialMatch = stages.find(
+    (s) => place.includes(s.name) && (s.id !== "体育館" || !/[0-9０-９]+号館/.test(place))
+  );
   if (partialMatch) return partialMatch.id;
 
   return null;

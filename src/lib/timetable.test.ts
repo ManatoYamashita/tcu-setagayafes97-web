@@ -149,6 +149,24 @@ describe("filterEventsByStage", () => {
     expect(ids(filterEventsByStage(day1Events, "7A"))).toEqual(["fx-7a-1", "fx-7a-2", "fx-7a-3"]);
   });
 
+  it("アリーナ表記と体育館表記を同じステージで絞り込む", () => {
+    const arenaEvent = fixture("arena", {
+      date: "day1",
+      type: "stage",
+      place: "アリーナ",
+      title: "アリーナ企画",
+      organizer: "実行委員会",
+      startTime: "10:00",
+      endTime: "11:00",
+    });
+    const events = [...day1Events, ...filterStageEvents([arenaEvent])];
+    expect(ids(filterEventsByStage(events, "体育館"))).toEqual(["fx-gym-1", "fx-gym-2", "arena"]);
+    expect(groupEventsByStage(events).find((group) => group.id === "体育館")?.name).toBe(
+      "アリーナ"
+    );
+    expect(listStageTabs(events, "all").find((tab) => tab.id === "体育館")?.name).toBe("アリーナ");
+  });
+
   it("「その他」で受け皿の企画を取れる", () => {
     // extractStageId() へ戻すと null !== "other" で必ず外れ、
     // 「その他」タブが常に空になる
