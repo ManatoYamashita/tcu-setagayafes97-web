@@ -89,16 +89,7 @@ export const aboutConfig = {
     memberCount: 150, // 実行委員数（仮）
     description:
       "世田谷祭実行委員会は、東京都市大学の学生によって組織され、学園祭の企画・運営を行う団体です。毎年10月末〜11月初旬に開催される世田谷祭を通じて、学生の自主性・創造性を育み、地域社会との交流を深めることを目的としています。",
-    departments: [
-      "総務局",
-      "渉外局",
-      "企画局",
-      "広報局",
-      "制作局",
-      "会場局",
-      "ステージ局",
-      "システム局",
-    ],
+    departments: ["広報部", "管理部", "企画部"],
   },
 
   // SNSリンク
@@ -267,16 +258,7 @@ export const festivalIntroContents = {
       "The Setagaya Festival Organizing Committee is a student body of Tokyo City University that plans and runs the festival. It prepares throughout the year with the aim of fostering student initiative and creativity while deepening ties with the local community.",
     ],
     departmentsLabel: "Departments",
-    departments: [
-      "General Affairs",
-      "External Relations",
-      "Programme Planning",
-      "Public Relations",
-      "Production",
-      "Venue",
-      "Stage",
-      "Systems",
-    ],
+    departments: ["Public Relations", "Administration", "Planning"],
     linksHeading: "Related pages",
     links: [
       { label: "Venue and access", href: "/access" },
@@ -310,7 +292,7 @@ export const festivalIntroContents = {
       "世田谷祭执行委员会由东京都市大学的学生组成，负责本文化节的策划与运营。以培养学生的自主性与创造力、加深与当地社会的交流为目标，用一整年的时间进行筹备。",
     ],
     departmentsLabel: "组织构成",
-    departments: ["总务局", "涉外局", "企划局", "宣传局", "制作局", "会场局", "舞台局", "系统局"],
+    departments: ["宣传部", "管理部", "企划部"],
     linksHeading: "相关页面",
     links: [
       { label: "会场与交通", href: "/access" },
@@ -344,16 +326,7 @@ export const festivalIntroContents = {
       "세타가야사이 실행위원회는 도쿄도시대학 학생들로 구성되어 축제의 기획과 운영을 담당하는 단체입니다. 학생의 자주성과 창의성을 기르고 지역 사회와의 교류를 넓히는 것을 목표로 1년에 걸쳐 준비를 진행합니다.",
     ],
     departmentsLabel: "조직 구성",
-    departments: [
-      "총무국",
-      "섭외국",
-      "기획국",
-      "홍보국",
-      "제작국",
-      "회장국",
-      "스테이지국",
-      "시스템국",
-    ],
+    departments: ["홍보부", "관리부", "기획부"],
     linksHeading: "관련 페이지",
     links: [
       { label: "장소와 오시는 길", href: "/access" },
