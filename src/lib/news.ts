@@ -51,6 +51,7 @@ function normalizeNews(rawNews: RawNews): News {
     title: rawNews.title ?? "",
     description: rawNews.description ?? "",
     content: rawNews.content ?? "",
+    cta: rawNews.cta?.trim() || undefined,
     type: normalizeNewsType(rawNews.type),
   };
 }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { AppImage } from "@/components/ui/AppImage";
-import { ArrowLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { getNewsById, getNewsList } from "@/lib/news";
 import { Badge } from "@/components/ui/Badge";
 import { DraftPreviewBanner } from "@/components/layout/DraftPreviewBanner";
@@ -25,6 +25,25 @@ interface NewsPageProps {
  * ISR設定: 10分ごとに再検証
  */
 export const revalidate = 600;
+
+function resolveNewsCtaTarget(cta?: string): { href: string; external: boolean } | null {
+  const value = cta?.trim();
+  if (!value) return null;
+
+  try {
+    const baseUrl = absoluteSiteUrl("/");
+    const url = new URL(value, baseUrl);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+
+    const external = url.origin !== new URL(baseUrl).origin;
+    return {
+      href: external ? url.href : `${url.pathname}${url.search}${url.hash}`,
+      external,
+    };
+  } catch {
+    return null;
+  }
+}
 
 /**
  * 静的パラメータ生成（generateStaticParams）
@@ -126,6 +145,9 @@ export default async function NewsPage({ params }: NewsPageProps) {
     "@context": "https://schema.org",
     "@graph": [newsArticle, createOrganizationNode()],
   };
+  const newsCtaTarget = resolveNewsCtaTarget(news.cta);
+  const newsCtaClassName =
+    "inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary-600 px-6 py-3 font-semibold text-white shadow-md transition-[background-color,box-shadow,scale] duration-150 ease-out hoverable:hover:bg-primary-700 hoverable:hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100";
 
   return (
     <>
@@ -257,6 +279,28 @@ export default async function NewsPage({ params }: NewsPageProps) {
                 <div className="mt-6" dangerouslySetInnerHTML={{ __html: news.content }} />
               )}
             </div>
+
+            {newsCtaTarget && (
+              <div className="mt-8">
+                {newsCtaTarget.external ? (
+                  <a
+                    href={newsCtaTarget.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={newsCtaClassName}
+                  >
+                    <span>詳しくはこちら</span>
+                    <ExternalLink className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
+                    <span className="sr-only">（新しいタブで開きます）</span>
+                  </a>
+                ) : (
+                  <Link href={newsCtaTarget.href} className={newsCtaClassName}>
+                    <span>詳しくはこちら</span>
+                    <ChevronRight className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
+                  </Link>
+                )}
+              </div>
+            )}
           </article>
 
           {/* 戻るリンク */}

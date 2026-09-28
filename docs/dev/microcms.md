@@ -88,6 +88,13 @@ while (allContents.length < limit) {
 | `events`       | 企画情報           | `getEventsList()`, `getFeaturedEvents()`, `getEventById()`  |
 | `informations` | 協賛企業・FAQ      | `getSponsorsList()`, `getFAQList()`, `getInformationById()` |
 
+### News API の CTA リンク
+
+News API の任意フィールド `cta` は、記事詳細に表示する「詳しくはこちら」のリンク先URLです。
+未入力または空文字の場合はCTAを表示しません。内部リンクは `/info/contact` のようなパス、
+外部リンクは `https://example.com/` のようなHTTP(S) URLを設定します。同一サイトの絶対URLも
+内部リンクとして扱い、外部URLは新しいタブで開きます。
+
 ## select フィールドの選択肢を増やすときの注意
 
 **スキーマ側で選択肢を増やしても、コード側の正規化関数を直さなければ静かに壊れる。**
