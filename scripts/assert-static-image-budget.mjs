@@ -183,7 +183,9 @@ const SINKS = [
     name: "画像サイトマップ（src/lib/sitemap-entries.ts）",
     file: "src/lib/sitemap-entries.ts",
     pattern: /"(\/[A-Za-z0-9/_.-]+\.(?:avif|webp|png|jpe?g|gif|ico))"/g,
-    expect: 1,
+    // 現在はパスを直書きせず siteConfig.metadata（上の site.ts のシンクが検査する）から
+    // 読むため、ここから拾える本数は 0 が正しい。直書きが戻ったときに拾うためだけに残す。
+    expect: 0,
   },
 ];
 
