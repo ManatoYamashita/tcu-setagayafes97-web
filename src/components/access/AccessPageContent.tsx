@@ -135,14 +135,13 @@ export function AccessPageView({ content, locale }: AccessPageContentProps) {
             <AccessRouteMedia />
           </div>
 
-          <div data-access-reveal="up">
-            <AccessDirectionsTabs
-              content={content.directions}
-              venue={content.location.venue}
-              trainRoutes={resolveTrainRoutes(locale)}
-              busRoutes={resolveBusRoutes(locale)}
-            />
-          </div>
+          {/* リビールは AccessDirectionsTabs の中（タブの列）に置く。カードは独自の入場演出で出る */}
+          <AccessDirectionsTabs
+            content={content.directions}
+            venue={content.location.venue}
+            trainRoutes={resolveTrainRoutes(locale)}
+            busRoutes={resolveBusRoutes(locale)}
+          />
 
           <p
             className="mt-6 flex items-start gap-2 text-sm leading-6 text-gray-600"

@@ -42,11 +42,12 @@ interface TimelineStepProps {
 export function TimelineStep({ marker, title, subtitle, lineVariant, segment }: TimelineStepProps) {
   return (
     <li className="grid grid-cols-[1.25rem_minmax(0,1fr)] gap-x-3">
+      {/* data-route-* は入場演出（route-entrance.ts）が丸と線を探すための目印 */}
       <div aria-hidden="true" className="flex flex-col items-center">
-        <span className={markerClassName[marker]}>
+        <span className={markerClassName[marker]} data-route-marker>
           {marker === "arrival" && <span className="h-2 w-2 rounded-full bg-primary-600" />}
         </span>
-        {lineVariant && <span className={lineClassName[lineVariant]} />}
+        {lineVariant && <span className={lineClassName[lineVariant]} data-route-line />}
       </div>
 
       {/* 終点以外は下側に余白を取り、その分だけ区間の線も伸びる */}
@@ -66,6 +67,8 @@ interface DurationTextProps {
   className?: string;
   /** 数字だけに掛けるクラス。既定は周囲より一段大きい text-base */
   numberClassName?: string;
+  /** 入場演出で 0 から数え上げる対象にする */
+  countUp?: boolean;
 }
 
 /** 所要時間。数字だけを一段大きくして視線が止まるようにする */
@@ -75,10 +78,33 @@ function DurationText({
   unit,
   className,
   numberClassName = "text-base",
+  countUp = false,
 }: DurationTextProps) {
+  if (!countUp) {
+    return (
+      <span className={className}>
+        {label} <span className={numberClassName}>{minutes}</span>
+        {unit}
+      </span>
+    );
+  }
+
+  // 数え上げ中の値（0, 1, 2…）を読み上げさせないため、見える数字は aria-hidden にして
+  // 正しい値を sr-only で別に持つ。見えない複製で最終値の幅を先に確保し、
+  // 桁が増えても後ろの単位が横へずれないようにする
   return (
     <span className={className}>
-      {label} <span className={numberClassName}>{minutes}</span>
+      {label}{" "}
+      <span
+        aria-hidden="true"
+        className={`inline-grid justify-items-end tabular-nums ${numberClassName}`}
+      >
+        <span className="invisible col-start-1 row-start-1">{minutes}</span>
+        <span className="col-start-1 row-start-1" data-route-count={minutes}>
+          {minutes}
+        </span>
+      </span>
+      <span className="sr-only">{minutes}</span>
       {unit}
     </span>
   );
@@ -136,6 +162,7 @@ export function WalkSegmentLabel({ walkTimeLabel, minutes, minuteUnit }: WalkSeg
         minutes={minutes}
         unit={minuteUnit}
         numberClassName="text-xl leading-none text-primary-600"
+        countUp
       />
     </div>
   );
