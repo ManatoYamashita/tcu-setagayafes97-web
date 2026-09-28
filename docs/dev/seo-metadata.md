@@ -6,8 +6,8 @@
 - ページごとの `title`、`description`、canonical、Open Graph、Twitter Card は `src/lib/metadata.ts` の `createPageMetadata` で生成する。
 - canonical は実際に公開するURLへ統一し、末尾スラッシュの有無による重複を作らない。
 - 多言語ページは各ロケールURLを canonical とし、`alternates.languages` に `ja`、`en`、`zh`、`ko`、`x-default` を出力する。
-- ページ固有のOG画像がない場合は `/ogp.webp`（1200×630）を使用する。microCMS画像を使用する場合は絶対URLへ変換する。
-- Google検索結果の正方形サムネイル候補には `/images/brand/search-thumbnail-97.webp`（1200×1200）を使用する。トップページと `/about` の `primaryImageOfPage` および画像サイトマップから同じURLを示す。OGP／Discover向けの `/ogp.webp` とは用途を分け、置き換えない。
+- ページ固有のOG画像がない場合は `/ogp-v2.webp`（1200×630）を使用する。**画像を差し替えるときはファイル名ごと変える。** X・Facebook・LINE はOGP画像をURL単位でキャッシュするため、同じURLのまま中身だけ替えると旧画像がシェアに出続ける（2026-09-28、`ogp.webp` → `ogp-v2.webp`。#278）。参照元は `siteConfig.metadata.ogImage` の1箇所で、サイトマップもここを読む。microCMS画像を使用する場合は絶対URLへ変換する。
+- Google検索結果の正方形サムネイル候補には `/images/brand/search-thumbnail-97.webp`（1200×1200）を使用する。トップページと `/about` の `primaryImageOfPage` および画像サイトマップから同じURLを示す。OGP／Discover向けの `/ogp-v2.webp` とは用途を分け、置き換えない。
 - トップページは `WebSite` のJSON-LDで第97回の名称・説明・正規URLを明示する。
 - トップページのJSON-LDは `WebSite`、主催 `Organization`、祭全体の `Event` を `@graph` で接続する。サイト名は年次をまたいで一貫する簡潔な「世田谷祭」、第97回の正式名称（`第97回東京都市大学世田谷祭`）はページタイトルと `Event.name` で示し、`alternateName` には検索での別名を並べる。表記ルールは [`website-content.md`](../requires/website-content.md) を参照。
 - faviconはクロール可能な500×500 PNG（`/images/brand/favicon.png`）を安定URLで配信する。
