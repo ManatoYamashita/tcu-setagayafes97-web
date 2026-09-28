@@ -41,11 +41,13 @@ export function EventCard({ event, variant = "default" }: EventCardProps) {
     [event.building?.trim(), event.place?.trim()].filter(Boolean).join(" ") ||
     EVENT_DISPLAY_FALLBACKS.venue;
   const hasThumbnail = Boolean(event.thumbnail?.url);
-  // カードは幅が限られるため「第1部」を付けず、終了時刻まで揃った枠だけを出す
-  // （従来も開始・終了の両方があるときだけ表示していた）
+  // カードは幅が限られるため「第1部」を付けない。
+  // 1枠の企画は従来どおり、開始・終了の両方があるときだけ出す（既存の企画の見え方を変えない）。
+  // 2枠以上では終了の無い枠も「14:45〜」で出す。落とすと、詳細ページでは2部制なのに
+  // カードでは1部制に見える
   const timeText = formatSessions(event.sessions, {
     separator: " - ",
-    requireEnd: true,
+    requireEnd: event.sessions.length < 2,
     withLabel: false,
   }).join(" / ");
 

@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getEventById, getEventsList } from "@/lib/events";
-import { SPECIAL_VISIBLE } from "@/data/site";
+import { siteConfig, SPECIAL_VISIBLE } from "@/data/site";
 import { EventDetail } from "@/components/events/EventDetail";
 import { RelatedEvents } from "@/components/events/RelatedEvents";
 import { DraftPreviewBanner } from "@/components/layout/DraftPreviewBanner";
@@ -121,7 +121,9 @@ export default async function EventPage({ params }: EventPageProps) {
     ...buildEventScheduleJsonLd({
       title: event.title,
       sessions: event.sessions,
-      dateIso: `2026-${event.date === "day1" ? "10-31" : "11-01"}`,
+      // 日付は siteConfig.dates を唯一の出典にする（src/app/special/[id]/page.tsx と同じ）。
+      // day1 以外（both / other）を day2 に寄せるのは従来どおり。両日開催の扱いは #289
+      dateIso: event.date === "day1" ? siteConfig.dates.day1 : siteConfig.dates.day2,
       location,
     }),
     image: event.thumbnail?.url,

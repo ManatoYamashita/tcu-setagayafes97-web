@@ -1,4 +1,4 @@
-import type { Event, EventDate } from "@/types/events";
+import type { Event, EventDate, EventSession } from "@/types/events";
 import type { TimetableEntry } from "@/types/timetable";
 import {
   stages,
@@ -10,7 +10,7 @@ import {
 } from "@/data/stages";
 import { parseTimeToMinutes } from "@/lib/timetable-layout";
 import { matchesEventDate } from "@/lib/filters";
-import { getSessionLabel } from "@/lib/event-sessions";
+import { labelSessions } from "@/lib/event-sessions";
 
 /**
  * タイムテーブルのデータ選択
@@ -39,30 +39,46 @@ export function filterStageEvents(events: Event[]): TimetableEntry[] {
   return events.flatMap((event) => {
     if (event.type !== "stage" && event.type !== "special") return [];
 
-    return event.sessions.flatMap((session, index): TimetableEntry[] => {
-      const start = parseTimeToMinutes(session.startTime);
-      const end = parseTimeToMinutes(session.endTime);
-      if (start !== null && end !== null && end > start) {
-        return [
-          {
-            ...event,
-            startTime: session.startTime,
-            endTime: session.endTime,
-            entryKey: `${event.id}#${index}`,
-            sessionLabel: getSessionLabel(index, event.sessions.length),
-          },
-        ];
-      }
-
-      // 時刻未定の企画は sessions が空なので、ここへは来ない。
-      // 入力はあるのに読めない枠だけが来るので、入稿ミスとして知らせる
-      const label = getSessionLabel(index, event.sessions.length);
+    // 時刻未定の企画は sessions が空なので、警告も出さずに落ちる。
+    // ここで警告するのは、入力はあるのに読めない枠（入稿ミス）だけ
+    const warnUnreadable = (session: EventSession, label: string | undefined) =>
       warnOnce(
         `[timetable] 企画「${event.title}」${label ? `の${label}` : ""}の時刻を解釈できません` +
           `（startTime: "${session.startTime}" / endTime: "${session.endTime}"）。` +
           `HH:mm 形式で、終了が開始より後になるよう入稿してください。タイムテーブルには出しません。`
       );
-      return [];
+
+    // 開始の無い枠は labelSessions() が落とす（詳細ページにも出ない）。警告だけ出す
+    for (const session of event.sessions) {
+      if (session.startTime === "") warnUnreadable(session, undefined);
+    }
+
+    // 呼び名は詳細ページと同じ labelSessions() から取る。
+    // 読めない枠を落とした後の数で付け直すと、詳細ページと「第n部」が食い違う
+    return labelSessions(event.sessions).flatMap((session, index): TimetableEntry[] => {
+      const start = parseTimeToMinutes(session.startTime);
+      const end = parseTimeToMinutes(session.endTime);
+      if (start === null || end === null || end <= start) {
+        warnUnreadable(session, session.label);
+        return [];
+      }
+
+      // Event 全体を展開しない。タイムテーブルは Client Component へ渡るため、
+      // content（本文の HTML）や special まで枠の数だけ直列化されてしまう
+      return [
+        {
+          id: event.id,
+          type: event.type,
+          date: event.date,
+          title: event.title,
+          place: event.place,
+          organizer: event.organizer,
+          startTime: session.startTime,
+          endTime: session.endTime,
+          entryKey: `${event.id}#${index}`,
+          sessionLabel: session.label,
+        },
+      ];
     });
   });
 }
@@ -219,7 +235,7 @@ function warnOnce(message: string): void {
   console.warn(message);
 }
 
-export function warnUnresolvedStagePlaces(events: Event[]): void {
+export function warnUnresolvedStagePlaces(events: Pick<Event, "place" | "title">[]): void {
   if (process.env.NODE_ENV === "production") return;
 
   for (const event of events) {

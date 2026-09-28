@@ -61,6 +61,30 @@ export function getSessionLabel(index: number, count: number): string | undefine
   return count >= 2 ? `第${index + 1}部` : undefined;
 }
 
+/** 呼び名を付けた開催枠 */
+export interface LabelledSession extends EventSession {
+  /** 枠が2つ以上あるときだけ「第1部」などが入る */
+  label?: string;
+}
+
+/**
+ * 表示する開催枠を選び、「第n部」を付ける
+ *
+ * 開始時刻の無い枠はどこにも表示しないので、ここで落としてから数えます。
+ * 落とす前の数で呼び名を決めると、実際には1枠しか見えないのに「第1部」と付いてしまいます。
+ *
+ * 開始時刻が入っていれば、HH:mm として読めなくても数に入れます。詳細ページはそれを入稿どおりに
+ * 表示するためです。タイムテーブルはその枠を描けませんが、呼び名は詳細ページと揃えます
+ * （`filterStageEvents()`）。
+ */
+export function labelSessions(sessions: EventSession[]): LabelledSession[] {
+  const shown = sessions.filter((session) => session.startTime !== "");
+  return shown.map((session, index) => ({
+    ...session,
+    label: getSessionLabel(index, shown.length),
+  }));
+}
+
 interface FormatSessionsOptions {
   /** 開始と終了の間に置く文字。既定は「 〜 」 */
   separator?: string;
@@ -81,14 +105,13 @@ export function formatSessions(
   sessions: EventSession[],
   { separator = " 〜 ", requireEnd = false, withLabel = true }: FormatSessionsOptions = {}
 ): string[] {
-  return sessions.flatMap((session, index) => {
-    if (!session.startTime) return [];
+  return labelSessions(sessions).flatMap((session) => {
     if (requireEnd && !session.endTime) return [];
 
     const range = session.endTime
       ? `${session.startTime}${separator}${session.endTime}`
       : `${session.startTime}〜`;
-    const label = withLabel ? getSessionLabel(index, sessions.length) : undefined;
+    const label = withLabel ? session.label : undefined;
 
     return [label ? `${label} ${range}` : range];
   });
@@ -105,8 +128,23 @@ interface EventScheduleJsonLdInput {
   fallbackStartDate?: string;
 }
 
-function toIsoDateTime(dateIso: string, time: string): string | undefined {
-  return parseTimeToMinutes(time) === null ? undefined : `${dateIso}T${time}:00+09:00`;
+interface TimedSession {
+  label?: string;
+  startMinutes: number;
+  endMinutes: number | null;
+}
+
+/**
+ * 0時からの分を ISO 8601 の日時にする
+ *
+ * 入稿値の文字列をそのまま埋め込まないのは、`9:30` のような1桁の時も `parseTimeToMinutes()` が
+ * 受け付けるためです。そのまま使うと `T9:30:00` という不正な日時になります。分から組み立て直して
+ * 必ず2桁にします。
+ */
+function toIsoDateTime(dateIso: string, minutes: number): string {
+  const hh = String(Math.floor(minutes / 60)).padStart(2, "0");
+  const mm = String(minutes % 60).padStart(2, "0");
+  return `${dateIso}T${hh}:${mm}:00+09:00`;
 }
 
 /**
@@ -118,6 +156,8 @@ function toIsoDateTime(dateIso: string, time: string): string | undefined {
  *
  * HH:mm として読めない時刻は出しません。`2026-10-31T1000:00+09:00` のような
  * 不正な日時を検索エンジンへ渡すより、欠けているほうが安全です。
+ * 同じ理由で、親の `endDate` が最後の枠の開始より前になるとき（最後の枠に終了が無い）は、
+ * 親の `endDate` を出しません。出すと subEvent が親の期間からはみ出します。
  */
 export function buildEventScheduleJsonLd({
   title,
@@ -126,30 +166,42 @@ export function buildEventScheduleJsonLd({
   location,
   fallbackStartDate,
 }: EventScheduleJsonLdInput): { startDate?: string; endDate?: string; subEvent?: object[] } {
-  const timed = sessions.flatMap((session, index) => {
-    const startDate = toIsoDateTime(dateIso, session.startTime);
-    if (!startDate) return [];
-    return [{ index, startDate, endDate: toIsoDateTime(dateIso, session.endTime) }];
+  const timed = labelSessions(sessions).flatMap((session): TimedSession[] => {
+    const startMinutes = parseTimeToMinutes(session.startTime);
+    if (startMinutes === null) return [];
+    const endMinutes = parseTimeToMinutes(session.endTime);
+    return [
+      {
+        label: session.label,
+        startMinutes,
+        // 終了が開始以前なら読めないものとして扱う
+        endMinutes: endMinutes !== null && endMinutes > startMinutes ? endMinutes : null,
+      },
+    ];
   });
 
   if (timed.length === 0) {
     return fallbackStartDate ? { startDate: fallbackStartDate } : {};
   }
 
-  // sessions は開始時刻の昇順だが、終了は昇順とは限らない（長い第1部と短い第2部など）
-  const endDates = timed.flatMap(({ endDate }) => (endDate ? [endDate] : []));
-  const endDate = endDates.length > 0 ? endDates.sort().at(-1) : undefined;
+  // sessions は開始時刻の昇順だが、終了は昇順とは限らない（長い第1部と短い第2部など）。
+  // 比較は分で行う。文字列で比べると "9:50" が "11:00" より後になる
+  const ends = timed.flatMap(({ endMinutes }) => (endMinutes === null ? [] : [endMinutes]));
+  const latestEnd = ends.length > 0 ? Math.max(...ends) : null;
+  const latestStart = Math.max(...timed.map(({ startMinutes }) => startMinutes));
+  const endDate =
+    latestEnd !== null && latestEnd > latestStart ? toIsoDateTime(dateIso, latestEnd) : undefined;
 
   const subEvent =
     timed.length >= 2
-      ? timed.map(({ index, startDate, endDate: childEnd }) => ({
+      ? timed.map(({ label, startMinutes, endMinutes }) => ({
           "@type": "Event",
-          name: `${title}（${getSessionLabel(index, sessions.length)}）`,
-          startDate,
-          endDate: childEnd,
+          name: label ? `${title}（${label}）` : title,
+          startDate: toIsoDateTime(dateIso, startMinutes),
+          endDate: endMinutes === null ? undefined : toIsoDateTime(dateIso, endMinutes),
           location,
         }))
       : undefined;
 
-  return { startDate: timed[0].startDate, endDate, subEvent };
+  return { startDate: toIsoDateTime(dateIso, timed[0].startMinutes), endDate, subEvent };
 }

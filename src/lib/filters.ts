@@ -172,7 +172,7 @@ export function eventsHref(filters: FilterParams, page = 1): string {
  * @param event 判定する企画
  * @param date 絞り込む日程。"all" は常に true
  */
-export function matchesEventDate(event: Event, date: EventDate | "all"): boolean {
+export function matchesEventDate(event: Pick<Event, "date">, date: EventDate | "all"): boolean {
   if (date === "all") return true;
   if (date === "day1" || date === "day2") return event.date === date || event.date === "both";
   return event.date === date;

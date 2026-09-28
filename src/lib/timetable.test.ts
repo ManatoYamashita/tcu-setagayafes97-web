@@ -19,7 +19,7 @@ const stageEvents = filterStageEvents(stageEventFixtures);
 const day1Events = filterEventsByDate(stageEvents, "day1");
 const day2Events = filterEventsByDate(stageEvents, "day2");
 
-const ids = (events: Event[]): string[] => events.map((event) => event.id);
+const ids = (events: Pick<Event, "id">[]): string[] => events.map((event) => event.id);
 
 describe("filterStageEvents", () => {
   it("ステージ企画と著名人企画を通す", () => {
@@ -322,6 +322,28 @@ describe("開発時の警告", () => {
 
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn.mock.calls[0][0]).toContain("片方が壊れた2部制」の第2部");
+  });
+
+  it("開始の無い枠は警告して落とし、残った1枠に「第1部」を付けない", async () => {
+    const { filterStageEvents: filter } = await import("@/lib/timetable");
+    const entries = filter([
+      fixture("end-only", {
+        date: "day1",
+        type: "stage",
+        place: "7A",
+        title: "開始が抜けた2枠目",
+        organizer: "テスト",
+        sessions: [
+          { startTime: "10:00", endTime: "11:00" },
+          { startTime: "", endTime: "15:00" },
+        ],
+      }),
+    ]);
+
+    // 詳細ページにも1枠しか出ないので、呼び名は付けない（詳細ページと揃える）
+    expect(entries.map((entry) => entry.sessionLabel)).toEqual([undefined]);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain("開始が抜けた2枠目");
   });
 
   it("時刻が未入力の企画は黙って落とす", async () => {

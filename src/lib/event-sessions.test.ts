@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildEventScheduleJsonLd, formatSessions, getSessionLabel } from "@/lib/event-sessions";
+import {
+  buildEventScheduleJsonLd,
+  formatSessions,
+  getSessionLabel,
+  labelSessions,
+} from "@/lib/event-sessions";
 
 const TWO_PARTS = [
   { startTime: "10:40", endTime: "11:25" },
@@ -11,6 +16,27 @@ describe("getSessionLabel", () => {
     expect(getSessionLabel(0, 1)).toBeUndefined();
     expect(getSessionLabel(0, 2)).toBe("第1部");
     expect(getSessionLabel(1, 2)).toBe("第2部");
+  });
+});
+
+describe("labelSessions", () => {
+  it("開始の無い枠を落としてから数える", () => {
+    // 落とす前の数で数えると、1枠しか見えないのに「第1部」と付く
+    expect(
+      labelSessions([
+        { startTime: "10:40", endTime: "11:25" },
+        { startTime: "", endTime: "15:45" },
+      ])
+    ).toEqual([{ startTime: "10:40", endTime: "11:25", label: undefined }]);
+  });
+
+  it("HH:mm として読めない開始時刻も数に入れる（詳細ページは入稿どおりに出すため）", () => {
+    expect(
+      labelSessions([
+        { startTime: "10:00", endTime: "11:00" },
+        { startTime: "1400", endTime: "15:00" },
+      ]).map((session) => session.label)
+    ).toEqual(["第1部", "第2部"]);
   });
 });
 
@@ -83,6 +109,40 @@ describe("buildEventScheduleJsonLd", () => {
       ],
     });
     expect(result.endDate).toBe("2026-10-31T16:00:00+09:00");
+  });
+
+  it("時が1桁の時刻を2桁に揃えて出す", () => {
+    // 入稿値を埋め込むと 2026-10-31T9:30:00+09:00 という不正な日時になる
+    expect(
+      buildEventScheduleJsonLd({ ...base, sessions: [{ startTime: "9:30", endTime: "9:50" }] })
+    ).toMatchObject({
+      startDate: "2026-10-31T09:30:00+09:00",
+      endDate: "2026-10-31T09:50:00+09:00",
+    });
+  });
+
+  it("親の終了を分で比べる（文字列で比べると 9:50 が 11:00 より後になる）", () => {
+    const result = buildEventScheduleJsonLd({
+      ...base,
+      sessions: [
+        { startTime: "9:00", endTime: "9:50" },
+        { startTime: "10:00", endTime: "11:00" },
+      ],
+    });
+    expect(result.endDate).toBe("2026-10-31T11:00:00+09:00");
+  });
+
+  it("最後の枠に終了が無いときは親の終了を出さない（subEvent が親の期間からはみ出すため）", () => {
+    const result = buildEventScheduleJsonLd({
+      ...base,
+      sessions: [
+        { startTime: "10:40", endTime: "11:25" },
+        { startTime: "14:45", endTime: "" },
+      ],
+    });
+    expect(result.startDate).toBe("2026-10-31T10:40:00+09:00");
+    expect(result.endDate).toBeUndefined();
+    expect(result.subEvent).toHaveLength(2);
   });
 
   it("読めない時刻を日時として出さない", () => {

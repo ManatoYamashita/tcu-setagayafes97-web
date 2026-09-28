@@ -254,7 +254,8 @@ CI 緑・マージ済みのまま本番だけが40分以上古いまま取り残
 **主要フィールド:**
 
 - **News API**: `type` (urgent/news/other), `title`, `thumbnail`, `description`, `content`
-- **Events API**: `date` (day1/day2/both/other), `type` (room/stage/special/other), `place`, `building`, `title`, `organizer`, `thumbnail`, `description`, `content`, `startTime`, `endTime`, `sns`, `special`
+- **Events API**: `date` (day1/day2/both/other), `type` (room/stage/special/other), `place`, `building`, `title`, `organizer`, `thumbnail`, `description`, `content`, `startTime`, `endTime`, `sessions`, `sns`, `special`
+  - `sessions` は開催枠の繰り返し（カスタムフィールド `session` = 開始・終了）。2部制の企画用（#281）。**値があれば `startTime` / `endTime` より優先**し、無ければ従来の欄から1枠を作る。**必須にしないこと**。正規化後の `Event` に `startTime` / `endTime` は無く、表示は `src/lib/event-sessions.ts` を通す。契約は [`docs/dev/event-sessions.md`](../docs/dev/event-sessions.md)
   - `sns` は**テキストフィールド1つ**（カスタムフィールドではない）。1企画につきSNSリンクは1件のみ
   - `special` は `type = special` のときのみ入力する著名人企画LP用のカスタムフィールド。中身は `logo` / `photos` / `openTime` / `goods` / `tickets` / `notices` ほか。詳細は `microcms/README.md`
   - `select` の値は `day1 : 10月31日（土）` のように **`値 : ラベル`** 形式。コード側は `split(":")` で先頭を取り出す
