@@ -1,4 +1,4 @@
-import type { Event } from "@/types/events";
+import type { Event, EventSession } from "@/types/events";
 
 /**
  * タイムテーブル検証用のフィクスチャ（開発専用）
@@ -23,6 +23,7 @@ import type { Event } from "@/types/events";
  * | 【TEST】テストステージ | 「その他」列 + 開発時の console.warn           |
  * | startTime が "1000"    | 形式不正が filterStageEvents で落ちること       |
  * | date: "both"           | Day1 / Day2 の両方に出ること                   |
+ * | ホールの2部制企画      | 開催枠ごとに2ブロックへ展開され、1企画と数えること |
  *
  * **ユニットテストからも読まれます**（`src/lib/timetable.test.ts` ほか）。
  * 上の表の各行は、対応するテストが実際に検証しています。件数や時刻を変更すると
@@ -38,12 +39,30 @@ const BASE = {
   content: "<p>検証用のダミー企画です。</p>",
 } as const;
 
+/**
+ * 検証用の企画を作る
+ *
+ * 1枠の企画は `startTime` / `endTime` で書けます（microCMS の従来の欄と同じ書き方）。
+ * 2部制などは `sessions` を渡してください。`sessions` を渡したときは `startTime` / `endTime` を無視します。
+ * 本番の `normalizeEventSessions()` と違って trim も並べ替えもしないので、
+ * 壊れた時刻をそのまま検証に使えます。
+ */
 export function fixture(
   id: string,
-  overrides: Pick<Event, "date" | "type" | "place" | "title" | "organizer"> &
-    Partial<Pick<Event, "startTime" | "endTime" | "building" | "description">>
+  {
+    startTime,
+    endTime,
+    sessions,
+    ...overrides
+  }: Pick<Event, "date" | "type" | "place" | "title" | "organizer"> &
+    Partial<Pick<Event, "building" | "description" | "sessions">> & {
+      startTime?: string;
+      endTime?: string;
+    }
 ): Event {
-  return { ...BASE, id, ...overrides };
+  const fallback: EventSession[] =
+    startTime || endTime ? [{ startTime: startTime ?? "", endTime: endTime ?? "" }] : [];
+  return { ...BASE, id, ...overrides, sessions: sessions ?? fallback };
 }
 
 export const stageEventFixtures: Event[] = [
@@ -116,6 +135,20 @@ export const stageEventFixtures: Event[] = [
     building: "講堂",
     startTime: "12:00",
     endTime: "12:30",
+  }),
+  // 2部制。空き時間（11:25〜14:45）を挟んで2ブロックになり、同じ列の 12:00 の企画と
+  // レーンを取り合わないこと。件数は1企画
+  fixture("fx-hall-2", {
+    date: "day1",
+    type: "stage",
+    place: "ホール",
+    title: "2部制ステージ（検証用）",
+    organizer: "実行委員会",
+    building: "講堂",
+    sessions: [
+      { startTime: "10:40", endTime: "11:25" },
+      { startTime: "14:45", endTime: "15:45" },
+    ],
   }),
   // 18時より後。レンジの上端が広がること
   fixture("fx-court-1", {

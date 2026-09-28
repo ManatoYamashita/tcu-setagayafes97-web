@@ -1,13 +1,13 @@
 import { siteConfig } from "@/data/site";
-import type { EventDate } from "@/types/events";
+import type { EventDate, EventSession } from "@/types/events";
+import { formatSessions } from "@/lib/event-sessions";
 
 interface SpecialScheduleProps {
   date: EventDate;
   /** 開場時刻（SpecialDetail.openTime） */
   openTime?: string;
-  /** 開演時刻（Event.startTime） */
-  startTime?: string;
-  endTime?: string;
+  /** 開演時刻（Event.sessions）。2部制なら行を分けて出す */
+  sessions: EventSession[];
   /** 建物名 */
   building?: string;
   /** 場所 */
@@ -48,13 +48,12 @@ function formatEventDate(date: EventDate): string {
 export function SpecialSchedule({
   date,
   openTime,
-  startTime,
-  endTime,
+  sessions,
   building,
   place,
 }: SpecialScheduleProps) {
   const venue = [building, place].filter(Boolean).join(" ");
-  const performance = startTime && endTime ? `${startTime} 〜 ${endTime}` : startTime;
+  const performance = formatSessions(sessions);
 
   return (
     <section aria-labelledby="special-schedule" className="py-8" data-special-reveal="up">
@@ -78,10 +77,16 @@ export function SpecialSchedule({
           </div>
         )}
 
-        {performance && (
+        {performance.length > 0 && (
           <div className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:gap-4">
             <dt className="w-32 shrink-0 text-sm font-semibold text-gray-900/70">開演</dt>
-            <dd className="text-sm text-gray-900">{performance}</dd>
+            <dd className="text-sm text-gray-900">
+              {performance.map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))}
+            </dd>
           </div>
         )}
 

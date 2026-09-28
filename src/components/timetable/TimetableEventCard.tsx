@@ -1,9 +1,10 @@
 import Link from "next/link";
-import type { Event } from "@/types/events";
+import type { TimetableEntry } from "@/types/timetable";
 import type { EventCardDensity } from "@/lib/timetable-layout";
 
 interface TimetableEventCardProps {
-  event: Event;
+  /** 開催枠1つぶん。2部制の企画は枠ごとに別のカードになる */
+  event: TimetableEntry;
   /**
    * ガント盤面での表示密度。省略するとモバイルの縦スタック用（高さ自動・全項目）になります。
    * 値は `getCardDensity(heightPx)` から得てください。
@@ -30,7 +31,8 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
   const label = [
     event.title,
     stageName,
-    event.startTime && event.endTime ? `${event.startTime}から${event.endTime}` : undefined,
+    event.sessionLabel,
+    `${event.startTime}から${event.endTime}`,
     event.place,
   ]
     .filter(Boolean)
@@ -54,7 +56,8 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
     : "";
   const cardClass = `${base} ${ganttAccent}`;
 
-  const timeText = `${event.startTime}–${event.endTime}`;
+  // 2部制の企画は、同じタイトルのカードが2枚並ぶ。どちらの枠かを時刻の前に添える
+  const timeText = `${event.sessionLabel ? `${event.sessionLabel} ` : ""}${event.startTime}–${event.endTime}`;
 
   // 高さが確保できないときは、優先度の低い情報から落とす。溢れさせて切ると
   // 「主催が途中で切れたカード」になり、読めない情報が場所だけ占めてしまう。
@@ -109,9 +112,18 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
             {event.endTime}
           </time>
         </p>
-        {stageName && (
-          <span className="rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700">
-            {stageName}
+        {(stageName || event.sessionLabel) && (
+          <span className="flex flex-wrap gap-1">
+            {event.sessionLabel && (
+              <span className="rounded-full border border-primary-200 px-2 py-0.5 text-xs font-semibold text-primary-700">
+                {event.sessionLabel}
+              </span>
+            )}
+            {stageName && (
+              <span className="rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700">
+                {stageName}
+              </span>
+            )}
           </span>
         )}
       </div>

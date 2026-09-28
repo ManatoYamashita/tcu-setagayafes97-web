@@ -46,7 +46,7 @@ export function TimetableStackedList({ groups }: TimetableStackedListProps) {
       >
         {items.map(({ event, stageName }) => (
           <li
-            key={event.id}
+            key={event.entryKey}
             data-timetable-list-item
             data-start-time={event.startTime}
             className="relative after:absolute after:top-5 after:-left-[0.9375rem] after:size-2 after:rounded-full after:bg-primary-600 after:ring-4 after:ring-white"

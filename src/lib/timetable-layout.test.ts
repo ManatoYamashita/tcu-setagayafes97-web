@@ -14,23 +14,34 @@ import {
   type TimeRange,
 } from "@/lib/timetable-layout";
 import { siteConfig } from "@/data/site";
-import { fixture } from "@/components/timetable/__fixtures__/stage-events";
-import type { Event } from "@/types/events";
+import { fixture, stageEventFixtures } from "@/components/timetable/__fixtures__/stage-events";
+import { filterEventsByDate, filterEventsByStage, filterStageEvents } from "@/lib/timetable";
+import type { TimetableEntry } from "@/types/timetable";
 
 /** 盤面の既定レンジ。10:00-20:00 = 600分 = 960px（1.6px/分） */
 const RANGE: TimeRange = { startHour: 10, endHour: 20 };
 
-/** 時刻だけが意味を持つ企画を作る */
-function at(id: string, startTime: string, endTime: string): Event {
-  return fixture(id, {
-    date: "day1",
-    type: "stage",
-    place: "7A",
-    title: id,
-    organizer: "テスト",
+/**
+ * 時刻だけが意味を持つブロックを作る
+ *
+ * `filterStageEvents()` を通さずに組み立てるので、壊れた時刻もそのまま渡せる。
+ * このモジュールの関数が防御的に振る舞うことを検証するためである。
+ */
+function at(id: string, startTime: string, endTime: string): TimetableEntry {
+  return {
+    ...fixture(id, {
+      date: "day1",
+      type: "stage",
+      place: "7A",
+      title: id,
+      organizer: "テスト",
+      startTime,
+      endTime,
+    }),
     startTime,
     endTime,
-  });
+    entryKey: `${id}#0`,
+  };
 }
 
 describe("parseTimeToMinutes", () => {
@@ -213,6 +224,27 @@ describe("calculateEventOffset", () => {
 });
 
 describe("layoutStageEvents", () => {
+  it("2部制の企画を空き時間を挟んだ2ブロックとして置き、レーンを分けない（#281）", () => {
+    // ホール列: 2部制（10:40-11:25 / 14:45-15:45）と 12:00-12:30 の企画。
+    // 1ブロックにまとめる実装へ戻すと 10:40-15:45 の帯が 12:00 の企画と重なり、レーンが2つに割れる
+    const hall = filterEventsByStage(
+      filterEventsByDate(filterStageEvents(stageEventFixtures), "day1"),
+      "ホール"
+    );
+    const layout = layoutStageEvents(hall, RANGE);
+    const pxPerMinute = HOUR_HEIGHT_PX / 60;
+
+    expect(layout.map(({ laneCount }) => laneCount)).toEqual([1, 1, 1]);
+    expect(
+      layout
+        .filter(({ event }) => event.id === "fx-hall-2")
+        .map(({ event, topPx }) => [event.entryKey, topPx])
+    ).toEqual([
+      ["fx-hall-2#0", 40 * pxPerMinute], // 10:40 はレンジ開始 10:00 から40分
+      ["fx-hall-2#1", 285 * pxPerMinute], // 14:45 は285分
+    ]);
+  });
+
   it("重なる企画をレーンへ分割し、重ならなくなったらリセットする", () => {
     const events = [
       at("a", "10:30", "12:00"),

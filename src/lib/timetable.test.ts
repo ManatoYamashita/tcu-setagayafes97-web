@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  countDistinctEvents,
   filterEventsByDate,
   filterEventsByStage,
   filterStageEvents,
@@ -67,6 +68,59 @@ describe("filterStageEvents", () => {
     const before = ids(stageEventFixtures);
     filterStageEvents(stageEventFixtures);
     expect(ids(stageEventFixtures)).toEqual(before);
+  });
+});
+
+describe("filterStageEvents の開催枠の展開（#281）", () => {
+  const blocks = stageEvents.filter((entry) => entry.id === "fx-hall-2");
+
+  it("2部制の企画を開催枠ごとの2ブロックにする", () => {
+    // 1ブロックにまとめると、空き時間の 11:25〜14:45 まで盤面を占める
+    expect(blocks.map((entry) => [entry.startTime, entry.endTime])).toEqual([
+      ["10:40", "11:25"],
+      ["14:45", "15:45"],
+    ]);
+  });
+
+  it("ブロックごとに一意の key と「第n部」を持たせる", () => {
+    expect(blocks.map((entry) => entry.entryKey)).toEqual(["fx-hall-2#0", "fx-hall-2#1"]);
+    expect(blocks.map((entry) => entry.sessionLabel)).toEqual(["第1部", "第2部"]);
+
+    const keys = stageEvents.map((entry) => entry.entryKey);
+    expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it("1枠の企画には「第1部」を付けない", () => {
+    const single = stageEvents.find((entry) => entry.id === "fx-7a-1");
+    expect(single?.sessionLabel).toBeUndefined();
+  });
+
+  it("読めない枠だけを落とし、同じ企画の他の枠は残す", () => {
+    const entries = filterStageEvents([
+      fixture("half-broken", {
+        date: "day1",
+        type: "stage",
+        place: "7A",
+        title: "片方が壊れた2部制",
+        organizer: "テスト",
+        sessions: [
+          { startTime: "10:00", endTime: "11:00" },
+          { startTime: "1400", endTime: "15:00" },
+        ],
+      }),
+    ]);
+
+    expect(entries.map((entry) => entry.entryKey)).toEqual(["half-broken#0"]);
+    // 呼び名は元の枠の数で決まる。落ちた枠があっても「第1部」のまま
+    expect(entries[0].sessionLabel).toBe("第1部");
+  });
+});
+
+describe("countDistinctEvents", () => {
+  it("2部制の企画をブロック数ではなく1企画として数える", () => {
+    const hall = filterEventsByStage(day1Events, "ホール");
+    expect(hall.map((entry) => entry.id).sort()).toEqual(["fx-hall-1", "fx-hall-2", "fx-hall-2"]);
+    expect(countDistinctEvents(hall)).toBe(2);
   });
 });
 
@@ -158,11 +212,12 @@ describe("groupEventsByStage", () => {
         endTime: "11:00",
       }),
     ];
-    const before = ids(unsorted);
-    const groups = groupEventsByStage(unsorted);
+    const entries = filterStageEvents(unsorted);
+    const before = ids(entries);
+    const groups = groupEventsByStage(entries);
 
     expect(ids(groups[0].events)).toEqual(["earlier", "later"]); // 出力は並べ替わる
-    expect(ids(unsorted)).toEqual(before); // 入力は動かない
+    expect(ids(entries)).toEqual(before); // 入力は動かない
   });
 
   it("「その他」グループに名前を与える", () => {
@@ -247,6 +302,26 @@ describe("開発時の警告", () => {
 
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn.mock.calls[0][0]).toContain("時刻が壊れている企画");
+  });
+
+  it("2部制の読めない枠は、どの部かを添えて警告する", async () => {
+    const { filterStageEvents: filter } = await import("@/lib/timetable");
+    filter([
+      fixture("half-broken", {
+        date: "day1",
+        type: "stage",
+        place: "7A",
+        title: "片方が壊れた2部制",
+        organizer: "テスト",
+        sessions: [
+          { startTime: "10:00", endTime: "11:00" },
+          { startTime: "1400", endTime: "15:00" },
+        ],
+      }),
+    ]);
+
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain("片方が壊れた2部制」の第2部");
   });
 
   it("時刻が未入力の企画は黙って落とす", async () => {
