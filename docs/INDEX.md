@@ -80,7 +80,7 @@ docs/
 
 ### 要件定義・仕様（requires/）
 
-- **[require.md](./requires/require.md)** - 東京都市大学 第97回 世田谷祭 Webサイト要件定義書
+- **[require.md](./requires/require.md)** - 第97回東京都市大学世田谷祭 Webサイト要件定義書
   - プロジェクト概要・目的
   - 技術要件・スタック
   - microCMS API設計
@@ -101,7 +101,7 @@ docs/
   - 年次更新時の作業手順（第98回以降、推定6時間）
 
 - **[website-content.md](./requires/website-content.md)** - クライアント提供のWebサイト掲載文
-  - 第97回 キャンパステーマ『カラクリ』本文
+  - 第97回 キャンパステーマ『カラクり』本文
   - 2026年度 学園祭共通テーマ『期待を超える瞬間へ、ともに進もう』本文
   - 第97回 実行委員長 髙野雄司 挨拶文
   - 仮画像 `pastel-castle.webp` から実画像 `setagayafe97-image.webp` への置換指示

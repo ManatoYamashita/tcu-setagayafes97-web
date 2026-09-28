@@ -9,7 +9,7 @@
 - ページ固有のOG画像がない場合は `/ogp.webp`（1200×630）を使用する。microCMS画像を使用する場合は絶対URLへ変換する。
 - Google検索結果の正方形サムネイル候補には `/images/brand/search-thumbnail-97.webp`（1200×1200）を使用する。トップページと `/about` の `primaryImageOfPage` および画像サイトマップから同じURLを示す。OGP／Discover向けの `/ogp.webp` とは用途を分け、置き換えない。
 - トップページは `WebSite` のJSON-LDで第97回の名称・説明・正規URLを明示する。
-- トップページのJSON-LDは `WebSite`、主催 `Organization`、祭全体の `Event` を `@graph` で接続する。サイト名は年次をまたいで一貫する簡潔な「世田谷祭」、第97回の正式名称は `alternateName` とページタイトルで示す。
+- トップページのJSON-LDは `WebSite`、主催 `Organization`、祭全体の `Event` を `@graph` で接続する。サイト名は年次をまたいで一貫する簡潔な「世田谷祭」、第97回の正式名称（`第97回東京都市大学世田谷祭`）はページタイトルと `Event.name` で示し、`alternateName` には検索での別名を並べる。表記ルールは [`website-content.md`](../requires/website-content.md) を参照。
 - faviconはクロール可能な500×500 PNG（`/images/brand/favicon.png`）を安定URLで配信する。
 - Googlebotには大きな画像プレビューを許可し、サイトマップの主要ページに代表画像を含める。ただし検索結果画像の採用はGoogle側の判断であり保証されない。
 
