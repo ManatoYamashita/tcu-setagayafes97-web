@@ -19,13 +19,13 @@ export const metadata: Metadata = NEWS_VISIBLE
   ? createPageMetadata({
       title: newsList,
       description:
-        "東京都市大学 第97回 世田谷祭のお知らせ一覧ページ。重要なお知らせやイベント情報をご確認いただけます。",
+        "第97回東京都市大学世田谷祭のお知らせ一覧ページ。重要なお知らせやイベント情報をご確認いただけます。",
       pathname: "/info",
     })
   : createPageMetadata({
       title: newsList,
       description:
-        "東京都市大学 第97回 世田谷祭のお知らせは現在準備中です。公開までもうしばらくお待ちください。",
+        "第97回東京都市大学世田谷祭のお知らせは現在準備中です。公開までもうしばらくお待ちください。",
       pathname: "/info",
     });
 
@@ -45,7 +45,7 @@ export default async function InfoPage() {
       <PageSheetLayout hero={pageHeroes.info}>
         <ComingSoon
           title="お知らせは準備中です"
-          description="第97回 世田谷祭に関するお知らせは現在準備中です。公開までもうしばらくお待ちください。"
+          description="第97回東京都市大学世田谷祭に関するお知らせは現在準備中です。公開までもうしばらくお待ちください。"
         />
       </PageSheetLayout>
     );

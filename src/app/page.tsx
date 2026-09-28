@@ -17,7 +17,7 @@ const AboutSection = dynamic(() =>
 
 /**
  * トップページ
- * 第97回世田谷祭の公式Webサイト
+ * 第97回東京都市大学世田谷祭の公式Webサイト
  */
 export default async function Home() {
   const [heroNews, newsList] = NEWS_VISIBLE

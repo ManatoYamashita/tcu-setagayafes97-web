@@ -4,14 +4,14 @@
 export const aboutConfig = {
   // Aboutページ ヒーロー（ミニマルデザイン）
   hero: {
-    title: "第97回世田谷祭実行委員会",
+    title: "第97回東京都市大学世田谷祭実行委員会",
     description: "東京都市大学",
     scrollIndicator: "( scroll down )",
   },
 
   // トップページ用Aboutセクション
   topSection: {
-    label: "東京都市大学 第97回 世田谷祭",
+    label: "第97回東京都市大学世田谷祭",
     heading: "カラクリ",
     tagline: "2026年10月31日(土)〜11月1日(日)",
     paragraphs: [
@@ -48,7 +48,7 @@ export const aboutConfig = {
 
 また、本学園祭の開催にあたり、日頃より温かいご理解をいただいている地域の皆様、多大なるご支援を賜りました協賛企業の皆様、そして開催を支えてくださった大学関係者の皆様に、この場をお借りして厚く御礼申し上げます。
 
-すべての想いが「カラクリ」のように動き出す今日という日が、皆様にとって驚きと感動に満ちた、忘れられない一日となりますように。 どうぞ最後まで、第97回世田谷祭を存分にお楽しみください。
+すべての想いが「カラクリ」のように動き出す今日という日が、皆様にとって驚きと感動に満ちた、忘れられない一日となりますように。 どうぞ最後まで、第97回東京都市大学世田谷祭を存分にお楽しみください。
     `.trim(),
   },
 
@@ -258,7 +258,7 @@ export const festivalIntroContents = {
       organizer: "Organizer",
     },
     admissionValue: "Free",
-    festivalName: "The 97th Setagaya Festival, Tokyo City University",
+    festivalName: "The 97th Tokyo City University Setagaya Festival",
     venueName: "Tokyo City University Setagaya Campus",
     venueAddress: "1-28-1 Tamatsutsumi, Setagaya-ku, Tokyo 158-8557, Japan",
     organizerName: "The 97th Tokyo City University Setagaya Festival Organizing Committee",
@@ -301,7 +301,7 @@ export const festivalIntroContents = {
       organizer: "主办",
     },
     admissionValue: "免费",
-    festivalName: "东京都市大学 第97届 世田谷祭",
+    festivalName: "第97届东京都市大学世田谷祭",
     venueName: "东京都市大学 世田谷校区",
     venueAddress: "〒158-8557 东京都世田谷区玉堤1-28-1",
     organizerName: "第97届东京都市大学世田谷祭执行委员会",
@@ -335,7 +335,7 @@ export const festivalIntroContents = {
       organizer: "주최",
     },
     admissionValue: "무료",
-    festivalName: "도쿄도시대학 제97회 세타가야사이",
+    festivalName: "제97회 도쿄도시대학 세타가야사이",
     venueName: "도쿄도시대학 세타가야 캠퍼스",
     venueAddress: "〒158-8557 도쿄도 세타가야구 다마쓰쓰미 1-28-1",
     organizerName: "제97회 도쿄도시대학 세타가야사이 실행위원회",

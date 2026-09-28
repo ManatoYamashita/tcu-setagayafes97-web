@@ -91,7 +91,7 @@ function generateEmailContent(data: {
   const subject = `【世田谷祭お問い合わせ】${data.subject}`;
 
   const text = `
-東京都市大学 第97回 世田谷祭 お問い合わせフォームからのメッセージ
+第97回東京都市大学世田谷祭 お問い合わせフォームからのメッセージ
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -131,7 +131,7 @@ ${data.message}
 </head>
 <body style="font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
   <div style="background: linear-gradient(135deg, #bf73e3 0%, #9b59b6 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0;">
-    <h1 style="margin: 0; font-size: 20px;">東京都市大学 第97回 世田谷祭</h1>
+    <h1 style="margin: 0; font-size: 20px;">第97回東京都市大学世田谷祭</h1>
     <p style="margin: 5px 0 0 0; opacity: 0.9;">お問い合わせフォームからのメッセージ</p>
   </div>
 

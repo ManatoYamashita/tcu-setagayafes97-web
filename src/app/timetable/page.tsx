@@ -17,13 +17,13 @@ export const metadata: Metadata = EVENTS_VISIBLE
   ? createPageMetadata({
       title: "タイムテーブル",
       description:
-        "東京都市大学 第97回 世田谷祭のタイムテーブルページ。ステージ企画の開催時刻を確認できます。",
+        "第97回東京都市大学世田谷祭のタイムテーブルページ。ステージ企画の開催時刻を確認できます。",
       pathname: "/timetable",
     })
   : createPageMetadata({
       title: "タイムテーブル",
       description:
-        "東京都市大学 第97回 世田谷祭のタイムテーブルは現在準備中です。公開までもうしばらくお待ちください。",
+        "第97回東京都市大学世田谷祭のタイムテーブルは現在準備中です。公開までもうしばらくお待ちください。",
       pathname: "/timetable",
     });
 
@@ -59,7 +59,7 @@ export default async function TimetablePage() {
       <PageSheetLayout hero={pageHeroes.timetable} heroSize="compact">
         <ComingSoon
           title="タイムテーブルは準備中です"
-          description="第97回 世田谷祭のタイムテーブルは現在準備中です。公開までもうしばらくお待ちください。"
+          description="第97回東京都市大学世田谷祭のタイムテーブルは現在準備中です。公開までもうしばらくお待ちください。"
         />
       </PageSheetLayout>
     );

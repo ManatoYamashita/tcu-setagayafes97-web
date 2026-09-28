@@ -7,12 +7,12 @@ export const siteConfig = {
   edition: 97,
 
   // サイト名称
-  name: "東京都市大学 第97回 世田谷祭",
+  name: "第97回東京都市大学世田谷祭",
   shortName: "世田谷祭",
 
   // サイト説明
   description:
-    "東京都市大学 第97回 世田谷祭の公式Webサイト。2026年10月31日・11月1日の開催情報、企画、タイムテーブル、キャンパスマップ、アクセス情報をご案内します。",
+    "第97回東京都市大学世田谷祭の公式Webサイト。2026年10月31日・11月1日の開催情報、企画、タイムテーブル、キャンパスマップ、アクセス情報をご案内します。",
 
   // 開催日程
   dates: {
@@ -50,7 +50,7 @@ export const siteConfig = {
 
   // メタデータ
   metadata: {
-    siteName: "東京都市大学 第97回 世田谷祭",
+    siteName: "第97回東京都市大学世田谷祭",
     searchSiteName: "世田谷祭",
     siteUrl: process.env.NEXT_PUBLIC_URL || "https://setagayafes.org",
     ogImage: "/ogp.webp",

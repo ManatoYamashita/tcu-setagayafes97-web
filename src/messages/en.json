@@ -28,7 +28,7 @@
     },
     "vision": {
       "title": "Philosophy & Vision",
-      "themeLabel": "97th Setagaya Festival Theme"
+      "themeLabel": "97th Tokyo City University Setagaya Festival Theme"
     },
     "committee": {
       "title": "About the Committee",
@@ -49,10 +49,10 @@
   },
   "contact": {
     "title": "Contact",
-    "subtitle": "Questions & Inquiries about 97th Setagaya Festival",
+    "subtitle": "Questions & Inquiries about the 97th Tokyo City University Setagaya Festival",
     "meta": {
       "title": "Contact",
-      "description": "Contact form for the 97th Setagaya Festival at Tokyo City University. For general visitors, media, and lost & found inquiries."
+      "description": "Contact form for the 97th Tokyo City University Setagaya Festival. For general visitors, media, and lost & found inquiries."
     },
     "types": {
       "general": {
@@ -94,7 +94,7 @@
     "subtitle": "Personal Information Protection Policy",
     "meta": {
       "title": "Privacy Policy",
-      "description": "Privacy policy for the 97th Setagaya Festival at Tokyo City University. Information about data protection, usage purposes, and security measures."
+      "description": "Privacy policy for the 97th Tokyo City University Setagaya Festival. Information about data protection, usage purposes, and security measures."
     },
     "sections": {
       "basicInfo": "Basic Information",
@@ -118,7 +118,7 @@
     "subtitle": "Information for a safe and comfortable visit",
     "meta": {
       "title": "Visitor Guide",
-      "description": "Important information for visitors to the 97th Setagaya Festival at Tokyo City University. Accessibility, guidelines, and facility information."
+      "description": "Important information for visitors to the 97th Tokyo City University Setagaya Festival. Accessibility, guidelines, and facility information."
     },
     "sections": {
       "admission": "Admission Information",
@@ -165,10 +165,10 @@
   },
   "faq": {
     "title": "FAQ",
-    "subtitle": "Frequently asked questions about 97th Setagaya Festival",
+    "subtitle": "Frequently asked questions about the 97th Tokyo City University Setagaya Festival",
     "meta": {
       "title": "FAQ",
-      "description": "Frequently asked questions and answers about the 97th Setagaya Festival at Tokyo City University."
+      "description": "Frequently asked questions and answers about the 97th Tokyo City University Setagaya Festival."
     },
     "count": "{count, plural, =0 {No questions} one {# question} other {# questions}}",
     "empty": {
