@@ -23,13 +23,13 @@ const lineClassName: Record<LineVariant, string> = {
 };
 
 /**
- * 路線カラーの指定。丸は公式色、文字は白背景で 4.5:1 を満たす段を使う（globals.css）。
+ * 塗り丸の路線カラー（globals.css の `--color-line-*`）。駅名の文字は塗らない。
  * Tailwind がソースから拾えるよう、クラス名は組み立てずに静的な文字列で持つ。
  */
-const lineColorClassName: Record<LineColor, { marker: string; title: string }> = {
-  oimachi: { marker: "bg-line-oimachi", title: "text-line-oimachi-text" },
-  toyoko: { marker: "bg-line-toyoko", title: "text-line-toyoko-text" },
-  denentoshi: { marker: "bg-line-denentoshi", title: "text-line-denentoshi-text" },
+const lineColorClassName: Record<LineColor, string> = {
+  oimachi: "bg-line-oimachi",
+  toyoko: "bg-line-toyoko",
+  denentoshi: "bg-line-denentoshi",
 };
 
 const defaultMarkerFillClassName: Record<MarkerVariant, string> = {
@@ -45,7 +45,7 @@ interface TimelineStepProps {
   marker: MarkerVariant;
   title: string;
   subtitle?: string;
-  /** 駅のノードに指定すると、塗り丸と駅名をその路線の色で描く（出発ノード専用） */
+  /** 駅のノードに指定すると、塗り丸をその路線の色で描く（出発ノード専用。駅名の文字色は変えない） */
   lineColor?: LineColor;
   /** 省略するとこのノードから下へ線を引かない（＝経路の終点） */
   lineVariant?: LineVariant;
@@ -68,9 +68,10 @@ export function TimelineStep({
   segment,
 }: TimelineStepProps) {
   // 路線カラーは塗り丸にしか載せない。白抜き丸・二重丸の色は経路の種類を表すため変えない
-  const lineColorClasses =
-    lineColor && marker === "departure" ? lineColorClassName[lineColor] : undefined;
-  const markerFillClassName = lineColorClasses?.marker ?? defaultMarkerFillClassName[marker];
+  const markerFillClassName =
+    lineColor && marker === "departure"
+      ? lineColorClassName[lineColor]
+      : defaultMarkerFillClassName[marker];
 
   return (
     <li className="grid grid-cols-[1.25rem_minmax(0,1fr)] gap-x-3">
@@ -83,9 +84,7 @@ export function TimelineStep({
 
       {/* 終点以外は下側に余白を取り、その分だけ区間の線も伸びる */}
       <div className={`min-w-0 ${lineVariant ? "pb-4" : ""}`}>
-        <p className={`text-lg font-bold leading-7 ${lineColorClasses?.title ?? "text-gray-900"}`}>
-          {title}
-        </p>
+        <p className="text-lg font-bold leading-7 text-gray-900">{title}</p>
         {subtitle && <p className="mt-0.5 text-xs font-bold text-gray-600">{subtitle}</p>}
         {segment}
       </div>

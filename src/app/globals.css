@@ -46,16 +46,12 @@
   --color-accent: var(--color-primary-400); /* CTA・強調 */
 
   /* ===== Railway Line Colors（アクセスページの経路カード） =====
-     公式のラインカラーは出発ノードの丸（装飾）にだけ使う。駅名の文字には -text を使う。
-     大井町線のオレンジは白背景で 2.45:1、田園都市線の緑は 3.19:1 しかなく、
-     文字に使うと 4.5:1 に届かないため、同じ色相で明度だけを下げた段を別に持つ。
-     HEX は Lightning CSS が出力した実配信値、比率はいずれも白背景に対する値（2026-09-28 実測）。 */
+     出発ノードの丸（aria-hidden の装飾）にだけ使う。文字には使わない。
+     大井町線のオレンジは白背景で 2.45:1 しかなく、文字にすると 4.5:1 に届かない。
+     HEX は Lightning CSS が出力した実配信値（2026-09-28 実測）。 */
   --color-line-oimachi: oklch(73.6% 0.15 53.6deg); /* 東急大井町線 実配信 #f18c43 */
-  --color-line-oimachi-text: oklch(56.4% 0.149 50deg); /* 実配信 #b85500 — 4.84:1 */
-  --color-line-toyoko: oklch(56.4% 0.225 17.3deg); /* 東急東横線 実配信 #da0242 — 5.16:1 */
-  --color-line-toyoko-text: var(--color-line-toyoko); /* 公式色のままで 4.5:1 を満たす */
+  --color-line-toyoko: oklch(56.4% 0.225 17.3deg); /* 東急東横線 実配信 #da0242 */
   --color-line-denentoshi: oklch(63.9% 0.113 175deg); /* 東急田園都市線 実配信 #21a288 */
-  --color-line-denentoshi-text: oklch(50.4% 0.091 173.7deg); /* 実配信 #137560 — 5.61:1 */
 
   /* ===== Alias（後方互換性のため残す） ===== */
   --color-primary: var(--color-primary-400);
