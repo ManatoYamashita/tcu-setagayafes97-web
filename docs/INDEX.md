@@ -16,536 +16,123 @@
 - **`.gitignore` で除外したドキュメントは、本索引でリンクにしません。** 存在しないファイルへのリンクは
   リンク切れ検査に引っかかり、読んだ人に「消えた」と誤解させます。パス名をコード表記で書き、
   除外の理由と入手方法を添えてください。
-- **ドキュメントを分割したら、元ファイルの行が分割後のどこかに残っているかを機械的に照合します。**
-  分割は「移すだけ」のつもりでも行が落ちます（2026-09-30 の #311 では、設計理由の1行を拾い漏らしていました）。
-  下のスクリプトが列挙した行が、**意図した削除と書き換えだけであること**を確かめてから完了とします。
-  列挙された行は PR の本文に理由付きで載せてください。
-
-  ```bash
-  # 使い方: 元ファイル → 分割後のファイル（作業ツリー）。元は origin/main から読む
-  python3 - docs/dev/<元>.md docs/dev/<元>.md docs/dev/<新>.md <<'EOF'
-  import os, subprocess, sys
-  orig, *news = sys.argv[1:]
-  base = os.environ.get("BASE", "origin/main")
-  before = subprocess.run(["git", "show", f"{base}:{orig}"], capture_output=True, text=True, check=True).stdout.splitlines()
-  kept = {l.strip() for path in news for l in open(path)}
-  lost = [(i, l.strip()) for i, l in enumerate(before, 1) if l.strip() and l.strip() not in kept]
-  print(f"{orig}: {len(lost)} 行が分割後のどのファイルにも無い")
-  for i, l in lost: print(f"  {i}: {l[:100]}")
-  EOF
-  ```
-
-  **ファイル名を zsh の変数に入れて `cat $FILES` のように渡さないこと。** zsh は引用符の無い変数を
-  単語分割しないため、複数のファイルが1つのパスとして渡り、照合が黙って空振りします（#311 で実際に踏みました）。
-
-## ディレクトリ構成（最小セット）
-
-```
-docs/
-├── INDEX.md          # 本索引ファイル
-├── dev/              # 開発関連ドキュメント
-│   ├── git.md        # ブランチ戦略・CI・コミット規約
-│   ├── staging-and-merge.md # ステージングの規約とマージ前の検証
-│   ├── ci-env.md     # GitHub Actions 環境変数管理（Secrets/Variables）
-│   ├── testing.md    # テスト方針（何をテストし、何をしないか）
-│   ├── domain-migration.md # setagayafes.org を第97回の正規ドメインにする手順
-│   ├── 96th-db-backup.md # 第96回 WordPress DBバックアップの検証情報と取扱い
-│   ├── seo-metadata.md # 共通metadata・canonical・構造化データ・sitemap の方針
-│   ├── legacy-site-deindex.md # 過去回サイト群を検索結果から恒久除外する運用手順
-│   ├── microcms.md   # microCMS API 制約と実装パターン
-│   ├── microcms-fetch-failures.md # 取得に失敗したときの扱い（404 と一時的な失敗の区別）
-│   ├── event-sessions.md # 企画の開催枠（2部制）の入稿と正規化の契約
-│   ├── content-revalidation.md # microCMS Webhook によるオンデマンド再検証の仕組みと設定
-│   ├── content-revalidation-ops.md # 再検証の検証手順と障害切り分け
-│   └── draft-preview.md # microCMS 画面プレビューによる下書きの実機確認
-├── frontend/         # フロントエンド関連ドキュメント
-│   ├── design.md                  # デザインシステム（カラー・タイポグラフィトークン）
-│   ├── special-ticket-cta.md      # 著名人企画LPのモバイルチケット導線
-│   ├── access-page-design.md      # Accessページの情報設計・UI実装方針
-│   ├── agent-browser-workflow.md      # agent-browserを使用したデザイン再現とデバッグフロー
-│   ├── browser-observation-limits.md  # ブラウザ観測の前提と限界（何が測れるか）
-│   ├── browser-verification-pitfalls.md # 検証手順そのものが誤る実例
-│   ├── layout-patterns.md         # レイアウトパターンと設計原則
-│   ├── landmarks-and-skip-link.md # <main> とスキップリンクの契約
-│   ├── timetable-gantt.md         # タイムテーブル盤面（ガントチャート）の設計
-│   ├── events-search.md           # /events の検索と絞り込み（正規化・建物導出）
-│   ├── events-infinite-scroll.md  # /events の無限スクロールと絞り込みの追従
-│   ├── layout-e2e.md              # 実ブラウザの再発防止装置（盤面 / ランドマーク / 404モバイル）
-│   ├── i18n-page-structure.md     # 多言語ページの構成パターン（next-intl）
-│   ├── image-delivery.md          # 画像変換の委譲先（microCMS=imgix / 静的=事前AVIF）
-│   ├── performance.md             # Lighthouse基準値とフロントエンド性能ルール
-│   └── page-transition.md         # ページ遷移アニメーションとView Transitions API
-└── requires/         # 要件定義・仕様関連
-    ├── require.md           # プロジェクト要件定義書
-    ├── todo.md                    # プロジェクト開発タスクリスト
-    ├── website-content.md         # クライアント提供のWebサイト掲載文（確定文面）
-    ├── contract-individual-v97.md # 第97回業務委託 個別契約書ドラフト（乙側提示用）※リポジトリ外（.gitignore）
-    └── delivery-spec-v97.md       # 実行委員会提出用 開発仕様書（外部委託仕様書と同フォーマット）
-```
+- **ドキュメントを分割・圧縮したら、元ファイルの行が残っているかを `pnpm docs:split-check` で照合します。**
+  分割は「移すだけ」のつもりでも行が落ちます（#311 では設計理由の1行を拾い漏らしていました）。
+  列挙された行が**意図した削除と書き換えだけであること**を確かめ、PR の本文に理由付きで載せてください。
+  使い方は `scripts/check-doc-split.mjs` の冒頭にあります。
 
 ## ドキュメント一覧
 
+各項目は「何が書いてあるか」の1行と、**読まずに作業すると事故になる要点を最大2行**だけ持つ。
+詳細と実測は各ドキュメントが正であり、本索引へ転記しない（転記は古くなる。2026-09-30 に
+ディレクトリ構成の図から3本が漏れていたのを見つけて図ごと削除した）。
+
 ### プロジェクトルール
 
-- **[.claude/CLAUDE.md](../.claude/CLAUDE.md)** - Claude Code 向けプロジェクトガイド（最優先参照）
-  - プロジェクト概要と技術スタック
-  - 開発フロー・コマンド
-  - ブランチ戦略とコミット規約
-  - アーキテクチャ・設計原則
-  - microCMS API 設計
-  - パフォーマンス最適化
-  - ページ構成と主要機能
-  - SEO・アクセシビリティ
+- **[.claude/CLAUDE.md](../.claude/CLAUDE.md)** - Claude Code 向けプロジェクトガイド（最優先参照）。技術スタック・コマンド・ブランチとコミット規約・設計原則・microCMS API 設計・ページ構成
+- **[AGENTS.md](../AGENTS.md)** - エージェント運用ルール。参照優先順位・ドキュメント運用・作業フロー（PDCA）
 
-- **[AGENTS.md](../AGENTS.md)** - エージェント運用ルール
-  - 参照優先順位
-  - ドキュメント運用フロー
-  - 作業フロー（PDCA）
-  - コミュニケーション指針
+> [!NOTE]
+> リポジトリルートの `DESIGN.md` にも UI 規約がある（`docs/` の外なので本索引の管理対象外）。
+> 参照頻度が高いのは §10（GSAP の入場規約と `useScrollReveal`）と §9（淡紫背景専用の
+> `bg-white/10` / `border-gray-200/20` は白いシート上で消える）。
 
 ### 要件定義・仕様（requires/）
 
-- **[require.md](./requires/require.md)** - 第97回東京都市大学世田谷祭 Webサイト要件定義書
-  - プロジェクト概要・目的
-  - 技術要件・スタック
-  - microCMS API設計
-  - サイト構成・機能要件
-  - 多言語対応仕様
-  - 静的コンテンツ管理
-  - 年次更新対応（第98回以降の使い回し設計）
-  - 非機能要件（パフォーマンス、SEO、アクセシビリティ）
-  - 開発スケジュール
-  - リスク・課題
-
-- **[todo.md](./requires/todo.md)** - プロジェクト開発タスクリスト
-  - Phase 1-4 の全タスク（件数と進捗率は todo.md 冒頭の進捗状況が正。本索引では持たない）
-  - セットアップから本番デプロイまでの詳細ステップ
-  - 進捗状況の可視化
-  - リスク管理とフォールバック戦略
-  - チェックボックス形式でのタスク管理
-  - 年次更新時の作業手順（第98回以降、推定6時間）
-
-- **[website-content.md](./requires/website-content.md)** - クライアント提供のWebサイト掲載文
-  - 第97回 キャンパステーマ『カラクリ』本文
-  - 2026年度 学園祭共通テーマ『期待を超える瞬間へ、ともに進もう』本文
-  - 第97回 実行委員長 髙野雄司 挨拶文
-  - 仮画像 `pastel-castle.webp` から実画像 `setagayafe97-image.webp` への置換指示
-  - 公開時点で「準備中」表示とする項目の指示
-
-- **`docs/requires/contract-individual-v97.md`** - 第97回業務委託 個別契約書ドラフト（乙側提示用 v1）
-  - **このファイルはリポジトリに存在しません。** 連絡先・氏名などの PII を含むため
-    `.gitignore` で除外し、リポジトリ外で管理しています（AGENTS.md「機密情報は保存禁止」）。
-    **リンクにしていないのは意図的**で、辿れないリンクを踏ませないためです。
-    参照が必要な場合は管理者へ問い合わせてください。
-  - 原契約書 `第97回世田谷祭ホームページ外部委託契約書.pdf` に対するレビュー指摘 9 項目を反映
-  - 業務請負契約・第97回限定・自動更新なし・損害賠償上限あり
-  - 検収条項（10営業日・みなし検収）／報酬支払条件（検収後30日以内一括）／実務者変更時の引渡物オプション
-  - 末尾に「指摘9項目→反映条文」対応表、想定反論への応答案を付録
-
-- **[delivery-spec-v97.md](./requires/delivery-spec-v97.md)** - 実行委員会提出用 開発仕様書
-  - 参考文書「第97回世田谷祭公式HPの外部委託仕様書」と同フォーマット（宛先・発信者は開発担当→実行委員会に反転）
-  - 業務目的・対象範囲・業務内容・成果物・実行委員会での可能な操作・改善目標を実プロジェクト仕様に基づき記載
+- **[require.md](./requires/require.md)** - 第97回 Webサイト要件定義書。機能要件・microCMS API 設計・多言語・非機能要件・年次更新（第98回以降）の設計
+- **[todo.md](./requires/todo.md)** - 開発タスクリスト（Phase 1-4）と年次更新時の作業手順。件数と進捗率は todo.md 冒頭が正
+- **[website-content.md](./requires/website-content.md)** - クライアント提供の掲載文（テーマ『カラクリ』・共通テーマ・実行委員長挨拶）と「準備中」表示の指示
+- **`docs/requires/contract-individual-v97.md`** - 第97回業務委託 個別契約書ドラフト
+  - **このファイルはリポジトリに存在しない。** PII を含むため `.gitignore` で除外している。**リンクにしていないのは意図的**。参照が必要なら管理者へ
+- **[delivery-spec-v97.md](./requires/delivery-spec-v97.md)** - 実行委員会提出用の開発仕様書（外部委託仕様書と同フォーマット）
 
 ### 開発関連（dev/）
 
-- **[git.md](./dev/git.md)** - ブランチ運用・CI・コミット規約
-  - **CI のジョブを分ける基準は「`pnpm install` 以外に何を要求するか」。** install だけで済む検査（lint / format / 型 / テスト / ドキュメントの相対リンク）は `Static Checks` に束ねる
-  - ブランチ命名規則とライフサイクル。**命名規則から外れたブランチでは push 時の CI が走らない**
-  - **CI は PR を自動作成しない。** 以前載っていた自動作成ジョブの説明は汎用テンプレートの名残で、2026-09-30 に削除
-  - コミットメッセージ規約、Hotfix フロー、トラブルシューティング（workflow を含む push の拒否ほか）
-
-- **[staging-and-merge.md](./dev/staging-and-merge.md)** - ステージングの規約とマージ前の検証
-  - **`git add -A` / `git add .` は禁止。** 複数エージェントが同じ作業ツリーを触るため、別作業の未コミット変更を無差別に取り込む。巻き込み時の復旧手順あり
-  - **マージ前は `merge-tree` で「消えるファイル」を確認する。** GitHub の `CLEAN` は競合が無いことしか意味せず、マージでファイルが消えないことは保証しない。worktree での実動確認手順あり
-  - **マージ前に `closingIssuesReferences` を見る。** 本文に `Closes #N` と書いても認識されないことがある（#306 → #287 が開いたまま残った）
-  - **CI の後に `main` が進んでいたら、両側で変わったファイルを確かめる。** CI が検証したのはその時点の `main` との組み合わせだけ。あればマージ結果を手元に作って検査を流す
-
-- **[testing.md](./dev/testing.md)** - テスト方針（#157）
-  - **算術で表せる不変条件はユニットテスト、盤面が 0px でないことなど DOM が要るものは実ブラウザ**という切り分け
-  - **jsdom / happy-dom を入れてはいけない。** レイアウトエンジンが無く `getBoundingClientRect()` が常に 0 を返すため #148 を原理的に検出できない
-  - `warnOnce` のモジュール状態は `vi.resetModules()` + 動的 import で捨てる。**動的 import で得た値は同一参照の検証に使えない**
-  - `process.env.NODE_ENV` への直接代入は `readonly` 宣言により TS2540 になる。`vi.stubEnv()` を使う
-  - **テストの価値は「落ちること」でしか測れない。** #157 の退行8種を実際に注入した結果を記録
-  - テストは「いまのデータ」ではなく「不変条件」を固定する（第98回の年次更新で無関係な赤を出さないため）
-  - **省略可能な引数は、本番の呼び出し元が渡しているかまで grep する。** 単体テストは自分で渡してしまうため、渡っていなくても緑のまま通る（#207）
-  - **「どちらも正しい」と書いた契約は疑う。** テストは差異を固定するが、差異が妥当かは何も言わない（`filterEvents` / `filterEventsByDate` は #207 で統合された）
-
-- **[ci-env.md](./dev/ci-env.md)** - GitHub Actions 環境変数管理
-  - Repository Secrets / Variables の使い分け基準
-  - 本プロジェクトの登録一覧（MICROCMS*\*, NEXT_PUBLIC*\*）
-  - 企画・お知らせの公開フラグと非公開時の表示範囲（著名人告知はトップ Hero 直下と /events 最下部の2箇所）
-  - ワークフローでの参照方法（`secrets.` vs `vars.`）
-  - ローカル開発（.env.local）との対応表
-  - 本番反映の完了判定（sha 突き合わせ／公開ドメインをポーリングしない）
-  - **Vercel の本番反映は挙動が変わった。** 2026-08-27 以降は main へのマージコミットが約1分で自動 Production 化される（それ以前は人手のみ）。**どちらの前提も思い込まず、毎回 Production デプロイの sha と main 先端の一致で判定する。** 一致していても意図した変更が出ているかは公開ドメインの実応答で確認する
-  - **`vercel promote` は使わない。** 再ビルドしないため Preview 環境変数の成果物が本番に出る（`MICROCMS_SERVICE_DOMAIN` は環境別）。`vercel redeploy --target production` を使う
-  - **`Aliased:` 表示は DNS を保証しない。** 公開ドメインは `curl -sI` の `server` / `location` ヘッダで実応答を確認する。`NEXT_PUBLIC_URL` のホストが名前解決できるかも確認する
-  - **`NEXT_PUBLIC_SPECIAL_VISIBLE` は `EVENTS_VISIBLE` と独立。** 4通りの組み合わせ表あり。著名人ページの先行公開には `getSpecialEvents()` を使う（`getEventsList()` は EVENTS_VISIBLE=false で常に空）
-  - **`NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` は物販だけを独立制御。** `SPECIAL_VISIBLE=true` のまま、`/special/[id]` のプロフィール・チケット・注意事項を維持して物販欄だけを非表示にできる
-  - **公開フラグの登録先は4箇所**（`.env.example` / GitHub Variables / Vercel / 本ドキュメント）。**未設定はエラーにならず黙って非公開になるため、登録漏れが「仕様どおりの準備中表示」と区別できない。** 突き合わせコマンドと `SPECIAL_VISIBLE` 登録漏れの実例あり
-  - **`EVENTS_VISIBLE=false` + `SPECIAL_VISIBLE=true` では `/events/[id]` → `/special/[id]` の誘導が効かない。** `getEventById()` が先に `null` を返し、リダイレクト判定へ到達しない
-
-- **[domain-migration.md](./dev/domain-migration.md)** - `setagayafes.org` を第97回の正規ドメインにする手順
-  - 第96回（WordPress）は `96th.setagayafes.org` へ退避し、`/96th/*` は 301 で引き継ぐ
-  - 旧実行委員会トップ `/sfa` は現行の `/about` へ301で統合し、内容が一致しないサブページは404を維持する
-  - **rewrite プロキシは採らない。** trailing-slash リダイレクトが rewrite より先に走るため無限ループになり、`skipTrailingSlashRedirect` で止めると canonical 未実装の現状で重複URLを生む
-  - 手順の順序（WordPress の `siteurl` 変更 → 301 の本番反映 → DNS 切替）と各段階の検証コマンド
-  - Vercel が要求する DNS レコード（`A 76.76.21.21` / `CNAME cname.vercel-dns.com`）
-
-- **[96th-db-backup.md](./dev/96th-db-backup.md)** - 第96回 WordPress DBバックアップの検証情報と安全な取扱い
-  - 取得日・サイズ・SHA-256による原本照合
-  - 機密な生ダンプをリポジトリ外で保管する理由と復元前チェック
-
-- **[seo-metadata.md](./dev/seo-metadata.md)** - 共通metadata・canonical・構造化データ・sitemap の方針
-  - ページごとのmetadata、canonical、Open Graph、Twitter Cardの生成方針
-  - OGP画像とGoogle検索結果用の正方形サムネイルを分け、JSON-LD・画像サイトマップから同じ候補画像を示す方針
-  - 多言語ページのcanonicalとhreflang相当のalternate設定
-  - 年次切替後のfavicon・サイト主体/開催イベント構造化データ・画像サイトマップとSearch Console再送信の運用
-  - **`@id` で参照したノードの実体は同じ `@graph` に含める。** 含めないと参照が宙に浮き、エンティティの結合が起きない
-  - **JSON-LD は必ず `serializeJsonLd()` を通す。** CMS 文字列に `</script>` が入ると script 要素が閉じる
-  - **`BreadcrumbList` は視覚的パンくずが実在するページにだけ出す。** 中間項目は必ず URL を持たせる（`item` の省略を許されるのは末尾だけ）
-  - **SearchAction / FAQPage / keywords は入れない。** いずれも Google 側で廃止・無視されており、保守対象だけが増える
-  - **sitemap の `lastModified` に `new Date()` を使わない。** 全件が同一値だと Google は lastmod をまるごと無視する
-  - **sitemap の hreflang は自分自身を含める。** Next.js の直列化は自己参照を補完しない
-  - **不在ページは `noindex` に加えて canonical も出さない。** `loading.tsx` により `notFound()` がステータスへ反映されず 200 が返るため、自己参照 canonical は「このURLが正規版」の宣言になる
-  - `/api-test` と `/test-ui` を本番404にする運用
-
-- **[legacy-site-deindex.md](./dev/legacy-site-deindex.md)** - 過去回サイト群を検索結果から恒久除外する運用手順（さくら + Search Console）
-  - 対象は `96th` / `about` / `archive` / `blog` / `form` / `link` の6サブドメイン。**閲覧は残し、検索結果だけを第97回へ一本化する**
-  - **`todorokifes.setagayafes.org` は対象外。** 第13回等々力祭の公式サイトであり、一括設定をすると巻き添えで消える
-  - **`robots.txt` でブロックしてはいけない。** クロール不能なURLは `X-Robots-Tag: noindex` を読まれず、URLだけの検索結果として恒久的に残る
-  - **WordPress の「検索エンジンでの表示」を使ってはいけない。** 仮想 robots.txt が `Disallow: /` になり上と同じ罠になる（`about` は物理 robots.txt が無いため直撃）
-  - **`.htaccess` は `# BEGIN WordPress` の外側に書く。** パーマリンク保存だけで内側は消える
-  - **`<FilesMatch>` で HTML に絞らない。** 無条件の `Header always set` が PDF・画像・XML・404 まで covers する（96th で実証済み）
-  - **削除ツールは約6ヶ月の目隠しであって削除ではない。** noindex とセットでしか意味がなく、単独運用は期限切れで全復活する（かつ6ヶ月間は気づけない）
-  - **`https://setagayafes.org/` をプレフィックス削除申請してはいけない。** 第97回サイト全体が6ヶ月消える
-  - **サイトマップの「削除」は Search Console の送信一覧から消すこと。** ファイルと生成機能は再クロール導線として残す
-  - `archive` に第96回の**静的コピー**があり、`96th.setagayafes.org` の WordPress とは別実体
-  - **`link.setagayafes.org` の公開フォルダは `~/www/linklist`** でサブドメイン名と一致しない。ドメイン一覧で確認せずに推測すると外す
-  - **`~/www/` 直下に `.htaccess` を置いてはいけない。** 初期ドメインの公開フォルダであり、`todoroki` を含む全ディレクトリへ継承される
-  - **Search Console のプロパティは複数アカウントに分散している**（DNS TXT 2本 + `96th` / `about` の HTML トークン）。第97回サイト自体には検証トークンが無い。実行委員は毎年交代するため、所有者の記録と引き継ぎが要る
-  - 実施順序、curl 検証マトリクス、削除期限1ヶ月前（M+5）の再確認手順
-  - 実施記録の台帳（2026-09-04 に5ホストへ付与、2026-09-05 に検証完了と削除申請9件）
+- **[git.md](./dev/git.md)** - ブランチ運用・CI・コミット規約・Hotfix・トラブルシューティング
+  - **命名規則から外れたブランチでは push 時の CI が走らない。** CI は PR を自動作成しない
+  - **CI のジョブを分ける基準は「`pnpm install` 以外に何を要求するか」**
+- **[staging-and-merge.md](./dev/staging-and-merge.md)** - ステージングの規約とマージ前チェックリスト
+  - **`git add -A` / `git add .` は禁止。** 複数エージェントが同じ作業ツリーを触るため、別作業を無差別に取り込む
+  - **`CLEAN` はマージでファイルが消えないことを保証しない。** `merge-tree` で消えるファイルを見る
+- **[testing.md](./dev/testing.md)** - テスト方針（何をユニットテストにし、何を実ブラウザに回すか。#157）
+  - **jsdom / happy-dom を入れてはいけない。** `getBoundingClientRect()` が常に 0 で #148 を原理的に検出できない
+  - **テストの価値は「落ちること」でしか測れない。** 退行を注入して赤になるのを確かめる
+- **[ci-env.md](./dev/ci-env.md)** - GitHub Actions / Vercel の環境変数と公開フラグ、本番反映の判定
+  - **公開フラグは未設定でもエラーにならず黙って非公開になる。** 登録先は4箇所
+  - **`vercel promote` は使わない。** Preview の環境変数の成果物が本番に出る
+- **[domain-migration.md](./dev/domain-migration.md)** - `setagayafes.org` を第97回の正規ドメインにした手順と転送一覧
+  - **rewrite プロキシは採らない。** trailing-slash リダイレクトと衝突して無限ループになる
+- **[96th-db-backup.md](./dev/96th-db-backup.md)** - 第96回 WordPress DB バックアップの照合情報と安全な取扱い
+- **[seo-metadata.md](./dev/seo-metadata.md)** - metadata・canonical・OGP・構造化データ・sitemap の方針
+  - **JSON-LD は必ず `serializeJsonLd()` を通す。** CMS 文字列の `</script>` で script 要素が閉じる
+  - **sitemap の `lastModified` に `new Date()` を使わない。** 全件同一値だと Google は lastmod を無視する
+- **[legacy-site-deindex.md](./dev/legacy-site-deindex.md)** - 過去回サイト群を検索結果から恒久除外する運用（さくら + Search Console）
+  - **`robots.txt` でブロックしてはいけない。** `noindex` が読まれず URL だけが恒久的に残る。`todorokifes` は対象外
   - **削除リクエストの失効は 2027-03-05 前後。** その1ヶ月前に `noindex` の生存を再確認する
-  - プロパティは `sc-domain:setagayafes.org`。**Google のマルチアカウントで `/u/1/` 配下**にあり、既定アカウントには存在しない
-  - Search Console をブラウザ自動操作する際の落とし穴（1回目のクリックが無視される・ダイアログのフェードイン・縦位置の揺れ）
-
-- **[event-sessions.md](./dev/event-sessions.md)** - 企画の開催枠（`sessions`）。2部制の企画（#281）
-  - **`sessions` に値があれば `startTime` / `endTime` は無視する。** 無ければ従来の欄から1枠を作るので、既存の企画は入稿し直さなくてよい
-  - **`sessions` は任意のまま運用する。** 必須にすると既存の企画が保存できなくなる
-  - **正規化後の `Event` に `startTime` / `endTime` は無い。** 先頭の枠だけを読むコードは型エラーになる
-  - タイムテーブルは枠ごとに別ブロック。件数は企画単位で数える
-  - **枠に日程（`day1` / `day2`）があれば、その枠はその日だけに出る**（#305）。「第n部」は同じ日の枠の中で数え、日程が2種類以上なら「1日目」を付ける（カードでも付ける）
-  - **時刻欄は `HH:mm` だけ。** 開場時刻などを書き添えると、タイムテーブルと構造化データから企画が黙って消える（#305 で3件）
-
-- **[microcms.md](./dev/microcms.md)** - microCMS API 制約と実装パターン
-  - 公開サイトの API キーに下書き・公開終了の全取得権限を付けない。`/info/[id]` と `/events/[id]` の HTTP 404 はローディングによるストリーミングに注意する
-  - News API の任意 `cta` フィールドは記事詳細の「詳しくはこちら」に使い、内部パスまたはHTTP(S) URLを格納する
-  - **サムネイルは入稿された原本を超えて拡大されない。** 正方形ロゴは 624px 四方、写真は 1400px 幅を推奨。実データは全件 207px 四方で、アイコン表示（208 CSS px）に対し既に等倍（#190）
-  - **縦横差 5% 以内かどうかで表示が分岐する。** ロゴは正方形、写真は横長で入稿する
-  - limit 上限100件の制約と offset ページネーション実装
-  - 適用済み関数（getEventsList）と未適用関数の一覧
-  - 使用 API エンドポイント一覧
-  - **select の選択肢を増やしたら正規化関数も直す。** ホワイトリスト方式のため、直さないと新しい値が黙って `other` に落ちる（エラーは出ない）
-  - **未入力の企画は表示用フォールバックで案内する。** 入稿データの修正は microCMS、公開画面の崩れ防止は `src/lib/event-display.ts` とプレースホルダーで分担する
-  - カスタムフィールドのネスト制約と作成順序（子から親へ）。API をまたいだ参照は不可
-  - **管理画面はブラウザ自動操作で編集できない。** 種類選択が実マウスイベントに依存し、スクリプトでは別の行へ適用される
-  - **手で控えた `draftKey` は使えない**（保存のたびに失効する）。画面プレビュー経由なら失効しない → [draft-preview.md](./dev/draft-preview.md)
-  - **「一時的に公開して確認」はもう使えない。** 公開フラグが4本とも `true` になり、公開すれば本番に出る
-
-- **[microcms-fetch-failures.md](./dev/microcms-fetch-failures.md)** - microCMS の取得に失敗したときの扱い（#287）
-  - **`null` / `[]` に潰してよいのは microCMS が 400 / 404 を返したときだけ。** 429 / 5xx は投げる。潰すと実在ページが 404 で生成されてもビルドが成功する（修正前の注入で 99 ページ）
-  - **ISR の再生成でも正常なキャッシュが 404 に置き換わっていた。** 修正後は時間ベースなら古いページを維持、Webhook 直後は 500 で回復後に自動で正常化
-  - **SDK の `retry: true` は Next.js の中で効かない。** 同じ URL の GET が描画内で重複排除され、最初の 429 が返り続ける。再試行は `microcmsGet()` が持つ
-  - **注入で検証するときは `.next/cache/fetch-cache` を先に消す。** 残っていると microCMS を1本も叩かずにビルドが通る
-  - **本番の確認では、実在する URL をサイトマップから全件叩く。** 1件だけでは「一部だけ 404」を見逃す
-  - **404 画面の中身は実ブラウザで見る。** `not-found.tsx` は実在するページの RSC ペイロードにも入っているため、HTML の grep では判定できない
-
-- **[draft-preview.md](./dev/draft-preview.md)** - 下書きの実機確認（microCMS 画面プレビュー）
-  - 編集画面の「画面プレビュー」から、本番と同じ詳細ページで下書きを表示する仕組み。対象は `events` と `news`
-  - **`draftKey` は `searchParams` では受け取れない。** 読んだ時点でルートが動的化し、下書きを見ない訪問者の ISR まで失われる。cookie で運ぶ
-  - **`draftMode()` の `isEnabled` は静的生成を壊さないが、`cookies()` は壊す。** `isEnabled` が false のとき `cookies()` へ到達させない順序が要る（Next.js 16.1 の実装で確認）
-  - **プレビューは公開フラグ（`NEXT_PUBLIC_*_VISIBLE`）を跨ぐ。** 解禁前の確認こそが目的であるため。守りはシークレットと draftKey の二重
-  - 遷移先は `/api/draft` が下書きを取得し、正規化後の `type` を見て決める（著名人企画は `/special/[id]`）。存在確認を兼ねてオープンリダイレクトを防ぐ
-  - **解除を忘れると、そのブラウザは以後ずっと ISR を迂回する**
-
-- **[content-revalidation.md](./dev/content-revalidation.md)** - コンテンツ反映の仕組み（オンデマンド再検証）
-  - microCMS 更新時の Webhook 即時失効と、失敗時の10分 ISR フォールバック
-  - 「下書き中」と「公開中かつ下書き中」の公開 API での違い
-  - microCMS Webhook（`POST /api/revalidate`）を主系、時間ベース ISR を保険とする二段構え
-  - **`revalidatePath` はパスの API ではなくタグの API。** `/about` や `type` 無しの動的ルートは、エラーにならず静かに何もしない
-  - microCMS 側の設定手順。**削除・公開終了の通知タイミングは既定 OFF** で、ONにしないと「消したのに残る」が直らない
-  - **予約公開でも Webhook は飛ぶ**（通知タイミング「コンテンツの公開（予約設定による操作）」＝既定 ON）。ただし microCMS が予約を実行する時刻に精度保証は無い
-  - microCMS を読むページを増やしたときの対応表更新手順
-
+- **[microcms.md](./dev/microcms.md)** - microCMS API の制約と実装パターン（limit・select・カスタムフィールド・画像）
+  - **select の選択肢を増やしたら正規化関数も直す。** 直さないと新しい値が黙って `other` に落ちる
+  - **管理画面はブラウザ自動操作で編集できない。** 手で控えた `draftKey` も保存のたびに失効する
+- **[microcms-fetch-failures.md](./dev/microcms-fetch-failures.md)** - 取得に失敗したときの扱いと本番での確認（#287）
+  - **`null` / `[]` に潰してよいのは 400 / 404 だけ。** 429 / 5xx を潰すと実在ページが 404 で生成されてもビルドが通る
+  - **SDK の `retry: true` は Next.js の中で効かない。** 再試行は `microcmsGet()` が持つ
+- **[event-sessions.md](./dev/event-sessions.md)** - 企画の開催枠（`sessions`、2部制）の入稿と正規化の契約（#281 / #305）
+  - **`sessions` は任意のまま運用する。** 必須にすると既存の企画が保存できない
+  - **時刻欄は `HH:mm` だけ。** 開場時刻などを書き添えると、タイムテーブルと構造化データから黙って消える
+- **[draft-preview.md](./dev/draft-preview.md)** - microCMS の画面プレビューで下書きを本番と同じ詳細ページに出す仕組み
+  - **`draftKey` を `searchParams` で受け取らない。`cookies()` を無条件に呼ばない。** どちらもルートが動的化して ISR が失われる
+- **[content-revalidation.md](./dev/content-revalidation.md)** - Webhook によるオンデマンド再検証の仕組みと microCMS 側の設定
+  - **`revalidatePath` はパスではなくタグの API。** 書き方を誤るとエラーにならず何もしない
+  - **削除・公開終了の通知タイミングは既定 OFF。** ON にしないと「消したのに残る」
 - **[content-revalidation-ops.md](./dev/content-revalidation-ops.md)** - 再検証の検証手順と障害切り分け
-  - **`pnpm dev` ではキャッシュ挙動を検証できない。** dev は全エントリを常に stale 扱いにする
-  - **合格判定は `age` であってラベルではない。** `REVALIDATED` は実体が古くなっても付いたまま残る。発火から**15秒**待って `age` が 0 近傍かを見る（5秒では旧コピーが返る）
-  - **平常時は `HIT` + 大きな `age` が正常。** 異常判定が成立するのは入稿直後の1回だけ
-  - **本番を汚さない導通確認**: `informations` に `category = other` のテスト項目を作れば、どのページにも sitemap にも出ないまま Webhook を試せる
-  - **API キーでは削除できない**（`DELETE is forbidden.`）。削除タイミングの検証は管理画面が要る
-  - シークレットは Vercel も microCMS も読み返せない。一致確認は「手元の値で署名を作って本番へ POST し 200 か」で行う
-  - 障害切り分け表（Webhook 実行履歴 → Vercel ログ → `x-vercel-cache`）
+  - **合格判定は `age` であってラベルではない。** 発火から15秒待って1回だけ叩く（連続ポーリング禁止）
 
 ### フロントエンド関連（frontend/）
 
-- **[access-page-design.md](./frontend/access-page-design.md)** - Accessページの情報設計・UI実装方針
-  - 会場所在地・推奨経路・注意事項の情報優先順位
-  - 地図iframe、外部リンク、経路リストのアクセシビリティ要件
-  - `focus-visible` による高コントラストなキーボードフォーカス表示と `ring-white` 禁止
-  - 初期表示・スクロール連動アニメーションとモーション軽減時の表示方針
-  - 交通情報の管理場所と公式情報の参照基準
-
-> [!NOTE]
-> リポジトリルートの `DESIGN.md` と `.claude/CLAUDE.md` にも UI 規約がある。
-> `docs/` の外にあるため本索引の管理対象ではないが、次の2件は参照頻度が高い。
->
-> - `DESIGN.md` §10 — GSAP の入場規約（`gsap.from()` / `{ start: "top 80%", once: true }`）、
->   Server Component へ演出だけ足すマーカー + `data-*` 方式（実装は
->   `src/lib/use-scroll-reveal.ts` の `useScrollReveal` に集約）、ScrollTrigger を
->   IntersectionObserver で遅延取得する際の `rootMargin` の向き
-> - `.claude/CLAUDE.md` デザイン仕様 — トップの `.hero-about-bg` グラデーションの
->   停止位置を `%` へ戻してはいけない理由（実測値つき）
-> - `DESIGN.md` §9 — `bg-white/10` と `border-gray-200/20` は淡紫背景専用で、
->   `PageSheetLayout` の白いシート上では消える（1.08:1）。白いシート上のカード枠と
->   ホバー時の `hover:border-l-*` 明示ルール
-
-- **[design.md](./frontend/design.md)** - デザインシステム（カラー・タイポグラフィトークン）
-  - ブランドカラーの HLC 定義（H319 / L64 / C70）と oklch CSS 実装。**配信されるのは
-    `#bf73e3`** で、仕様 HEX `#CD79EE` はその由来（コントラスト検証は必ず実配信値で行う）
-  - 一次定義は `globals.css` の `@theme` 1箇所。CSS が効かない3箇所（メールHTML・
-    WebGL シェーダ・メタデータ）だけ実配信 HEX を直書きしており、手で追従させる必要がある
-  - Primary スケール・Neutral スケール・Semantic カラートークン（`gray-300` は**意図的な欠番**。
-    `gray-500` は 2026-09-19 に追加）
-  - **Tailwind 既定パレットを直接使わない** — `@theme` に無い色名は**エラーも警告も出ないまま**
-    既定値へ落ちる。何に落ちるかの対応表と、`text-gray-500` を `gray-400` へ機械置換すると
-    16箇所が一斉に AA 未達になる警告
-  - **紫はすべて `primary-*` を使う** — `purple-*` はブランドと色相差 15° 未満で別色に見えない
-  - **残している非ブランド色相と、その理由** — red / green / blue / orange / amber / pink を
-    実測比つきで列挙。**バッジの既定配色が描画されるのはお知らせの2画面だけ**という注意つき（#228）
-  - **「実配信HEX」は2つある** — 出力CSSの `#hex` は `lab()` 非対応向けフォールバック
-    （**一次定義は `oklch()` だが出力CSSには残らない**）で、**動作下限のブラウザでは一度も
-    描画されない**。自前トークンは一致するが、Tailwind 既定パレットのガマット外の段では
-    食い違う。**既定パレットの比は grep ではなく canvas の実ピクセルで測る**
-  - **規約を破れないようにしてある** — 上記3節は `eslint.config.mjs` の `no-restricted-syntax`
-    と `scripts/assert-no-restricted-colors.mjs`（`pnpm check:colors`）が二段で守る。
-    画像は `scripts/assert-static-image-budget.mjs`（`pnpm check:images`）が
-    役割・形式・寸法・バイト予算・参照の解決を守る。
-    **ESLint はコメントを見ないが Tailwind は読む**ため、生テキストを見る検査を別に置いた（#230）。
-    禁止リストの一次定義は `scripts/restricted-color-tokens.mjs` の1箇所で、
-    `@theme` へ段を足したらそこから外す
-  - アクセシビリティ（コントラスト比）ガイドライン
-  - 選択状態と競合する操作要素の `hoverable:hover:` ゲート方針
-  - Kaisei Opti ブランドフォント仕様と使用制限
-  - フォントスケール（モジュラースケール 1.25）
-  - Aboutページ開催概要のシンプルな2列情報リスト（**この節の「角丸・影・横罫線を足さない」は
-    開催概要リスト限定の規約であり、白いシート全体の規約ではない**）
-  - CSS 変数まとめ
-  - リッチテキスト（`prose`）の扱い — typography プラグイン未導入と `@layer` の選び方
-
-- **[special-ticket-cta.md](./frontend/special-ticket-cta.md)** - 著名人企画LPのモバイルチケット導線
-  - 購入可能な券種数に応じた固定CTAの遷移先
-  - モバイル縦カードとデスクトップ比較表の表示分担
-  - safe area、レイヤー、ヒーロー下余白、本文CTA・フッター表示時の退避条件
-  - 320px幅・キーボードフォーカス・コントラストの検証契約
-
-- **[image-delivery.md](./frontend/image-delivery.md)** - 画像配信の経路（変換をどこにやらせるか）
-  - **変換は2つとも Vercel の外。** microCMS は imgix、`public/` は `pnpm images:optimize` で
-    事前に AVIF 化。**Vercel の変換枠の消費は 0**
-  - 変換枠が枯れると「一部の画像だけ」が 402 で壊れる。同じ画像でも幅で生死が分かれる（#237）
-  - **枠は総量で枯れる。消費が 7% の利用者も、枯れた枠の上では 402 になる**（#241。
-    「静的画像は枠の 7% しか使わないので残してよい」という #240 の判断は誤りだった）
-  - **短時間しか DOM に無い画像は巡回で数えられない。** オープナーのロゴは2度、調査から漏れた
+- **[design.md](./frontend/design.md)** - デザインシステム（カラー・タイポグラフィトークン、コントラスト、フォント）
+  - **配信される紫は `#bf73e3`**（仕様 HEX `#CD79EE` ではない）。コントラストは実配信値で測る
+  - **Tailwind 既定パレットを直接使わない。** `@theme` に無い色名はエラーも警告も出ずに既定値へ落ちる
+- **[access-page-design.md](./frontend/access-page-design.md)** - Access ページの情報設計・地図・経路・フォーカス表示・モーション方針
+- **[special-ticket-cta.md](./frontend/special-ticket-cta.md)** - 著名人企画 LP のモバイルチケット導線（固定 CTA・退避条件・320px の検証契約）
+- **[image-delivery.md](./frontend/image-delivery.md)** - 画像配信の経路（microCMS は imgix、`public/` は事前 AVIF）
+  - **Vercel の変換枠は総量で枯れる。** 消費が少なくても、枯れた枠の上では 402 になる
   - **`curl` で検証するときは `Accept` を付ける。** 付けないとキャッシュ済みでも 402 に見える
-  - `auto=format` が効かない理由と、`fm=avif` / `fit=max` を決めた実測値
-  - 事前最適化の運用（原画像は `assets/source/`、`scripts/static-image-manifest.mjs` が一次定義、
-    `pnpm check:images` が守る）
-  - `AppImage` というラッパーに至るまでに実測で否定した2案
-  - 再発防止装置3つの射程の違い（ESLint / ユニットテスト / ビルド生成物）
-
-- **[performance.md](./frontend/performance.md)** - Lighthouse基準値とフロントエンド性能ルール
-  - 初期表示モーションの尺は `src/lib/motion.ts` に集約（2026-08-29）
-  - トップページ desktop の基準値と LCP 内訳
-  - LCP、動画、レスポンシブ画像、無限ロゴ列、Webフォントの実装ルール
-  - `content-visibility` による初期描画遅延、フォントCSSの遅延配信、ScrollTriggerの遅延初期化
-  - LogoLoop の強制リフロー回避
-  - 未使用CSS/JS、render-blocking CSS、AVIF画像配信の残存候補と次回対応方針
-  - 初期ビューポート外の演出チャンクとNext.js route prefetchの遅延方針
-  - Tailwind のソース走査を `src/` へ限定（docs由来の未使用CSSは brotli 280 B で性能要因ではない）
-  - CSSチャンク3本の役割（本体85 KBのみ初期ブロック、フォント187 KBとLogoLoopは遅延）
-  - 文字数固定の見出しはサブセットを自前配信する（ヒーロー8文字 = 2,832バイト）
-  - #90 の本番再計測（mobile Performance 98、総転送632 KiB、font preload 0本）と生成HTML回帰検査
-  - 静的検査、ローカル本番ビルド、ブラウザ、Lighthouse の検証手順
-
-> [!NOTE]
-> ブラウザ自動化の知見は3ファイルに分かれています。**手順は `agent-browser-workflow.md`、判断基準は `browser-observation-limits.md`、失敗例は `browser-verification-pitfalls.md`。**
-
-- **[agent-browser-workflow.md](./frontend/agent-browser-workflow.md)** - agent-browserを使用したデザイン再現とデバッグの標準フロー
-  - デザイン再現3ステップ（分析→実装→検証）
-  - 数値測定手法とコマンド集（Header高さ、z-index階層、viewport占有率）
-  - レスポンシブテスト標準手順（375px/768px/1920px）
-  - デバッグワークフロー（Layout Shift検出、z-index競合確認）
-
+- **[performance.md](./frontend/performance.md)** - Lighthouse 基準値とフロントエンド性能ルール（LCP・フォント・CSS チャンク・検証手順）
 - **[browser-observation-limits.md](./frontend/browser-observation-limits.md)** - ブラウザ観測の前提と限界（**測る前に読むこと**）
-  - **観測の前提を測る** — 実行環境は一定でない。`framesIn1s` を測ってから検証可否を分岐する
-  - 検証できるもの / できないものの切り分け表
-  - **`hidden` なタブで rAF を await するとレンダラが凍結してタブが落ちる**（agent-browser / Claude in Chrome 共通。`visibilityState` を同期評価で先に読む）
-  - **`ssr: false` の描画検証の症状はツールで異なる。** agent-browser は canvas がマウントせず、実 Chrome の `hidden` タブは**マウントするが `300×150` のまま未描画**（要素の存在だけで合格判定すると誤判定する）
-  - **Claude in Chrome の `hidden` タブでは `vh` / `svh` / `dvh` が 0 になる。** レイアウトが潰れ「画像が表示されない」と誤診する
-  - **BFCache の観測** — Vercel preview は `vercel.live` の iframe が阻害するため測れない。ローカル本番ビルドで、プローブ生存 / `pageshow.persisted` / DOM ノード同一性の3点で判定する
-  - `navigation.type` は BFCache 復帰でも `"navigate"` のまま。`"back_forward"` はドキュメント再作成のサイン（逆に読むと判定が反転する）
-
+  - **`hidden` なタブでは rAF・`vh`・canvas が止まる。** `visibilityState` を先に読む
 - **[browser-verification-pitfalls.md](./frontend/browser-verification-pitfalls.md)** - 検証手順そのものが誤る実例
-  - **ハイドレーション完了前に読むと結論が反転する。** 測定値に「まだ fallback か」を含め、false になるまで読まない。`navigate` 後の `wait` だけでは足りず、`readyState === "complete"` も使えない（#207 で3回誤診）
-  - **Tailwind の任意値を `grep` するときは `-F`。** `[...]` が文字クラスになり、存在するのに0件と出る
-  - **CSS のカスタムクラスが効かないときは `.next` を丸ごと削除する。** HMR でも `.next/cache` 削除でも復旧しないことがある
-  - **`resize_window` は viewport を変えない。** レスポンシブ検証は `agent-browser set viewport <w> <h>` で行う（`open --viewport` は効かない実測あり。メディアクエリの切り替わりはコンテナ幅を絞る方法では再現できない）
-  - **外部SPAの管理画面は「操作」に使わない。** 観測用であり、設定投入の自動化は失敗が本番に残る（[dev/microcms.md](./dev/microcms.md) に実例）
-  - 誤診の実例は [page-transition.md](./frontend/page-transition.md) も参照
-
-- **[layout-patterns.md](./frontend/layout-patterns.md)** - レイアウトパターンと設計原則
+  - **ハイドレーション完了前に読むと結論が反転する。** `resize_window` は viewport を変えない
+- **[agent-browser-workflow.md](./frontend/agent-browser-workflow.md)** - agent-browser によるデザイン再現とデバッグの標準フロー
+- **[layout-patterns.md](./frontend/layout-patterns.md)** - レイアウトパターンと設計原則（ヘッダー高さ・z-index・`max-w-*`・Tailwind v4 の出力順）
+  - **縦方向の寸法を CSS と JS が別々に持たない。** 片方だけ変えられる構造は必ず食い違う
+  - **1ページに `max-w-*` を何種類も同居させない。** ハウス標準は `PageSheetLayout` の1本
 - **[landmarks-and-skip-link.md](./frontend/landmarks-and-skip-link.md)** - `<main id="content">` とスキップリンクの契約（#177 A）
-  - Header/Hero統合パターン（calc()による実効100vh、CSS変数化）
-  - z-index管理とレイヤー構造（標準スケール: 10/20/30/40/60）
-  - absolute/fixed/sticky使い分けガイド
-  - レスポンシブ高さ計算（100vh vs 100svh、モバイルSafari対策）
-  - `--header-height` は2状態ヘッダー（上部107px / スクロール後77px）の近似値である
-  - **同じ寸法を CSS と JS が別々に持たない。** 片方だけ変えられる構造は必ず食い違う（#148 の親高さ / #154 のカード余白）
-  - 全画面ヒーローの実装は3箇所で統一する（sticky ヘッダーがフロー上に高さを占有するため素の `100svh` は使わない）
-  - 部分幅ヒーロー画像の境界処理（mask-image とオーバーレイの分担）
-  - **1ページに `max-w-*` を何種類も同居させない。** ハウス標準は `PageSheetLayout` の1本（シート `mx-4 sm:mx-6 lg:mx-8` + 内側 `mx-auto max-w-7xl px-4 sm:px-6 lg:px-8`）。本文を絞るのはさらに内側の measure 制限で行う
-  - **揃えるのは器の左端であって、中身の左端ではない。** トラックを埋めない固定サイズ要素（ロゴ・アイコン・バッジ）を `justify-start` にすると反対側にだけ空白が寄る（`/events/[id]` の 208px アイコンを 485〜667px のトラックで左寄せし、右に 277〜459px 残した）
-  - **中身を左端へ寄せるのは誤りだが、器を中身に合わせるのは正しい。** トラック幅を固定サイズ要素に合わせれば左端は自動的に揃い、残りを受け取る列が広がる（#190 のアイコン分岐は `lg:grid-cols-[18rem_minmax(0,1fr)]`）
-  - **シートの外側に置いた節には、シートと同じ `mx-*` を持たせる。** 全幅の背景が要るパンくずのような節は、背景の要素と幅を決める要素を分けて内側に `mx-*` の層を挟む
-  - **`max-w-*` が効く幅では外枠の左端が `W/2 - 640` に収束し、外側インセットの差が消える。** 内側パディングまで揃えると 1440px では完全一致して見えるため、確認には必ず 1344px 未満を含める
-  - **重ねるための負のマージン（`-mt-6`）は、重ねる相手が実在する場所にだけ置く。** 相手のいないページへ写経すると直前の要素を覆う（`/events/[id]` で md 以上の全幅がパンくずを 24px 欠けさせていた）
-  - **モバイルの全幅ブリード（負のマージン）は `lg` で `lg:mx-0 lg:mt-0` により解除する。** 解除漏れは2カラム化した瞬間にトラックを超過して隣の列へめり込む
-  - **Tailwind v4 の出力順は「変種群 → プロパティ順」の2段。** 変種は必ずベース群より後ろに出るので `lg:` はベースの長形式に勝つ。一括指定が長形式より前に来るのは同じ群の中だけ
-
-- **[timetable-gantt.md](./frontend/timetable-gantt.md)** - タイムテーブル盤面（ガントチャート）の設計
-  - 30分目盛りはラベルと罫線で同じ刻み幅・座標を使い、1時間あたり96pxのスケールを保つ
-  - アリーナはID `体育館` のまま「アリーナ」と表示し、`体育館` / `アリーナ` / **`9号館アリーナ`** を同じ絞り込みへ入れる。**実データは号館付き表記で入稿されている**（除外していた #290 では実データでタブが一度も出なかった。#302）
-  - **モバイルの縦スタックにも30分刻みの時刻見出しを置く**（刻み幅は盤面と共有。企画の無い目盛りは出さない）
-  - **縦方向の寸法は必ず px で持つ。** `height: %` は親の高さが確定しているときしか解決されず、`min-height` しか持たない親の下では 0px に潰れる（#148 の事故そのもの）
-  - `overflow-x: auto` は `overflow-y` の使用値も `auto` にする。中の要素をページに対して `sticky top-0` にはできず、はみ出しは縦スクロールバーを生む
-  - `sticky left-0` はスクローラの `padding-left` を無視する。余白は外側の要素が持つ
-  - **絞り込みとグループ化は必ず同じ `resolveStageId()` を通す。** 片方だけ `extractStageId()`（null を返す）に戻すと「その他」タブが常に空になる
-  - 時間レンジは企画から算出し、全ステージ列で共有する（ステージ絞り込み後から作るとタブ切替でスケールが動く）
-  - **カードの密度判定は「枠」ではなく「カード実寸」（枠 − `CARD_GAP_PX`）で行う。** 枠のまま比べると収まらない密度が選ばれる
-  - 選択中のステージは当日0件でもタブに残す（残さないとどのタブも `aria-pressed` にならず、絞り込みが画面から読めない）
-  - 盤面と縦スタックの DOM 2枚持ちは、インラインスタイルにレスポンシブバリアントが無いことによる意図的な例外
-  - **モバイルはステージ別ではなく全会場横断の開始時刻順。** 各カードへステージ名を出し、320px幅では重複パディングを外して本文幅250px以上を守る
-  - **操作優先の compact ヒーローと時刻レール。** 320×640pxでも日程選択を初期画面内へ収め、カード幅を削らず開始時刻を縦に追える構造にする
-  - **検証は2層。** 算術で表せる不変条件は `pnpm test` が固定し、盤面が実際に 0px でないことは実ブラウザでしか測れない（[dev/testing.md](./dev/testing.md)）
-
-- **[events-search.md](./frontend/events-search.md)** - `/events` の検索と絞り込み
-  - 絞り込みパネルの項目間隔は親の `space-y-6` が管理する。`fieldset` の `m-0` は縦余白を打ち消すため `mx-0` を使う（#293）
-  - **`building` は実データ18件すべて未入力。** 必須で全件埋まっている `place` から建物を導出する
-  - **正規化は `normalizeText()` の1本に集約する。** 検索と建物導出で別々に正規化すると
-    「検索では出るのにフィルタでは落ちる」が生まれる（`９号館` と `9号館` が同居している）
-  - キーワード検索は**3段カスケード**（全文一致 → AND → OR）。`のど自慢` を割らずに
-    `9号館でやってるダンスのやつ` も捌くための構造
-  - **`buildings` 配列の並び順は仕様。** `号館` を `アリーナ` より前に置かないと
-    `９号館アリーナ` が体育館へ誤配される
-  - 検索語が0個 = 「0件」ではなく「**絞り込む条件が無い**」。全件を返す
-  - **切った右側は保証されない。** `なところ` → `ころ` が `サイコロ` へ誤爆していた（#251）。
-    実際に切ったときだけ「2文字以下かつひらがなだけ」の断片を捨てる。**片方の条件だけでは行きすぎる**
-    （`友達` `静か` が消え、`だんす` も巻き込まれる。4方向の退行注入で確認済み）
-  - **URL クエリはホワイトリストで検証する。** `?type=Stage` が無言の0件になっていた
-  - **IME は `InputEvent.isComposing` で判定する。** `compositionend` を合図にすると
-    発火順の違いで環境によって検索が動かなくなる
-  - **ハイドレーション完了前に合成イベントを流すと検証が嘘をつく**（実測で3回誤った）
-
-- **[contact-form.md](./frontend/contact-form.md)** - お問い合わせフォームの送信可否（#260 / #261）
-  - **設定が欠けていたら成功を返さない。** 2026-09-21 まで本番は1通も送らず、来場者には
-    「送信完了・3営業日以内に返信」と出ていた。落とし物の届け出もそこで消えていた
-  - **`CONTACT_TO_EMAIL` に既定値を置かない。** 以前は `.com`（サイトは `.org`）へ静かに送る形だった
-  - **主防御はハニーポットと経過時間（状態を持たない）。IP 制限は補助。**
-    サーバーレスではリミッタの状態がインスタンスごとに別で、**429 の約3秒後に同じIPが通る**（実測）
-  - **30本/分は NAT 前提。** 1人基準で置くと、他人の送信で来場者が弾かれる
-  - **空ボディ `{}` は 400 で終わりメールが出ない** → 副作用なしにレート制限を試せる検証口
-
-- **[events-semantic-search.md](./frontend/events-semantic-search.md)** - `/events` の意味検索（第4段・TypeSafe Jev）（#253）
-  - **段1〜3が0件のときだけ呼ぶ。** `/api/search` は認証の無い従量課金口で、1リクエスト ≒ 0.097円（実測）
-  - **足切りは `has_match`（Noul）。`confidence` を使ってはいけない。** 該当なしの `スキー場` の
-    confidence 0.79 は、該当ありの `体を動かしたい` 0.39 を上回る（2026-09-20 実測・98件）
-  - **Issue #253 の「該当なし群 0.02〜0.06」は再現しない。** `スキー場` は 0.24。閾値 0.5 は動かさない
-  - **判定は絞り込み前の全企画に対して行う。** フィルタ起因の0件で呼ぶと、積集合で消える結果に課金する
-  - **レート制限の第一層は Vercel WAF で、コードではない。** マージしただけでは有効にならない
-    （2026-09-21 に REST API で作成し、**実際に弾くことを検証済み**。**300本を連打すると自分のルールより先に
-    bot 対策 `x-vercel-mitigated: challenge` が50〜72本で反応して検証にならない。** 上限を 2本/10秒 へ一時的に下げ
-    6本だけ叩くと、3本目から `deny`。復元は `finally` + 別コマンドでの読み戻し）
-  - **来場者の検索語は米国の TypeSafe へ送られ、ZDR はエンタープライズ限定。**
-    `src/data/privacy.ts` の `thirdParty.externalServices` に明記した
-  - **費用の歯止めはプリペイド $5（クレカ未登録）で、請求は暴走しない。** 使い切っても
-    意味検索が消えるだけで、リテラル検索は動く。**残高追加やカード登録でこの安全装置は外れる**
-  - **`eslint.config.mjs` の `no-restricted-imports` / `no-restricted-syntax` は後勝ちで丸ごと置き換わる。**
-    #156 の `useSearchParams` 禁止と #230 の禁止色（EventInfiniteList のみ）は、それぞれ後続ブロックに
-    消されて**一度も効いていなかった**（2026-09-20 に `--print-config` と退行注入で確認し、合成へ直した）
-
+- **[timetable-gantt.md](./frontend/timetable-gantt.md)** - タイムテーブル盤面（ガントチャート）とモバイル縦スタックの設計
+  - **縦方向の寸法は必ず px で持つ。** `height: %` は `min-height` しか持たない親の下で 0px に潰れる（#148）
+  - **絞り込みとグループ化は必ず同じ `resolveStageId()` を通す**
+- **[events-search.md](./frontend/events-search.md)** - `/events` の検索と絞り込み（正規化・建物導出・3段カスケード）
+  - **正規化は `normalizeText()` の1本に集約する。** 別々に正規化すると「検索では出るのにフィルタでは落ちる」
+- **[events-semantic-search.md](./frontend/events-semantic-search.md)** - `/events` の意味検索（第4段・TypeSafe Jev。#253）
+  - **足切りは `has_match`。`confidence` を使ってはいけない**
+  - **来場者の検索語は米国の TypeSafe へ送られる。** 費用の歯止めはプリペイド $5（カード登録で外れる）
 - **[events-infinite-scroll.md](./frontend/events-infinite-scroll.md)** - `/events` の無限スクロールと絞り込みの追従（#239）
-  - **ページ分割は撤去済み。** 旧 `Pagination` は `href` を持たない `<button>` だったため、SEO の損失はゼロ
-  - **監視は発火即 `disconnect()` し、`visibleCount` の変化でだけ張り直す。** 依存から落とすと
-    **1回だけ追加して永久に止まる**（実測: 12件 → 24件 で打ち止め）。`exhaustive-deps` を error へ格上げして縛った
-  - **`<aside>` の `self-start` は grid で必須。** 外すと高さが行全体まで伸び、sticky が一度も貼り付かない
-    （実測: 一覧表示中に画面外 15/16 回）。**lint / 型 / テスト / build のすべてを通過する**
-  - **`--header-height`（88px）をそのまま `top` に使わない。** スクロール中のヘッダー実高は 77px で、11px の隙間からカードが透ける
-
-- **[layout-e2e.md](./frontend/layout-e2e.md)** - 実ブラウザの再発防止装置（Playwright / #157 / #177 A / #249）
-  - 複数 worktree の E2E は `E2E_PORT` でポートを分ける。同じフィクスチャを持つ旧サーバを再利用すると検証対象を取り違える
-  - 盤面の実測（#148）、ランドマークの1周検査（#177 A）、404モバイル配置（#249）が載る
-  - 生HTMLでは数えられない理由（`/events` は生HTML 2個・ライブDOM 1個）
-  - **jsdom も Vitest Browser Mode も #148 を検出できない。** 前者はレイアウトエンジンが無く、後者は祖先の連鎖が本物と別物になる
-  - **`pnpm build && pnpm start` は原理的に使えない。** フィクスチャ分岐が `NODE_ENV !== "production"` に閉じており、本番ビルドではチャンクごと落ちる
-  - **secrets を要求しない唯一のジョブ。** フィクスチャ経路は `getEventsList()` を呼ばないため fork PR でも走る
-  - **測ろうとしている値そのものを待たない。** 盤面の高さを `waitForFunction` で待つと #148 は「検出できない」に化ける
-  - **列の `height` を `minHeight` へ変えるだけでは落ちない。** #148 の再現には `h-full` の中間ラッパが要る（実測記録あり）
-  - 1024px 未満は盤面が `display:none` になり全アサーションが偽陰性。共通フィクスチャが測定条件を先に検査する
-
-- **[static-html-and-search-params.md](./frontend/static-html-and-search-params.md)** - `useSearchParams()` と静的HTML（#156）
-  - **境界を書かないとエラーにならず、いちばん近い `loading.tsx` が代役になる。** `/events` の一覧だけを `src/app/events/(list)/loading.tsx` で捕まえ、企画詳細へは継承させない
-  - **境界を足すだけでは中身は静的HTMLに戻らない。** bailout は境界の内側を落とすものであり、戻すものではない
-  - **fallback はサーバーで描かれてHTMLに出る。** そこへ既定状態の完成形を置くと企画カードのリンクが載る
-  - **fallback の中で `useSearchParams()` を呼んではいけない**（それ以上落ちる先が無い）。下位からは props へ引き上げる
-  - 判定は `data-page-hero="true"` の綴りで行う。`grep -c` と属性名だけの grep はどちらも誤読する（flight ペイロードに別綴りで入っている）
-  - 実測: 静的HTMLの企画リンク 0 → 11本。転送量は brotli で +4.2KB。差し替えは約390ms、CLS 0
-  - **再発防止装置は2つ。** `eslint.config.mjs` の `no-restricted-imports`（fallback ツリーがクエリを読み始めるのを止める）と、`scripts/assert-events-static-html.mjs`（境界の消失・fallback の格下げを `pnpm build` で落とす）
-  - **アサーションはフラグ false の間スキップし、`EVENTS_VISIBLE=true` になった瞬間に自動で有効化する。** 解禁時に足す作業は要らない
-  - **フラグは `@next/env` の `loadEnvConfig()` で読む。** 素の `process.env` は `.env.local` を読まないため、`next build` とアサーションが違う値を見て「事実と正反対のメッセージで落ちる」
-
-- **[i18n-page-structure.md](./frontend/i18n-page-structure.md)** - 多言語ページの構成パターン
-  - メッセージの二分割（ページ本文 `messages/` と ヘッダー・フッター `messages/chrome/`）
-  - ページビューの置き場所（同名ルートの二重実装がデッドコード化する罠）
-  - `pageHeroes` のロケール上書き（日本語ハードコードの共有データ）
-  - リンクの扱い（Provider の内は `@/i18n/navigation`、外は `localizeNavHref()`）
-  - 翻訳しないもの（コンテンツに対する照合ロジック）
-  - 言語宣言（`lang` 属性の二段構え、`headers()` を使えない理由）
-  - 多言語ページを追加する手順と `proxy.ts` 編集時の禁止事項
-
+  - **`<aside>` の `self-start` を外すと sticky が一度も貼り付かない。** lint / 型 / テスト / build はすべて通る
+- **[static-html-and-search-params.md](./frontend/static-html-and-search-params.md)** - `useSearchParams()` と静的 HTML（#156）
+  - **境界を書かないとエラーにならず、いちばん近い `loading.tsx` が代役になって本体が静的 HTML から消える**
+- **[contact-form.md](./frontend/contact-form.md)** - お問い合わせフォームの送信可否と防御（#260 / #261）
+  - **設定が欠けていたら成功を返さない。** 2026-09-21 まで本番は1通も送らず「送信完了」と表示していた
+- **[layout-e2e.md](./frontend/layout-e2e.md)** - 実ブラウザの再発防止装置（Playwright。盤面 / ランドマーク / 404）
+  - **測ろうとしている値そのものを待たない。** 待つと #148 は「検出できない」に化ける
+- **[i18n-page-structure.md](./frontend/i18n-page-structure.md)** - 多言語ページの構成パターン（next-intl・メッセージ分割・リンク・`lang`）
 - **[page-transition.md](./frontend/page-transition.md)** - ページ遷移アニメーションと View Transitions API
-  - `template.tsx` に `<ViewTransition>` を 1 箇所置けば全ページに効く（`page.tsx` 個別対応は不要）
-  - View Transition が走るのは `<Link>` / `router.push()` のみ。戻る・進む（popstate）は React が仕様上必ずスキップする
-  - 履歴遷移は `.page-enter-history` の CSS アニメーションで enter だけ再現。**popstate リスナはモジュール評価時登録が必須**（`useEffect` だと2回目以降動かない）
-  - **`next` のアップグレード時は履歴遷移の再検証が必須。** 登録順は Next.js 内部の挙動依存で、崩れると無演出に戻るだけなので CI では検出できない（`next` は `16.1.0` 固定）
-  - **リスナの多重登録を `window` フラグで抑止してはいけない。** ハンドラは冪等で重複は無害。抑止すると HMR 後に新インスタンスの `record` が孤立し、開発時だけ無演出になる（静的解析ツールが繰り返し指摘してくる）
-  - **発火範囲はルート直下セグメントの stateKey 単位。** `/about` ↔ `/access` はリンクでも無演出（検証で踏むと誤判定する）
-  - **BFCache 復帰は実機 Chrome で検証済み（2026-08-10）。** `pageshow.persisted: true` / 同一 DOM ノード / `.page-enter-history` なしを実測
-  - **View Transition 中（合計 0.3 秒）はページ全体がクリックを受け付けない** — `pointer-events` では回避できない仕様
-  - `::view-transition-*` は React の `<ViewTransition>` が無いと発火しない
-  - CSS の落とし穴（root 停止時の `mix-blend-mode`、ワイルドカードセレクタ）
-  - `@supports not (view-transition-name: a)` はモダンブラウザで逆効果になるアンチパターン
-  - `experimental.viewTransition` は next@16.1.0 では読まれていない死に設定（警告も出ない）
-  - **Issue #39 の誤診** — `<div hidden id="S:0">` は rAF 停止時の Suspense 差し込み待ち
-  - 可視性の計測は要素単体ではなく祖先すべてを見る（`display: none` は子孫の computed 値を変えない）
-  - 自動化環境での view transition は `visibilityState` で挙動が割れる（`hidden` のみスキップされ `ready` が reject）
+  - **popstate リスナはモジュール評価時に登録する**（`useEffect` だと2回目以降動かない）。`next` を上げたら履歴遷移を再検証する
 
 ## 更新手順（PDCA）
 
 1. PLAN: 既存の配置と命名を本索引で確認し、追加箇所を決める。
-2. DO: 対応するサブディレクトリに Markdown を作成・更新し、本索引へ追記。
+2. DO: 対応するサブディレクトリに Markdown を作成・更新し、本索引へ1行（＋要点最大2行）を追記。
 3. CHECK: `pnpm check:doc-links` で相対リンクの切れを落とし、`#anchor`・命名・重複・文責の整合を目で確認。
 4. ACTION: 改善点を洗い出し、必要ならルールやテンプレートを強化する。
 
 ---
 
-**最終更新日**: 2026-09-30
+**最終更新日**: 2026-09-30（各項目を要点最大2行へ圧縮し、ディレクトリ構成の図を削除）

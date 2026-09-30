@@ -98,6 +98,9 @@ pnpm check:images
 
 # assets/source/ の原画像を表示寸法の AVIF へ焼き直す（生成物はコミットする）
 pnpm images:optimize
+
+# ドキュメントを分割・圧縮したとき、元ファイルの行が残っているかを列挙する（合否は判定しない。docs/INDEX.md の運用原則）
+pnpm docs:split-check <元ファイル> <分割後のファイル...>
 ```
 
 ### ブランチ戦略
