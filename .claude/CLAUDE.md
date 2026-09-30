@@ -156,7 +156,7 @@ secrets もビルド成果物も要求しないため、**fork からの PR で�
 動的404は生HTML 0個・ライブDOM 1個）。
 **新しいルートを足したら `e2e/landmarks/route-sweep.spec.ts` の表へ1行足すこと。**
 このジョブも secrets を要求しないため、fork からの PR でも同じ判定が出る。
-**`Build Check` は fork の PR では secrets が届かず、落ちずに空データのまま緑になる**（末尾の検査は `NOTE` で空振りする。#352）。
+**`Build Check` は secrets と公開フラグが空なら先頭ステップで落ちる。ただし fork の PR は例外で、空データのまま緑になる**（#352）。
 設計は [`docs/frontend/layout-e2e.md`](../docs/frontend/layout-e2e.md) を参照。
 
 ### ビルド末尾の検査
@@ -176,7 +176,7 @@ secrets もビルド成果物も要求しないため、**fork からの PR で�
 2本目は microCMS の画像が1枚もHTMLに出ないときで、それぞれログに `SKIP` / `NOTE` を出す。
 **その行が出ているときは、検査が効いていないと考えること。**
 なお2本目は**公開フラグが全て false でも空振りしない**（協賛企業はフラグ非依存）。
-`NOTE` が出たら「協賛の取得が0件」を疑うこと。**CI で出たら secrets の置き場所を疑う**（Repository secrets に置く。Environment secrets は `environment:` の無いジョブから空に見える。#352）。
+`NOTE` が出たら「協賛の取得が0件」を疑うこと。**CI で出たら microCMS の取得結果を疑う**（資格情報の空は先頭ステップが落とす。#352）。
 3本目は全事前描画HTMLの `<head>` を対象にするため、HTMLが1枚でもあれば空振りしない。
 4本目は詳細ページが1枚も事前描画されていないとき（公開フラグ false・microCMS 未設定）に `NOTE` を出す。
 
