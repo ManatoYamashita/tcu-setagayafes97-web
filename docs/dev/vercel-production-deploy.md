@@ -116,18 +116,26 @@ gh api "repos/ManatoYamashita/tcu-setagayafes97-web/commits/<sha>/statuses" \
 # "Deployment rate limited — retry in 24 hours." なら上限。何も無ければ取りこぼし
 ```
 
-**上限のときは、枠が空くまで待つしかない。** 窓は 24時間のローリングなので、直近24時間のデプロイ数から
-空く時刻を見積もれる（GitHub の deployments の件数で数える。Vercel の数え方と一致する保証は無い）。
+**上限のときは待つ。ただし、いつ空くかは読めない。** 窓は 24時間のローリングだが、Vercel が実際に通すかどうかは
+GitHub に残るデプロイの記録を数えても予測できなかった。2026-09-30〜10-01 の実例:
 
-```bash
-since=$(date -u -v-24H +%Y-%m-%dT%H:%M:%SZ)   # macOS の date。GNU なら date -u -d '24 hours ago' ...
-gh api --paginate "repos/ManatoYamashita/tcu-setagayafes97-web/deployments?per_page=100" \
-  --jq ".[] | select(.created_at >= \"$since\") | .created_at" | sort > /tmp/dep.txt
-wc -l < /tmp/dep.txt   # 100 以上なら上限。古い順に (件数 − 99) 件目の時刻 + 24時間 で1件ぶん空く
-```
+| コミット時刻（JST） | 出来事                                                                                              |
+| ------------------- | --------------------------------------------------------------------------------------------------- |
+| 09-30 23:22         | #367 のマージから `rate limited`。本番は #364 で止まる                                              |
+| 09-30 23:24         | `docs/events-schema-open-time` の push が `rate limited`                                            |
+| **09-30 23:38**     | **`feature/sponsors-logo-panel` の Preview は完了した**（上限の最中に通った）                       |
+| 09-30 23:45         | `refactor/remove-visible-flags` の push が `rate limited`                                           |
+| **10-01 00:27**     | **#373 のマージの Production が完了**（作成 00:27:56）。止まっていた #367 / #369 もこれで本番に出た |
 
-- **待っている間は push を控える。** push のたびに Preview が作られ、空く時刻が後ろへずれる
-- 枠が空いたら「取りこぼしからの復旧」の手順で `main` を本番へ出す。**その間にマージされた他の PR も一緒に出る**
+GitHub の記録（直近24時間で 114 件）から見積もった「空く時刻」は 10-01 15:49 で、**実際より約15時間遅かった。**
+
+**待ち方: 次のマージ（または push）の Vercel ステータスが通るかを見る。** 通れば `main` の先端が本番になり、
+止まっていたマージもまとめて出る（Vercel はブランチの先端をデプロイするため）。
+
+- **待っている間は push を控える。** push のたびに Preview が作られる
+- 次のマージを待たずに本番を最新にしたいときだけ、「取りこぼしからの復旧」の手順（CLI）を試す。**その間にマージされた他の PR も一緒に出る**
+- 上限に近いかは直近24時間の件数で分かる（空く時刻の予測には使えない）:
+  `gh api --paginate "repos/ManatoYamashita/tcu-setagayafes97-web/deployments?per_page=100" --jq ".[] | select(.created_at >= \"$(date -u -v-24H +%FT%TZ)\") | .id" | wc -l`
 - CLI の `vercel deploy --prod` がこの上限を受けるかは確認していない（2026-06-17 に
   [CLI 固有の上限は撤廃された](https://vercel.com/changelog/cli-deployment-limits-removed) が、1日100件の枠との関係は書かれていない）
 
@@ -282,4 +290,4 @@ curl -s https://<production deployment url>/robots.txt | grep Sitemap
 
 ---
 
-**最終更新日**: 2026-10-01（ci-env.md から分割し、デプロイ数の上限で止まったときの手順を追加）
+**最終更新日**: 2026-10-01（ci-env.md から分割し、デプロイ数の上限で止まったときの手順を追加。空く時刻は読めないことを実例で追記）
