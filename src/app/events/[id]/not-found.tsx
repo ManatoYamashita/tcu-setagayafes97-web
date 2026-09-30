@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
+import { AppImage } from "@/components/ui/AppImage";
+import { notFoundPageContent } from "@/data/not-found";
 import { pageHeroes } from "@/data/page-heroes";
 
 /**
@@ -9,12 +11,24 @@ import { pageHeroes } from "@/data/page-heroes";
  * 以前の濃紫グラデーションの上では、本文が 3.4〜3.6:1、「404」の数字（primary-700）が
  * 1.75:1 しかなかった（#149。2026-09-23 に本番の画素で実測）。
  * スキップリンクの遷移先 `<main id="content">` は `PageSheetLayout` が出す。
+ *
+ * 歯車のイラストはグローバル404（`src/app/not-found.tsx`）と同じ画像を使う。
+ * microCMS に企画が無いときの404だけ、URL違いの404と見た目が揃っていなかった。
  */
 export default function EventDetailNotFound() {
   return (
     <PageSheetLayout hero={pageHeroes.events}>
       <div className="container mx-auto px-4 py-24">
         <div className="mx-auto max-w-md text-center">
+          <div data-event-not-found-illustration className="mx-auto mb-6 w-full max-w-48">
+            <AppImage
+              src={notFoundPageContent.illustration.src}
+              alt={notFoundPageContent.illustration.alt}
+              width={notFoundPageContent.illustration.width}
+              height={notFoundPageContent.illustration.height}
+              className="h-auto w-full"
+            />
+          </div>
           <div className="mb-6 text-6xl font-bold text-primary-700">404</div>
           <h2 className="mb-4 text-2xl font-bold text-gray-900">企画が見つかりません</h2>
           <p className="mb-8 text-gray-700">
