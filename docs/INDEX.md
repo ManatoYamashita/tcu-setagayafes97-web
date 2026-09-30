@@ -31,6 +31,7 @@ docs/
 │   ├── seo-metadata.md # 共通metadata・canonical・構造化データ・sitemap の方針
 │   ├── legacy-site-deindex.md # 過去回サイト群を検索結果から恒久除外する運用手順
 │   ├── microcms.md   # microCMS API 制約と実装パターン
+│   ├── microcms-fetch-failures.md # 取得に失敗したときの扱い（404 と一時的な失敗の区別）
 │   ├── event-sessions.md # 企画の開催枠（2部制）の入稿と正規化の契約
 │   ├── content-revalidation.md # microCMS Webhook によるオンデマンド再検証と運用手順
 │   └── draft-preview.md # microCMS 画面プレビューによる下書きの実機確認
@@ -223,6 +224,12 @@ docs/
   - **管理画面はブラウザ自動操作で編集できない。** 種類選択が実マウスイベントに依存し、スクリプトでは別の行へ適用される
   - **手で控えた `draftKey` は使えない**（保存のたびに失効する）。画面プレビュー経由なら失効しない → [draft-preview.md](./dev/draft-preview.md)
   - **「一時的に公開して確認」はもう使えない。** 公開フラグが4本とも `true` になり、公開すれば本番に出る
+
+- **[microcms-fetch-failures.md](./dev/microcms-fetch-failures.md)** - microCMS の取得に失敗したときの扱い（#287）
+  - **`null` / `[]` に潰してよいのは microCMS が 400 / 404 を返したときだけ。** 429 / 5xx は投げる。潰すと実在ページが 404 で生成されてもビルドが成功する（修正前の注入で 99 ページ）
+  - **ISR の再生成でも正常なキャッシュが 404 に置き換わっていた。** 修正後は時間ベースなら古いページを維持、Webhook 直後は 500 で回復後に自動で正常化
+  - **SDK の `retry: true` は Next.js の中で効かない。** 同じ URL の GET が描画内で重複排除され、最初の 429 が返り続ける。再試行は `microcmsGet()` が持つ
+  - **注入で検証するときは `.next/cache/fetch-cache` を先に消す。** 残っていると microCMS を1本も叩かずにビルドが通る
 
 - **[draft-preview.md](./dev/draft-preview.md)** - 下書きの実機確認（microCMS 画面プレビュー）
   - 編集画面の「画面プレビュー」から、本番と同じ詳細ページで下書きを表示する仕組み。対象は `events` と `news`

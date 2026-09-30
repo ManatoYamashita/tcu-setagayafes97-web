@@ -321,6 +321,13 @@ curl -sS -w '\n%{http_code}\n' -X POST https://setagayafes.org/api/revalidate \
 - **トップの「おすすめ企画」は再検証のたびに並びが変わる。**
   `getFeaturedEvents()` が毎レンダーでシャッフルする仕様のため（`src/lib/events.ts`）。
 
+## 再生成中に microCMS が失敗したとき
+
+取得関数は 429 / 5xx を投げる（#287）。時間ベース ISR では再生成が失敗して**古いページが残り**、
+Webhook 直後は **500 がキャッシュされずに返り**、microCMS が戻った最初のアクセスで正常化する。
+以前は両経路とも**正常なページが 404 に置き換わり、回復後も残っていた**（2026-09-30 実測）。
+詳細は [microcms-fetch-failures.md](./microcms-fetch-failures.md)。
+
 ## microCMS を読むページを増やすとき
 
 `src/lib/revalidate-targets.ts` の対応表を**同じコミットで**更新すること。
@@ -338,6 +345,7 @@ grep -rn 'from "@/lib/\(events\|news\|informations\)"' src/
 ## 関連ドキュメント
 
 - [docs/dev/microcms.md](./microcms.md) — microCMS API の制約と実装パターン
+- [docs/dev/microcms-fetch-failures.md](./microcms-fetch-failures.md) — 取得に失敗したときの扱い（#287）
 - [docs/dev/ci-env.md](./ci-env.md) — 環境変数の登録先と Vercel の本番反映
 - [.claude/CLAUDE.md](../../.claude/CLAUDE.md) — プロジェクト全体のガイド
 
