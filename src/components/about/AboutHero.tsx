@@ -159,19 +159,19 @@ export function AboutHero() {
       {/* Layer 1: 上マスク（gray-50で覆う） */}
       <div
         ref={upperMaskRef}
-        className="absolute inset-x-0 top-0 z-[1] bg-gray-50"
+        className="absolute inset-x-0 top-0 z-10 bg-gray-50"
         style={{ bottom: "55%" }}
       />
 
       {/* Layer 1: 下マスク（gray-50で覆う） */}
       <div
         ref={lowerMaskRef}
-        className="absolute inset-x-0 bottom-0 z-[1] bg-gray-50"
+        className="absolute inset-x-0 bottom-0 z-10 bg-gray-50"
         style={{ top: "45%" }}
       />
 
       {/* Layer 2: 右下テキストブロック — 「97」を主役にした縦積みレイアウト */}
-      <div className="absolute bottom-20 right-6 z-10 text-right sm:bottom-16 sm:right-8 lg:bottom-20 lg:right-12">
+      <div className="absolute bottom-20 right-6 z-20 text-right sm:bottom-16 sm:right-8 lg:bottom-20 lg:right-12">
         <h1 ref={titleRef} className="leading-tight" style={{ fontFamily: "var(--font-sans)" }}>
           <span className="block text-2xl font-semibold tracking-[0.08em] text-gray-900 sm:text-3xl lg:text-4xl">
             第
@@ -227,7 +227,7 @@ export function AboutHero() {
       {/* Layer 2: スクロールインジケーター */}
       <div
         ref={scrollRef}
-        className="absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 sm:flex"
+        className="absolute bottom-6 left-1/2 z-20 hidden -translate-x-1/2 flex-col items-center gap-2 sm:flex"
         role="presentation"
         aria-label={scrollIndicator}
       >

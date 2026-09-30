@@ -142,7 +142,7 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
 
                     {/* ブラー境界のぼかし（グラデーションマスク） */}
                     <div
-                      className="pointer-events-none absolute inset-x-0 bottom-0 z-[9] rounded-b-3xl backdrop-blur-md"
+                      className="pointer-events-none absolute inset-x-0 bottom-0 z-10 rounded-b-3xl backdrop-blur-md"
                       style={{
                         top: "40%",
                         maskImage: "linear-gradient(to bottom, transparent 0%, black 35%)",
@@ -154,13 +154,13 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
                     {/* 可読性オーバーレイ（濃い紫）。ブラー層より上から始める理由と
                         停止位置の根拠は globals.css の .featured-card-overlay を参照 */}
                     <div
-                      className="featured-card-overlay pointer-events-none absolute inset-x-0 bottom-0 z-[9] rounded-b-3xl"
+                      className="featured-card-overlay pointer-events-none absolute inset-x-0 bottom-0 z-10 rounded-b-3xl"
                       style={{ top: "25%" }}
                       aria-hidden="true"
                     />
 
                     {/* コンテンツ（下部） */}
-                    <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col rounded-b-3xl p-5">
+                    <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col rounded-b-3xl p-5">
                       {/* タイトル */}
                       <h3 className="text-base font-bold leading-snug text-white line-clamp-2 sm:text-lg">
                         {event.title}
