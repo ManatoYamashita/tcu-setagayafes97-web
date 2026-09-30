@@ -28,7 +28,7 @@ import { test, expect, type Page } from "@playwright/test";
  *
  * ## 秘密情報を要求しない
  *
- * microCMS を読む関数はすべて `isMicrocmsConfigured` で門を閉じ、失敗時も `[]` / `null` を
+ * microCMS を読む関数はすべて `isMicrocmsConfigured` で門を閉じ、未設定なら問い合わせずに `[]` / `null` を
  * 返す（`src/lib/{news,events,sponsors}.ts`）。したがって secrets 無しでも全ルートが
  * 描画される。**fork からの PR でも結果が出る**という Layout E2E の性質を壊さない。
  *
