@@ -284,10 +284,10 @@ microCMS の入稿は **Webhook 経由で十数秒（実測10〜15秒）**で本
 [`docs/dev/content-revalidation.md`](../docs/dev/content-revalidation.md)、検証と障害切り分けは
 [`docs/dev/content-revalidation-ops.md`](../docs/dev/content-revalidation-ops.md) を参照。
 
-| 系統 | 手段                                                                  | 反映まで                     |
-| ---- | --------------------------------------------------------------------- | ---------------------------- |
-| 主系 | microCMS Webhook → `POST /api/revalidate` → `revalidatePath()`        | 十数秒（実測10〜15秒）       |
-| 保険 | microCMS を読むページとサイトマップの `export const revalidate = 600` | 10分経過後のアクセスで再生成 |
+| 系統 | 手段                                                                               | 反映まで                     |
+| ---- | ---------------------------------------------------------------------------------- | ---------------------------- |
+| 主系 | microCMS Webhook → `POST /api/revalidate` → `revalidatePath()` / `revalidateTag()` | 十数秒（実測10〜15秒）       |
+| 保険 | microCMS を読むページとサイトマップの `export const revalidate = 600`              | 10分経過後のアクセスで再生成 |
 
 **microCMS の Webhook は失敗しても再送されない。** 時間ベース ISR はその取りこぼしを拾う保険であり、
 `revalidate` 宣言を消してはいけない。
@@ -296,7 +296,7 @@ microCMS の入稿は **Webhook 経由で十数秒（実測10〜15秒）**で本
 > **microCMS を読むページを増やしたら、[`src/lib/revalidate-targets.ts`](../src/lib/revalidate-targets.ts)
 > の対応表も同じコミットで更新すること。** 漏れてもエラーにはならず、そのページだけ静かに古いまま残る。
 > ページ本体の import だけでなく、**そのページが描画する Server Component が読むデータも数える**
-> （`/` の `SponsorBanner` や `FeaturedEvents` がその例）。
+> （`/` の `FeaturedEvents` がその例）。共通 Footer の `SponsorBanner` は `sponsors` キャッシュタグで全ルートを失効させる。
 
 `revalidatePath` はパスの API ではなく**タグの API** である。次の3つはエラーにならず静かに no-op になる。
 

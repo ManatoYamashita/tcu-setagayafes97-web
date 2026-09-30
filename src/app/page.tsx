@@ -3,7 +3,6 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { NewsSection } from "@/components/home/NewsSection";
 import { FeaturedEvents } from "@/components/home/FeaturedEvents";
 import { SpecialGuestSection } from "@/components/special/SpecialGuestSection";
-import { SponsorBanner } from "@/components/home/SponsorBanner";
 import { getLatestHeroNews, getNewsList } from "@/lib/news";
 import { NEWS_VISIBLE, siteConfig } from "@/data/site";
 import { createHomeStructuredData, serializeJsonLd } from "@/lib/structured-data";
@@ -41,7 +40,6 @@ export default async function Home() {
       </div>
       <NewsSection newsList={newsList} isVisible={NEWS_VISIBLE} />
       <FeaturedEvents />
-      <SponsorBanner />
     </main>
   );
 }

@@ -1,14 +1,12 @@
 import Link from "next/link";
 import { sponsorBannerCta } from "@/data/sponsors";
 import { getSponsorsList } from "@/lib/informations";
-import { SponsorLogoLoopLoader } from "./SponsorLogoLoopLoader";
+import { SponsorLogoLoopLoader } from "@/components/home/SponsorLogoLoopLoader";
 
 /**
- * 協賛企業バナーセクション（サーバーコンポーネント）
+ * 協賛企業バナー（サーバーコンポーネント）
  * データ取得のみ担当し、表示はクライアントコンポーネントに委譲
- *
- * ロゴ帯の下に一覧ページ（/about/sponsors）への CTA を置く。ロゴ帯は流れ続けるうえ、
- * 各ロゴはモーダルを開くボタンなので、全件を落ち着いて見られる導線はこの CTA だけになる。
+ * ロゴ帯の下に一覧ページへの CTA を置く
  */
 export async function SponsorBanner() {
   const sponsors = await getSponsorsList();
@@ -40,7 +38,7 @@ export async function SponsorBanner() {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M17 8l4 4m0 0l-4 4m4-4H3"
+              d="M17 8l4 4m0 0-4 4m4-4H3"
             />
           </svg>
         </Link>

@@ -18,7 +18,7 @@ git add .
 
 # OK
 git status --short                     # まず全体を見る
-git add src/app/globals.css src/components/home/SponsorBanner.tsx
+git add src/app/globals.css src/components/layout/SponsorBanner.tsx
 git diff --cached --name-only          # ステージした内容を確認してからコミット
 ```
 

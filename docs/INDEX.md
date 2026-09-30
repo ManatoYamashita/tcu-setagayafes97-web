@@ -51,7 +51,7 @@
 - **[git.md](./dev/git.md)** - ブランチ運用・CI・コミット規約・Hotfix・トラブルシューティング
   - **命名規則から外れたブランチでは push 時の CI が走らない。** CI は PR を自動作成しない
   - **CI のジョブを分ける基準は「`pnpm install` 以外に何を要求するか」**
-- **[staging-and-merge.md](./dev/staging-and-merge.md)** - ステージングの規約とマージ前チェックリスト
+- **[staging-and-merge.md](./dev/staging-and-merge.md)** - ステージングの規約とマージ前チェックリスト（実在するファイルを使ったステージング例を含む）
   - **`git add -A` / `git add .` は禁止。** 複数エージェントが同じ作業ツリーを触るため、別作業を無差別に取り込む
   - **`CLEAN` はマージでファイルが消えないことを保証しない。** `merge-tree` で消えるファイルを見る
 - **[testing.md](./dev/testing.md)** - テスト方針（何をユニットテストにし、何を実ブラウザに回すか。#157）
@@ -82,7 +82,7 @@
   - **時刻欄は `HH:mm` だけ。** 開場時刻などを書き添えると、タイムテーブルと構造化データから黙って消える。開場時刻の置き場は `special.openTime`
 - **[draft-preview.md](./dev/draft-preview.md)** - microCMS の画面プレビューで下書きを本番と同じ詳細ページに出す仕組み
   - **`draftKey` を `searchParams` で受け取らない。`cookies()` を無条件に呼ばない。** どちらもルートが動的化して ISR が失われる
-- **[content-revalidation.md](./dev/content-revalidation.md)** - Webhook によるオンデマンド再検証の仕組みと microCMS 側の設定
+- **[content-revalidation.md](./dev/content-revalidation.md)** - Webhook によるオンデマンド再検証の仕組みと microCMS 側の設定。共通 Footer の協賛バナーは `sponsors` タグで全ルートへ反映
   - **`revalidatePath` はパスではなくタグの API。** 書き方を誤るとエラーにならず何もしない
   - **削除・公開終了の通知タイミングは既定 OFF。** ON にしないと「消したのに残る」
 - **[content-revalidation-ops.md](./dev/content-revalidation-ops.md)** - 再検証の検証手順と障害切り分け
