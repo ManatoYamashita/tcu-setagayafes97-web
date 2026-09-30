@@ -1,17 +1,25 @@
 import type { Metadata } from "next";
+import { ExternalLink } from "lucide-react";
+import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
 import { AppImage } from "@/components/ui/AppImage";
-import Link from "next/link";
-import { Heart, ExternalLink } from "lucide-react";
+import { pageHeroes } from "@/data/page-heroes";
+import { sponsorsPageContent } from "@/data/sponsors";
 import { getSponsorsList } from "@/lib/informations";
-import type { Information } from "@/types/informations";
 import { createPageMetadata } from "@/lib/metadata";
+import { groupSponsorsForList } from "@/lib/sponsor-list";
+import { getChromeMessages } from "@/i18n/chrome-messages";
+import type { Information } from "@/types/informations";
+
+/** ページの呼称はカタログ1箇所で決める。フッターのリンク文言と同じ値を使う */
+const { sponsors: sponsorsLabel } = getChromeMessages("ja").navigation;
+
 /**
  * メタデータ
  */
 export const metadata: Metadata = createPageMetadata({
-  title: "協賛企業一覧",
+  title: sponsorsLabel,
   description:
-    "第97回東京都市大学世田谷祭を支援してくださる協賛企業様をご紹介します。心より感謝申し上げます。",
+    "第97回東京都市大学世田谷祭を支援してくださる協賛企業・団体の皆様をご紹介します。心より感謝申し上げます。",
   pathname: "/about/sponsors",
 });
 
@@ -21,131 +29,138 @@ export const metadata: Metadata = createPageMetadata({
 export const revalidate = 600;
 
 /**
- * 協賛企業一覧ページ
+ * 協賛・協力の一覧ページ
+ *
+ * トップと /about の協賛バー（SponsorBanner）の CTA から遷移してくる。
+ * 見出しはバーと同じ「協賛・協力」にそろえる。
  */
 export default async function SponsorsPage() {
-  // 協賛企業一覧を取得
   const sponsors = await getSponsorsList();
+  const { intro, countSuffix, emptyMessage } = sponsorsPageContent;
+  const { detailed, nameOnly } = groupSponsorsForList(sponsors);
 
   return (
-    <main
-      id="content"
-      tabIndex={-1}
-      className="min-h-screen bg-secondary focus-visible:outline-none"
-    >
-      {/* ページヘッダー */}
-      <div className="bg-secondary py-16 text-gray-900">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center gap-3">
-            <Heart className="h-10 w-10 md:h-12 md:w-12" />
-            <h1 className="text-4xl font-bold md:text-5xl">協賛企業</h1>
-          </div>
-          <p className="mt-4 text-center text-lg opacity-90">
-            第97回東京都市大学世田谷祭を支援してくださる企業様
-          </p>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-12">
-        <div className="mx-auto max-w-6xl">
-          {/* 感謝メッセージ */}
-          <section className="mb-12 rounded-lg border border-gray-200/20 bg-white/10 p-6 shadow-sm md:p-8">
-            <h2 className="mb-4 text-center text-2xl font-bold text-gray-900">協賛企業の皆様へ</h2>
-            <p className="text-center text-gray-900/90">
-              第97回
-              世田谷祭の開催にあたり、多大なるご支援を賜りました協賛企業の皆様に、心より感謝申し上げます。
-              <br />
-              皆様のご協力により、学生主体の素晴らしいイベントを実現することができております。
+    <PageSheetLayout hero={pageHeroes.sponsors} heroSize="compact">
+      <div className="mx-auto max-w-6xl py-4 md:py-8">
+        {/* 謝辞 */}
+        <div className="mx-auto max-w-3xl space-y-3 text-center leading-8 text-gray-700 md:text-lg md:leading-9">
+          {intro.map((paragraph) => (
+            <p key={paragraph} className="text-pretty [word-break:auto-phrase]">
+              {paragraph}
             </p>
+          ))}
+        </div>
+
+        {sponsors.length > 0 ? (
+          <section aria-labelledby="sponsor-list-heading" className="mt-12 md:mt-16">
+            <div className="mb-6 flex items-baseline justify-between gap-4 border-b border-gray-200 pb-3">
+              <h2 id="sponsor-list-heading" className="text-2xl font-bold text-gray-900">
+                協賛・協力一覧
+              </h2>
+              <p className="shrink-0 text-sm text-gray-600">
+                <span className="font-semibold text-gray-900 tabular-nums">{sponsors.length}</span>
+                {countSuffix}
+              </p>
+            </div>
+            {detailed.length > 0 && (
+              <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {detailed.map((sponsor) => (
+                  <li key={sponsor.id}>
+                    <SponsorCard sponsor={sponsor} />
+                  </li>
+                ))}
+              </ul>
+            )}
+            {nameOnly.length > 0 && (
+              <ul
+                className={`grid grid-cols-2 gap-3 lg:grid-cols-4 ${detailed.length > 0 ? "mt-6" : ""}`}
+              >
+                {nameOnly.map((sponsor) => (
+                  <li
+                    key={sponsor.id}
+                    className="flex min-h-20 items-center justify-center rounded-xl bg-gray-50 px-3 py-4 md:min-h-24"
+                  >
+                    <h3 className="text-center text-sm font-bold min-w-0 text-balance [overflow-wrap:anywhere] [word-break:auto-phrase] text-gray-900 md:text-base">
+                      {sponsor.title}
+                    </h3>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
-
-          {/* 協賛企業件数表示 */}
-          <div className="mb-6">
-            <p className="text-sm text-gray-900/80">
-              <span className="font-semibold text-gray-900">{sponsors.length}</span> 社の企業様
-            </p>
-          </div>
-
-          {/* 協賛企業一覧 */}
-          {sponsors.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {sponsors.map((sponsor) => (
-                <SponsorCard key={sponsor.id} sponsor={sponsor} />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-lg border border-gray-200/20 bg-white/10 p-12 text-center shadow-sm">
-              <p className="text-gray-900/60">現在、協賛企業情報は準備中です。</p>
-            </div>
-          )}
-        </div>
+        ) : (
+          <p className="mt-12 rounded-2xl bg-gray-50 p-12 text-center text-gray-600">
+            {emptyMessage}
+          </p>
+        )}
       </div>
-    </main>
+    </PageSheetLayout>
   );
 }
 
 /**
- * 協賛企業カードコンポーネント
+ * 協賛カード（画像・説明・URL のいずれかを持つ協賛）
+ *
+ * 画像の無い協賛はロゴ枠の中へ社名を置き、画像ありのカードと高さをそろえる（#332）。
+ * 社名しか持たない協賛はここへ来ない（`groupSponsorsForList` がタイル側へ振り分ける）。
  */
-interface SponsorCardProps {
-  sponsor: Information;
-}
-
-function SponsorCard({ sponsor }: SponsorCardProps) {
+function SponsorCard({ sponsor }: { sponsor: Information }) {
   const hasImage = Boolean(sponsor.image?.url);
-  const hasDetails = Boolean(sponsor.description || sponsor.url);
 
-  const CardContent = (
-    <div className="group h-full overflow-hidden rounded-lg border border-gray-200/20 bg-white/10 shadow-sm transition-[color,background-color,border-color,box-shadow] hover:border-gray-200 hover:shadow-lg">
-      {/* ロゴ。画像の無い協賛はロゴ枠の中へ社名を置き、画像ありのカードと高さをそろえる（#332） */}
+  const content = (
+    <>
       {sponsor.image?.url ? (
-        <div className="relative aspect-video w-full overflow-hidden bg-white/10">
+        <div className="relative aspect-video w-full overflow-hidden bg-gray-50">
           <AppImage
             src={sponsor.image.url}
             alt={sponsor.title}
             fill
-            className="object-contain p-6 transition-transform duration-300 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
+            className="object-contain p-6 transition-transform duration-300 motion-safe:group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
           />
         </div>
       ) : (
-        <div className="flex aspect-video w-full items-center justify-center bg-white/10 p-6">
-          <h3 className="text-center text-xl font-bold text-balance [word-break:auto-phrase] text-gray-900">
+        <div className="flex aspect-video w-full items-center justify-center bg-gray-50 p-6">
+          <h3 className="text-center text-lg font-bold min-w-0 text-balance [overflow-wrap:anywhere] [word-break:auto-phrase] text-gray-900">
             {sponsor.title}
           </h3>
         </div>
       )}
 
-      {(hasImage || hasDetails) && (
-        <div className="p-6">
-          {/* 企業名（画像の無い協賛はロゴ枠に出しているので重ねない） */}
-          {hasImage && <h3 className="mb-2 text-lg font-bold text-gray-900">{sponsor.title}</h3>}
-
-          {/* 説明文 */}
-          {sponsor.description && (
-            <p className="mb-4 line-clamp-3 text-sm text-gray-900/80">{sponsor.description}</p>
-          )}
-
-          {/* Webサイトリンク */}
-          {sponsor.url && (
-            <div className="mt-4 flex items-center gap-2 text-sm text-primary-700">
-              <ExternalLink className="h-4 w-4" />
-              <span className="group-hover:underline">Webサイトを見る</span>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+      <div className="flex flex-1 flex-col gap-2 p-5">
+        {/* 画像の無い協賛はロゴ枠に社名を出しているので重ねない */}
+        {hasImage && <h3 className="text-lg font-bold text-gray-900">{sponsor.title}</h3>}
+        {sponsor.description && (
+          <p className="line-clamp-3 text-sm leading-6 text-gray-600">{sponsor.description}</p>
+        )}
+        {sponsor.url && (
+          <span className="mt-auto inline-flex items-center gap-1.5 pt-2 text-sm font-semibold text-primary-700">
+            <ExternalLink className="h-4 w-4" aria-hidden="true" />
+            <span className="hoverable:group-hover:underline">
+              {sponsorsPageContent.websiteLabel}
+            </span>
+            <span className="sr-only">（新しいタブで開きます）</span>
+          </span>
+        )}
+      </div>
+    </>
   );
 
-  // URLがある場合はリンク、ない場合は通常のdiv
+  const cardClassName =
+    "flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white";
+
   if (sponsor.url) {
     return (
-      <a href={sponsor.url} target="_blank" rel="noopener noreferrer" className="block h-full">
-        {CardContent}
+      <a
+        href={sponsor.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`group ${cardClassName} transition-[border-color,box-shadow] hoverable:hover:border-primary-300 hoverable:hover:shadow-md focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600`}
+      >
+        {content}
       </a>
     );
   }
 
-  return <div>{CardContent}</div>;
+  return <div className={cardClassName}>{content}</div>;
 }

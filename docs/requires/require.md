@@ -335,11 +335,11 @@ interface Information {
 - 静的コンテンツ
 - 委員長写真、メッセージ
 
-#### 4.7.2 協賛企業一覧 (/about/sponsors)
+#### 4.7.2 協賛・協力 (/about/sponsors)
 
-- Informations APIから取得（category: 'sponsor'）
-- ロゴ表示、リンク付き（任意）
-- 約30社想定
+- Informations APIから取得（category: 'sponsor'）。約30社想定
+- 画像・説明・URL のいずれかを持つ協賛はロゴ付きカード（リンクは任意）、社名しか無い協賛は小さなタイルで並べる（`src/lib/sponsor-list.ts`。#337）
+- 導線: トップと `/about` の協賛バー（`SponsorBanner`）の CTA、フッターの「委員会について」節
 
 #### 4.7.3 お問い合わせフォーム (/info/contact)
 
