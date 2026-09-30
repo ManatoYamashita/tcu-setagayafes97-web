@@ -11,11 +11,17 @@
 
 ## ファイル一覧
 
-| ファイル            | 対象API                       | 実機との照合           |
-| ------------------- | ----------------------------- | ---------------------- |
-| `news.json`         | News API（お知らせ）          | ✅ 2026-08-16 照合済み |
-| `events.json`       | Events API（企画）            | ✅ 2026-08-16 照合済み |
-| `informations.json` | Informations API（協賛・FAQ） | ✅ 2026-08-16 照合済み |
+| ファイル            | 対象API                       | 実機との照合                         |
+| ------------------- | ----------------------------- | ------------------------------------ |
+| `news.json`         | News API（お知らせ）          | ⚠️ 2026-08-16 照合（要再照合。下記） |
+| `events.json`       | Events API（企画）            | ✅ 2026-09-30 エクスポートで置換     |
+| `informations.json` | Informations API（協賛・FAQ） | ⚠️ 2026-08-16 照合（要再照合。下記） |
+
+> [!WARNING]
+> **2026-08-16 の「照合済み」は、`events.json` では必須設定が5項目食い違っていた**（2026-09-30 のエクスポートで判明。
+> 詳細は「Events API」節）。同じ日に照合した `news.json` / `informations.json` も同じ誤りを含む可能性があるので、
+> 次にそれらの API を触るときはエクスポートで置き換えること。**手で書き写さず、エクスポートをそのまま整形して置く**
+> （`pnpm exec prettier --write microcms/<api>.json`）。
 
 > [!NOTE]
 > **`select` の値はいずれの API も `値 : ラベル` 形式**（例: `urgent : 緊急`）で登録されています。
@@ -86,36 +92,39 @@ else links.website = sns;
 
 ### Events API (events.json)
 
-**実機と照合済み（2026-08-16）**
+**実機のエクスポートで置き換え済み（2026-09-30）。** `events.json` は管理画面「API設定 > APIスキーマ > この設定をエクスポートする」の出力をそのまま整形したもので、`selectItems[].id` も実機の値です。
 
 | フィールドID | 表示名           | 型           | 必須 | 備考                                                                                                                                                                                           |
 | ------------ | ---------------- | ------------ | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | date         | 開催日           | select       | ✓    | `day1 : 10月31日（土）` 形式（値 : ラベル）                                                                                                                                                    |
-| type         | 企画タイプ       | select       | ✓    | room / stage / store / special / other                                                                                                                                                         |
-| place        | 場所             | text         | ✓    |                                                                                                                                                                                                |
-| building     | 建物番号         | text         |      | **未入力運用。** 実データ18件すべてが空のため、検索・絞り込みは `place` から導出する → [docs/frontend/events-search.md](../docs/frontend/events-search.md)                                     |
-| title        | タイトル         | text         | ✓    |                                                                                                                                                                                                |
-| organizer    | 主催団体         | text         | ✓    |                                                                                                                                                                                                |
+| type         | 企画タイプ       | select       | ✓    | room / stage / special / store / other。**`store` だけ値が `store: 模擬店`（コロンの前に空白が無い）**。取り出しは trim するので影響しない                                                     |
+| title        | タイトル         | text         |      | 実機では任意（実データは全件入力済み）                                                                                                                                                         |
 | thumbnail    | サムネイル       | media        |      | 正方形ロゴは 624px 四方、写真は 1400px 幅を推奨。縦横比が表示の分岐を決める → [docs/dev/microcms.md](../docs/dev/microcms.md)                                                                  |
-| description  | 概要             | textArea     | ✓    |                                                                                                                                                                                                |
-| content      | 詳細             | richEditorV2 | ✓    |                                                                                                                                                                                                |
-| startTime    | 開始時刻         | text         |      |                                                                                                                                                                                                |
-| endTime      | 終了時刻         | text         |      |                                                                                                                                                                                                |
-| sessions     | 開催枠           | repeater     |      | → `session`。**任意のまま運用する**（必須にすると既存企画が保存できなくなる）。値があれば `startTime` / `endTime` より優先 → [docs/dev/event-sessions.md](../docs/dev/event-sessions.md)。#281 |
+| description  | 概要             | textArea     |      | 実機では任意。**開場時刻などの補足はここへ書く**（時刻欄には書かない。#305）                                                                                                                   |
+| organizer    | 主催団体         | text         |      | 実機では任意                                                                                                                                                                                   |
+| content      | 詳細             | richEditorV2 |      | 実機では任意                                                                                                                                                                                   |
+| place        | 場所             | text         |      | 実機では任意（実データは全件入力済み。建物・ステージの導出はこの欄が頼り）                                                                                                                     |
+| building     | 建物番号         | text         |      | **未入力運用。** 実データ18件すべてが空のため、検索・絞り込みは `place` から導出する → [docs/frontend/events-search.md](../docs/frontend/events-search.md)                                     |
+| startTime    | 開始時刻         | text         |      | **入力制限 `^(([01]?[0-9]\|2[0-3]):[0-5][0-9])?$`**（HH:mm か空欄のみ。#305）                                                                                                                  |
+| endTime      | 終了時刻         | text         |      | 同上                                                                                                                                                                                           |
 | sns          | SNS              | text         |      | カスタムフィールドではない（上記参照）                                                                                                                                                         |
 | special      | 著名人企画の詳細 | custom       |      | → `specialDetail`。#70                                                                                                                                                                         |
+| sessions     | 開催枠           | repeater     |      | → `session`。**任意のまま運用する**（必須にすると既存企画が保存できなくなる）。値があれば `startTime` / `endTime` より優先 → [docs/dev/event-sessions.md](../docs/dev/event-sessions.md)。#281 |
+
+> [!WARNING]
+> **2026-09-30 のエクスポートまで、この表と `events.json` は `title` / `organizer` / `description` /
+> `content` / `place` を必須としていたが、実機ではすべて任意だった。** いつから食い違っていたかは不明
+> （2026-08-16 の照合時点の記録が誤っていたのか、その後に外されたのかは追えない）。
+> 実データは全件入力済みだが、**未入力の企画が保存できる状態である**ことを前提にコードを書くこと
+> （`src/lib/events.ts` の正規化と `resolveBuildingId()` はすでに空欄を受け付ける）。
 
 > [!NOTE]
 > `select` の値は `day1 : 10月31日（土）` のように **`値 : ラベル`** 形式で登録されています。
-> コード側は `src/lib/events.ts` で `split(":")` して先頭を取り出しています。
+> コード側は `src/lib/microcms-select.ts` の `readSelectKey()` で `:` より前を取り出しています。
 > ラベルだけを変更する分にはコードへの影響はありません。
 
 > [!IMPORTANT]
-> **`type` の `store : 模擬店` は、実機の入稿データから確認して 2026-09-06 に追記したものです。**
-> 本ファイルの `selectItems[].id` は microCMS が生成する不透明値ですが、`store` の行だけは
-> 実機の id を取得できていないため仮の値（`store-slot`）が入っています。このJSONを
-> インポートし直す用途では問題ありませんが、**実機の id と一致はしません。**
->
+> **`type` の `store` は 2026-09-06 に実機の入稿データから見つけて追記したものです。**
 > それ以前は `store` がスキーマ写しにも `EventType` にも無く、`normalizeEventType()` の
 > ホワイトリストから漏れて**エラーも警告も出さずに `other` へ落ちていました。**
 > 選択肢を増やしたら `src/types/events.ts` / `src/lib/events.ts` / `src/data/filter-options.ts`
@@ -123,17 +132,13 @@ else links.website = sns;
 
 **カスタムフィールド（開催枠 / #281）**
 
-`session` — 開催枠1つ（`events.sessions` から参照）
+`session` — 開催枠1つ（`events.sessions` から参照）。管理画面の並びは 開始時刻 → 終了時刻 → 日程
 
 | フィールドID | 表示名   | 型     | 必須 | 備考                                                                                                    |
 | ------------ | -------- | ------ | ---- | ------------------------------------------------------------------------------------------------------- |
+| startTime    | 開始時刻 | text   |      | 入力制限はトップレベルの `startTime` と同じ                                                             |
+| endTime      | 終了時刻 | text   |      | 同上                                                                                                    |
 | date         | 日程     | select |      | `day1` / `day2`。**値があればその枠はその日だけに出る**。両日開催で日ごとに時刻が違う企画のため（#305） |
-| startTime    | 開始時刻 | text   |      |                                                                                                         |
-| endTime      | 終了時刻 | text   |      |                                                                                                         |
-
-> [!NOTE]
-> `date` の `selectItems[].id`（`session-day1-slot` / `session-day2-slot`）は仮の値です（`store-slot` と同じ扱い）。
-> 管理画面でフィールドを作成したあと、エクスポートした実機の id に差し替えてください。
 
 **カスタムフィールド（著名人企画LP用 / #70）**
 
