@@ -339,8 +339,9 @@ body {
     contain-intrinsic-size: auto 15rem;
   }
 
+  /* 見出し 76px + ロゴ帯 40px + CTA 88px（mt-10 + ボタン）≒ 204px */
   .deferred-section--sponsors {
-    contain-intrinsic-size: auto 8rem;
+    contain-intrinsic-size: auto 13rem;
   }
 
   /*
