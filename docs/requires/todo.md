@@ -7,7 +7,7 @@
 - **開催日程**: 2026年10月31日（土）〜11月1日（日）
 - **公開予定**: 2026年2月28日
 - **開発期間**: 約3ヶ月（2025年12月〜2026年2月）
-- **技術スタック**: Next.js 16.1 (App Router), TypeScript, TailwindCSS, GSAP, Three.js / React Three Fiber, microCMS, next-intl, Vercel（Three.js は 3Dマップでは不採用。カラクりの歯車演出 `src/components/three/` で稼働中 — Phase 3 の見送り節を参照）
+- **技術スタック**: Next.js 16.1 (App Router), TypeScript, TailwindCSS, GSAP, Three.js / React Three Fiber, microCMS, next-intl, Vercel（Three.js は 3Dマップでは不採用。カラクリの歯車演出 `src/components/three/` で稼働中 — Phase 3 の見送り節を参照）
 
 ## 進捗状況
 
@@ -188,7 +188,7 @@
 >
 > - `src/data/buildings.ts` / `src/data/facilities.ts` — 3D マップ用に作成されたが、どこからもインポートされていない
 > - `@react-three/drei` — 依存にあるが未使用
-> - `three` / `@react-three/fiber` — `src/components/three/`（カラクりのギア演出）が使用。**2026-08-10 に復活させたため、現在はクライアントチャンクに含まれる**（860K / brotli 185K）。3Dマップとは無関係なので削除しないこと
+> - `three` / `@react-three/fiber` — `src/components/three/`（カラクリのギア演出）が使用。**2026-08-10 に復活させたため、現在はクライアントチャンクに含まれる**（860K / brotli 185K）。3Dマップとは無関係なので削除しないこと
 >
 > 第98回以降で再検討する場合は、以下のチェックリストをそのまま復活させてください。
 

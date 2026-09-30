@@ -141,7 +141,7 @@ describe("STATIC_PAGES", () => {
   it("トップページはOGP画像と検索結果用画像をサイトマップへ載せる", () => {
     const home = entries.find((entry) => entry.url === "https://setagayafes.org");
     expect(home?.images).toEqual([
-      "https://setagayafes.org/ogp-v2.webp",
+      "https://setagayafes.org/ogp-v3.webp",
       "https://setagayafes.org/images/brand/search-thumbnail-97.webp",
     ]);
   });
