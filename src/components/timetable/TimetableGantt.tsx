@@ -15,6 +15,8 @@ import { TimetableEventCard } from "./TimetableEventCard";
 interface TimetableGanttProps {
   groups: StageGroup[];
   range: TimeRange;
+  /** カードを押したときに呼ぶ。企画詳細パネルを開く */
+  onSelect?: (entryKey: string) => void;
 }
 
 /** 見出し行の高さ（px）。全列で同じ値にすることで盤面の開始位置が揃う */
@@ -41,7 +43,7 @@ const HEADER_HEIGHT_CLASS = "h-8";
  * 2. `sticky left-0` はスクロールポートの端に付くため、スクローラ自身に `padding-left` を
  *    置くと見た目がずれる。余白は外側のカード（`TimetableChart`）が持つ。
  */
-export function TimetableGantt({ groups, range }: TimetableGanttProps) {
+export function TimetableGantt({ groups, range, onSelect }: TimetableGanttProps) {
   const boardHeight = calculateBoardHeight(range, HOUR_HEIGHT_PX);
   const gridTemplateColumns = `${TIME_COL_WIDTH_PX}px repeat(${groups.length}, minmax(${MIN_STAGE_COL_WIDTH_PX}px, 1fr))`;
 
@@ -105,6 +107,7 @@ export function TimetableGantt({ groups, range }: TimetableGanttProps) {
                     event={positioned.event}
                     density={getCardDensity(positioned.heightPx)}
                     stageName={group.name}
+                    onSelect={onSelect}
                   />
                 </div>
               ))}

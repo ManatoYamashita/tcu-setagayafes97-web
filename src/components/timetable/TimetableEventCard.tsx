@@ -1,3 +1,4 @@
+import type { MouseEvent } from "react";
 import Link from "next/link";
 import type { TimetableEntry } from "@/types/timetable";
 import type { EventCardDensity } from "@/lib/timetable-layout";
@@ -12,6 +13,11 @@ interface TimetableEventCardProps {
   density?: EventCardDensity;
   /** 読み上げ用にステージ名を補う。ガント盤面では列の位置でしか伝わらないため */
   stageName?: string;
+  /**
+   * 押されたときに企画詳細パネルを開く。省略すると通常のリンク遷移になる。
+   * リンク（`href`）は残してあるので、新規タブ・中クリック・JS無効・クローラは従来どおり働く。
+   */
+  onSelect?: (entryKey: string) => void;
 }
 
 /**
@@ -21,9 +27,29 @@ interface TimetableEventCardProps {
  * タイトルに見出し要素を使っていないのは、見出しはステージ名（セクションの構造）が担うためです。
  * カードはリンクであり、その名前がタイトルになります。
  */
-export function TimetableEventCard({ event, density, stageName }: TimetableEventCardProps) {
+export function TimetableEventCard({
+  event,
+  density,
+  stageName,
+  onSelect,
+}: TimetableEventCardProps) {
   // 著名人企画は専用LP（/special/[id]）が正規URL
   const href = event.type === "special" ? `/special/${event.id}` : `/events/${event.id}`;
+
+  // 著名人企画は専用LPへ遷移する。パネルで見せるのは通常の企画だけ。
+  // 修飾キー付き・左ボタン以外は、ブラウザの「新規タブで開く」等へ任せる
+  const opensPanel = onSelect !== undefined && event.type !== "special";
+  const linkProps = {
+    href,
+    ...(opensPanel && {
+      "aria-haspopup": "dialog" as const,
+      onClick: (e: MouseEvent<HTMLAnchorElement>) => {
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        e.preventDefault();
+        onSelect(event.entryKey);
+      },
+    }),
+  };
 
   // ガント盤面では、時刻・場所・ステージが「位置」でしか伝わらず、密度によっては
   // 文字としても出ない。デスクトップ表示中はモバイル側の縦スタックが display:none で
@@ -65,7 +91,7 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
   // 「主催が途中で切れたカード」になり、読めない情報が場所だけ占めてしまう。
   if (density === "minimal") {
     return (
-      <Link href={href} aria-label={label} className={`${cardClass} px-2 py-1`}>
+      <Link {...linkProps} aria-label={label} className={`${cardClass} px-2 py-1`}>
         <p className="truncate text-xs font-bold leading-tight">
           {event.title}
           {organizer}
@@ -76,7 +102,7 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
 
   if (density === "compact") {
     return (
-      <Link href={href} aria-label={label} className={`${cardClass} px-2 py-1`}>
+      <Link {...linkProps} aria-label={label} className={`${cardClass} px-2 py-1`}>
         <p className="text-sm font-bold leading-tight line-clamp-1">{event.title}</p>
         <p className="truncate text-xs font-medium">
           {timeText}
@@ -96,7 +122,7 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
   if (density === "detailed" || density === "full") {
     const lineClass = "truncate text-[0.8125rem] leading-tight";
     return (
-      <Link href={href} aria-label={label} className={`${cardClass} px-3 py-1.5`}>
+      <Link {...linkProps} aria-label={label} className={`${cardClass} px-3 py-1.5`}>
         <p className="mb-1 text-[0.9375rem] font-bold leading-[1.2] line-clamp-2">{event.title}</p>
         <p className={`${lineClass} mb-1 font-semibold tabular-nums`}>{timeText}</p>
         {density === "detailed" ? (
@@ -113,7 +139,7 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
 
   // 密度指定なし = モバイルの縦スタック。高さが自由なので全項目を出す
   return (
-    <Link href={href} className={`${cardClass} p-4`}>
+    <Link {...linkProps} className={`${cardClass} p-4`}>
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <p className="flex items-baseline gap-1 font-sans tabular-nums">
           <time dateTime={event.startTime} className="text-lg font-bold">

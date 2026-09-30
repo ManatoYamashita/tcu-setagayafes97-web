@@ -1,9 +1,11 @@
-import type { StageGroup } from "@/lib/timetable";
-import { getTimeAxisTick, parseTimeToMinutes } from "@/lib/timetable-layout";
+import { sortEntriesByStart, type StageGroup } from "@/lib/timetable";
+import { getTimeAxisTick } from "@/lib/timetable-layout";
 import { TimetableEventCard } from "./TimetableEventCard";
 
 interface TimetableStackedListProps {
   groups: StageGroup[];
+  /** カードを押したときに呼ぶ。企画詳細パネルを開く */
+  onSelect?: (entryKey: string) => void;
 }
 
 /**
@@ -30,19 +32,12 @@ interface TimetableStackedListProps {
  * 見出しは `aria-hidden`。各カードが自分の時刻を文字で持っており、盤面の時刻ラベルと同じ理由で
  * 読み上げるとノイズにしかならない。リストの項目数も企画数のまま保てる。
  */
-export function TimetableStackedList({ groups }: TimetableStackedListProps) {
-  const items = groups
-    .flatMap((group) =>
+export function TimetableStackedList({ groups, onSelect }: TimetableStackedListProps) {
+  const items = sortEntriesByStart(
+    groups.flatMap((group) =>
       group.events.map((event) => ({ event, stageName: group.name, stageId: group.id }))
     )
-    .sort((a, b) => {
-      const startDiff =
-        (parseTimeToMinutes(a.event.startTime) ?? Number.POSITIVE_INFINITY) -
-        (parseTimeToMinutes(b.event.startTime) ?? Number.POSITIVE_INFINITY);
-
-      if (startDiff !== 0) return startDiff;
-      return a.stageId.localeCompare(b.stageId);
-    });
+  );
 
   return (
     <div data-timetable-list>
@@ -73,7 +68,7 @@ export function TimetableStackedList({ groups }: TimetableStackedListProps) {
               )}
               {/* 時系列の点はカードの上端に合わせる。li に付けると見出しの分だけ上へずれる */}
               <div className="relative after:absolute after:top-5 after:-left-[0.9375rem] after:size-2 after:rounded-full after:bg-primary-600 after:ring-4 after:ring-white">
-                <TimetableEventCard event={event} stageName={stageName} />
+                <TimetableEventCard event={event} stageName={stageName} onSelect={onSelect} />
               </div>
             </li>
           );
