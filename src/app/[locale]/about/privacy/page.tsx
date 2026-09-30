@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Info, Lock, Users, Cookie, Mail, FileText, Copyright } from "lucide-react";
+import type { ReactNode } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
+import { FactList } from "@/components/ui/FactList";
 import { pageHeroes, type PageHeroData } from "@/data/page-heroes";
 import { privacyPolicyConfig } from "@/data/privacy";
 import { Link } from "@/i18n/navigation";
@@ -35,6 +36,35 @@ export async function generateMetadata({
   });
 }
 
+/** 本文リンクの共通スタイル。min-h-11 でタップ領域を 44px 確保する */
+const textLinkClassName =
+  "inline-flex min-h-11 items-center font-semibold text-gray-900 underline decoration-gray-400 underline-offset-4 hoverable:hover:text-primary-700 hoverable:hover:decoration-primary-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600";
+
+/**
+ * 見出し付きの節
+ */
+function PolicySection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section>
+      <h2 className="mb-5 text-2xl font-bold text-gray-900">{title}</h2>
+      <div className="space-y-5 leading-8 text-gray-700">{children}</div>
+    </section>
+  );
+}
+
+/**
+ * 箇条書き
+ */
+function PolicyList({ items }: { items: readonly string[] }) {
+  return (
+    <ul className="list-disc space-y-1.5 pl-5 marker:text-gray-400">
+      {items.map((item) => (
+        <li key={item}>{item}</li>
+      ))}
+    </ul>
+  );
+}
+
 /**
  * プライバシーポリシーページ
  */
@@ -58,189 +88,90 @@ export default async function PrivacyPolicyPage({
     description: t("subtitle"),
   };
 
+  const { info, thirdParty, cookies, contact, copyright } = privacyPolicyConfig;
+
   return (
     <PageSheetLayout hero={hero}>
-      <div className="mx-auto max-w-4xl space-y-12">
-        {/* 基本情報 */}
-        <section className="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm md:p-8">
-          <div className="mb-6 flex items-center gap-3">
-            <Info className="h-6 w-6 text-primary-400" />
-            <h2 className="text-2xl font-bold text-gray-900">{t("sections.basicInfo")}</h2>
-          </div>
-          <div className="space-y-3">
-            <p className="text-gray-700">
-              {privacyPolicyConfig.info.organizationName}
-              （以下「当委員会」）は、お客様の個人情報保護の重要性について認識し、個人情報の保護に関する法律（個人情報保護法）を遵守すると共に、以下のプライバシーポリシーに従って、個人情報を適切に取り扱います。
-            </p>
-            <div className="mt-4 rounded-lg bg-gray-100 p-4">
-              <p className="text-sm font-semibold text-gray-600">{t("lastUpdated")}</p>
-              <p className="text-lg font-bold text-gray-900">
-                {privacyPolicyConfig.info.updateDate}
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* 個人情報の利用目的 */}
-        <section className="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm md:p-8">
-          <div className="mb-6 flex items-center gap-3">
-            <FileText className="h-6 w-6 text-blue-500" />
-            <h2 className="text-2xl font-bold text-gray-900">{t("sections.purposes")}</h2>
-          </div>
-          <p className="mb-4 text-gray-700">
-            当委員会は、お客様からお預かりした個人情報を以下の目的で利用いたします。
+      <div className="mx-auto max-w-3xl space-y-14 sm:space-y-16">
+        <PolicySection title={t("sections.basicInfo")}>
+          <p>
+            {info.organizationName}
+            （以下「当委員会」）は、お客様の個人情報保護の重要性について認識し、個人情報の保護に関する法律（個人情報保護法）を遵守すると共に、以下のプライバシーポリシーに従って、個人情報を適切に取り扱います。
           </p>
-          <ul className="space-y-2">
-            {privacyPolicyConfig.purposes.map((purpose, index) => (
-              <li key={index} className="flex items-start gap-2 text-gray-700">
-                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500"></span>
-                <span>{purpose}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
+          <FactList items={[{ label: t("lastUpdated"), value: info.updateDate }]} />
+        </PolicySection>
 
-        {/* 収集する情報 */}
-        <section className="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm md:p-8">
-          <div className="mb-6 flex items-center gap-3">
-            <Users className="h-6 w-6 text-green-500" />
-            <h2 className="text-2xl font-bold text-gray-900">{t("sections.collectedInfo")}</h2>
-          </div>
-          <p className="mb-4 text-gray-700">当サイトでは、以下の情報を収集する場合があります。</p>
-          <div className="grid gap-3 md:grid-cols-2">
-            {privacyPolicyConfig.collectedInfo.map((info, index) => (
-              <div
-                key={index}
-                className="rounded-lg border border-gray-200 bg-gray-100 p-4 text-gray-700"
-              >
-                {info}
-              </div>
-            ))}
-          </div>
-        </section>
+        <PolicySection title={t("sections.purposes")}>
+          <p>当委員会は、お客様からお預かりした個人情報を以下の目的で利用いたします。</p>
+          <PolicyList items={privacyPolicyConfig.purposes} />
+        </PolicySection>
 
-        {/* セキュリティ */}
-        <section className="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm md:p-8">
-          <div className="mb-6 flex items-center gap-3">
-            <Lock className="h-6 w-6 text-orange-500" />
-            <h2 className="text-2xl font-bold text-gray-900">{t("sections.security")}</h2>
-          </div>
-          <p className="text-gray-700">{privacyPolicyConfig.security.description}</p>
-        </section>
+        <PolicySection title={t("sections.collectedInfo")}>
+          <p>当サイトでは、以下の情報を収集する場合があります。</p>
+          <PolicyList items={privacyPolicyConfig.collectedInfo} />
+        </PolicySection>
 
-        {/* 第三者提供 */}
-        <section className="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm md:p-8">
-          <div className="mb-6 flex items-center gap-3">
-            <Users className="h-6 w-6 text-primary-500" />
-            <h2 className="text-2xl font-bold text-gray-900">{t("sections.thirdParty")}</h2>
+        <PolicySection title={t("sections.security")}>
+          <p>{privacyPolicyConfig.security.description}</p>
+        </PolicySection>
+
+        <PolicySection title={t("sections.thirdParty")}>
+          <p className="font-bold text-gray-900">{thirdParty.policy}</p>
+          <div>
+            <p>{t("except")}</p>
+            <PolicyList items={thirdParty.exceptions} />
           </div>
-          <p className="mb-4 font-semibold text-gray-900">
-            {privacyPolicyConfig.thirdParty.policy}
-          </p>
-          <p className="mb-2 text-sm text-gray-700">{t("except")}</p>
-          <ul className="space-y-2">
-            {privacyPolicyConfig.thirdParty.exceptions.map((exception, index) => (
-              <li key={index} className="flex items-start gap-2 text-gray-700">
-                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary-500"></span>
-                <span>{exception}</span>
-              </li>
-            ))}
-          </ul>
 
           {/*
             外部サービスへ実際に送信しているもの。
             「原則として提供しない」の例外を具体的に書く欄で、送信先が増えたら
             src/data/privacy.ts の externalServices へ足す
           */}
-          <div className="mt-6 space-y-4">
-            {privacyPolicyConfig.thirdParty.externalServices.map((service) => (
-              <div key={service.provider} className="rounded-lg bg-gray-100 p-4">
-                <p className="mb-1 font-semibold text-gray-900">{service.purpose}</p>
-                <p className="text-sm text-gray-700">{service.provider}</p>
-                <p className="mt-2 text-sm text-gray-700">{service.sent}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Cookie・アクセス解析 */}
-        <section className="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm md:p-8">
-          <div className="mb-6 flex items-center gap-3">
-            <Cookie className="h-6 w-6 text-amber-500" />
-            <h2 className="text-2xl font-bold text-gray-900">{t("sections.cookies")}</h2>
-          </div>
-          <div className="space-y-4">
-            <p className="text-gray-700">{privacyPolicyConfig.cookies.description}</p>
-            <div className="rounded-lg bg-gray-100 p-4">
-              <p className="mb-2 text-sm font-semibold text-gray-600">{t("usedTools")}</p>
-              <p className="font-bold text-amber-700">{privacyPolicyConfig.cookies.analytics}</p>
+          {thirdParty.externalServices.map((service) => (
+            <div key={service.provider} className="border-l-[3px] border-primary-600 pl-5 sm:pl-8">
+              <p className="font-bold text-gray-900">{service.purpose}</p>
+              <p className="text-sm text-gray-600">{service.provider}</p>
+              <p className="mt-1">{service.sent}</p>
             </div>
-            <div>
-              <p className="mb-2 text-sm text-gray-700">{privacyPolicyConfig.cookies.optOut}</p>
-              <a
-                href={privacyPolicyConfig.cookies.optOutUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-primary-600 hover:underline"
-              >
-                {t("analyticsOptOut")}
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </section>
+          ))}
+        </PolicySection>
 
-        {/* お問い合わせ窓口 */}
-        <section className="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm md:p-8">
-          <div className="mb-6 flex items-center gap-3">
-            <Mail className="h-6 w-6 text-pink-500" />
-            <h2 className="text-2xl font-bold text-gray-900">{t("sections.contactWindow")}</h2>
+        <PolicySection title={t("sections.cookies")}>
+          <p>{cookies.description}</p>
+          <FactList items={[{ label: t("usedTools"), value: cookies.analytics }]} />
+          <div>
+            <p>{cookies.optOut}</p>
+            <a
+              href={cookies.optOutUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={textLinkClassName}
+            >
+              {t("analyticsOptOut")}
+              <span className="sr-only">{t("opensInNewTab")}</span>
+            </a>
           </div>
-          <p className="mb-4 text-gray-700">{privacyPolicyConfig.contact.description}</p>
-          <Link
-            href={privacyPolicyConfig.contact.url}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-6 py-3 font-semibold text-white transition-[color,background-color,border-color,box-shadow] hover:bg-primary-700 hover:shadow-lg"
-          >
-            <Mail className="h-5 w-5" />
-            <span>{t("toContactForm")}</span>
-          </Link>
-        </section>
+        </PolicySection>
 
-        {/* 免責事項 */}
-        <section className="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm md:p-8">
-          <div className="mb-6 flex items-center gap-3">
-            <Info className="h-6 w-6 text-red-500" />
-            <h2 className="text-2xl font-bold text-gray-900">{t("sections.disclaimer")}</h2>
+        <PolicySection title={t("sections.contactWindow")}>
+          <div>
+            <p>{contact.description}</p>
+            <Link href={contact.url} className={textLinkClassName}>
+              {t("toContactForm")}
+            </Link>
           </div>
-          <ul className="space-y-2">
-            {privacyPolicyConfig.disclaimer.map((item, index) => (
-              <li key={index} className="flex items-start gap-2 text-gray-700">
-                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-500"></span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
+        </PolicySection>
 
-        {/* 著作権 */}
-        <section className="rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm md:p-8">
-          <div className="mb-6 flex items-center gap-3">
-            <Copyright className="h-6 w-6 text-gray-600" />
-            <h2 className="text-2xl font-bold text-gray-900">{t("sections.copyright")}</h2>
-          </div>
-          <p className="mb-4 text-gray-700">{privacyPolicyConfig.copyright.description}</p>
-          <p className="text-sm text-gray-500">
-            Copyright © {privacyPolicyConfig.copyright.year} {privacyPolicyConfig.copyright.holder}.
-            All Rights Reserved.
+        <PolicySection title={t("sections.disclaimer")}>
+          <PolicyList items={privacyPolicyConfig.disclaimer} />
+        </PolicySection>
+
+        <PolicySection title={t("sections.copyright")}>
+          <p>{copyright.description}</p>
+          <p className="text-sm text-gray-600">
+            Copyright © {copyright.year} {copyright.holder}. All Rights Reserved.
           </p>
-        </section>
+        </PolicySection>
       </div>
     </PageSheetLayout>
   );

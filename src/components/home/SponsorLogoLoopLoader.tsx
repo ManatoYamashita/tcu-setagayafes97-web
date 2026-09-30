@@ -3,7 +3,9 @@
 import dynamic from "next/dynamic";
 import { AppImage } from "@/components/ui/AppImage";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { SPONSOR_LOGO_HEIGHT, toSponsorLogos } from "@/lib/sponsor-logos";
 import type { Information } from "@/types/informations";
+import { SponsorWordmark } from "./SponsorWordmark";
 
 // スポンサー欄はページ下部のため、LogoLoopのCSS/JSを初期レンダリングから分離する。
 const SponsorLogoLoop = dynamic(
@@ -15,31 +17,27 @@ const SponsorLogoLoop = dynamic(
 );
 
 function StaticSponsorLogos({ sponsors }: { sponsors: Information[] }) {
-  const logos = sponsors
-    .filter((sponsor) => sponsor.image?.url)
-    .map((sponsor) => {
-      const image = sponsor.image!;
-      const width = image.width ?? 1;
-      const height = image.height ?? 1;
-      const displayWidth = Math.max(1, Math.round((width / Math.max(1, height)) * 40));
-      return { sponsor, displayWidth };
-    });
+  const logos = toSponsorLogos(sponsors);
 
   if (logos.length === 0) return null;
 
   return (
     <ul className="flex h-10 items-center gap-12 overflow-hidden" aria-label="協賛企業ロゴ">
-      {logos.map(({ sponsor, displayWidth }) => (
-        <li key={sponsor.id} className="flex h-10 shrink-0 items-center">
-          <AppImage
-            src={sponsor.image!.url}
-            alt={sponsor.title}
-            width={displayWidth}
-            height={40}
-            sizes={`${displayWidth}px`}
-            loading="lazy"
-            draggable={false}
-          />
+      {logos.map((logo) => (
+        <li key={logo.sponsor.id} className="flex h-10 shrink-0 items-center">
+          {logo.kind === "image" ? (
+            <AppImage
+              src={logo.src}
+              alt={logo.sponsor.title}
+              width={logo.displayWidth}
+              height={SPONSOR_LOGO_HEIGHT}
+              sizes={`${logo.displayWidth}px`}
+              loading="lazy"
+              draggable={false}
+            />
+          ) : (
+            <SponsorWordmark title={logo.sponsor.title} />
+          )}
         </li>
       ))}
     </ul>

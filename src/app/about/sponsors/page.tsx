@@ -92,10 +92,13 @@ interface SponsorCardProps {
 }
 
 function SponsorCard({ sponsor }: SponsorCardProps) {
+  const hasImage = Boolean(sponsor.image?.url);
+  const hasDetails = Boolean(sponsor.description || sponsor.url);
+
   const CardContent = (
     <div className="group h-full overflow-hidden rounded-lg border border-gray-200/20 bg-white/10 shadow-sm transition-[color,background-color,border-color,box-shadow] hover:border-gray-200 hover:shadow-lg">
-      {/* ロゴ */}
-      {sponsor.image ? (
+      {/* ロゴ。画像の無い協賛はロゴ枠の中へ社名を置き、画像ありのカードと高さをそろえる（#332） */}
+      {sponsor.image?.url ? (
         <div className="relative aspect-video w-full overflow-hidden bg-white/10">
           <AppImage
             src={sponsor.image.url}
@@ -106,28 +109,32 @@ function SponsorCard({ sponsor }: SponsorCardProps) {
           />
         </div>
       ) : (
-        <div className="flex aspect-video w-full items-center justify-center bg-gradient-to-br from-primary to-primary-600">
-          <Heart className="h-16 w-16 text-gray-900 opacity-50" />
+        <div className="flex aspect-video w-full items-center justify-center bg-white/10 p-6">
+          <h3 className="text-center text-xl font-bold text-balance [word-break:auto-phrase] text-gray-900">
+            {sponsor.title}
+          </h3>
         </div>
       )}
 
-      <div className="p-6">
-        {/* 企業名 */}
-        <h3 className="mb-2 text-lg font-bold text-gray-900">{sponsor.title}</h3>
+      {(hasImage || hasDetails) && (
+        <div className="p-6">
+          {/* 企業名（画像の無い協賛はロゴ枠に出しているので重ねない） */}
+          {hasImage && <h3 className="mb-2 text-lg font-bold text-gray-900">{sponsor.title}</h3>}
 
-        {/* 説明文 */}
-        {sponsor.description && (
-          <p className="mb-4 line-clamp-3 text-sm text-gray-900/80">{sponsor.description}</p>
-        )}
+          {/* 説明文 */}
+          {sponsor.description && (
+            <p className="mb-4 line-clamp-3 text-sm text-gray-900/80">{sponsor.description}</p>
+          )}
 
-        {/* Webサイトリンク */}
-        {sponsor.url && (
-          <div className="mt-4 flex items-center gap-2 text-sm text-primary-700">
-            <ExternalLink className="h-4 w-4" />
-            <span className="group-hover:underline">Webサイトを見る</span>
-          </div>
-        )}
-      </div>
+          {/* Webサイトリンク */}
+          {sponsor.url && (
+            <div className="mt-4 flex items-center gap-2 text-sm text-primary-700">
+              <ExternalLink className="h-4 w-4" />
+              <span className="group-hover:underline">Webサイトを見る</span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 

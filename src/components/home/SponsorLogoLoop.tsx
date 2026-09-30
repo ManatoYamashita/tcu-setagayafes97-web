@@ -4,6 +4,8 @@ import { useMemo, useState, useCallback, useEffect } from "react";
 import { AppImage } from "@/components/ui/AppImage";
 import { LogoLoop, type LogoItem } from "@/components/ui/LogoLoop";
 import { SponsorModal } from "./SponsorModal";
+import { SponsorWordmark } from "./SponsorWordmark";
+import { SPONSOR_LOGO_HEIGHT, toSponsorLogos } from "@/lib/sponsor-logos";
 import type { Information } from "@/types/informations";
 
 interface SponsorLogoLoopProps {
@@ -19,28 +21,33 @@ export function SponsorLogoLoop({ sponsors, onReady }: SponsorLogoLoopProps) {
   const [selectedSponsor, setSelectedSponsor] = useState<Information | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const filteredSponsors = useMemo(() => sponsors.filter((s) => s.image?.url), [sponsors]);
+  // 画像の無い協賛も捨てない（#332）。renderItem は logos と同じ添字でこの配列を引く
+  const sponsorLogos = useMemo(() => toSponsorLogos(sponsors), [sponsors]);
 
-  const logos = useMemo(
+  const logos = useMemo<LogoItem[]>(
     () =>
-      filteredSponsors.map((s) => ({
-        src: s.image!.url,
-        alt: s.title,
-        width: s.image!.width,
-        height: s.image!.height,
-      })),
-    [filteredSponsors]
+      sponsorLogos.map((logo) =>
+        logo.kind === "image"
+          ? {
+              src: logo.src,
+              alt: logo.sponsor.title,
+              width: logo.displayWidth,
+              height: SPONSOR_LOGO_HEIGHT,
+            }
+          : { node: logo.sponsor.title, ariaLabel: logo.sponsor.title }
+      ),
+    [sponsorLogos]
   );
 
   const handleSponsorClick = useCallback(
     (index: number) => {
-      const sponsor = filteredSponsors[index];
+      const sponsor = sponsorLogos[index]?.sponsor;
       if (sponsor) {
         setSelectedSponsor(sponsor);
         setIsModalOpen(true);
       }
     },
-    [filteredSponsors]
+    [sponsorLogos]
   );
 
   const handleCloseModal = useCallback(() => {
@@ -52,25 +59,27 @@ export function SponsorLogoLoop({ sponsors, onReady }: SponsorLogoLoopProps) {
   }, [onReady]);
 
   const renderItem = useCallback(
-    (item: LogoItem, key: string) => {
+    (_item: LogoItem, key: string) => {
       const [copyIndexText, itemIndexText] = key.split("-");
       const copyIndex = Number(copyIndexText);
       const itemIndex = Number(itemIndexText);
-      const imgItem = item as { src: string; alt?: string; width: number; height: number };
-      const src = imgItem.src;
-      const alt = imgItem.alt ?? "";
-      const displayWidth = Math.max(1, Math.round((imgItem.width / imgItem.height) * 40));
-      const logoImage = (
-        <AppImage
-          src={src}
-          alt={copyIndex === 0 ? alt : ""}
-          width={displayWidth}
-          height={40}
-          sizes={`${displayWidth}px`}
-          loading="lazy"
-          draggable={false}
-        />
-      );
+      const logo = sponsorLogos[itemIndex];
+      if (!logo) return null;
+      const title = logo.sponsor.title;
+      const logoContent =
+        logo.kind === "image" ? (
+          <AppImage
+            src={logo.src}
+            alt={copyIndex === 0 ? title : ""}
+            width={logo.displayWidth}
+            height={SPONSOR_LOGO_HEIGHT}
+            sizes={`${logo.displayWidth}px`}
+            loading="lazy"
+            draggable={false}
+          />
+        ) : (
+          <SponsorWordmark title={title} />
+        );
 
       // 無限スクロール用の複製列は aria-hidden。操作要素を内包すると
       // Lighthouse違反になるため、先頭列だけをボタンにする。
@@ -81,7 +90,7 @@ export function SponsorLogoLoop({ sponsors, onReady }: SponsorLogoLoopProps) {
             onClick={() => handleSponsorClick(itemIndex)}
             aria-hidden="true"
           >
-            {logoImage}
+            {logoContent}
           </span>
         );
       }
@@ -91,13 +100,13 @@ export function SponsorLogoLoop({ sponsors, onReady }: SponsorLogoLoopProps) {
           type="button"
           onClick={() => handleSponsorClick(itemIndex)}
           className="cursor-pointer border-0 bg-transparent p-0"
-          aria-label={`${alt || "協賛企業"}の詳細を見る`}
+          aria-label={`${title || "協賛企業"}の詳細を見る`}
         >
-          {logoImage}
+          {logoContent}
         </button>
       );
     },
-    [handleSponsorClick]
+    [sponsorLogos, handleSponsorClick]
   );
 
   if (logos.length === 0) {
