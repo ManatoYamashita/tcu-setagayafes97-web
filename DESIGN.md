@@ -132,7 +132,7 @@ font-family:
 
 ### 3.5 行間・字間
 
-- **本文の行間 (line-height)**: 1.75（日本語の可読性を確保）
+- **本文の行間 (line-height)**: 一律の値は無い。既定は Preflight の `html { line-height: 1.5 }` で、`text-*` を付けるとそのサイズの既定（`text-sm` 1.43 / `text-xs` 1.33）になる。読み物の本文は部品ごとに `leading-*` で広げている（`leading-relaxed` 1.625、16px で `leading-7` = 1.75 / `leading-8` = 2.0。企画本文は `leading-8`）。リッチテキストの `.prose p` / `.prose li` だけは `globals.css` で 1.8（2026-09-30 の本番の実測: /about 2.0 と 1.75、/info/guide 1.75、企画詳細 2.0、お知らせ本文 1.8、/access 1.5）
 - **見出しの行間**: 既定は文字サイズに付随する Tailwind の値（`text-5xl` 以上 1 / `text-4xl` 1.11 / `text-3xl` 1.2 / `text-2xl` 1.33 / `text-xl` 1.4 / `text-lg` 1.56）。変えるときは見出しに `leading-*` を付ける（2026-09-30 時点で `h1`〜`h3` 66個のうち8個: `leading-tight`（1.25）×4・`leading-snug`（1.375）×2・`leading-[1.2]`・`leading-none`（1））。値の表は [docs/frontend/typography.md](docs/frontend/typography.md)
 - **ラベルの字間 (letter-spacing)**: `tracking-widest`（0.2em）〜 `tracking-[0.3em]`
 - **見出しの字間**: `tracking-wide`（0.025em）〜 `tracking-wider`（0.05em）
@@ -317,7 +317,7 @@ PICKUP ラベル等の装飾テキストで使用。
 ### Do（推奨）
 
 - フォントは必ずフォールバックチェーンを指定する
-- 日本語本文の line-height は 1.5 以上にする（推奨: 1.75）
+- 読み物の本文（段落が続くもの）は `leading-*` で 1.625 以上に広げる（`leading-relaxed` / 16px なら `leading-7` か `leading-8`）
 - 色のコントラスト比は WCAG AA 以上を確保する
 - コンポーネントの余白は Spacing Scale に従う
 - 見出しの書体は要素で決める（`h1`〜`h3` は Kaisei Opti、sans にするなら `font-sans` を明示）
@@ -382,10 +382,10 @@ Text Muted:       oklch(45% 0 0deg)         -> #555555
 Background:       Secondary (紫) or #FFFFFF (白)
 Border:           oklch(86% 0 0deg)         -> #d1d1d1
 
-Body Font:    var(--font-noto-sans-jp), sans-serif
-Heading Font: var(--font-kaisei-opti), serif
+Body Font:    var(--font-sans)  (ui-sans-serif, system-ui, sans-serif)
+Heading Font: var(--font-kaisei-opti, "Kaisei Opti"), serif  (h1〜h3)
 Body Size:    16px
-Line Height:  1.75
+Line Height:  1.5 (既定) / 読み物の本文は 1.625〜2.0 (leading-*)
 ```
 
 ### プロンプト例
@@ -395,7 +395,7 @@ Line Height:  1.75
 - プライマリカラー: oklch(68% 0.175 314deg)（実配信 #bf73e3）
 - 本文フォント: ui-sans-serif, system-ui, sans-serif（システムフォント）
 - 見出しフォント: Kaisei Opti, serif（h1〜h3 に自動適用。sans にするなら font-sans を明示）
-- 行間: 本文は line-height: 1.75
+- 行間: 読み物の本文は leading-relaxed〜leading-8（1.625〜2.0）。短い補足は text-* の既定のまま
 - カード背景: 淡紫背景のページは bg-white/10, rounded-2xl / 白いシート上は bg-white
 - ボーダー: 淡紫背景のページは border-gray-200/20 / 白いシート上は border-gray-200
 - テキスト色: text-gray-900（実配信 #070707）
