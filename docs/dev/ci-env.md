@@ -96,7 +96,7 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 ### Secrets の登録
 
 1. GitHub リポジトリ → **Settings** → **Secrets and variables** → **Actions**
-2. **Repository secrets** タブ → **New repository secret**
+2. **Repository secrets** タブ → **New repository secret**（**Environment secrets に置かないこと。** `environment:` を宣言しないジョブからは空文字に見え、ビルドは空データのまま成功する。#352）
 3. Name と Value を入力して **Add secret**
 
 ### Variables の登録
@@ -462,7 +462,7 @@ curl -s https://<production deployment url>/robots.txt | grep Sitemap
 
 ## 注意事項
 
-- Secrets は一度登録すると値の確認ができない（再設定は可能）
+- Secrets は一度登録すると値の確認ができない（再設定は可能）。Vercel の Sensitive 変数も `vercel env pull` では空で返るため、本番の値と照合できない
 - Variables はいつでも値の確認・編集が可能
 - `NEXT_PUBLIC_` プレフィックスの変数はクライアントサイドに公開される（Next.js の仕様）
 - Vercel デプロイ時は Vercel の Environment Variables で別途管理（Settings → Environment Variables）
@@ -476,4 +476,4 @@ curl -s https://<production deployment url>/robots.txt | grep Sitemap
 
 ---
 
-**最終更新日**: 2026-09-06
+**最終更新日**: 2026-09-30

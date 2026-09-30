@@ -65,7 +65,7 @@ const LINE_LIMIT = 300;
 const GRANDFATHERED = new Map([
   ["docs/frontend/design.md", 762],
   ["DESIGN.md", 688],
-  [".claude/CLAUDE.md", 666],
+  [".claude/CLAUDE.md", 665],
   ["docs/requires/require.md", 614],
   ["docs/frontend/page-transition.md", 540],
   ["docs/frontend/image-delivery.md", 530],
