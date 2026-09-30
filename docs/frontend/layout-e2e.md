@@ -63,7 +63,7 @@ const USE_FIXTURE =
 
 したがって E2E は `pnpm dev` に対してのみ成立します。これは制約であると同時に利点でもあり、
 **secrets を要求しないので、fork からの PR でも同じ判定が出ます**
-（`Build Check` は fork PR では secrets が届かず、落ちずに空データのまま緑になります。#352）。
+（`Build Check` は fork PR では secrets が届かないため、先頭の検査を飛ばして空データのまま緑になります。#352）。
 
 代わりに失うものは「本番ビルド固有の壊れ方」の検出です。そこは既存の `Build Check` と
 実機の確認に委ねます。

@@ -113,7 +113,7 @@ jobs:
 
       # env を渡さないのは意図的である。フィクスチャ経路は getEventsList() を
       # 呼ばないため microCMS のシークレットが要らない。fork からの PR でも同じ判定が出る
-      # （build ジョブは fork PR では secrets が届かず、落ちずに空データのまま緑になる。#352）。
+      # （build ジョブは fork PR では secrets が届かず、先頭の検査を飛ばして空データのまま緑になる。#352）。
       - name: Run layout assertions
         run: pnpm run test:e2e
 
@@ -133,14 +133,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 資格情報が空でも src/lib/microcms.ts は空データを返し、ビルドは緑になる。
+      # そのせいで 2026-09-30 まで Build Check は microCMS を一度も読めていなかった（#352）。
+      # 公開フラグも未登録だと黙って false になり、本番と違うページを検査する。
+      # 空なら install より先に落とす。値が誤っている場合は microCMS が 401 を返し、
+      # microcmsGet() が例外を投げてビルドが落ちるため、ここでは有無だけを見る。
+      # fork からの PR には secrets が渡らないので、同じリポジトリの push / PR に限る。
+      - name: Require microCMS secrets and publish flags
+        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          MICROCMS_SERVICE_DOMAIN: ${{ secrets.MICROCMS_SERVICE_DOMAIN }}
+          MICROCMS_API_KEY: ${{ secrets.MICROCMS_API_KEY }}
+          NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
+          NEXT_PUBLIC_EVENTS_VISIBLE: ${{ vars.NEXT_PUBLIC_EVENTS_VISIBLE }}
+          NEXT_PUBLIC_NEWS_VISIBLE: ${{ vars.NEXT_PUBLIC_NEWS_VISIBLE }}
+          NEXT_PUBLIC_SPECIAL_VISIBLE: ${{ vars.NEXT_PUBLIC_SPECIAL_VISIBLE }}
+          NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE: ${{ vars.NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE }}
+        run: |
+          missing=""
+          for name in MICROCMS_SERVICE_DOMAIN MICROCMS_API_KEY NEXT_PUBLIC_URL \
+            NEXT_PUBLIC_EVENTS_VISIBLE NEXT_PUBLIC_NEWS_VISIBLE \
+            NEXT_PUBLIC_SPECIAL_VISIBLE NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE; do
+            if [ -z "${!name}" ]; then
+              missing="$missing $name"
+            fi
+          done
+
+          if [ -n "$missing" ]; then
+            echo "::error title=Build Check に渡す値が空です::未登録:$missing。MICROCMS_* は Repository secrets に、NEXT_PUBLIC_* は Repository variables に登録すること（Environment に置くとこのジョブからは空に見える）。手順は docs/dev/ci-env.md。"
+            exit 1
+          fi
+
+          echo "microCMS の secrets 2本と Variables 5本がすべて届いています。"
+
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup
         uses: ./.github/actions/setup
 
-      # secrets は Repository secrets に置く。Environment secrets はこのジョブ（environment: 無し）から
-      # 空文字に見え、ビルドは空データのまま成功して末尾の検査が NOTE で空振りする（#352）。
+      # secrets は Repository secrets に置く。Environment secrets はこのジョブ（environment: 無し）からは
+      # 空文字に見え、先頭の検査で落ちる（#352）。
       - name: Build project
         run: pnpm run build
         env:

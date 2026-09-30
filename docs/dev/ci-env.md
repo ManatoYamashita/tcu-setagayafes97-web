@@ -27,19 +27,18 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 
 ### Repository Variables
 
-| 変数名                              | 内容                           | 値の例                    | 登録状況（2026-08-17 実測） |
-| ----------------------------------- | ------------------------------ | ------------------------- | --------------------------- |
-| `NEXT_PUBLIC_URL`                   | 本番サイト URL                 | `https://setagayafes.org` | **登録済み**                |
-| `NEXT_PUBLIC_GTM_ID`                | Google Tag Manager ID          | `GTM-XXXXXXX`             | 未登録                      |
-| `NEXT_PUBLIC_EVENTS_VISIBLE`        | 企画情報の公開フラグ           | `false`                   | 未登録                      |
-| `NEXT_PUBLIC_NEWS_VISIBLE`          | お知らせ情報の公開フラグ       | `false`                   | 未登録                      |
-| `NEXT_PUBLIC_SPECIAL_VISIBLE`       | 著名人企画の公開フラグ         | `false`                   | 未登録                      |
-| `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` | 著名人企画の物販欄の公開フラグ | `false`                   | 未登録                      |
+| 変数名                              | 内容                           | 値の例                    | 登録値（2026-09-30 実測。本番と同じ） |
+| ----------------------------------- | ------------------------------ | ------------------------- | ------------------------------------- |
+| `NEXT_PUBLIC_URL`                   | 本番サイト URL                 | `https://setagayafes.org` | `https://setagayafes.org`             |
+| `NEXT_PUBLIC_GTM_ID`                | Google Tag Manager ID          | `GTM-XXXXXXX`             | 未登録（CI では計測タグを出さない）   |
+| `NEXT_PUBLIC_EVENTS_VISIBLE`        | 企画情報の公開フラグ           | `false`                   | `true`                                |
+| `NEXT_PUBLIC_NEWS_VISIBLE`          | お知らせ情報の公開フラグ       | `false`                   | `true`                                |
+| `NEXT_PUBLIC_SPECIAL_VISIBLE`       | 著名人企画の公開フラグ         | `false`                   | `true`                                |
+| `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` | 著名人企画の物販欄の公開フラグ | `false`                   | `false`                               |
 
 > [!NOTE]
-> **この表は「登録すべきもの」であって、現状の登録一覧ではない。** `gh variable list` で確認できるのは `NEXT_PUBLIC_URL` のみ。
-> CI（`feature-ci.yml`）は Lint / Format / 型 / Build の検証だけなので、公開フラグが未登録でも **`false` としてビルドが通る**。
-> **つまり CI が緑でも、公開状態のページがビルドできることは何も検証していない。**
+> **公開フラグは本番（Vercel Production）と同じ値にそろえる。** 違えば CI は本番と別のページを検査する（2026-09-30 まで NEWS / SPECIAL が未登録で、`/info` と `/special` を準備中の画面でビルドしていた）。
+> **`Build Check` の先頭ステップは、`GTM_ID` 以外のこの表の変数と `MICROCMS_*` の2本が空なら落ちる**（#352）。フラグの切り替えは値の変更であって、削除ではない。
 
 ### Vercel のみに登録する変数（GitHub には登録しない）
 
@@ -96,7 +95,7 @@ CI/CD ワークフローで使用する環境変数の管理方法と登録手�
 ### Secrets の登録
 
 1. GitHub リポジトリ → **Settings** → **Secrets and variables** → **Actions**
-2. **Repository secrets** タブ → **New repository secret**（**Environment secrets に置かないこと。** `environment:` を宣言しないジョブからは空文字に見え、ビルドは空データのまま成功する。#352）
+2. **Repository secrets** タブ → **New repository secret**（**Environment secrets に置かないこと。** `environment:` を宣言しないジョブからは空文字に見え、`Build Check` の先頭ステップで落ちる。#352）
 3. Name と Value を入力して **Add secret**
 
 ### Variables の登録
