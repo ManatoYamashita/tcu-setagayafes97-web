@@ -121,7 +121,9 @@
 - **[contact-form.md](./frontend/contact-form.md)** - お問い合わせフォームの送信可否と防御（#260 / #261）
   - **設定が欠けていたら成功を返さない。** 2026-09-21 まで本番は1通も送らず「送信完了」と表示していた
 - **[layout-e2e.md](./frontend/layout-e2e.md)** - 実ブラウザの再発防止装置（Playwright。盤面 / ランドマーク / 404）
+- **[layout-e2e-waiting.md](./frontend/layout-e2e-waiting.md)** - E2E の待ち方（不確定要素ごとの決定的な待ち方）
   - **測ろうとしている値そのものを待たない。** 待つと #148 は「検出できない」に化ける
+  - **dev では Suspense の中身がまず `div[hidden][id^="S:"]` に届く。** `toBeAttached()` は通るが幾何は 0（#309）
 - **[i18n-page-structure.md](./frontend/i18n-page-structure.md)** - 多言語ページの構成パターン（next-intl・メッセージ分割・リンク・`lang`）
 - **[page-transition.md](./frontend/page-transition.md)** - ページ遷移アニメーションと View Transitions API
   - **popstate リスナはモジュール評価時に登録する**（`useEffect` だと2回目以降動かない）。`next` を上げたら履歴遷移を再検証する
