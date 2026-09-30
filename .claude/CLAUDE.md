@@ -524,7 +524,7 @@ microCMS の編集画面にある「画面プレビュー」から、**公開せ
 
 ### タイムテーブル (/timetable)
 
-- **形式**: 縦型ガントチャート（縦軸: 時間、横軸: ステージ）
+- **形式**: 縦型ガントチャート（縦軸: 時間、横軸: ステージ）。**カードは遷移ではなく企画詳細パネル（`<dialog>`、`?event=`）を開く**。[`docs/frontend/timetable-event-panel.md`](../docs/frontend/timetable-event-panel.md)
 - **日程切替**: Day1 / Day2 タブ
 - **ステージ切替**: ステージごとのタブ（7A, 7B, 体育館, ホール等）
 

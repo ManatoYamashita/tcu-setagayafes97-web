@@ -114,6 +114,7 @@
   - **確認は `max-w-*` が効かない幅（1344px 未満）を含める。** 広い画面ではずれが消えて見える
 - **[landmarks-and-skip-link.md](./frontend/landmarks-and-skip-link.md)** - `<main id="content">` とスキップリンクの契約（#177 A）
 - **[timetable-gantt.md](./frontend/timetable-gantt.md)** - タイムテーブル盤面（ガントチャート）とモバイル縦スタックの設計
+- **[timetable-event-panel.md](./frontend/timetable-event-panel.md)** - タイムテーブルの企画詳細パネル（右パネル／ボトムシート、`?event=` による状態、前後移動）の設計
   - **縦方向の寸法は必ず px で持つ。** `height: %` は `min-height` しか持たない親の下で 0px に潰れる（#148）
   - **絞り込みとグループ化は必ず同じ `resolveStageId()` を通す**
 - **[events-search.md](./frontend/events-search.md)** - `/events` の検索と絞り込み（正規化・建物導出・3段カスケード）
