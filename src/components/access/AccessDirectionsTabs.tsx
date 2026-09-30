@@ -1,7 +1,9 @@
 "use client";
 
+import { gsap } from "gsap";
 import { Bus, Train } from "lucide-react";
-import { type KeyboardEvent, useEffect, useRef, useState } from "react";
+import { type KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
+import { buildRouteEntrance, resetRouteCounts } from "@/components/access/route-entrance";
 import {
   RideSegmentLabel,
   TimelineStep,
@@ -44,8 +46,10 @@ const recommendedBorderClassName = "border border-transparent";
 const recommendedFrameClassName =
   "pointer-events-none absolute -inset-px rounded-2xl border-4 border-primary-600";
 
-/** 枠の点滅を始める、カードの見えている割合 */
-const RECOMMENDED_BLINK_THRESHOLD = 0.6;
+const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+
+/** 経路カードの入場演出を始める、パネルの見えている割合 */
+const ENTRANCE_THRESHOLD = 0.25;
 
 const recommendedBadgeClassName =
   "absolute -top-3 right-5 inline-flex items-center rounded-full bg-primary-600 px-3 py-1 text-xs font-bold text-white shadow-sm";
@@ -72,7 +76,57 @@ export function AccessDirectionsTabs({
   busRoutes,
 }: AccessDirectionsTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>("train");
+  const [shouldBlinkRecommended, setShouldBlinkRecommended] = useState(false);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const panelRefs = useRef<Partial<Record<TabId, HTMLDivElement | null>>>({});
+  /** 経路カードが一度でも画面に入ったか。入った後のタブ切替は、待たずにその場で再生する */
+  const hasEnteredRef = useRef(false);
+
+  // 表示中のパネルの入場演出（route-entrance.ts）を組み、見えたら再生する。
+  // タブを切り替えるたびに組み直すので、切替時も同じ演出で入れ替わる。
+  // useLayoutEffect なのは、切り替えた直後のコマに完成形を一瞬描かせないため
+  useLayoutEffect(() => {
+    const panel = panelRefs.current[activeTab];
+    if (!panel) return;
+
+    // この判定より前で gsap にも IntersectionObserver にも触れないこと。
+    // ここで return すれば SSR の完成形が残る（use-scroll-reveal.ts と同じ順序）
+    if (window.matchMedia(REDUCED_MOTION_QUERY).matches) return;
+
+    let entrance: gsap.core.Timeline | undefined;
+    const ctx = gsap.context(() => {
+      entrance = buildRouteEntrance(panel, {
+        // おすすめ枠は、電車の経路を描き終えてから点滅させる
+        onComplete: activeTab === "train" ? () => setShouldBlinkRecommended(true) : undefined,
+      });
+    }, panel);
+
+    let observer: IntersectionObserver | undefined;
+
+    if (hasEnteredRef.current || !("IntersectionObserver" in window)) {
+      entrance?.play();
+    } else {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+          hasEnteredRef.current = true;
+          observer?.disconnect();
+          entrance?.play();
+        },
+        { threshold: ENTRANCE_THRESHOLD }
+      );
+      observer.observe(panel);
+    }
+
+    return () => {
+      observer?.disconnect();
+      ctx.revert();
+      resetRouteCounts(panel);
+      // 隠れたパネルの CSS アニメーションは、再表示のときに頭から再生される。
+      // クラスを外しておき、電車へ戻ったときも描き終えてから点滅させる
+      if (activeTab === "train") setShouldBlinkRecommended(false);
+    };
+  }, [activeTab]);
 
   // 矢印キー・Home・End でタブ間を移動し、フォーカス移動と同時に選択も切り替える
   const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
@@ -103,7 +157,14 @@ export function AccessDirectionsTabs({
 
   return (
     <div>
-      <div role="tablist" aria-label={content.title} className={tablistClassName}>
+      {/* 入場は AccessPageMotion のリビールに任せる。カードは上の演出で出すため、
+          塊全体ではなくタブの列だけにリビールを掛ける */}
+      <div
+        role="tablist"
+        aria-label={content.title}
+        className={tablistClassName}
+        data-access-reveal="up"
+      >
         {TABS.map(({ id, Icon }, index) => {
           const isActive = activeTab === id;
 
@@ -139,13 +200,21 @@ export function AccessDirectionsTabs({
           key={id}
           role="tabpanel"
           id={`${PANEL_ID_PREFIX}${id}`}
+          ref={(node) => {
+            panelRefs.current[id] = node;
+          }}
           aria-labelledby={`${TAB_ID_PREFIX}${id}`}
           tabIndex={0}
           hidden={activeTab !== id}
           className={`mt-6 rounded-2xl ${focusRing}`}
         >
           {id === "train" ? (
-            <TrainRouteList content={content} venue={venue} routes={trainRoutes} />
+            <TrainRouteList
+              content={content}
+              venue={venue}
+              routes={trainRoutes}
+              shouldBlinkRecommended={shouldBlinkRecommended}
+            />
           ) : (
             <BusRouteList content={content} venue={venue} routes={busRoutes} />
           )}
@@ -159,37 +228,21 @@ interface TrainRouteListProps {
   content: AccessPageContent["directions"];
   venue: string;
   routes: readonly TrainRoute[];
+  /**
+   * おすすめ枠を点滅させるか。入場演出が電車の経路を描き終えたときに立つ。
+   * 点滅はクラスの付与で始まるため、JavaScript が無い環境やモーション軽減時は
+   * 枠が表示されたまま点滅しない
+   */
+  shouldBlinkRecommended: boolean;
 }
 
-function TrainRouteList({ content, venue, routes }: TrainRouteListProps) {
-  const recommendedFrameRef = useRef<HTMLSpanElement>(null);
-  const [shouldBlink, setShouldBlink] = useState(false);
-
-  // おすすめカードが初めて画面に入ったときに一度だけ枠を点滅させる。
-  // 点滅はクラスの付与で始まるため、JavaScript が無い環境では枠が表示されたまま残る。
-  // モーション軽減時は globals.css 側でアニメーションを止める
-  useEffect(() => {
-    const frame = recommendedFrameRef.current;
-    if (!frame || !("IntersectionObserver" in window)) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        setShouldBlink(true);
-        observer.disconnect();
-      },
-      { threshold: RECOMMENDED_BLINK_THRESHOLD }
-    );
-    observer.observe(frame);
-
-    return () => observer.disconnect();
-  }, []);
-
+function TrainRouteList({ content, venue, routes, shouldBlinkRecommended }: TrainRouteListProps) {
   return (
     <ol role="list" className={listClassName}>
       {routes.map((route) => (
         <li
           key={route.station}
+          data-route-card
           className={`${cardClassName} ${
             route.recommended ? recommendedBorderClassName : cardBorderClassName
           }`}
@@ -198,10 +251,9 @@ function TrainRouteList({ content, venue, routes }: TrainRouteListProps) {
             <>
               {/* バッジより先に置き、バッジが枠の上に重なるようにする */}
               <span
-                ref={recommendedFrameRef}
                 aria-hidden="true"
                 className={`${recommendedFrameClassName} ${
-                  shouldBlink ? "recommended-frame-blink" : ""
+                  shouldBlinkRecommended ? "recommended-frame-blink" : ""
                 }`}
               />
               <span className={recommendedBadgeClassName}>{content.recommended}</span>
@@ -244,6 +296,7 @@ function BusRouteList({ content, venue, routes }: BusRouteListProps) {
       {routes.map((route) => (
         <li
           key={`${route.lineCode}-${route.from}`}
+          data-route-card
           className={`${cardClassName} ${cardBorderClassName}`}
         >
           <ol>

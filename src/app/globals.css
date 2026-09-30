@@ -357,14 +357,14 @@ body {
   }
 
   /*
-   * アクセスページの「おすすめ」経路カードの枠。カードが画面に入ったときに
-   * AccessDirectionsTabs が付与し、3回点滅して不透明のまま止まる。
+   * アクセスページの「おすすめ」経路カードの枠。入場演出（route-entrance.ts）が
+   * 電車の経路を描き終えたときに AccessDirectionsTabs が付与し、3回点滅して不透明のまま止まる。
    * 0.6秒周期（1秒あたり約1.7回）で WCAG 2.3.1 の「1秒あたり3回以下」を満たし、
-   * 合計約2.3秒で止まるため 2.2.2 の停止手段も要らない。
-   * 遅延は、親の data-access-reveal="up"（0.72秒のフェード）とのぶつかりを避けるため。
+   * 合計約1.8秒で止まるため 2.2.2 の停止手段も要らない。
+   * 遅延は持たない。描き終えるまで付与されないので、カードの入場とはぶつからない。
    */
   .recommended-frame-blink {
-    animation: recommended-frame-blink 0.6s ease-in-out 0.5s 3;
+    animation: recommended-frame-blink 0.6s ease-in-out 3;
   }
 
   /*
