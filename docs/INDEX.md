@@ -102,9 +102,14 @@
 - **[browser-verification-pitfalls.md](./frontend/browser-verification-pitfalls.md)** - 検証手順そのものが誤る実例
   - **ハイドレーション完了前に読むと結論が反転する。** `resize_window` は viewport を変えない
 - **[agent-browser-workflow.md](./frontend/agent-browser-workflow.md)** - agent-browser によるデザイン再現とデバッグの標準フロー
-- **[layout-patterns.md](./frontend/layout-patterns.md)** - レイアウトパターンと設計原則（ヘッダー高さ・z-index・`max-w-*`・Tailwind v4 の出力順）
-  - **縦方向の寸法を CSS と JS が別々に持たない。** 片方だけ変えられる構造は必ず食い違う
+- **[layout-patterns.md](./frontend/layout-patterns.md)** - Header / Hero の寸法、z-index のレイヤー、position、寸法を1か所で持つ原則
+  - **Hero の高さは「viewport − Header の実高」ではない。** `--header-height`（88px）は2状態ヘッダー（107 / 77px）の近似値
+  - **z-index が効くのは同じ積み重ね文脈の中だけ。** Header 内のドロップダウンの z-60 は、ページ全体では Header と同じ 40
+- **[layout-responsive.md](./frontend/layout-responsive.md)** - タブレット帯（640〜1023px）の取りこぼし、DOM 2枚持ち、部分幅ヒーロー画像の境界処理
+  - **`lg:` の1段階だけで切り替えると 640〜1023px が全てモバイル扱いになる**
+- **[layout-width-and-alignment.md](./frontend/layout-width-and-alignment.md)** - 幅の梯子、左端の揃え方、負のマージン、Tailwind v4 の出力順
   - **1ページに `max-w-*` を何種類も同居させない。** ハウス標準は `PageSheetLayout` の1本
+  - **確認は `max-w-*` が効かない幅（1344px 未満）を含める。** 広い画面ではずれが消えて見える
 - **[landmarks-and-skip-link.md](./frontend/landmarks-and-skip-link.md)** - `<main id="content">` とスキップリンクの契約（#177 A）
 - **[timetable-gantt.md](./frontend/timetable-gantt.md)** - タイムテーブル盤面（ガントチャート）とモバイル縦スタックの設計
   - **縦方向の寸法は必ず px で持つ。** `height: %` は `min-height` しか持たない親の下で 0px に潰れる（#148）
