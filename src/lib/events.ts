@@ -1,4 +1,4 @@
-import { client, isMicrocmsConfigured } from "./microcms";
+import { isMicrocmsConfigured, isMicrocmsNotFound, microcmsGet } from "./microcms";
 import { EVENTS_VISIBLE, SPECIAL_VISIBLE } from "@/data/site";
 import { normalizeEventSessions } from "./event-sessions";
 import type {
@@ -182,6 +182,7 @@ function excludeUnreleasedSpecial(events: Event[]): Event[] {
  * @param limit 取得件数（デフォルト: 50）
  * @param filters フィルタオプション
  * @returns 企画の配列
+ * @throws microCMS から取得できなかった場合（空配列にはしない。#287）
  */
 export async function getEventsList(
   limit: number = 50,
@@ -209,7 +210,7 @@ export async function getEventsList(
 
     // 100件以下なら1回で取得
     if (limit <= MICROCMS_MAX_LIMIT) {
-      const response: RawEventListResponse = await client.get({
+      const response = await microcmsGet<RawEventListResponse>({
         endpoint: "events",
         queries: {
           limit,
@@ -226,7 +227,7 @@ export async function getEventsList(
 
     while (allContents.length < limit) {
       const perPage = Math.min(MICROCMS_MAX_LIMIT, limit - allContents.length);
-      const response: RawEventListResponse = await client.get({
+      const response = await microcmsGet<RawEventListResponse>({
         endpoint: "events",
         queries: {
           limit: perPage,
@@ -245,8 +246,9 @@ export async function getEventsList(
 
     return excludeUnreleasedSpecial(applyFilters(allContents.map(normalizeEvent)));
   } catch (error) {
+    // 「0件」と「取れなかった」を区別するため、空配列にせず投げる（#287）
     console.error("[getEventsList] Error:", error);
-    return [];
+    throw error;
   }
 }
 
@@ -257,12 +259,13 @@ export async function getEventsList(
  * 著名人ページは一般企画一覧より先に公開されることがあり、`getEventsList()` を
  * 流用すると EVENTS_VISIBLE が false の間は常に空になって先行公開が成立しない。
  * @returns 著名人企画の配列（公開日の新しい順）
+ * @throws microCMS から取得できなかった場合
  */
 export async function getSpecialEvents(): Promise<Event[]> {
   if (!SPECIAL_VISIBLE) return [];
   if (!isMicrocmsConfigured) return [];
   try {
-    const response: RawEventListResponse = await client.get({
+    const response = await microcmsGet<RawEventListResponse>({
       endpoint: "events",
       queries: {
         limit: MICROCMS_MAX_LIMIT,
@@ -272,8 +275,9 @@ export async function getSpecialEvents(): Promise<Event[]> {
     // select は API の filters で絞れない（上記コメント参照）。正規化後の値で絞る
     return response.contents.map(normalizeEvent).filter((event) => event.type === "special");
   } catch (error) {
+    // 「0件」と「取れなかった」を区別するため、空配列にせず投げる（#287）
     console.error("[getSpecialEvents] Error:", error);
-    return [];
+    throw error;
   }
 }
 
@@ -286,13 +290,14 @@ export async function getSpecialEvents(): Promise<Event[]> {
  * @param id 企画ID
  * @param draftKey microCMS の画面プレビューから渡された下書きキー。省略時は公開コンテンツのみ
  * @returns 著名人企画、該当しない場合は null
+ * @throws microCMS が「存在しない」以外の理由で失敗した場合（429 / 5xx など。#287）
  */
 export async function getSpecialEventById(id: string, draftKey?: string): Promise<Event | null> {
   // draftKey があるときは公開フラグを跨ぐ（理由は getEventById() のコメントを参照）
   if (!SPECIAL_VISIBLE && !draftKey) return null;
   if (!isMicrocmsConfigured) return null;
   try {
-    const response: RawEvent = await client.get({
+    const response = await microcmsGet<RawEvent>({
       endpoint: "events",
       contentId: id,
       ...(draftKey ? { queries: { draftKey } } : {}),
@@ -300,8 +305,11 @@ export async function getSpecialEventById(id: string, draftKey?: string): Promis
     const event = normalizeEvent(response);
     return event.type === "special" ? event : null;
   } catch (error) {
+    // null（→ 404）にするのは microCMS が「存在しない」と答えたときだけ。
+    // 429 / 5xx などを null にすると、実在するページが 404 で生成される（#287）
+    if (isMicrocmsNotFound(error)) return null;
     console.error("[getSpecialEventById] Error:", error);
-    return null;
+    throw error;
   }
 }
 
@@ -310,6 +318,7 @@ export async function getSpecialEventById(id: string, draftKey?: string): Promis
  * ISR再検証のたびにランダムが更新される
  * EVENTS_VISIBLE が false の間は常に空配列を返す（microCMSへは問い合わせない）
  * @returns おすすめ企画の配列
+ * @throws microCMS から取得できなかった場合
  */
 export async function getFeaturedEvents(): Promise<Event[]> {
   if (!EVENTS_VISIBLE) return [];
@@ -326,8 +335,9 @@ export async function getFeaturedEvents(): Promise<Event[]> {
     }
     return shuffled.slice(0, 6);
   } catch (error) {
+    // 「0件」と「取れなかった」を区別するため、空配列にせず投げる（#287）
     console.error("[getFeaturedEvents] Error:", error);
-    return [];
+    throw error;
   }
 }
 
@@ -340,6 +350,7 @@ export async function getFeaturedEvents(): Promise<Event[]> {
  * @param id 企画ID
  * @param draftKey microCMS の画面プレビューから渡された下書きキー。省略時は公開コンテンツのみ
  * @returns 企画情報、見つからない場合はnull
+ * @throws microCMS が「存在しない」以外の理由で失敗した場合（429 / 5xx など。#287）
  */
 export async function getEventById(id: string, draftKey?: string): Promise<Event | null> {
   /*
@@ -352,7 +363,7 @@ export async function getEventById(id: string, draftKey?: string): Promise<Event
   if (!EVENTS_VISIBLE && !draftKey) return null;
   if (!isMicrocmsConfigured) return null;
   try {
-    const response: RawEvent = await client.get({
+    const response = await microcmsGet<RawEvent>({
       endpoint: "events",
       contentId: id,
       ...(draftKey ? { queries: { draftKey } } : {}),
@@ -360,7 +371,10 @@ export async function getEventById(id: string, draftKey?: string): Promise<Event
     // データを正規化して返す
     return normalizeEvent(response);
   } catch (error) {
+    // null（→ 404）にするのは microCMS が「存在しない」と答えたときだけ。
+    // 429 / 5xx などを null にすると、実在するページが 404 で生成される（#287）
+    if (isMicrocmsNotFound(error)) return null;
     console.error("[getEventById] Error:", error);
-    return null;
+    throw error;
   }
 }
