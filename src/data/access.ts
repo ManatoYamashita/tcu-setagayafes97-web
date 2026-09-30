@@ -63,6 +63,13 @@ const lineNames = {
   },
 } as const satisfies Record<string, LocalizedText>;
 
+const lineNamesToyoko = {
+  ja: "東急東横線・目黒線",
+  en: "Tokyu Toyoko & Meguro Lines",
+  zh: "东急东横线・目黑线",
+  ko: "도큐 도요코선・메구로선",
+} as const satisfies LocalizedText;
+
 const tokyuBus = {
   ja: "東急バス",
   en: "Tokyu Bus",
@@ -113,6 +120,8 @@ export type BusRoute = {
  * 尾山台駅・等々力駅の徒歩時間は、大学公式案内の表記に合わせている。
  * 尾山台駅の12分は、委員会の決定（2026-09-28）でもある。路線図動画にも同じ数字が
  * 焼き込まれているため、変えるときは動画も作り直す（docs/frontend/access-page-design.md）。
+ * 田園調布駅の25分は、依頼者が Google マップで確認した値（2026-09-30）。大学公式案内に
+ * 記載は無い。路線図動画には田園調布駅が無く、動画の数字とは無関係。
  * 多摩川駅からの徒歩ルートは案内しない（バス経路のみ掲載）。
  */
 const trainRoutes = [
@@ -137,6 +146,18 @@ const trainRoutes = [
       en: "The next station from Oyamadai. Cross Kanpachi-dori and head toward the Tama River.",
       zh: "尾山台站的邻站。穿过环八通，朝多摩川方向步行即可抵达。",
       ko: "오야마다이역의 옆 역입니다. 간파치도리를 건너 다마가와 방면으로 향하면 도착합니다.",
+    },
+    recommended: false,
+  },
+  {
+    line: lineNamesToyoko,
+    station: stationNames.denenchofu,
+    walkTime: 25,
+    description: {
+      ja: "尾山台駅・等々力駅より距離があり、徒歩で約25分です。歩いてお越しの方向けの経路です。",
+      en: "This station is farther than Oyamadai and Todoroki, about a 25-minute walk. The route is for visitors who prefer to walk.",
+      zh: "此站比尾山台站、等等力站更远，步行约25分钟。适合愿意步行前来的访客。",
+      ko: "오야마다이역·도도로키역보다 멀어 도보 약 25분 걸립니다. 걸어서 오시는 분을 위한 경로입니다.",
     },
     recommended: false,
   },
