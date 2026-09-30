@@ -23,7 +23,8 @@
 docs/
 ├── INDEX.md          # 本索引ファイル
 ├── dev/              # 開発関連ドキュメント
-│   ├── git.md        # ブランチ戦略とCI/CDワークフロー
+│   ├── git.md        # ブランチ戦略・CI・コミット規約
+│   ├── staging-and-merge.md # ステージングの規約とマージ前の検証
 │   ├── ci-env.md     # GitHub Actions 環境変数管理（Secrets/Variables）
 │   ├── testing.md    # テスト方針（何をテストし、何をしないか）
 │   ├── domain-migration.md # setagayafes.org を第97回の正規ドメインにする手順
@@ -33,7 +34,8 @@ docs/
 │   ├── microcms.md   # microCMS API 制約と実装パターン
 │   ├── microcms-fetch-failures.md # 取得に失敗したときの扱い（404 と一時的な失敗の区別）
 │   ├── event-sessions.md # 企画の開催枠（2部制）の入稿と正規化の契約
-│   ├── content-revalidation.md # microCMS Webhook によるオンデマンド再検証と運用手順
+│   ├── content-revalidation.md # microCMS Webhook によるオンデマンド再検証の仕組みと設定
+│   ├── content-revalidation-ops.md # 再検証の検証手順と障害切り分け
 │   └── draft-preview.md # microCMS 画面プレビューによる下書きの実機確認
 ├── frontend/         # フロントエンド関連ドキュメント
 │   ├── design.md                  # デザインシステム（カラー・タイポグラフィトークン）
@@ -125,15 +127,16 @@ docs/
 
 ### 開発関連（dev/）
 
-- **[git.md](./dev/git.md)** - ブランチ運用戦略とGitHub ActionsによるCI/CDワークフローのテンプレート
+- **[git.md](./dev/git.md)** - ブランチ運用・CI・コミット規約
   - **CI のジョブを分ける基準は「`pnpm install` 以外に何を要求するか」。** install だけで済む検査（lint / format / 型 / テスト / ドキュメントの相対リンク）は `Static Checks` に束ねる
-  - ブランチ命名規則とライフサイクル
-  - GitHub Actionsワークフローの設定例
-  - コミットメッセージ規約
+  - ブランチ命名規則とライフサイクル。**命名規則から外れたブランチでは push 時の CI が走らない**
+  - **CI は PR を自動作成しない。** 以前載っていた自動作成ジョブの説明は汎用テンプレートの名残で、2026-09-30 に削除
+  - コミットメッセージ規約、Hotfix フロー、トラブルシューティング（workflow を含む push の拒否ほか）
+
+- **[staging-and-merge.md](./dev/staging-and-merge.md)** - ステージングの規約とマージ前の検証
   - **`git add -A` / `git add .` は禁止。** 複数エージェントが同じ作業ツリーを触るため、別作業の未コミット変更を無差別に取り込む。巻き込み時の復旧手順あり
   - **マージ前は `merge-tree` で「消えるファイル」を確認する。** GitHub の `CLEAN` は競合が無いことしか意味せず、マージでファイルが消えないことは保証しない。worktree での実動確認手順あり
   - **マージ前に `closingIssuesReferences` を見る。** 本文に `Closes #N` と書いても認識されないことがある（#306 → #287 が開いたまま残った）
-  - 運用フロー例とトラブルシューティング
 
 - **[testing.md](./dev/testing.md)** - テスト方針（#157）
   - **算術で表せる不変条件はユニットテスト、盤面が 0px でないことなど DOM が要るものは実ブラウザ**という切り分け
@@ -248,15 +251,17 @@ docs/
   - microCMS Webhook（`POST /api/revalidate`）を主系、時間ベース ISR を保険とする二段構え
   - **`revalidatePath` はパスの API ではなくタグの API。** `/about` や `type` 無しの動的ルートは、エラーにならず静かに何もしない
   - microCMS 側の設定手順。**削除・公開終了の通知タイミングは既定 OFF** で、ONにしないと「消したのに残る」が直らない
+  - **予約公開でも Webhook は飛ぶ**（通知タイミング「コンテンツの公開（予約設定による操作）」＝既定 ON）。ただし microCMS が予約を実行する時刻に精度保証は無い
+  - microCMS を読むページを増やしたときの対応表更新手順
+
+- **[content-revalidation-ops.md](./dev/content-revalidation-ops.md)** - 再検証の検証手順と障害切り分け
   - **`pnpm dev` ではキャッシュ挙動を検証できない。** dev は全エントリを常に stale 扱いにする
   - **合格判定は `age` であってラベルではない。** `REVALIDATED` は実体が古くなっても付いたまま残る。発火から**15秒**待って `age` が 0 近傍かを見る（5秒では旧コピーが返る）
   - **平常時は `HIT` + 大きな `age` が正常。** 異常判定が成立するのは入稿直後の1回だけ
-  - **予約公開でも Webhook は飛ぶ**（通知タイミング「コンテンツの公開（予約設定による操作）」＝既定 ON）。ただし microCMS が予約を実行する時刻に精度保証は無い
   - **本番を汚さない導通確認**: `informations` に `category = other` のテスト項目を作れば、どのページにも sitemap にも出ないまま Webhook を試せる
   - **API キーでは削除できない**（`DELETE is forbidden.`）。削除タイミングの検証は管理画面が要る
   - シークレットは Vercel も microCMS も読み返せない。一致確認は「手元の値で署名を作って本番へ POST し 200 か」で行う
   - 障害切り分け表（Webhook 実行履歴 → Vercel ログ → `x-vercel-cache`）
-  - microCMS を読むページを増やしたときの対応表更新手順
 
 ### フロントエンド関連（frontend/）
 

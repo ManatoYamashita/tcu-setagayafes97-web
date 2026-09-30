@@ -1,6 +1,7 @@
 # Branch Strategy & CI/CD Workflow
 
-ブランチ運用戦略とGitHub Actionsによる自動化ワークフローのテンプレートです。プロジェクトに適用する際は、実際のプロジェクト構成に合わせてカスタマイズしてください。
+本リポジトリのブランチ運用・CI・コミット規約。
+**ステージングとマージ前の検証は [staging-and-merge.md](./staging-and-merge.md)** にある（複数のエージェントが同じ作業ツリーを触るため、事故の実例が多い）。
 
 ## ブランチ戦略
 
@@ -8,7 +9,8 @@
 
 - **main ブランチへの直接 push は禁止**
 - すべての作業は専用のフィーチャーブランチで実施
-- GitHub Actions による自動 PR 作成を活用
+- PR は `gh pr create` などで手で作る（CI は PR を自動作成しない）
+- **PR の base は `main`。`dev` ブランチは存在しない**（2026-09-23 に削除）
 - PR マージ後に main ブランチを更新
 
 ### ブランチ命名規則
@@ -55,22 +57,17 @@ refactor/<refactor-target>   # リファクタリング
 
    ```bash
    git status --short              # 意図しないファイルが無いか確認
-   git add <パスを明示>            # git add . / git add -A は禁止（後述）
+   git add <パスを明示>            # git add . / git add -A は禁止（staging-and-merge.md）
    git commit -m "PREFIX: Commit message"
    git push origin feature/your-feature
    ```
 
-3. **PR 作成**: GitHub Actions が自動実行（後述）
+3. **PR 作成**: `gh pr create --base main`。CI（後述）が push 時と PR 時に走る
 
 4. **レビュー & マージ**: PR を確認後、main へマージ
 
-   **マージする前に、PR が閉じる Issue を GitHub が認識しているかを確かめる。**
-   2026-09-30 の #306 では、本文の `Closes #287` が認識されず、マージ後も Issue が開いたまま残った
-   （原因は未調査）。空ならマージ前に本文を直すか、マージ後に手で閉じる。
-
-   ```bash
-   gh pr view <N> --json closingIssuesReferences --jq '.closingIssuesReferences[].number'
-   ```
+   **マージの前に [staging-and-merge.md](./staging-and-merge.md) の「マージ前チェックリスト」を通す**
+   （消えるファイル・既に main へ入っていないか・閉じる Issue の認識）。
 
 5. **削除**: マージ後は不要なブランチを削除
    ```bash
@@ -78,126 +75,28 @@ refactor/<refactor-target>   # リファクタリング
    git push origin --delete feature/your-feature
    ```
 
-## GitHub Actions ワークフロー
+## CI（GitHub Actions）
 
-### Feature Branch CI/CD
+ワークフローは2本。定義の一次情報は `.github/workflows/` で、カバー範囲の表は
+[.claude/CLAUDE.md](../../.claude/CLAUDE.md) の「CI のカバー範囲」にある。
 
-GitHub Actionsを使用した自動化ワークフローのテンプレートです。プロジェクトの構成に合わせてカスタマイズしてください。
+| ワークフロー                  | いつ走るか                                       | 何をするか                                                       |
+| ----------------------------- | ------------------------------------------------ | ---------------------------------------------------------------- |
+| `feature-ci.yml`              | 上記5種のブランチへの push、base が `main` の PR | `Static Checks` / `Layout E2E` / `Build Check` の3ジョブ         |
+| `production-deploy-guard.yml` | `main` への push                                 | そのコミットの Vercel Production デプロイが5分以内に現れるか見る |
 
-**ファイル:** `.github/workflows/feature-ci.yml`（プロジェクトに応じて作成）
+**命名規則から外れたブランチ名では、push 時のチェックが一切走らない。**
 
-**トリガー条件例:**
-
-```yaml
-on:
-  push:
-    branches:
-      - "feature/**"
-```
-
-**ワークフロー概要:**
-
-#### 1. Quality Check Job
-
-feature ブランチへの push 時に自動実行される品質チェック：
-
-プロジェクトの構成に応じて、以下のようなチェックを実装します：
-
-- **Lint チェック**
-  - コード品質の検証
-  - プロジェクトで使用しているLinterに応じて設定
-
-- **フォーマットチェック**
-  - コードフォーマット規約準拠確認
-  - インデント、改行、引用符などの統一性検証
-
-- **型チェック**
-  - 型定義の整合性検証
-  - ビルドと重複しても、secrets を要求せず短時間で落ちる検査として価値がある
-
-- **ビルドチェック**
-  - ビルド成功確認
-  - ビルドサイズ計測（必要に応じて）
-
-**実装例（Node.jsプロジェクトの場合）:**
-
-```yaml
-- name: Run lint check
-  run: npm run lint:check
-
-- name: Run format check
-  run: npm run format:check
-
-- name: Run type check
-  run: npm run type-check
-
-- name: Run build
-  run: npm run build
-```
+**ジョブを分ける基準は「`pnpm install` 以外に何を要求するか」である。** install だけで済む検査
+（lint / format / 型 / ユニットテスト / ドキュメントの相対リンク / 禁止色 / 静的画像）は
+`Static Checks` に束ね、ブラウザを要求する検査は `Layout E2E`、microCMS の secrets を要求する
+検査は `Build Check` に置く。`Build Check` は secrets が届かない fork の PR では必ず落ちる。
+型チェックは `Build Check` と重複するが、secrets を要求せず短時間で落ちる検査として
+`Static Checks` にも置いてある。共通のセットアップは `.github/actions/setup` にある。
 
 > [!NOTE]
-> **本リポジトリの実装は上記テンプレートとは異なる。** `feature-ci.yml` は
-> `Static Checks`（lint / format / 型 / ユニットテスト / ドキュメントの相対リンク）、
-> `Layout E2E`（実ブラウザ）、
-> `Build Check` の3ジョブで、PR の自動作成は行わない。
-> ジョブを分ける基準は「`pnpm install` 以外に何を要求するか」である。
-> install だけで済む検査は `Static Checks` に束ね、secrets やビルド成果物、
-> ブラウザを要求する検査は別ジョブにする。
-
-#### 2. Create Pull Request Job
-
-品質チェック成功時に自動実行される PR 作成：
-
-**実行条件:**
-
-```yaml
-needs: quality-check
-if: success()
-```
-
-**PR 作成内容:**
-
-- **タイトル:** `🚀 [<feature-name>] Auto-generated PR`
-- **本文:**
-  - 品質チェック結果サマリー
-  - 最近のコミットリスト（最大10件）
-  - CI/CD 実行情報
-- **ベースブランチ:** main
-- **ヘッドブランチ:** feature/<feature-name>
-
-**重複 PR 防止:**
-
-- 既存 PR の存在確認
-- 同一ブランチの PR が存在する場合はスキップ
-
-### 必要な Repository 設定
-
-GitHub Actions が PR を作成するには、以下の設定が必要：
-
-1. リポジトリ設定ページへアクセス:
-
-   ```
-   https://github.com/<owner>/<repo>/settings/actions
-   ```
-
-2. 「Workflow permissions」セクションで以下を有効化:
-   - [x] **Allow GitHub Actions to create and approve pull requests**
-
-3. Permissions 設定:
-   ```yaml
-   permissions:
-     contents: write
-     pull-requests: write
-   ```
-
-### ワークフロー実行環境
-
-プロジェクトの構成に応じて、適切な実行環境を設定してください：
-
-- **OS:** ubuntu-latest（推奨）
-- **ランタイム:** プロジェクトに応じて設定（Node.js、Python、Goなど）
-- **パッケージマネージャー:** プロジェクトに応じて設定（npm、yarn、pipなど）
-- **キャッシュ戦略:** 使用するパッケージマネージャーに応じて設定
+> 以前ここに載っていた「品質チェック成功時に PR を自動作成するジョブ」は汎用テンプレートの名残で、
+> 本リポジトリには存在しない（2026-09-30 に削除）。
 
 ## Commit Message 規約
 
@@ -270,169 +169,7 @@ git commit -m "FEATURE: 新機能を追加" -m "
 "
 ```
 
-## ステージングの規約
-
-### `git add -A` / `git add .` は使わない
-
-> [!CAUTION]
-> **必ずパスを明示してステージングしてください。** ワイルドカードのステージングは、作業ツリーに残っている**別作業の未コミット変更や生成物を無差別に取り込みます。**
-
-```bash
-# NG
-git add -A
-git add .
-
-# OK
-git status --short                     # まず全体を見る
-git add src/app/globals.css src/components/home/SponsorBanner.tsx
-git diff --cached --name-only          # ステージした内容を確認してからコミット
-```
-
-**Why:** 2026-08-29、UIフィードバック対応の PR で `git add -A` を使ったところ、次の3つを巻き込んだ。
-
-| 巻き込んだもの                                          | 実害                                         |
-| ------------------------------------------------------- | -------------------------------------------- |
-| `home-dev.html`（dev サーバのHTMLダンプ 100KB）         | Prettier の `format:check` が落ち、CI が失敗 |
-| Kaisei Opti サブセットの自前配信（`@font-face`＋woff2） | 未レビューの別作業が PR に混入               |
-| `--font-serif` 等の `var()` フォールバック追加          | 同上（2回目は検知して回避）                  |
-
-**このリポジトリでは複数のエージェント・セッションが同じ作業ツリーを触ることがある。** 自分が編集していないファイルが `git status` に現れるのは異常ではなく通常であり、**ワイルドカードのステージングはそれを黙って取り込む。**
-
-### コミット前のチェックリスト
-
-1. `git status --short` — 身に覚えのないファイルが無いか
-2. `git diff --cached --stat` — ステージした差分が意図どおりか
-3. `git diff origin/main...HEAD --stat` — PR 全体のスコープが説明と一致しているか
-
-3 は特に重要で、**PR の説明と実体が食い違っていないか**を最後に必ず見る。
-
-### 巻き込んでしまった場合の復旧
-
-**他人の作業を消してはいけない。** まず別ブランチへ退避して git 履歴に残し、そのうえで自分の PR から取り除く。
-
-```bash
-# 1. 現在の HEAD から退避ブランチを作り、未コミット分も含めて保全
-git switch -c feature/<退避先>
-git add <該当パス> && git commit -m "..."
-git push -u origin feature/<退避先>
-
-# 2. 元のブランチへ戻り、対象ファイルを main の状態に戻してから自分の変更だけ再適用
-git switch <元のブランチ>
-git rm --cached <巻き込んだ資産>
-git checkout origin/main -- <巻き込まれたファイル>
-# → エディタで自分の変更だけを入れ直す
-```
-
-## マージ前の検証
-
-### diff ではなく「実マージ結果」を見る
-
-> [!CAUTION]
-> **GitHub の `mergeStateStatus=CLEAN` は「競合が無い」ことしか意味しません。マージによってファイルが消えないことは保証しません。**
-
-`git diff` は two-dot でも three-dot でもこれを検知できません。**実際にマージした結果のツリーを作って確認します。**
-
-```bash
-git fetch origin
-
-# 結果ツリーを作る（作業ツリーは変更されない）
-git merge-tree --write-tree origin/main origin/<ブランチ> > /tmp/mt.txt \
-  && echo "クリーンにマージ可能" || { echo "競合あり"; head /tmp/mt.txt; }
-
-TREE=$(head -1 /tmp/mt.txt)
-
-# 消えるファイルが無いか（ここが本題）
-git diff --diff-filter=D --name-only origin/main "$TREE"
-
-# 変わるファイル全体
-git diff --stat origin/main "$TREE"
-```
-
-**Why:** 2026-08-29、退避ブランチ（PR #116）は GitHub 上で `CLEAN` だったが、実際にマージすると
-`public/fonts/kaisei-opti-hero-700.woff2` と `@font-face` 宣言の**両方が無言で消えた。**
-残るのは存在しないフォントを参照する `.font-hero-display` だけで、エラーも警告も出ず静かに
-フォールバックする状態になっていた。
-
-原因は git の3-wayマージの正常な挙動である。**マージベースに存在し、片方で削除され、
-もう片方で未変更なら、削除が採用される。** この PR ではマージベースにファイルがあり、
-`main` 側で削除されていた（別 PR のスコープ整理）ため、こうなった。
-
-### アセットを含む PR は worktree で実際に動かす
-
-結果ツリーの検査で足りない場合（本当に動くかを見たい場合）は、**worktree を切る。**
-本体の作業ツリーを汚さず、他のセッションの未コミット作業とも衝突しない。
-
-```bash
-W=/tmp/wt-review
-git worktree add "$W" <ブランチ>
-cd "$W" && git merge origin/main        # ここで削除・競合が可視化される
-pnpm install --frozen-lockfile --prefer-offline
-PORT=3456 pnpm dev                       # 使用中のポートを避ける
-# 確認後
-git worktree remove --force "$W"
-```
-
-> [!WARNING]
-> **`node_modules` をシンボリックリンクで済ませない。** Turbopack が
-> `Symlink node_modules is invalid, it points out of the filesystem root` で panic する。
-> worktree 内で `pnpm install` すること（pnpm のストアが効くので数秒で終わる）。
-
-### 検証で分かることと分からないこと
-
-**アニメーションに依存する描画は自動操作では判定できない。** オープナー演出は自動操作下で
-t=0 のまま固まり、ヒーロー SVG が 0×0 のまま発火しないことがある。
-`document.fonts.load()` のような**明示的な API で「素材が正しいこと」までは確認できる**が、
-「実際に描画されるか」は実ブラウザでの目視が要る。詳細は
-[browser-verification-pitfalls.md](../frontend/browser-verification-pitfalls.md)。
-
-### マージ前チェックリスト
-
-1. `git merge-tree --write-tree` の結果ツリーで `--diff-filter=D` を確認 — **消えるファイルは無いか**
-2. `git diff --stat origin/main "$TREE"` — 変更範囲が PR の説明と一致しているか
-3. **その作業が既に `main` へ別経路で入っていないか** — 入っていればマージは巻き戻しになる
-
-3 も実際に起きた。PR #116 の内容は別コミット（`bf56d1a`）で `main` へ入っており、
-しかも `main` 側の実装のほうが後発で改善を含んでいた。**マージしていれば改善を打ち消していた。**
-
-## 運用フロー例
-
-### 典型的な開発フロー
-
-1. **新機能開発の開始**
-
-   ```bash
-   git checkout main
-   git pull origin main
-   git checkout -b feature/new-animation
-   ```
-
-2. **実装とコミット**
-
-   ```bash
-   # ファイル編集...
-   git status --short                    # 意図しないファイルが無いか確認
-   git add src/components/Foo.tsx        # パスを明示（git add . は禁止）
-   git commit -m "FEATURE: 新機能を追加"
-   git push origin feature/new-feature
-   ```
-
-3. **GitHub Actions 自動実行**（設定済みの場合）
-   - 品質チェック実行（Lint、Format、Buildなど）
-   - 成功時に自動 PR 作成
-
-4. **PR レビュー & マージ**
-   - GitHub UI で PR を確認
-   - 必要に応じてコードレビュー
-   - Merge pull request ボタンをクリック
-
-5. **ローカル更新**
-   ```bash
-   git checkout main
-   git pull origin main
-   git branch -d feature/new-feature
-   ```
-
-### 緊急修正（Hotfix）フロー
+## 緊急修正（Hotfix）フロー
 
 本番環境の緊急バグ修正時：
 
@@ -448,12 +185,13 @@ t=0 のまま固まり、ヒーロー SVG が 0×0 のまま発火しないこ�
 
    ```bash
    # バグ修正...
-   git add .
+   git status --short
+   git add <パスを明示>
    git commit -m "FIX: 本番環境でのクリティカルなバグを緊急修正"
    git push origin hotfix/critical-bug
    ```
 
-3. **手動 PR 作成（緊急時）**
+3. **PR 作成**
 
    ```bash
    gh pr create --base main --head hotfix/critical-bug \
@@ -498,40 +236,6 @@ git restore "$FILE" && git pull --ff-only
 > `git restore --staged --worktree .github/workflows/<file>` で該当ファイルだけ戻してから
 > 残りをコミットする。
 
-### PR が自動作成されない
-
-**原因 1:** Repository 設定で GitHub Actions の PR 作成が許可されていない
-
-**解決策:**
-
-```
-Settings > Actions > General > Workflow permissions
-→ "Allow GitHub Actions to create and approve pull requests" を有効化
-```
-
-**原因 2:** 既に同じブランチの PR が存在する
-
-**解決策:**
-
-- GitHub UI で既存 PR を確認
-- 必要に応じて既存 PR を使用
-
-**原因 3:** 品質チェックが失敗している
-
-**解決策:**
-
-```bash
-# ローカルで品質チェック実行（プロジェクトの構成に応じて）
-# 例: npm run lint:check
-# 例: npm run format:check
-# 例: npm run build
-
-# エラーを修正後、再度 push
-git add .
-git commit -m "FIX: 品質チェックエラーを修正"
-git push origin feature/your-feature
-```
-
 ### ブランチ名の競合
 
 **エラー例:**
@@ -555,6 +259,8 @@ git push origin feature-add-gtm
 
 ## 関連ドキュメント
 
+- [docs/dev/staging-and-merge.md](./staging-and-merge.md) - ステージングの規約とマージ前の検証
+- [docs/dev/ci-env.md](./ci-env.md) - CI とデプロイの環境変数
 - [docs/INDEX.md](../INDEX.md) - ドキュメント索引
 - [AGENTS.md](../../AGENTS.md) - エージェント運用ルール
 
@@ -567,3 +273,4 @@ git push origin feature-add-gtm
 - 2026-09-03: `feature-ci.yml` に型チェックを追加し、`lint-and-format` を `static-checks` へ改名（#157 段階1）
 - 2026-09-03: ユニットテストと実ブラウザのレイアウト実測を CI へ追加。共通のセットアップ4ステップを `.github/actions/setup` へ切り出した（#157 段階2・3）
 - 2026-09-06: ドキュメントの相対リンク検査（`pnpm check:doc-links`）を `Static Checks` へ追加（#211）。**見るのは相対リンクだけで、`#anchor` の存在は射程外**
+- 2026-09-30: 「ステージングの規約」「マージ前の検証」を staging-and-merge.md へ分割。存在しない「PR 自動作成ジョブ」の説明と、`git add .` を使っていた手順例を削除し、CI の節を実際のワークフローに合わせて書き直した
