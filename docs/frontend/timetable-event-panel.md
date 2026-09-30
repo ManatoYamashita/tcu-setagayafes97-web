@@ -61,6 +61,8 @@ JS 無効、中クリック、新規タブで開く、クローラの巡回が�
 退場は JS が `data-closing` を付け、`animationend` を待ってから `dialog.close()` する。
 `animationend` が来ない場合の保険として 320ms のタイムアウトを持つ（退場は 200ms）。
 
+退場も入場と同じ ease-out（`cubic-bezier(0.22, 1, 0.36, 1)`）にする。ease-in は出だしが遅く、閉じる操作の体感が鈍る。
+
 `prefers-reduced-motion: reduce` では移動をやめ、透明度だけで 120ms。e2e は
 `reducedMotion: "reduce"` で走るため、テストが見るのは最終形の位置である。
 
@@ -80,6 +82,8 @@ Esc（`cancel` イベント）は `preventDefault()` して自前の閉じる処
 - 目視: 1280px と 390px で確認。サムネイル無しの企画は `EventMediaPlaceholder` が出る
 
 ## 落とし穴
+
+- **前後ボタンの企画名を 1 行の `truncate` にしない。** 448px 幅でも切れ、押すまで全文が見えない。`line-clamp-2` にし、時刻は折り返す（`/better-interface` レビュー、2026-09-30）
 
 - **`{ scroll: false }` を外さない。** パネルを開くたびに先頭へ飛ぶ
 - **カードの `onClick` で `preventDefault()` した後に `onSelect` を呼ぶ順序を変えない。**

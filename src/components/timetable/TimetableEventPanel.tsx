@@ -229,8 +229,7 @@ function PanelBody({
 
         <h2
           id="timetable-panel-title"
-          tabIndex={-1}
-          className="mt-3 text-2xl font-bold leading-tight text-balance text-gray-900 focus-visible:outline-none"
+          className="mt-3 text-2xl font-bold leading-tight text-balance text-gray-900"
         >
           {event.title}
         </h2>
@@ -314,11 +313,11 @@ function NeighborButton({
         <span className="block text-xs font-semibold text-gray-600">
           {isPrev ? "前の企画" : "次の企画"}
         </span>
-        <span className="block truncate text-sm font-bold">
+        <span className="block line-clamp-2 text-sm font-bold">
           {neighbor ? neighbor.event.title : "なし"}
         </span>
         {neighbor && (
-          <span className="block truncate text-xs text-gray-600 tabular-nums">
+          <span className="block text-xs text-gray-600 tabular-nums">
             {timeText(neighbor.event)}
           </span>
         )}
