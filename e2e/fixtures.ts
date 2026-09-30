@@ -23,6 +23,24 @@ export const test = base.extend<TimetableFixtures>({
     await use(async (query: string) => {
       await page.goto(`/timetable${query}`);
 
+      // Suspense の中身が本来の位置へ移されるまで待つ（#309）。
+      // dev は動的描画でストリーミングするため、中身はまず <body> 直下の
+      // <div hidden id="S:n"> に届く。移される前でも DOM には接続しているので
+      // toBeAttached() は通るが、幅も高さも 0 を返す。
+      //
+      // load を待つだけでは足りない。移すのはストリーム中の $RC ではなく、$RC が
+      // 予約する $RV であり、load より後に走りうる。シェルの初回描画（$RT）より前なら
+      // requestAnimationFrame、後なら $RT + 300ms まで setTimeout で待つ
+      // （performance.now() が 2000〜2300ms なら 2300ms まで）。実測では 30〜335ms 後だった。
+      //
+      // 一方で goto() は load まで待ち、load はストリームの終端より後に来る。したがってこの時点で
+      // 一時置き場はすべて DOM に揃っており、「0個になる」は中身の到着前に素通りしない。
+      // 測る値（幅・高さ）とは独立した信号なので、下の「測ろうとしている値を待たない」にも反しない。
+      await expect(
+        page.locator('div[hidden][id^="S:"]'),
+        "Suspense の中身がストリーミングの一時置き場から移されていない"
+      ).toHaveCount(0);
+
       // 幅が project の指定どおりであること。1024px 未満だと盤面が display:none になり
       // getBoundingClientRect() が 0 を返すため、以降のアサーションが全部偽陰性になる
       const viewport = testInfo.project.use.viewport;
