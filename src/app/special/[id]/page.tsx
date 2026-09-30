@@ -12,7 +12,7 @@ import { NoticeList } from "@/components/special/NoticeList";
 import { SpecialPageMotion } from "@/components/special/SpecialPageMotion";
 import { SNSLinks } from "@/components/events/SNSLinks";
 import { DraftPreviewBanner } from "@/components/layout/DraftPreviewBanner";
-import { siteConfig, SPECIAL_GOODS_VISIBLE, SPECIAL_VISIBLE } from "@/data/site";
+import { siteConfig } from "@/data/site";
 import { readDraftPreviewContext } from "@/lib/draft-mode";
 import { createPageMetadata } from "@/lib/metadata";
 import { createBreadcrumbStructuredData, serializeJsonLd } from "@/lib/structured-data";
@@ -30,7 +30,6 @@ export const revalidate = 600;
 
 /**
  * 静的パラメータ生成
- * SPECIAL_VISIBLE が false の間は空配列（URLを先行露出させない）
  */
 export async function generateStaticParams() {
   const events = await getSpecialEvents();
@@ -88,23 +87,11 @@ function parsePriceValue(price?: string): string | undefined {
 /**
  * 著名人企画LP
  *
- * データは events API（type = special）に置きつつ、URL と公開制御だけを
- * /events から独立させています。著名人の発表は一般企画一覧より先行することがあり、
- * /events/[id] に統合すると「一覧は準備中なのに詳細だけ見える」不整合が生じるためです。
+ * データは events API（type = special）に置き、正規URLを /special/[id] に統一します。
  */
 export default async function SpecialDetailPage({ params }: SpecialPageProps) {
-  /*
-   * 下書きプレビューの判定に id が要るため、SPECIAL_VISIBLE の門より先に params を解決する。
-   * プレビューは公開フラグを跨ぐ。解禁前のLPを確認したいという要求はフラグが false の
-   * ときにこそ発生するためで、判断の経緯は docs/dev/draft-preview.md にある。
-   * 通常のアクセス（draft が null）に対する挙動はこれまでと変わらない。
-   */
   const { id } = await params;
   const draft = await readDraftPreviewContext("events", id);
-
-  if (!SPECIAL_VISIBLE && !draft) {
-    notFound();
-  }
 
   const event = await getSpecialEventById(id, draft?.draftKey);
 
@@ -188,8 +175,8 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
                   /*
                    * 画面上の「著名人企画」はリンクではなく素のラベルであり、対応する
                    * URL が無い。Google が item の省略を許すのは末尾の項目だけなので、
-                   * 中間階層としては宣言しない。/special を充てると SPECIAL_VISIBLE が
-                   * 真の間は このLP自身へ 302 転送されるため循環する。
+                   * 中間階層としては宣言しない。/special はこのLP自身へ
+                   * 302 転送されるため循環する。
                    */
                   { name: event.title },
                 ])
@@ -256,9 +243,7 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
                 place={event.place}
               />
 
-              {SPECIAL_GOODS_VISIBLE && (
-                <GoodsTable goods={special?.goods} note={special?.goodsNote} />
-              )}
+              <GoodsTable goods={special?.goods} note={special?.goodsNote} />
 
               <TicketTable tickets={special?.tickets} note={special?.ticketNote} />
 

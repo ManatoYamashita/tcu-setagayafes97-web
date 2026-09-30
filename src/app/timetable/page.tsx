@@ -3,29 +3,19 @@ import type { Metadata } from "next";
 import { getEventsList } from "@/lib/events";
 import { buildStageEventDetails, filterStageEvents } from "@/lib/timetable";
 import { TimetableContent } from "@/components/timetable/TimetableContent";
-import { ComingSoon } from "@/components/common/ComingSoon";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
 import { pageHeroes } from "@/data/page-heroes";
-import { EVENTS_VISIBLE } from "@/data/site";
 import { createPageMetadata } from "@/lib/metadata";
 
 /**
  * メタデータ
- * EVENTS_VISIBLE が false の間は準備中の文言を表示
  */
-export const metadata: Metadata = EVENTS_VISIBLE
-  ? createPageMetadata({
-      title: "タイムテーブル",
-      description:
-        "第97回東京都市大学世田谷祭のタイムテーブルページ。ステージ企画の開催時刻を確認できます。",
-      pathname: "/timetable",
-    })
-  : createPageMetadata({
-      title: "タイムテーブル",
-      description:
-        "第97回東京都市大学世田谷祭のタイムテーブルは現在準備中です。公開までもうしばらくお待ちください。",
-      pathname: "/timetable",
-    });
+export const metadata: Metadata = createPageMetadata({
+  title: "タイムテーブル",
+  description:
+    "第97回東京都市大学世田谷祭のタイムテーブルページ。ステージ企画の開催時刻を確認できます。",
+  pathname: "/timetable",
+});
 
 /**
  * ISR設定: 10分ごとに再検証
@@ -51,20 +41,8 @@ const USE_FIXTURE =
 /**
  * タイムテーブルページ
  * SSG + クライアントサイドフィルタリング
- * EVENTS_VISIBLE が false の間は準備中表示
  */
 export default async function TimetablePage() {
-  if (!EVENTS_VISIBLE) {
-    return (
-      <PageSheetLayout hero={pageHeroes.timetable} heroSize="compact">
-        <ComingSoon
-          title="タイムテーブルは準備中です"
-          description="第97回東京都市大学世田谷祭のタイムテーブルは現在準備中です。公開までもうしばらくお待ちください。"
-        />
-      </PageSheetLayout>
-    );
-  }
-
   // フィクスチャも本番と同じ filterStageEvents を通す。ここを迂回すると、
   // 検証しているものが本番の経路と別物になる
   const sourceEvents = USE_FIXTURE

@@ -1,5 +1,4 @@
 import { isMicrocmsConfigured, isMicrocmsNotFound, microcmsGet } from "./microcms";
-import { EVENTS_VISIBLE, SPECIAL_VISIBLE } from "@/data/site";
 import { normalizeEventSessions } from "./event-sessions";
 import { readSelectKey } from "./microcms-select";
 import type {
@@ -153,23 +152,8 @@ const MICROCMS_MAX_LIMIT = 100;
  */
 
 /**
- * 未解禁の著名人企画を一覧から除外する
- *
- * SPECIAL_VISIBLE が false の間、type = special の企画は
- * 企画一覧・タイムテーブル・おすすめ企画のどこにも出してはいけない。
- * 解禁前の出演者名が露出すると契約上の事故になる。
- * @param events 正規化済みの企画配列
- * @returns SPECIAL_VISIBLE が false の場合、type = special を除いた配列
- */
-function excludeUnreleasedSpecial(events: Event[]): Event[] {
-  if (SPECIAL_VISIBLE) return events;
-  return events.filter((event) => event.type !== "special");
-}
-
-/**
  * 企画一覧を取得
  * limit が microCMS 上限(100)を超える場合は自動的にページネーションで全件取得
- * EVENTS_VISIBLE が false の間は常に空配列を返す（microCMSへは問い合わせない）
  * @param limit 取得件数（デフォルト: 50）
  * @param filters フィルタオプション
  * @returns 企画の配列
@@ -179,7 +163,6 @@ export async function getEventsList(
   limit: number = 50,
   filters?: EventsFilterOptions
 ): Promise<Event[]> {
-  if (!EVENTS_VISIBLE) return [];
   if (!isMicrocmsConfigured) return [];
   try {
     // microCMS filters パラメータの構築
@@ -209,7 +192,7 @@ export async function getEventsList(
           ...filterParam,
         },
       });
-      return excludeUnreleasedSpecial(applyFilters(response.contents.map(normalizeEvent)));
+      return applyFilters(response.contents.map(normalizeEvent));
     }
 
     // 100件超: ページネーションで全件取得
@@ -235,7 +218,7 @@ export async function getEventsList(
       offset += perPage;
     }
 
-    return excludeUnreleasedSpecial(applyFilters(allContents.map(normalizeEvent)));
+    return applyFilters(allContents.map(normalizeEvent));
   } catch (error) {
     // 「0件」と「取れなかった」を区別するため、空配列にせず投げる（#287）
     console.error("[getEventsList] Error:", error);
@@ -246,14 +229,10 @@ export async function getEventsList(
 /**
  * 著名人企画（type = special）の一覧を取得
  *
- * IMPORTANT: 判定に使うのは SPECIAL_VISIBLE のみで、EVENTS_VISIBLE には依存しない。
- * 著名人ページは一般企画一覧より先に公開されることがあり、`getEventsList()` を
- * 流用すると EVENTS_VISIBLE が false の間は常に空になって先行公開が成立しない。
  * @returns 著名人企画の配列（公開日の新しい順）
  * @throws microCMS から取得できなかった場合
  */
 export async function getSpecialEvents(): Promise<Event[]> {
-  if (!SPECIAL_VISIBLE) return [];
   if (!isMicrocmsConfigured) return [];
   try {
     const response = await microcmsGet<RawEventListResponse>({
@@ -275,7 +254,6 @@ export async function getSpecialEvents(): Promise<Event[]> {
 /**
  * 著名人企画を1件取得
  *
- * `getEventById()` と違い EVENTS_VISIBLE には依存しない（`getSpecialEvents()` と同じ理由）。
  * type が special でないコンテンツを指定した場合は null を返す。
  *
  * @param id 企画ID
@@ -284,8 +262,6 @@ export async function getSpecialEvents(): Promise<Event[]> {
  * @throws microCMS が「存在しない」以外の理由で失敗した場合（429 / 5xx など。#287）
  */
 export async function getSpecialEventById(id: string, draftKey?: string): Promise<Event | null> {
-  // draftKey があるときは公開フラグを跨ぐ（理由は getEventById() のコメントを参照）
-  if (!SPECIAL_VISIBLE && !draftKey) return null;
   if (!isMicrocmsConfigured) return null;
   try {
     const response = await microcmsGet<RawEvent>({
@@ -307,12 +283,10 @@ export async function getSpecialEventById(id: string, draftKey?: string): Promis
 /**
  * おすすめ企画を取得（全企画からランダムに最大6件）
  * ISR再検証のたびにランダムが更新される
- * EVENTS_VISIBLE が false の間は常に空配列を返す（microCMSへは問い合わせない）
  * @returns おすすめ企画の配列
  * @throws microCMS から取得できなかった場合
  */
 export async function getFeaturedEvents(): Promise<Event[]> {
-  if (!EVENTS_VISIBLE) return [];
   if (!isMicrocmsConfigured) return [];
   try {
     const allEvents = await getEventsList(100);
@@ -335,23 +309,12 @@ export async function getFeaturedEvents(): Promise<Event[]> {
 /**
  * 特定の企画を取得
  *
- * EVENTS_VISIBLE が false の間は常に null を返す（microCMSへは問い合わせない）。
- * ただし draftKey が渡された場合はフラグを跨ぐ（下記）。
- *
  * @param id 企画ID
  * @param draftKey microCMS の画面プレビューから渡された下書きキー。省略時は公開コンテンツのみ
  * @returns 企画情報、見つからない場合はnull
  * @throws microCMS が「存在しない」以外の理由で失敗した場合（429 / 5xx など。#287）
  */
 export async function getEventById(id: string, draftKey?: string): Promise<Event | null> {
-  /*
-   * draftKey があるときは公開フラグを跨ぐ。「解禁前の内容を確認したい」という要求は
-   * フラグが false のときにこそ発生するため、ここで塞ぐとプレビューの意味が無くなる。
-   * この経路は /api/draft のシークレットと、その時点で有効な draftKey の二重で守られており、
-   * 公開ルート（draftKey を伴わない通常のアクセス）の判定は一切変えていない。
-   * 判断の経緯は docs/dev/draft-preview.md を参照。
-   */
-  if (!EVENTS_VISIBLE && !draftKey) return null;
   if (!isMicrocmsConfigured) return null;
   try {
     const response = await microcmsGet<RawEvent>({

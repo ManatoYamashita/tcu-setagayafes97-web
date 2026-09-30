@@ -20,13 +20,10 @@
  * `src/lib/*.ts` を型除去でそのまま読むためです（`scripts/ts-module-loader.mjs`）。
  * ロジックを書き写さないための選択で、package.json の engines も `>=24.0.0` です。
  *
- * ## 解禁前の企画名を公開リポジトリへ置かないための歯止め
+ * ## 著名人企画のIDを fixture に残さないための歯止め
  *
- * fixture に**企画名は入れません。** 保存するのは `E00` 形式の参照名と microCMS の
- * コンテンツID、そして答えの確率だけです。さらに `--write` は、母集団に著名人企画
- * （`type = special`）が1件でも含まれていたら**書き出しを拒否します**。
- * 著名人は解禁日が契約で決まっており、名前どころかIDの露出も避ける必要があるためです。
- * 計測そのものは拒否しません（解禁後の品質を測る用途があるため）。
+ * fixture に企画名は入れません。`--write` 時は著名人企画を母集団から除外し、
+ * ID も保存しません。計測だけを行う場合は全企画を対象にします。
  */
 
 /*
@@ -103,7 +100,7 @@ async function main() {
     error: (...args) => console.error(...args),
   });
 
-  // 環境変数を読んだ後に import する。src/data/site.ts は公開フラグをモジュール読み込み時に評価する
+  // microCMS と TypeSafe の設定を読み込んだ後に import する
   const { getEventsList } = await import("../src/lib/events.ts");
   const { buildSemanticRequest, interpretSemanticAnswers } =
     await import("../src/lib/semantic-search.ts");
@@ -113,22 +110,16 @@ async function main() {
     fail("TYPESAFE_API_KEY が未設定です。.env.local へ入れてください。");
   }
 
-  const events = await getEventsList(EVENTS_LIMIT);
+  const allEvents = await getEventsList(EVENTS_LIMIT);
+  const events = shouldWrite ? allEvents.filter((event) => event.type !== "special") : allEvents;
 
   if (events.length === 0) {
     fail(
-      "企画を1件も取得できませんでした。NEXT_PUBLIC_EVENTS_VISIBLE=true と microCMS の資格情報を確認してください。"
+      "企画を1件も取得できませんでした。microCMS の資格情報と公開コンテンツを確認してください。"
     );
   }
 
   const specialCount = events.filter((event) => event.type === "special").length;
-
-  if (shouldWrite && specialCount > 0) {
-    fail(
-      `著名人企画が ${specialCount} 件含まれています。fixture は公開リポジトリへ入るため、` +
-        " NEXT_PUBLIC_SPECIAL_VISIBLE=false で測り直してください。"
-    );
-  }
 
   console.log(`[measure] 母集団 ${events.length} 件（うち著名人企画 ${specialCount} 件）`);
   console.log(`[measure] モデル ${TYPESAFE_MODEL} / ${QUERIES.length} クエリ / 課金あり\n`);
@@ -173,7 +164,7 @@ async function main() {
         path.join(FIXTURE_DIR, toFixtureName(index, query)),
         `${JSON.stringify(
           {
-            // 企画名は入れない。冒頭コメントの「解禁前の企画名を置かない」を参照
+            // 企画名は入れず、著名人企画は母集団から除外する
             query,
             expected,
             model: response.model,

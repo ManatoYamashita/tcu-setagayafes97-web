@@ -4,14 +4,13 @@ import { NewsSectionClientLoader } from "./NewsSectionClientLoader";
 
 interface NewsSectionProps {
   newsList: News[];
-  isVisible: boolean;
 }
 
 /**
- * 非公開時はニュース用のクライアント実装を読み込まず、静的な案内だけを返す。
- * GSAP、ScrollTrigger、フィルタは公開データがある場合にだけ必要になる。
+ * お知らせが0件のときは静的な案内だけを返す。
+ * GSAP、ScrollTrigger、フィルタはデータがある場合にだけ必要になる。
  */
-function NewsUnavailable({ isVisible }: { isVisible: boolean }) {
+function NewsUnavailable() {
   return (
     <section className="deferred-section relative bg-secondary py-32">
       <CircularText
@@ -25,11 +24,7 @@ function NewsUnavailable({ isVisible }: { isVisible: boolean }) {
             <div className="mb-12 flex items-center justify-between">
               <h2 className="text-5xl font-bold md:text-6xl">NEWS</h2>
             </div>
-            <div className="text-center text-gray-900/60">
-              {isVisible
-                ? "現在、お知らせはありません。"
-                : "現在、お知らせは準備中です。公開までもうしばらくお待ちください。"}
-            </div>
+            <div className="text-center text-gray-900/60">現在、お知らせはありません。</div>
           </div>
         </div>
       </div>
@@ -37,9 +32,9 @@ function NewsUnavailable({ isVisible }: { isVisible: boolean }) {
   );
 }
 
-export function NewsSection({ newsList, isVisible }: NewsSectionProps) {
-  if (!isVisible || newsList.length === 0) {
-    return <NewsUnavailable isVisible={isVisible} />;
+export function NewsSection({ newsList }: NewsSectionProps) {
+  if (newsList.length === 0) {
+    return <NewsUnavailable />;
   }
 
   return <NewsSectionClientLoader newsList={newsList} />;

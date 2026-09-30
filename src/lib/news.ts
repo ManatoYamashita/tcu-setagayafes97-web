@@ -1,5 +1,4 @@
 import { isMicrocmsConfigured, isMicrocmsNotFound, microcmsGet } from "./microcms";
-import { NEWS_VISIBLE } from "@/data/site";
 import type { News, NewsListResponse, NewsType, RawNews, RawNewsListResponse } from "@/types/news";
 
 // 型を再エクスポート
@@ -58,13 +57,11 @@ function normalizeNews(rawNews: RawNews): News {
 
 /**
  * お知らせ一覧を取得
- * NEWS_VISIBLE が false の間は常に空配列を返す（microCMSへは問い合わせない）
  * @param limit 取得件数（デフォルト: 10）
  * @returns お知らせの配列
  * @throws microCMS から取得できなかった場合（空配列にはしない。#287）
  */
 export async function getNewsList(limit: number = 10): Promise<News[]> {
-  if (!NEWS_VISIBLE) return [];
   if (!isMicrocmsConfigured) return [];
   try {
     const response = await microcmsGet<RawNewsListResponse>({
@@ -97,17 +94,12 @@ export async function getLatestHeroNews(): Promise<News | null> {
 /**
  * 特定のお知らせを取得
  *
- * NEWS_VISIBLE が false の間は常に null を返す（microCMSへは問い合わせない）。
- * ただし draftKey が渡された場合はフラグを跨ぐ（`getEventById()` と同じ判断。
- * 理由は docs/dev/draft-preview.md）。
- *
  * @param id お知らせID
  * @param draftKey microCMS の画面プレビューから渡された下書きキー。省略時は公開コンテンツのみ
  * @returns お知らせ情報、見つからない場合はnull
  * @throws microCMS が「存在しない」以外の理由で失敗した場合（429 / 5xx など。#287）
  */
 export async function getNewsById(id: string, draftKey?: string): Promise<News | null> {
-  if (!NEWS_VISIBLE && !draftKey) return null;
   if (!isMicrocmsConfigured) return null;
   try {
     const response = await microcmsGet<RawNews>({

@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { specialBanner } from "../../src/data/special-banner";
 
 /**
  * 全ルートを1周して `<main id="content">` がちょうど1つあることを数える（#177 A の再発防止装置）
@@ -44,6 +45,8 @@ interface Route {
   readonly label: string;
   /** 期待する HTTP ステータス。`notFound()` へ落ちるルートは 404 */
   readonly status: 200 | 404;
+  /** /special は常時LPへ転送。CMS未設定時の転送先は404になる */
+  readonly redirectTo?: string;
 }
 
 /**
@@ -57,7 +60,12 @@ interface Route {
 const ROUTES: readonly Route[] = [
   { path: "/", label: "トップ", status: 200 },
   { path: "/events", label: "企画一覧", status: 200 },
-  { path: "/special", label: "著名人企画", status: 200 },
+  {
+    path: "/special",
+    label: "著名人企画への転送",
+    status: 200,
+    redirectTo: `/special/${specialBanner.eventId}`,
+  },
   { path: "/timetable", label: "タイムテーブル", status: 200 },
   { path: "/access", label: "アクセス", status: 200 },
   { path: "/info", label: "お知らせ一覧", status: 200 },
@@ -101,7 +109,15 @@ test.describe("ランドマークとスキップリンク", () => {
     test(`${route.label}（${route.path}）に main が1つだけある`, async ({ page }) => {
       const response = await page.goto(route.path);
       expect(response, `${route.path} への応答が無い`).not.toBeNull();
-      expect(response!.status(), `${route.path} の HTTP ステータス`).toBe(route.status);
+      if (route.redirectTo) {
+        expect(new URL(response!.url()).pathname, `${route.path} の転送先`).toBe(route.redirectTo);
+        // microCMS の資格情報が無い CI では転送先の詳細が 404 になる。
+        expect([200, 404], `${route.path} の転送先の HTTP ステータス`).toContain(
+          response!.status()
+        );
+      } else {
+        expect(response!.status(), `${route.path} の HTTP ステータス`).toBe(route.status);
+      }
 
       await assertRigAlive(page);
 

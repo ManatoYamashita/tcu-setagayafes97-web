@@ -1,5 +1,4 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { EVENTS_VISIBLE } from "@/data/site";
 import { getEventsList } from "@/lib/events";
 import { createRateLimiter, getClientIp } from "@/lib/rate-limit";
 import {
@@ -31,7 +30,7 @@ import { askSystemOne, isTypeSafeConfigured, TypeSafeRequestError } from "@/lib/
  * > 設置手順は docs/frontend/events-semantic-search.md を参照。
  *
  * 検証の順序に意味があります。**課金が発生する処理へ到達する前に、安い検査を全部終える**
- * ことで、公開フラグが落ちている間や鍵が未設定の間に1円も使わないようにしています。
+ * ことで、鍵が未設定の間に1円も使わないようにしています。
  */
 
 /**
@@ -101,19 +100,14 @@ function failure(error: string, status: number) {
 
 export async function GET(request: NextRequest) {
   try {
-    // 1. 企画が非公開なら母集団が空。問い合わせる意味がない
-    if (!EVENTS_VISIBLE) {
-      return failure("Semantic search is disabled.", 503);
-    }
-
-    // 2. 鍵が無ければ fail closed。クライアントは段3の結果を出したまま静かに戻る
+    // 1. 鍵が無ければ fail closed。クライアントは段3の結果を出したまま静かに戻る
     if (!isTypeSafeConfigured()) {
       console.error("[search] TYPESAFE_API_KEY が未設定です。意味検索は無効です。");
 
       return failure("Semantic search is not configured.", 503);
     }
 
-    // 3. クエリの検証。短すぎる・長すぎるものはここで落とす
+    // 2. クエリの検証。短すぎる・長すぎるものはここで落とす
     const raw = request.nextUrl.searchParams.get("q") ?? "";
     const normalized = normalizeSemanticQuery(raw);
 
@@ -121,7 +115,7 @@ export async function GET(request: NextRequest) {
       return failure("Query must be between 2 and 60 normalized characters.", 400);
     }
 
-    // 4. レート制限
+    // 3. レート制限
     const ip = getClientIp(request.headers);
 
     if (!limiter.take(ip)) {
@@ -130,7 +124,7 @@ export async function GET(request: NextRequest) {
       return failure("Too many requests.", 429);
     }
 
-    // 5. 母集団。#252 が入るまで fetch キャッシュを持たせない（Route Handler は revalidatePath が届かない）
+    // 4. 母集団。#252 が入るまで fetch キャッシュを持たせない（Route Handler は revalidatePath が届かない）
     const events = await getEventsList(EVENTS_LIMIT);
 
     if (events.length === 0) {
@@ -140,7 +134,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 6. 組み立て。Choice の選択肢上限を超える場合はここで RangeError になる
+    // 5. 組み立て。Choice の選択肢上限を超える場合はここで RangeError になる
     let plan;
 
     try {

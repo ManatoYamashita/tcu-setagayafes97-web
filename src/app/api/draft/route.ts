@@ -32,7 +32,7 @@ import { isMicrocmsApi, type MicrocmsApi } from "@/lib/revalidate-targets";
  * 環境変数:
  * - MICROCMS_DRAFT_SECRET: 上記URLの `secret` と照合する値。`openssl rand -hex 32` で生成する。
  *   **未設定のときは 500 を返してすべてのリクエストを拒否する（fail closed）。**
- *   このエンドポイントは公開フラグを跨いで未公開コンテンツを見せる力を持つため、
+ *   このエンドポイントは microCMS の下書きを見せる力を持つため、
  *   検証できない状態で素通しさせない。
  *   Vercel への登録は、microCMS 側のプレビューURLを設定する**前に**済ませること。
  *

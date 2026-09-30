@@ -81,7 +81,7 @@ export const test = base.extend<TimetableFixtures>({
     // 同じ文字列が2箇所に当たる。visible ではなく attached で見る
     await expect(
       page.getByText(FIXTURE_MARKER).first(),
-      "フィクスチャが無効です。NEXT_PUBLIC_EVENTS_VISIBLE=true NEXT_PUBLIC_TIMETABLE_FIXTURE=1 で dev を起動してください"
+      "フィクスチャが無効です。NEXT_PUBLIC_TIMETABLE_FIXTURE=1 で dev を起動してください"
     ).toBeAttached();
 
     await use(page);
