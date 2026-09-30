@@ -65,7 +65,7 @@
 - **[testing.md](./dev/testing.md)** - テスト方針（何をユニットテストにし、何を実ブラウザに回すか。#157）
   - **jsdom / happy-dom を入れてはいけない。** `getBoundingClientRect()` が常に 0 で #148 を原理的に検出できない
   - **テストの価値は「落ちること」でしか測れない。** 退行を注入して赤になるのを確かめる
-- **[ci-env.md](./dev/ci-env.md)** - GitHub Actions / Vercel の環境変数と本番反映の判定
+- **[ci-env.md](./dev/ci-env.md)** - GitHub Actions / Vercel の環境変数、シークレット登録順と本番反映の判定
   - **表示制御の環境変数は廃止済み。** 公開状態は microCMS で管理する
   - **`vercel promote` は使わない。** Preview の環境変数の成果物が本番に出る
 - **[domain-migration.md](./dev/domain-migration.md)** - `setagayafes.org` を第97回の正規ドメインにした手順と転送一覧
