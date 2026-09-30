@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
+import { FactList } from "@/components/ui/FactList";
 import { guideConfig } from "@/data/guide";
 import { pageHeroes, type PageHeroData } from "@/data/page-heroes";
 import { Link } from "@/i18n/navigation";
@@ -33,44 +34,6 @@ export async function generateMetadata({
     locale: locale as "ja" | "en" | "zh" | "ko",
     localized: true,
   });
-}
-
-/**
- * ラベル・値の2列リスト
- *
- * About の開催概要（src/components/about/FestivalIntroSection.tsx）と同じ構成で、
- * 角丸・影・セル背景を持たず、左の一本線と余白だけでまとまりを示す
- * （docs/frontend/design.md「開催概要の情報リスト」）。
- * `alert` は緊急時の対応にだけ使う。赤は危険の意味を担う色なので、ほかの節へ広げないこと。
- * Tailwind がクラスを検出できるよう、値は完全なリテラルで書く。
- */
-const factTones = {
-  default: { rule: "border-primary-600", label: "text-primary-700" },
-  alert: { rule: "border-red-700", label: "text-red-700" },
-} as const;
-
-function GuideFacts({
-  items,
-  tone = "default",
-}: {
-  items: readonly { label: string; value: string }[];
-  tone?: keyof typeof factTones;
-}) {
-  const style = factTones[tone];
-  return (
-    <dl className={`space-y-3 border-l-[3px] pl-5 sm:pl-8 ${style.rule}`}>
-      {items.map((item) => (
-        <div key={item.label} className="sm:flex sm:gap-8">
-          <dt
-            className={`w-32 shrink-0 break-keep text-sm font-bold leading-6 sm:w-40 sm:text-base sm:leading-7 ${style.label}`}
-          >
-            {item.label}
-          </dt>
-          <dd className="text-sm leading-7 text-gray-900 sm:text-base">{item.value}</dd>
-        </div>
-      ))}
-    </dl>
-  );
 }
 
 /**
@@ -165,7 +128,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
         </nav>
 
         <GuideSection id="admission" title={t("sections.admission")}>
-          <GuideFacts
+          <FactList
             items={[
               { label: t("labels.admissionFee"), value: guideConfig.admission.fee },
               { label: t("labels.openingHours"), value: guideConfig.admission.time },
@@ -175,7 +138,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
         </GuideSection>
 
         <GuideSection id="precautions" title={t("sections.precautions")}>
-          <GuideFacts
+          <FactList
             items={guideConfig.precautions.map((item) => ({
               label: item.category,
               value: item.content,
@@ -184,7 +147,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
         </GuideSection>
 
         <GuideSection id="accessibility" title={t("sections.accessibility")}>
-          <GuideFacts
+          <FactList
             items={[
               {
                 label: t("labels.wheelchair"),
@@ -209,7 +172,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
         </GuideSection>
 
         <GuideSection id="lost-and-found" title={t("sections.lostFound")}>
-          <GuideFacts
+          <FactList
             items={[
               { label: t("labels.lostFoundLocation"), value: guideConfig.lostAndFound.location },
               { label: t("labels.lostFoundHours"), value: guideConfig.lostAndFound.hours },
@@ -219,7 +182,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
         </GuideSection>
 
         <GuideSection id="families" title={t("sections.families")}>
-          <GuideFacts
+          <FactList
             items={[
               { label: t("labels.nursingRoom"), value: existence(forFamilies.nursingRoom) },
               {
@@ -232,7 +195,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
         </GuideSection>
 
         <GuideSection id="emergency" title={t("sections.emergency")}>
-          <GuideFacts
+          <FactList
             tone="alert"
             items={[
               { label: t("labels.medicalRoom"), value: guideConfig.emergency.medicalRoom },
