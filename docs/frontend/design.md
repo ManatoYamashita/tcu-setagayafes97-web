@@ -545,98 +545,10 @@ WCAG 2.1 に準拠した最低基準。
 
 ---
 
-## タイポグラフィシステム
+## タイポグラフィ
 
-### ブランドフォント — Kaisei Opti
-
-東京都市大学 世田谷祭のブランドフォント。
-
-| 属性       | 値                                         |
-| ---------- | ------------------------------------------ |
-| フォント名 | Kaisei Opti（海星 Opti）                   |
-| 分類       | Japanese Mincho / Serif                    |
-| 制作       | Font Data Inc.                             |
-| 提供元     | Google Fonts                               |
-| ウェイト   | 400（Regular）/ 500（Medium）/ 700（Bold） |
-| ライセンス | SIL Open Font License 1.1                  |
-
-#### フォントの特性
-
-Kaisei Opti は毛筆書体（楷書）の筆法を残しつつ、現代的な可読性のために最適化された明朝体（Mincho）フォント。「Opti」の名は Optical Sizing（視覚的調整）に由来し、表示サイズに応じたバランスが考慮されている。
-
-**強み:**
-
-- 日本語テキストとの相性が良い（漢字・かな・英数字のウェイトが統一）
-- 大サイズでの使用時に筆の抑揚が映える
-- ウェイト 700 はインパクトのある見出しに適する
-
-**制限・注意事項（重要）:**
-
-- 毛筆由来の筆跡（払い・止め・入り）が強く、**本文小サイズ（16px 以下）での連用は可読性が落ちる**
-- 欧文との混植では字幅の差が目立ちやすいため、英数字は別フォントの指定を推奨
-- 行間は最低 `1.8` 以上を確保すること（詰まると読みにくくなる）
-- 過度に使用するとデザインが「和風・和食店」的なトーンに偏るため、**使用箇所を見出し・大テキストに絞る**
-
-#### 読み込み（Next.js）
-
-```tsx
-// src/app/layout.tsx
-// src/components/layout/KaiseiFont.ts
-import { Kaisei_Opti } from "next/font/google";
-
-const kaiseiOpti = Kaisei_Opti({
-  weight: ["400", "700"],
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-kaisei-opti",
-});
-```
-
-`next/font` の変数をルートへ付けるとフォントCSSが全ページへ配信される。
-使用箇所のないフォントは将来用に読み込まず、必要になった時点で追加する。Kaisei Opti は
-ページ見出しでのみ遅延ロードし、本文はOSのシステムフォントを使用する。
-性能上の判断基準は [performance.md](./performance.md) を参照する。
-
-```css
-/* globals.css */
-:root {
-  --font-kaisei-opti: /* Next.js が注入 */;
-}
-```
-
-#### 使用用途と禁止事項
-
-| 用途                      | 可否 | 備考                                                |
-| ------------------------- | ---- | --------------------------------------------------- |
-| ページ大見出し（H1/H2）   | 推奨 | 48px 以上、weight 700                               |
-| セクション見出し（H3/H4） | 可   | 32px 以上、weight 500 以上                          |
-| ロゴ・ブランド表記        | 推奨 | SVG または大サイズでの使用に限る                    |
-| キャッチコピー            | 可   | 日本語テキストに限定                                |
-| 本文（16px 以下）         | 禁止 | 読みにくい。本文はシステムフォントまたは sans-serif |
-| 英語テキスト              | 禁止 | 欧文グリフのバランスが崩れる                        |
-| 数字（価格・日時）        | 禁止 | 欧文専用フォントで揃えること                        |
-| UI ラベル・ボタン         | 禁止 | 操作性が落ちる                                      |
-
----
-
-### フォントスケール
-
-タイポグラフィはモジュラースケール（比率 1.25 / Major Third）を基準とする。
-
-| Token         | サイズ | Line Height | Weight  | 主な用途             |
-| ------------- | ------ | ----------- | ------- | -------------------- |
-| `--text-6xl`  | 60px   | 1.1         | 700     | ページタイトル（H1） |
-| `--text-5xl`  | 48px   | 1.2         | 700     | セクション大見出し   |
-| `--text-4xl`  | 38px   | 1.3         | 700     | セクション見出し     |
-| `--text-3xl`  | 30px   | 1.4         | 500–700 | カード見出し         |
-| `--text-2xl`  | 24px   | 1.5         | 500     | サブ見出し           |
-| `--text-xl`   | 20px   | 1.6         | 400–500 | リード文             |
-| `--text-base` | 16px   | 1.75        | 400     | 本文テキスト         |
-| `--text-sm`   | 14px   | 1.7         | 400     | 補足・キャプション   |
-| `--text-xs`   | 12px   | 1.6         | 400     | ラベル・タグ         |
-
-> **Kaisei Opti 適用対象**: `--text-4xl` 以上（30px 以上）の見出しテキストのみ推奨。
-> `--text-3xl` 以下は sans-serif（Noto Sans JP 等）を基本とし、Kaisei Opti は避ける。
+**[typography.md](./typography.md) に分割した**（2026-09-30）。Kaisei Opti の読み込みと使い分け、
+文字サイズと行送り（Tailwind の既定値）はそちらにある。
 
 ---
 
@@ -663,7 +575,7 @@ grep -nE '^[[:space:]]*--(color|font)-' src/app/globals.css
 `--text-xs`〜`--text-6xl`）は `globals.css` に存在せず**、`--color-accent` の値も違っていた
 （実体は `var(--color-primary-400)`）。逆に実在する `--color-gray-500` などが載っていなかった。
 写しは必ず古くなるため削除した。フォントは `--font-sans` / `--font-serif` / `--font-heading` で、
-文字サイズは CSS 変数を定義せず Tailwind 既定の `text-*` を使っている（上のフォントスケール表は目安であり、変数名ではない）。
+文字サイズは CSS 変数を定義せず Tailwind 既定の `text-*` を使っている（[typography.md](./typography.md) のフォントスケール表を参照）。
 
 ---
 
@@ -751,6 +663,7 @@ const href = document.querySelector("link[rel=stylesheet]").href;
 
 ## 参照・関連ドキュメント
 
+- [typography.md](./typography.md) — Kaisei Opti の使い分け、文字サイズと行送り
 - [layout-patterns.md](./layout-patterns.md) — z-index・レイアウト設計原則
 - [browser-verification-pitfalls.md](./browser-verification-pitfalls.md) — 検証手順そのものが誤る実例
 - [.claude/CLAUDE.md](../../.claude/CLAUDE.md) — プロジェクト全体設計方針（テーマカラー・多言語対応）
@@ -759,4 +672,4 @@ const href = document.querySelector("link[rel=stylesheet]").href;
 
 ---
 
-**最終更新日**: 2026-09-30（実体と食い違っていた「CSS 変数まとめ」を一次定義への参照に置き換えた）
+**最終更新日**: 2026-09-30（「CSS 変数まとめ」を一次定義への参照に置き換え、タイポグラフィを typography.md へ分割した）
