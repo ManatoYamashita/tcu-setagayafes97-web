@@ -115,3 +115,57 @@ describe("normalizeEvent の開催枠（#281）", () => {
     expect(event).not.toHaveProperty("endTime");
   });
 });
+
+describe("normalizeEvent の開催枠の日程（#305）", () => {
+  const session = (date: string[] | string | undefined, startTime: string, endTime: string) =>
+    ({ fieldId: "session", date, startTime, endTime }) as const;
+
+  it("select の日程（配列・文字列）を day1 / day2 として読む", () => {
+    const event = normalizeEvent(
+      rawEventFixture({
+        date: "both : 両日",
+        sessions: [
+          session("day2", "11:00", "15:00"),
+          session(["day1 : 10月31日（土）"], "11:00", "16:00"),
+        ],
+      })
+    );
+    expect(event.sessions).toEqual([
+      { date: "day1", startTime: "11:00", endTime: "16:00" },
+      { date: "day2", startTime: "11:00", endTime: "15:00" },
+    ]);
+  });
+
+  it("日程の順に並べてから開始時刻で並べる", () => {
+    // 開始時刻だけで並べると、2日目の 10:00 が1日目の 11:00 より前に来る
+    const event = normalizeEvent(
+      rawEventFixture({
+        sessions: [session("day2", "10:00", "11:00"), session("day1", "11:00", "12:00")],
+      })
+    );
+    expect(event.sessions.map(({ date }) => date)).toEqual(["day1", "day2"]);
+  });
+
+  it("both / other / 未入力の日程は「日程の指定なし」とし、date キーを持たせない", () => {
+    const event = normalizeEvent(
+      rawEventFixture({
+        sessions: [
+          session(["both : 両日"], "10:00", "11:00"),
+          session("other", "12:00", "13:00"),
+          session(undefined, "14:00", "15:00"),
+        ],
+      })
+    );
+    expect(event.sessions).toHaveLength(3);
+    for (const normalized of event.sessions) {
+      expect(normalized).not.toHaveProperty("date");
+    }
+  });
+
+  it("日程だけで時刻の無い行は、値の無い行として落とす", () => {
+    const event = normalizeEvent(
+      rawEventFixture({ startTime: "10:40", endTime: "11:25", sessions: [session("day1", "", "")] })
+    );
+    expect(event.sessions).toEqual([{ startTime: "10:40", endTime: "11:25" }]);
+  });
+});

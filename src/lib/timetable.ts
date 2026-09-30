@@ -69,7 +69,8 @@ export function filterStageEvents(events: Event[]): TimetableEntry[] {
         {
           id: event.id,
           type: event.type,
-          date: event.date,
+          // 日程を持つ枠はその日だけに出す（#305）。filterEventsByDate() はこの値で振り分ける
+          date: session.date ?? event.date,
           title: event.title,
           place: event.place,
           organizer: event.organizer,

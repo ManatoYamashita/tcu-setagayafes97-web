@@ -11,6 +11,12 @@ const TWO_PARTS = [
   { startTime: "14:45", endTime: "15:45" },
 ];
 
+/** 両日開催で日ごとに終了が違う企画（#305 の Jazz Festival） */
+const PER_DAY = [
+  { date: "day1" as const, startTime: "11:00", endTime: "16:00" },
+  { date: "day2" as const, startTime: "11:00", endTime: "15:00" },
+];
+
 describe("getSessionLabel", () => {
   it("枠が2つ以上のときだけ「第n部」と呼ぶ", () => {
     expect(getSessionLabel(0, 1)).toBeUndefined();
@@ -65,7 +71,13 @@ describe("formatSessions", () => {
 });
 
 describe("buildEventScheduleJsonLd", () => {
-  const base = { title: "カレッジフェスタ", dateIso: "2026-10-31", location: { name: "ホール" } };
+  const dates = { day1: "2026-10-31", day2: "2026-11-01" };
+  const base = {
+    title: "カレッジフェスタ",
+    dates,
+    defaultDateIso: "2026-10-31",
+    location: { name: "ホール" },
+  };
 
   it("1枠は親の開始・終了だけを出し、subEvent を付けない", () => {
     expect(
@@ -162,5 +174,80 @@ describe("buildEventScheduleJsonLd", () => {
     expect(
       buildEventScheduleJsonLd({ ...base, sessions: [], fallbackStartDate: "2026-10-31" })
     ).toEqual({ startDate: "2026-10-31" });
+  });
+
+  it("日程を持つ枠はその日の日付で出し、親の範囲は両日にまたがる（#305）", () => {
+    const result = buildEventScheduleJsonLd({
+      ...base,
+      title: "Jazz Festival",
+      // 日程の無い枠の既定日（両日開催は2日目に寄る）とは別に、枠の日程が勝つ
+      defaultDateIso: dates.day2,
+      sessions: PER_DAY,
+    });
+
+    expect(result).toEqual({
+      startDate: "2026-10-31T11:00:00+09:00",
+      endDate: "2026-11-01T15:00:00+09:00",
+      subEvent: [
+        {
+          "@type": "Event",
+          name: "Jazz Festival（1日目）",
+          startDate: "2026-10-31T11:00:00+09:00",
+          endDate: "2026-10-31T16:00:00+09:00",
+          location: base.location,
+        },
+        {
+          "@type": "Event",
+          name: "Jazz Festival（2日目）",
+          startDate: "2026-11-01T11:00:00+09:00",
+          endDate: "2026-11-01T15:00:00+09:00",
+          location: base.location,
+        },
+      ],
+    });
+  });
+
+  it("親の終了を日付込みで比べる（時刻だけで比べると1日目の 16:00 が勝つ）", () => {
+    // 1日目 11:00–16:00 と 2日目 11:00–15:00。時刻だけなら 16:00 が最後の終了になり、
+    // 親の範囲が1日目で閉じて2日目の subEvent がはみ出す
+    const result = buildEventScheduleJsonLd({ ...base, sessions: PER_DAY });
+    expect(result.endDate).toBe("2026-11-01T15:00:00+09:00");
+  });
+});
+
+describe("日程を持つ開催枠（#305）", () => {
+  it("同じ日の枠の中でだけ「第n部」を数え、日程が2種類以上なら「n日目」を付ける", () => {
+    expect(labelSessions(PER_DAY)).toEqual([
+      { ...PER_DAY[0], dayLabel: "1日目" },
+      { ...PER_DAY[1], dayLabel: "2日目" },
+    ]);
+
+    const mixed = labelSessions([
+      { date: "day1", startTime: "10:00", endTime: "11:00" },
+      { date: "day1", startTime: "13:00", endTime: "14:00" },
+      { date: "day2", startTime: "10:00", endTime: "11:00" },
+    ]);
+    expect(mixed.map(({ dayLabel, label }) => [dayLabel, label])).toEqual([
+      ["1日目", "第1部"],
+      ["1日目", "第2部"],
+      ["2日目", undefined],
+    ]);
+  });
+
+  it("日程が1種類だけなら「n日目」を付けない（1日だけの企画に付けても情報が増えない）", () => {
+    const sessions = [{ date: "day1" as const, startTime: "10:00", endTime: "11:00" }];
+    expect(labelSessions(sessions)[0]).not.toHaveProperty("dayLabel");
+  });
+
+  it("詳細ページは「1日目 11:00 〜 16:00」の形で出す", () => {
+    expect(formatSessions(PER_DAY)).toEqual(["1日目 11:00 〜 16:00", "2日目 11:00 〜 15:00"]);
+  });
+
+  it("カード向け（withLabel: false）でも「n日目」は付ける", () => {
+    // 付けないと "11:00 - 16:00 / 11:00 - 15:00" になり、どちらが何日目か読めない
+    expect(formatSessions(PER_DAY, { separator: " - ", withLabel: false })).toEqual([
+      "1日目 11:00 - 16:00",
+      "2日目 11:00 - 15:00",
+    ]);
   });
 });

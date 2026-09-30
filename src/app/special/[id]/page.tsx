@@ -142,7 +142,9 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
     ...buildEventScheduleJsonLd({
       title: event.title,
       sessions: event.sessions,
-      dateIso: eventDateIso,
+      // 日程を持つ枠はその日の日付になる（#305）
+      dates: siteConfig.dates,
+      defaultDateIso: eventDateIso,
       location,
       fallbackStartDate: eventDateIso,
     }),

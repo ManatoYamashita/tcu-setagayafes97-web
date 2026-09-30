@@ -1,6 +1,7 @@
 import { isMicrocmsConfigured, isMicrocmsNotFound, microcmsGet } from "./microcms";
 import { EVENTS_VISIBLE, SPECIAL_VISIBLE } from "@/data/site";
 import { normalizeEventSessions } from "./event-sessions";
+import { readSelectKey } from "./microcms-select";
 import type {
   Event,
   EventListResponse,
@@ -27,17 +28,7 @@ export interface EventsFilterOptions {
  * @returns 正規化されたEventDate
  */
 function normalizeEventDate(date: string[] | string | undefined): EventDate {
-  if (!date) {
-    return "other";
-  }
-
-  const rawDate = Array.isArray(date) ? date[0] : date;
-
-  if (typeof rawDate !== "string") {
-    return "other";
-  }
-
-  const cleanDate = rawDate.split(":")[0].trim().toLowerCase();
+  const cleanDate = readSelectKey(date);
 
   if (
     cleanDate === "day1" ||
