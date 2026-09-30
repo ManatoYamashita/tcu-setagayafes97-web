@@ -24,6 +24,11 @@ export type TimetableEntry = Pick<
   entryKey: string;
   /** 開催枠が2つ以上ある企画だけ「第1部」などが入る */
   sessionLabel?: string;
+  /**
+   * 開場時刻（著名人企画の `special.openTime`）。未入力の企画には無い。
+   * 自由入力のテキストなので、HH:mm とは限らない
+   */
+  openTime?: string;
 };
 
 /**
