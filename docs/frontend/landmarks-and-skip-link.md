@@ -12,11 +12,11 @@
 `src/app/layout.tsx` は `<Header />` → `{children}` → `<Footer />` を出すだけで、
 **`<main>` は出さない。** 各ルートが自分で出す。
 
-| 出し方                               | 対象                                                                                                                             |
-| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| **`PageSheetLayout` が出す**（推奨） | `/access` `/about/privacy` `/about/sponsors` `/events` `/info` `/info/contact` `/info/faq` `/info/guide` `/special` `/timetable` |
-| **ルートが自前で出す**               | `/`（`src/app/page.tsx`）・`/about`・`/events/[id]`・`/info/[id]`・`/info/pamphlet`・`/special/[id]`                             |
-| **404・エラー画面が自前で出す**      | `src/app/not-found.tsx`・`src/app/error.tsx`・`src/app/events/[id]/not-found.tsx`・`src/app/events/[id]/error.tsx`               |
+| 出し方                               | 対象                                                                                                                                              |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`PageSheetLayout` が出す**（推奨） | `/access` `/about/privacy` `/about/sponsors` `/events` `/info` `/info/contact` `/info/faq` `/info/guide` `/info/pamphlet` `/special` `/timetable` |
+| **ルートが自前で出す**               | `/`（`src/app/page.tsx`）・`/about`・`/events/[id]`・`/info/[id]`・`/special/[id]`                                                                |
+| **404・エラー画面が自前で出す**      | `src/app/not-found.tsx`・`src/app/error.tsx`・`src/app/events/[id]/not-found.tsx`・`src/app/events/[id]/error.tsx`                                |
 
 自前で出す側は、ページ最外の `<div className="min-h-screen …">` を `<main>` に変えるだけでよい。
 

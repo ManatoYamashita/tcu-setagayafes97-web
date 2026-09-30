@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, MessageCircleQuestion, ArrowRight } from "lucide-react";
+import { Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Accordion } from "@/components/ui/Accordion";
 import { Link } from "@/i18n/navigation";
@@ -18,6 +18,10 @@ interface FAQFilterDef {
   key: Exclude<FAQFilter, "all" | "other">;
   keywords: string[];
 }
+
+/** 文中・文末のリンク。色ではなく下線で示し、ホバーは hoverable でゲートする（docs/frontend/design.md） */
+const linkClassName =
+  "font-semibold text-gray-900 underline decoration-gray-400 underline-offset-4 hoverable:hover:text-primary-700 hoverable:hover:decoration-primary-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600";
 
 /**
  * FAQのサブカテゴリ分類定義
@@ -121,27 +125,21 @@ export function FAQContent({ initialFAQ }: FAQContentProps) {
    */
   if (initialFAQ.length === 0) {
     return (
-      <div className="mx-auto max-w-4xl">
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-8 text-center">
-          <MessageCircleQuestion
-            aria-hidden="true"
-            className="mx-auto mb-4 h-12 w-12 text-gray-200"
-          />
-          <p className="text-gray-500">{t("empty.title")}</p>
-          <p className="mt-2 text-sm text-gray-400">
-            {t("empty.prefix")}{" "}
-            <Link href="/info/contact" className="text-primary-600 hover:underline">
-              {t("empty.contactLink")}
-            </Link>{" "}
-            {t("empty.suffix")}
-          </p>
-        </div>
+      <div className="mx-auto max-w-3xl">
+        <p className="text-lg font-bold text-gray-900">{t("empty.title")}</p>
+        <p className="mt-2 leading-8 text-gray-700">
+          {t("empty.prefix")}{" "}
+          <Link href="/info/contact" className={linkClassName}>
+            {t("empty.contactLink")}
+          </Link>{" "}
+          {t("empty.suffix")}
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-3xl">
       {/* 検索バー */}
       <div className="relative mb-6">
         <Search
@@ -201,31 +199,19 @@ export function FAQContent({ initialFAQ }: FAQContentProps) {
       {filteredFAQ.length > 0 ? (
         <Accordion items={accordionItems} />
       ) : (
-        <div className="rounded-xl border border-gray-200 bg-gray-50 py-16 text-center">
-          <MessageCircleQuestion
-            aria-hidden="true"
-            className="mx-auto mb-4 h-12 w-12 text-gray-200"
-          />
-          <p className="text-gray-500">{t("noResults.title")}</p>
-          <p className="mt-2 text-sm text-gray-400">{t("noResults.description")}</p>
+        <div>
+          <p className="text-lg font-bold text-gray-900">{t("noResults.title")}</p>
+          <p className="mt-2 leading-8 text-gray-700">{t("noResults.description")}</p>
         </div>
       )}
 
-      {/* お問い合わせ誘導バナー */}
-      <div className="mt-10 rounded-xl border border-blue-200 bg-blue-50 p-6 md:p-8">
-        <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="text-lg font-bold text-gray-900">{t("cta.title")}</h2>
-            <p className="mt-1 text-sm text-gray-600">{t("cta.description")}</p>
-          </div>
-          <Link
-            href="/info/contact"
-            className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg bg-primary-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
-          >
-            {tNav("contact")}
-            <ArrowRight aria-hidden="true" className="h-4 w-4" />
-          </Link>
-        </div>
+      {/* お問い合わせ誘導。質問が見つからない人の次の一手なので、箱にせず一覧の末尾へ置く */}
+      <div className="mt-12 border-t border-gray-200 pt-8">
+        <h2 className="text-lg font-bold text-gray-900">{t("cta.title")}</h2>
+        <p className="mt-2 leading-8 text-gray-700">{t("cta.description")}</p>
+        <Link href="/info/contact" className={`${linkClassName} inline-flex min-h-11 items-center`}>
+          {tNav("contact")}
+        </Link>
       </div>
     </div>
   );
