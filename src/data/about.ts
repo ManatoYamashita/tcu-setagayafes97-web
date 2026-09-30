@@ -134,13 +134,11 @@ export const aboutConfig = {
       },
       {
         label: "公式SNS",
-        value:
-          "Website：setagayafes.org\nX (Twitter)：@setagayafes_tcu\nInstagram：@setagayafes_sfa",
+        value: "X (Twitter)：@setagayafes_tcu\nInstagram：@setagayafes_sfa\nYouTube：@setagayafes",
       },
       {
         label: "問い合わせ先",
-        value:
-          "東京都市大学世田谷祭実行委員会\n〒158-8557 東京都世田谷区玉堤1丁目28-1\n東京都市大学世田谷祭実行委員会室\nTel：03-3703-8423（直通）\nE-mail：sfa@setagayafes.org",
+        value: "Tel：03-3703-8423（直通）\nE-mail：sfa@setagayafes.org",
       },
     ],
   },

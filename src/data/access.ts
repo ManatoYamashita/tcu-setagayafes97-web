@@ -277,7 +277,7 @@ export interface AccessPageContent {
 export const accessPageContent = {
   introduction: {
     label: "Setagaya Campus",
-    title: "世田谷祭への行き方",
+    title: "世田谷祭への 行き方",
     description:
       "会場は東京都市大学 世田谷キャンパスです。最寄りの尾山台駅からは徒歩約12分。時間に余裕を持ってお越しください。",
     mapLinkLabel: "Google マップで開く",
@@ -307,6 +307,10 @@ export const accessPageContent = {
     label: "Before you visit",
     title: "ご来場前にご確認ください",
     items: [
+      {
+        title: "北門は封鎖されています",
+        description: "当日は北門が封鎖されています。正門からお越しください。",
+      },
       {
         title: "お車での来場はできません",
         description: "学内駐車場はご利用いただけません。公共交通機関をご利用ください。",
@@ -365,6 +369,11 @@ export const accessPageContents = {
       title: "Please check before arrival",
       items: [
         {
+          title: "The north gate is closed",
+          description:
+            "The north gate will be closed on the day. Please enter through the main gate.",
+        },
+        {
           title: "No visitor parking",
           description: "Campus parking is not available. Please use public transportation.",
         },
@@ -419,6 +428,10 @@ export const accessPageContents = {
       title: "到场前请确认",
       items: [
         {
+          title: "北门关闭",
+          description: "活动当天北门关闭，请从正门入场。",
+        },
+        {
           title: "无法驾车来场",
           description: "校内停车场不对访客开放，请使用公共交通工具。",
         },
@@ -471,6 +484,10 @@ export const accessPageContents = {
       label: "Before you visit",
       title: "방문 전에 확인해 주세요",
       items: [
+        {
+          title: "북문은 폐쇄됩니다",
+          description: "당일에는 북문이 폐쇄되므로 정문으로 입장해 주세요.",
+        },
         {
           title: "자동차로 방문할 수 없습니다",
           description: "교내 주차장을 이용할 수 없으므로 대중교통을 이용해 주세요.",
