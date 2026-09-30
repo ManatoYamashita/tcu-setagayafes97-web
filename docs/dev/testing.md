@@ -233,7 +233,7 @@ SEO シグナル（`metadata.ts` / `structured-data.ts` / `sitemap-entries.ts`�
 ## pre-commit には足さない
 
 husky + lint-staged は現在 `prettier --write` だけで sub-second に終わる。
-複数のエージェントが同じ作業ツリーを触る運用（[git.md](./git.md)）で、コミットに
+複数のエージェントが同じ作業ツリーを触る運用（[staging-and-merge.md](./staging-and-merge.md)）で、コミットに
 数十秒かかる状態は事故を増やす。**強制点は CI の1箇所に保つ。**
 
 ## 関連ドキュメント

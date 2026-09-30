@@ -21,7 +21,8 @@ import { isMicrocmsApi, REVALIDATE_TARGETS } from "@/lib/revalidate-targets";
  *   Vercel への登録は、microCMS 側の Webhook を作成する**前に**済ませること。
  *   順序を逆にすると、最初の数回の入稿が 500 で静かに失われる。
  *
- * 運用手順・障害切り分けは docs/dev/content-revalidation.md を参照。
+ * 設定手順は docs/dev/content-revalidation.md、検証と障害切り分けは
+ * docs/dev/content-revalidation-ops.md を参照。
  */
 
 /** microCMS が署名を載せてくるヘッダー名 */

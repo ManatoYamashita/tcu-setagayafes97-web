@@ -105,7 +105,7 @@ pnpm images:optimize
 - **main ブランチへの直接 push は禁止**
 - **PR の base は `main`。`dev` ブランチは存在しない**（2026-09-23 に削除。`dev` へマージされた PR が main へ届かず取り残されていた）
 - すべての作業は専用のフィーチャーブランチで実施
-- GitHub Actions による自動 PR 作成を活用
+- PR は `gh pr create --base main` などで作る（CI は PR を自動作成しない）
 - PR マージ後に main ブランチを更新
 
 **ブランチ命名規則:**
@@ -275,8 +275,9 @@ CI 緑・マージ済みのまま本番だけが40分以上古いまま取り残
 
 ### データ反映の仕組み（オンデマンド再検証）
 
-microCMS の入稿は **Webhook 経由で十数秒（実測10〜15秒）**で本番へ反映される。詳細と運用手順は
-[`docs/dev/content-revalidation.md`](../docs/dev/content-revalidation.md) を参照。
+microCMS の入稿は **Webhook 経由で十数秒（実測10〜15秒）**で本番へ反映される。仕組みと設定は
+[`docs/dev/content-revalidation.md`](../docs/dev/content-revalidation.md)、検証と障害切り分けは
+[`docs/dev/content-revalidation-ops.md`](../docs/dev/content-revalidation-ops.md) を参照。
 
 | 系統 | 手段                                                                  | 反映まで                     |
 | ---- | --------------------------------------------------------------------- | ---------------------------- |
