@@ -66,10 +66,16 @@ console.log("実効占有率:", ((hero.offsetHeight / window.innerHeight) * 100)
 **スクリーンショット取得:**
 
 ```bash
-agent-browser screenshot /tmp/reference-desktop.png --viewport 1920x1080
-agent-browser screenshot /tmp/reference-tablet.png --viewport 768x1024
-agent-browser screenshot /tmp/reference-mobile.png --viewport 375x667
+agent-browser set viewport 1920 1080 && agent-browser screenshot /tmp/reference-desktop.png
+agent-browser set viewport 768 1024  && agent-browser screenshot /tmp/reference-tablet.png
+agent-browser set viewport 375 667   && agent-browser screenshot /tmp/reference-mobile.png
 ```
+
+> [!WARNING]
+> **`screenshot <path> --viewport WxH` と書いてはいけない。** agent-browser 0.38.1 には
+> `screenshot` の `--viewport` オプションが無く、**`--viewport` が出力先のファイル名として解釈される。**
+> viewport は変わらず、作業ディレクトリに `--viewport` という名前の PNG が残る（2026-09-30 実測）。
+> 幅は必ず `set viewport` で変える。詳細は [browser-verification-pitfalls.md](./browser-verification-pitfalls.md)。
 
 ---
 
@@ -109,8 +115,8 @@ const header = document.querySelector("header");
 const hero = document.querySelector("section");
 
 console.log("=== ローカル実装の検証 ===");
-console.log("Header高さ:", header.offsetHeight, "px"); // 目標: 64px
-console.log("Hero top位置:", hero.offsetTop, "px"); // 目標: 64px（Header直下）
+console.log("Header高さ:", header.offsetHeight, "px"); // 目標: 107px（スクロール前。layout-patterns.md）
+console.log("Hero top位置:", hero.offsetTop, "px"); // 目標: Header高さと一致（Header直下）
 console.log("Hero高さ:", hero.offsetHeight, "px"); // 目標: 1016px（1080 - 64）
 console.log("実効占有率:", ((hero.offsetHeight / window.innerHeight) * 100).toFixed(2), "%"); // 目標: ~94%
 
@@ -209,40 +215,33 @@ console.log("占有率:", ((element.offsetHeight / window.innerHeight) * 100).to
 
 **共通チェック項目:**
 
-- [ ] Header高さが適切（64px前後、viewport占有率 6%前後）
+- [ ] Header高さが適切（スクロール前 107px / スクロール後 77px。一次情報は [layout-patterns.md](./layout-patterns.md) の表）
 - [ ] Hero top位置 === Header高さ（Header直下配置）
 - [ ] Hero実効高さ === viewport高さ - Header高さ
 - [ ] z-index階層が正しい（Header: z-40、Hero内最上位: z-30以下）
 - [ ] Layout Shiftが発生しない（CLS < 0.1）
 
-**viewport別コマンド例:**
+**viewport別の測定とスクリーンショット:**
 
-```javascript
-const viewports = [
-  { name: "Mobile", width: 375, height: 667 },
-  { name: "Tablet", width: 768, height: 1024 },
-  { name: "Desktop", width: 1920, height: 1080 },
-];
-
-// 各viewportでの測定（agent-browserでviewport変更後に実行）
-const header = document.querySelector("header");
-const hero = document.querySelector("section");
-
-viewports.forEach((vp) => {
-  console.log(`\n=== ${vp.name} (${vp.width}×${vp.height}) ===`);
-  console.log("Header高さ:", header.offsetHeight, "px");
-  console.log("Hero top:", hero.offsetTop, "px");
-  console.log("一致:", hero.offsetTop === header.offsetHeight ? "✅" : "❌");
-});
-```
-
-**スクリーンショット一括取得:**
+viewport はページ内の JS からは変えられない（`window.resizeTo()` は効かない）。
+**幅ごとに `set viewport` で切り替えてから測る。** 以前ここにあった「配列を回して3回ログを出す」JS は
+viewport を一度も変えておらず、同じ値に3つのラベルを付けていただけだった。
 
 ```bash
-agent-browser screenshot /tmp/localhost-mobile.png --viewport 375x667
-agent-browser screenshot /tmp/localhost-tablet.png --viewport 768x1024
-agent-browser screenshot /tmp/localhost-desktop.png --viewport 1920x1080
+# read で分けるのは zsh でも動かすため（zsh は引用符の無い変数を単語分割しない）
+for vp in "375 667 mobile" "768 1024 tablet" "1920 1080 desktop"; do
+  read -r w h name <<< "$vp"
+  agent-browser set viewport "$w" "$h"
+  agent-browser eval 'JSON.stringify({
+    innerWidth,
+    header: document.querySelector("header").offsetHeight,
+    heroTop: document.querySelector("section").offsetTop,
+  })'
+  agent-browser screenshot "/tmp/localhost-$name.png"
+done
 ```
+
+**測った値に `innerWidth` を必ず含める。** 幅が変わっていないまま3回測っても、値だけ見れば正常に見える。
 
 ---
 
@@ -314,24 +313,25 @@ agent-browser goto https://example.com
 # JavaScriptコードを実行
 agent-browser eval "console.log('Hello, World!')"
 
-# スクリーンショット取得
-agent-browser screenshot /tmp/screenshot.png --viewport 1920x1080
+# viewport変更（以降の open でも保たれる）
+agent-browser set viewport 375 667
 
-# viewport変更
-agent-browser eval "window.resizeTo(375, 667)"
+# スクリーンショット取得（幅は直前の set viewport で決まる）
+agent-browser screenshot /tmp/screenshot.png
 ```
 
 ### 複合コマンド例
 
 ```bash
 # 参考サイト分析 → スクリーンショット取得 → ローカル比較
+agent-browser set viewport 1920 1080
 agent-browser goto https://sumitomoexpo.com/
 agent-browser eval "$(cat measure-header.js)"  # 測定スクリプトファイル
-agent-browser screenshot /tmp/reference.png --viewport 1920x1080
+agent-browser screenshot /tmp/reference.png
 
 agent-browser goto http://localhost:3000
 agent-browser eval "$(cat measure-header.js)"
-agent-browser screenshot /tmp/localhost.png --viewport 1920x1080
+agent-browser screenshot /tmp/localhost.png
 ```
 
 ---
