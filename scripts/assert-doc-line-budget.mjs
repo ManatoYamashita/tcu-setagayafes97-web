@@ -12,6 +12,8 @@
  * 守られているかを確かめる手段は人の目しかなかった。#318 では `docs/frontend/layout-e2e.md` が
  * 326 行へ伸びたことに、マージ直前にたまたま `wc -l` を打つまで誰も気づかなかった。
  * 導入時点（2026-09-30）で、追跡 `.md` 65 本のうち **18 本がすでに 300 行を超えていた。**
+ * このうち `docs/frontend/agent-browser-workflow.md` は導入 PR のレビュー中に #323 が 188 行へ書き直したため、
+ * 記録は 17 本で始まった（この検査が最初に落としたのは、その解消済みの記録だった）。
  *
  * ## 対象
  *
@@ -73,7 +75,6 @@ const GRANDFATHERED = new Map([
   ["docs/dev/legacy-site-deindex.md", 435],
   ["docs/requires/todo.md", 414],
   [".agents/skills/next-cache-components/SKILL.md", 411],
-  ["docs/frontend/agent-browser-workflow.md", 356],
   ["docs/dev/microcms.md", 326],
   [".agents/skills/deploy-to-vercel/SKILL.md", 321],
   ["docs/frontend/events-search.md", 312],

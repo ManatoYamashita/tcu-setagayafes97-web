@@ -57,7 +57,7 @@ jobs:
 
       # 追跡 .md が300行以下かを見る（#322）。規約は .claude/CLAUDE.md の「命名・配置ガイド」。
       # 人の目しか無かったため、#318 では 326 行へ伸びたことにマージ直前まで気づかなかった。
-      # **導入時点の超過18本は上限つきで記録してあり、伸ばすと落ちる**（scripts/assert-doc-line-budget.mjs 冒頭）。
+      # **導入時点ですでに超えていたファイルは上限つきで記録してあり、伸ばすと落ちる**（scripts/assert-doc-line-budget.mjs 冒頭）。
       # git ls-files 以外に何も要求しないため、このジョブの「install だけで完結する」性質を崩さない。
       - name: Check doc line budget
         run: pnpm run check:doc-lines
