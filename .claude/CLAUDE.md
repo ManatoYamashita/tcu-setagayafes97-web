@@ -590,12 +590,12 @@ View Transitions（Safari 18）、`text-wrap: balance`（Safari 17.5）、
 Hero の直下へ入れた時点で要素高が 2004px → 3105px（390px 幅）へ伸び、Hero 下端の色が
 primary-50 → primary-100 間の 64.9% から 26.7% まで後退した。
 
-Hero は `h-[52svh] lg:h-[50svh]`（compact）なので、`svh` で持てば
+Hero は `h-[calc(100svh-var(--header-height))]` なので、`svh` で持てば
 後続コンテンツの量から完全に独立する。`SPECIAL_VISIBLE=false` で著名人企画が
 消えても Hero の見た目が変わらないのはこのため（実測の画素差: Hero 0/255、ABOUT 最大 3/255）。
 
 このブロックへセクションを足し引きする場合は、`%` へ戻さずに
-Hero 下端（`52svh`。lg 以上は `50svh`）へ来る色で停止位置を判断すること。
+Hero 下端（`100svh - 5.5rem`）へ来る色で停止位置を判断すること。
 
 ## 開発上の注意点
 
