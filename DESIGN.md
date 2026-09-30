@@ -133,7 +133,7 @@ font-family:
 ### 3.5 行間・字間
 
 - **本文の行間 (line-height)**: 1.75（日本語の可読性を確保）
-- **見出しの行間**: 1.1 - 1.4（スケールに応じて段階的に）
+- **見出しの行間**: 既定は文字サイズに付随する Tailwind の値（`text-5xl` 以上 1 / `text-4xl` 1.11 / `text-3xl` 1.2 / `text-2xl` 1.33 / `text-xl` 1.4 / `text-lg` 1.56）。変えるときは見出しに `leading-*` を付ける（2026-09-30 時点で `h1`〜`h3` 66個のうち8個: `leading-tight`（1.25）×4・`leading-snug`（1.375）×2・`leading-[1.2]`・`leading-none`（1））。値の表は [docs/frontend/typography.md](docs/frontend/typography.md)
 - **ラベルの字間 (letter-spacing)**: `tracking-widest`（0.2em）〜 `tracking-[0.3em]`
 - **見出しの字間**: `tracking-wide`（0.025em）〜 `tracking-wider`（0.05em）
 
