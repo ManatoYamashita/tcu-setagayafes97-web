@@ -1,11 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  buildStageEventDetails,
   countDistinctEvents,
   filterEventsByDate,
   filterEventsByStage,
   filterStageEvents,
   groupEventsByStage,
   listStageTabs,
+  sortEntriesByStart,
 } from "@/lib/timetable";
 import { OTHER_STAGE_ID, OTHER_STAGE_NAME, stages } from "@/data/stages";
 import { fixture, stageEventFixtures } from "@/components/timetable/__fixtures__/stage-events";
@@ -310,6 +312,85 @@ describe("listStageTabs", () => {
  * 動的 import で得た値は静的 import と別実体になるので、同一参照（`toBe`）の検証は
  * このブロックへ持ち込まないこと。
  */
+describe("buildStageEventDetails", () => {
+  const details = buildStageEventDetails(stageEventFixtures);
+
+  it("ステージ企画と著名人企画だけを企画IDごとに1件作る", () => {
+    expect(Object.keys(details).sort()).toEqual(
+      stageEventFixtures
+        .filter((event) => event.type === "stage" || event.type === "special")
+        .map((event) => event.id)
+        .sort()
+    );
+  });
+
+  it("2部制の企画でも1件にまとまる", () => {
+    // TimetableEntry は枠ごとに2つへ展開されるが、詳細は企画単位。重複して直列化しない
+    const hallEntries = stageEvents.filter((entry) => entry.id === "fx-hall-2");
+    expect(hallEntries).toHaveLength(2);
+    expect(Object.keys(details).filter((id) => id === "fx-hall-2")).toHaveLength(1);
+  });
+
+  it("本文（content）を持たない", () => {
+    // Client Component へ直列化されるため。全文はパネルのリンク先に任せる
+    for (const detail of Object.values(details)) {
+      expect(detail).not.toHaveProperty("content");
+    }
+  });
+
+  it("建物名と場所の空項目を落として繋ぐ", () => {
+    const events = [
+      fixture("v1", {
+        date: "day1",
+        type: "stage",
+        place: "7A ステージ",
+        building: "",
+        title: "a",
+        organizer: "x",
+      }),
+      fixture("v2", {
+        date: "day1",
+        type: "stage",
+        place: "ステージ",
+        building: " 7号館 ",
+        title: "b",
+        organizer: "x",
+      }),
+    ];
+    const built = buildStageEventDetails(events);
+    expect(built.v1.venue).toBe("7A ステージ");
+    expect(built.v2.venue).toBe("7号館 ステージ");
+  });
+});
+
+describe("sortEntriesByStart", () => {
+  const items = groupEventsByStage(day1Events).flatMap((group) =>
+    group.events.map((event) => ({ event, stageId: group.id }))
+  );
+  const sorted = sortEntriesByStart(items);
+
+  it("開始時刻の昇順に並べる", () => {
+    const starts = sorted.map((item) => item.event.startTime);
+    expect(starts).toEqual([...starts].sort());
+  });
+
+  it("同時刻はステージIDの順にする", () => {
+    for (let i = 1; i < sorted.length; i++) {
+      const a = sorted[i - 1];
+      const b = sorted[i];
+      if (a.event.startTime === b.event.startTime) {
+        expect(a.stageId.localeCompare(b.stageId)).toBeLessThanOrEqual(0);
+      }
+    }
+  });
+
+  it("元の配列を変更しない", () => {
+    const before = items.map((item) => item.event.entryKey);
+    sortEntriesByStart(items);
+    expect(items.map((item) => item.event.entryKey)).toEqual(before);
+  });
+});
+
 describe("開発時の警告", () => {
   let warn: ReturnType<typeof vi.spyOn>;
 
