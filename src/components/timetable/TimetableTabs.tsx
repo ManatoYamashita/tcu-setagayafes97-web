@@ -63,14 +63,14 @@ export function TimetableTabs({
     const params = new URLSearchParams();
     params.set("date", date);
     params.set("stage", "all");
-    router.push(`${pathname}?${params.toString()}`);
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   const handleStageChange = (stage: string) => {
     const params = new URLSearchParams();
     params.set("date", selectedDate);
     params.set("stage", stage);
-    router.push(`${pathname}?${params.toString()}`);
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   return (

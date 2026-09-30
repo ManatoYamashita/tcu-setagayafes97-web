@@ -117,7 +117,7 @@ export function EventFilters({ filters, buildingOptions }: EventFiltersProps) {
 
     const timer = setTimeout(() => {
       lastSentRef.current = keywordDraft;
-      router.replace(eventsHref({ ...filters, keyword: keywordDraft }));
+      router.replace(eventsHref({ ...filters, keyword: keywordDraft }), { scroll: false });
     }, KEYWORD_DEBOUNCE_MS);
 
     return () => clearTimeout(timer);
@@ -133,7 +133,7 @@ export function EventFilters({ filters, buildingOptions }: EventFiltersProps) {
    * "all" と空文字は `eventsHref` がクエリから落とします。
    */
   const handleFilterChange = (patch: Partial<FilterParams>) => {
-    router.push(eventsHref({ ...filters, ...patch }));
+    router.push(eventsHref({ ...filters, ...patch }), { scroll: false });
   };
 
   /**
@@ -142,7 +142,7 @@ export function EventFilters({ filters, buildingOptions }: EventFiltersProps) {
   const handleReset = () => {
     lastSentRef.current = "";
     setKeywordDraft("");
-    router.push("/events");
+    router.push("/events", { scroll: false });
   };
 
   return (

@@ -7,7 +7,7 @@ interface PageSheetLayoutProps {
   children: React.ReactNode;
 }
 
-export function PageSheetLayout({ hero, heroSize = "default", children }: PageSheetLayoutProps) {
+export function PageSheetLayout({ hero, heroSize = "compact", children }: PageSheetLayoutProps) {
   return (
     <div className="min-h-screen bg-secondary">
       <PageHero {...hero} size={heroSize} />
