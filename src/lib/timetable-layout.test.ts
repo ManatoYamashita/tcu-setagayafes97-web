@@ -391,6 +391,12 @@ describe("getCardDensity", () => {
     expect(getCardDensity(90.5)).toBe("compact");
   });
 
+  it("detailed の境界", () => {
+    expect(getCardDensity(HOUR_HEIGHT_PX * 1.5)).toBe("detailed"); // 90分
+    expect(getCardDensity(114.75)).toBe("detailed"); // 実寸 110.75
+    expect(getCardDensity(114.7)).toBe("full"); // 実寸 110.7
+  });
+
   it("full の境界", () => {
     expect(getCardDensity(94.5)).toBe("full"); // 実寸 90.5
     expect(getCardDensity(94.4)).toBe("compact"); // 実寸 90.4

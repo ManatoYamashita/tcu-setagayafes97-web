@@ -30,6 +30,7 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
   // 支援技術から見えないため、盤面のカードは単体で自足している必要がある。
   const label = [
     event.title,
+    event.organizer,
     stageName,
     event.sessionLabel,
     `${event.startTime}から${event.endTime}`,
@@ -38,33 +39,37 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
     .filter(Boolean)
     .join("／");
 
-  // 左アクセントは primary-600（白いシート上で 7.45:1）。primary-light は 2.43:1 しかなく、
-  // 装飾線としても読めない（docs/frontend/design.md「コントラスト比（アクセシビリティ）」）。
-  // hover:border-* は border-color を全辺へ当てて border-left-color を上書きするため、
-  // ホバー時の左色も明示している。
-  // 面も bg-white で不透明に持つ。bg-white/10 は白いシート上では結果的に同じ色になるが、
-  // 淡紫背景を前提にしたトークンであり、下地が変わったときに黙って崩れる。
+  // 面は primary-700（白文字で 11.2:1）。ホバーで primary-600（同 7.45:1）へ明るくする。
+  // primary-400 以下へ寄せると白文字が AA に届かない（docs/frontend/design.md「コントラスト比」）。
+  // 枠線は透明で 1px を残す。`getCardDensity` の閾値が上下の border 2px を含めて計算しているため、
+  // 枠ごと外すとカード内の高さ配分がずれる。
   //
   // focus リングを ring-inset にしているのは、盤面が overflow-x-auto のスクロールコンテナで、
-  // 外向きの outline / ring がクリップされて見えなくなるため。
-  const base =
-    "block h-full overflow-hidden rounded-lg bg-white border border-gray-200 transition-colors " +
-    "hoverable:hover:border-gray-400 focus-visible:outline-none focus-visible:ring-2 " +
-    "focus-visible:ring-inset focus-visible:ring-primary-600";
-  const ganttAccent = density
-    ? "border-l-4 border-l-primary-600 hoverable:hover:border-l-primary-700"
-    : "";
-  const cardClass = `${base} ${ganttAccent}`;
+  // 外向きの outline / ring がクリップされて見えなくなるため。暗色の面の上なので色は白を使う。
+  const cardClass =
+    "block h-full overflow-hidden rounded-lg border border-transparent bg-primary-700 text-white " +
+    "transition-colors hoverable:hover:bg-primary-600 focus-visible:outline-none " +
+    "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white";
 
   // 2部制の企画は、同じタイトルのカードが2枚並ぶ。どちらの枠かを時刻の前に添える
   const timeText = `${event.sessionLabel ? `${event.sessionLabel} ` : ""}${event.startTime}–${event.endTime}`;
+
+  // 団体名は盤面のどこにも出ない情報なので、どの密度でも落とさない。
+  // タイトルが「世田谷祭公演」のように団体名を含まない企画は、団体名が無いと見つけられない。
+  // 行を足せない密度では、既存の行の後ろへ細字で続ける（1行に収め、溢れた分は省略記号で切る）
+  const organizer = event.organizer ? (
+    <span className="ms-1.5 font-normal">{event.organizer}</span>
+  ) : null;
 
   // 高さが確保できないときは、優先度の低い情報から落とす。溢れさせて切ると
   // 「主催が途中で切れたカード」になり、読めない情報が場所だけ占めてしまう。
   if (density === "minimal") {
     return (
       <Link href={href} aria-label={label} className={`${cardClass} px-2 py-1`}>
-        <p className="text-xs font-bold leading-tight text-gray-900 line-clamp-1">{event.title}</p>
+        <p className="truncate text-xs font-bold leading-tight">
+          {event.title}
+          {organizer}
+        </p>
       </Link>
     );
   }
@@ -72,26 +77,36 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
   if (density === "compact") {
     return (
       <Link href={href} aria-label={label} className={`${cardClass} px-2 py-1`}>
-        <p className="text-sm font-bold leading-tight text-gray-900 line-clamp-1">{event.title}</p>
-        <p className="truncate text-xs font-medium text-primary-700">{timeText}</p>
+        <p className="text-sm font-bold leading-tight line-clamp-1">{event.title}</p>
+        <p className="truncate text-xs font-medium">
+          {timeText}
+          {organizer}
+        </p>
       </Link>
     );
   }
 
   // 縦の余白が `px-3` と揃わないのは、60分企画（カード実寸 92px）へ
-  // 15px のタイトル2行 + 13px の時刻・場所（計 76.5px）を余白ごと収めるため。
+  // 15px のタイトル2行 + 13px の時刻・団体名（計 76.5px）を余白ごと収めるため。
   // `py-3` に戻すと `getCardDensity` の閾値も連動して上がるため、
-  // 1時間企画が compact へ落ちて場所が表示されなくなる。
-  if (density === "full") {
+  // 1時間企画が compact へ落ちて団体名が時刻の後ろへ押し込まれる。
+  //
+  // full の3行目は団体名で、場所は detailed（約72分以上）でだけ出す。場所はステージ列の見出しと
+  // おおむね重なるが、団体名は盤面のどこにも出ないため。団体名が空の企画は場所で埋める。
+  if (density === "detailed" || density === "full") {
+    const lineClass = "truncate text-[0.8125rem] leading-tight";
     return (
       <Link href={href} aria-label={label} className={`${cardClass} px-3 py-1.5`}>
-        <p className="mb-1 text-[0.9375rem] font-bold leading-[1.2] text-gray-900 line-clamp-2">
-          {event.title}
-        </p>
-        <p className="mb-1 truncate text-[0.8125rem] font-semibold leading-tight text-primary-700 tabular-nums">
-          {timeText}
-        </p>
-        <p className="truncate text-[0.8125rem] leading-tight text-gray-700">{event.place}</p>
+        <p className="mb-1 text-[0.9375rem] font-bold leading-[1.2] line-clamp-2">{event.title}</p>
+        <p className={`${lineClass} mb-1 font-semibold tabular-nums`}>{timeText}</p>
+        {density === "detailed" ? (
+          <>
+            <p className={`${lineClass} ${event.organizer ? "mb-1" : ""}`}>{event.place}</p>
+            {event.organizer ? <p className={lineClass}>{event.organizer}</p> : null}
+          </>
+        ) : (
+          <p className={lineClass}>{event.organizer || event.place}</p>
+        )}
       </Link>
     );
   }
@@ -101,26 +116,26 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
     <Link href={href} className={`${cardClass} p-4`}>
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <p className="flex items-baseline gap-1 font-sans tabular-nums">
-          <time dateTime={event.startTime} className="text-lg font-bold text-gray-900">
+          <time dateTime={event.startTime} className="text-lg font-bold">
             {event.startTime}
           </time>
           <span className="sr-only">から</span>
-          <span className="text-sm text-gray-400" aria-hidden="true">
+          <span className="text-sm" aria-hidden="true">
             –
           </span>
-          <time dateTime={event.endTime} className="text-sm font-semibold text-gray-700">
+          <time dateTime={event.endTime} className="text-sm font-semibold">
             {event.endTime}
           </time>
         </p>
         {(stageName || event.sessionLabel) && (
           <span className="flex flex-wrap gap-1">
             {event.sessionLabel && (
-              <span className="rounded-full border border-primary-200 px-2 py-0.5 text-xs font-semibold text-primary-700">
+              <span className="rounded-full border border-primary-200 px-2 py-0.5 text-xs font-semibold">
                 {event.sessionLabel}
               </span>
             )}
             {stageName && (
-              <span className="rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700">
+              <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-primary-700">
                 {stageName}
               </span>
             )}
@@ -128,14 +143,10 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
         )}
       </div>
 
-      <p className="mt-2 text-base font-bold leading-snug text-pretty text-gray-900">
-        {event.title}
-      </p>
-      <p className="mt-2 text-sm leading-relaxed text-gray-700">{event.place}</p>
+      <p className="mt-2 text-base font-bold leading-snug text-pretty">{event.title}</p>
+      <p className="mt-2 text-sm leading-relaxed">{event.place}</p>
 
-      {event.organizer ? (
-        <p className="mt-1 text-sm leading-relaxed text-gray-600">{event.organizer}</p>
-      ) : null}
+      {event.organizer ? <p className="mt-1 text-sm leading-relaxed">{event.organizer}</p> : null}
     </Link>
   );
 }
