@@ -75,11 +75,11 @@ export function extractStageId(place: string): string | null {
   const exactMatch = stages.find((s) => place.includes(s.id));
   if (exactMatch) return exactMatch.id;
 
-  // 「体育館」と「アリーナ」は同じ会場。ただし「9号館アリーナ」は体育館ではない。
-  // 体育館表記は上の ID 判定で拾い、アリーナ表記は建物番号が無いときだけ拾う。
-  const partialMatch = stages.find(
-    (s) => place.includes(s.name) && (s.id !== "体育館" || !/[0-9０-９]+号館/.test(place))
-  );
+  // 「体育館」と「アリーナ」は同じステージ。体育館表記は上の ID 判定で拾い、
+  // アリーナ表記はここで拾う。実データのステージ企画は「9号館アリーナ」「９号館アリーナ」で
+  // 入稿されているため、号館を含む表記も除外しない（除外すると全件が「その他」へ落ちる。#302）。
+  // 建物フィルタ（src/data/filter-options.ts）で「9号館アリーナ」を 9号館 とするのは別の判定。
+  const partialMatch = stages.find((s) => place.includes(s.name));
   if (partialMatch) return partialMatch.id;
 
   return null;

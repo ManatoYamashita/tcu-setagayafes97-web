@@ -234,8 +234,9 @@ CI では `webServer.stdout: "pipe"` により **dev サーバのコンパイル
 `MAIN#content` へ移ることまで見ます。
 
 **秘密情報を要求しません。** microCMS を読む関数は `isMicrocmsConfigured` で門を閉じ、
-失敗時も `[]` / `null` を返すため、secrets 無しでも全ルートが描画されます
-（`src/lib/{news,events,sponsors}.ts`）。動的ルートは入稿データが無いので 404 になりますが、
+未設定なら問い合わせずに `[]` / `null` を返すため、secrets 無しでも全ルートが描画されます
+（`src/lib/{news,events,informations}.ts`）。なお**取得に失敗したときは投げます**（#287。
+[microcms-fetch-failures.md](../dev/microcms-fetch-failures.md)）。動的ルートは入稿データが無いので 404 になりますが、
 **それが検査したい対象そのもの**です。
 
 > [!IMPORTANT]

@@ -31,6 +31,7 @@ docs/
 │   ├── seo-metadata.md # 共通metadata・canonical・構造化データ・sitemap の方針
 │   ├── legacy-site-deindex.md # 過去回サイト群を検索結果から恒久除外する運用手順
 │   ├── microcms.md   # microCMS API 制約と実装パターン
+│   ├── microcms-fetch-failures.md # 取得に失敗したときの扱い（404 と一時的な失敗の区別）
 │   ├── event-sessions.md # 企画の開催枠（2部制）の入稿と正規化の契約
 │   ├── content-revalidation.md # microCMS Webhook によるオンデマンド再検証と運用手順
 │   └── draft-preview.md # microCMS 画面プレビューによる下書きの実機確認
@@ -224,6 +225,12 @@ docs/
   - **手で控えた `draftKey` は使えない**（保存のたびに失効する）。画面プレビュー経由なら失効しない → [draft-preview.md](./dev/draft-preview.md)
   - **「一時的に公開して確認」はもう使えない。** 公開フラグが4本とも `true` になり、公開すれば本番に出る
 
+- **[microcms-fetch-failures.md](./dev/microcms-fetch-failures.md)** - microCMS の取得に失敗したときの扱い（#287）
+  - **`null` / `[]` に潰してよいのは microCMS が 400 / 404 を返したときだけ。** 429 / 5xx は投げる。潰すと実在ページが 404 で生成されてもビルドが成功する（修正前の注入で 99 ページ）
+  - **ISR の再生成でも正常なキャッシュが 404 に置き換わっていた。** 修正後は時間ベースなら古いページを維持、Webhook 直後は 500 で回復後に自動で正常化
+  - **SDK の `retry: true` は Next.js の中で効かない。** 同じ URL の GET が描画内で重複排除され、最初の 429 が返り続ける。再試行は `microcmsGet()` が持つ
+  - **注入で検証するときは `.next/cache/fetch-cache` を先に消す。** 残っていると microCMS を1本も叩かずにビルドが通る
+
 - **[draft-preview.md](./dev/draft-preview.md)** - 下書きの実機確認（microCMS 画面プレビュー）
   - 編集画面の「画面プレビュー」から、本番と同じ詳細ページで下書きを表示する仕組み。対象は `events` と `news`
   - **`draftKey` は `searchParams` では受け取れない。** 読んだ時点でルートが動的化し、下書きを見ない訪問者の ISR まで失われる。cookie で運ぶ
@@ -385,7 +392,8 @@ docs/
 
 - **[timetable-gantt.md](./frontend/timetable-gantt.md)** - タイムテーブル盤面（ガントチャート）の設計
   - 30分目盛りはラベルと罫線で同じ刻み幅・座標を使い、1時間あたり96pxのスケールを保つ
-  - 体育館メインアリーナはID `体育館` のまま「アリーナ」と表示し、両方の場所表記を同じ絞り込みへ入れる
+  - アリーナはID `体育館` のまま「アリーナ」と表示し、`体育館` / `アリーナ` / **`9号館アリーナ`** を同じ絞り込みへ入れる。**実データは号館付き表記で入稿されている**（除外していた #290 では実データでタブが一度も出なかった。#302）
+  - **モバイルの縦スタックにも30分刻みの時刻見出しを置く**（刻み幅は盤面と共有。企画の無い目盛りは出さない）
   - **縦方向の寸法は必ず px で持つ。** `height: %` は親の高さが確定しているときしか解決されず、`min-height` しか持たない親の下では 0px に潰れる（#148 の事故そのもの）
   - `overflow-x: auto` は `overflow-y` の使用値も `auto` にする。中の要素をページに対して `sticky top-0` にはできず、はみ出しは縦スクロールバーを生む
   - `sticky left-0` はスクローラの `padding-left` を無視する。余白は外側の要素が持つ
@@ -508,4 +516,4 @@ docs/
 
 ---
 
-**最終更新日**: 2026-09-28
+**最終更新日**: 2026-09-30

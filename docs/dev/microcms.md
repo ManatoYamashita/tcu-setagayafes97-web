@@ -308,6 +308,7 @@ microCMS 管理画面のフィールド種類選択ダイアログは、**実マ
 
 ## 関連ドキュメント
 
+- [microcms-fetch-failures.md](./microcms-fetch-failures.md) - 取得に失敗したときの扱い。`null` / `[]` にしてよいのは 400 / 404 だけ（#287）
 - [event-sessions.md](./event-sessions.md) - 企画の開催枠（`sessions`）。2部制の企画の入稿と正規化の契約
 
 - [docs/dev/content-revalidation.md](./content-revalidation.md) — Webhook によるオンデマンド再検証と運用手順

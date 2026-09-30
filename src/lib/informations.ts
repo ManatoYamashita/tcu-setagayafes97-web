@@ -1,4 +1,4 @@
-import { client, isMicrocmsConfigured } from "./microcms";
+import { isMicrocmsConfigured, isMicrocmsNotFound, microcmsGet } from "./microcms";
 import type {
   Information,
   InformationListResponse,
@@ -63,11 +63,12 @@ function normalizeInformation(rawInfo: RawInformation): Information {
 /**
  * 協賛企業一覧を取得
  * @returns 協賛企業の配列（優先度順）
+ * @throws microCMS から取得できなかった場合（空配列にはしない。#287）
  */
 export async function getSponsorsList(): Promise<Information[]> {
   if (!isMicrocmsConfigured) return [];
   try {
-    const response: RawInformationListResponse = await client.get({
+    const response = await microcmsGet<RawInformationListResponse>({
       endpoint: "informations",
       queries: {
         limit: 100,
@@ -79,19 +80,21 @@ export async function getSponsorsList(): Promise<Information[]> {
       .map(normalizeInformation)
       .filter((info) => info.category === "sponsor");
   } catch (error) {
+    // 「0件」と「取れなかった」を区別するため、空配列にせず投げる（#287）
     console.error("[getSponsorsList] Error:", error);
-    return [];
+    throw error;
   }
 }
 
 /**
  * よくある質問（FAQ）一覧を取得
  * @returns FAQの配列
+ * @throws microCMS から取得できなかった場合
  */
 export async function getFAQList(): Promise<Information[]> {
   if (!isMicrocmsConfigured) return [];
   try {
-    const response: RawInformationListResponse = await client.get({
+    const response = await microcmsGet<RawInformationListResponse>({
       endpoint: "informations",
       queries: {
         limit: 100,
@@ -101,8 +104,9 @@ export async function getFAQList(): Promise<Information[]> {
     // select は API の filters で絞れない（上記コメント参照）。正規化後の値で絞る
     return response.contents.map(normalizeInformation).filter((info) => info.category === "faq");
   } catch (error) {
+    // 「0件」と「取れなかった」を区別するため、空配列にせず投げる（#287）
     console.error("[getFAQList] Error:", error);
-    return [];
+    throw error;
   }
 }
 
@@ -110,18 +114,22 @@ export async function getFAQList(): Promise<Information[]> {
  * 特定の情報を取得
  * @param id 情報ID
  * @returns 情報、見つからない場合はnull
+ * @throws microCMS が「存在しない」以外の理由で失敗した場合
  */
 export async function getInformationById(id: string): Promise<Information | null> {
   if (!isMicrocmsConfigured) return null;
   try {
-    const response: RawInformation = await client.get({
+    const response = await microcmsGet<RawInformation>({
       endpoint: "informations",
       contentId: id,
     });
     // データを正規化して返す
     return normalizeInformation(response);
   } catch (error) {
+    // null（→ 404）にするのは microCMS が「存在しない」と答えたときだけ。
+    // 429 / 5xx などを null にすると、実在するページが 404 で生成される（#287）
+    if (isMicrocmsNotFound(error)) return null;
     console.error("[getInformationById] Error:", error);
-    return null;
+    throw error;
   }
 }

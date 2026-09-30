@@ -21,10 +21,12 @@ describe("extractStageId", () => {
     expect(extractStageId("体育館 メインアリーナ")).toBe("体育館");
   });
 
-  it("アリーナ表記を体育館と同じステージへ解決し、号館内のアリーナとは区別する", () => {
+  it("アリーナ表記を、号館の有無にかかわらず体育館と同じステージへ解決する", () => {
     expect(extractStageId("アリーナ")).toBe("体育館");
     expect(extractStageId("世田谷キャンパス第１アリーナ")).toBe("体育館");
-    expect(extractStageId("９号館アリーナ")).toBeNull();
+    // 実データの入稿表記（#302）。号館を理由に外すと「その他」へ落ち、アリーナのタブが出ない
+    expect(extractStageId("9号館アリーナ")).toBe("体育館");
+    expect(extractStageId("９号館アリーナ")).toBe("体育館");
   });
 
   it("id の完全一致を name の部分一致より優先する", () => {

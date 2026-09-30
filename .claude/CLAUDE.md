@@ -60,7 +60,7 @@ pnpm install
 # 開発サーバー起動
 pnpm dev
 
-# ビルド（末尾に生成物の検査が3本連結されている。下記「ビルド末尾の検査」を参照）
+# ビルド（末尾に生成物の検査が4本連結されている。下記「ビルド末尾の検査」を参照）
 pnpm build
 
 # プロダクションサーバー起動
@@ -156,7 +156,7 @@ microCMS の secrets を要求するので fork PR では必ず落ちる）。�
 
 ### ビルド末尾の検査
 
-`pnpm build` は `next build` のあとに、**生成物を読む検査を3本**流す。
+`pnpm build` は `next build` のあとに、**生成物を読む検査を4本**流す。
 いずれも「ビルドは通るが壊れている」状態を落とすためにあり、ESLint でも Vitest でも
 代替できない（生成された HTML を読む以外に判定する方法が無い）。
 
@@ -165,6 +165,7 @@ microCMS の secrets を要求するので fork PR では必ず落ちる）。�
 | `assert-events-static-html.mjs` | `/events` の本体がクライアント描画へ落ちる（#156）                                          | [`docs/frontend/static-html-and-search-params.md`](../docs/frontend/static-html-and-search-params.md) |
 | `assert-no-image-optimizer.mjs` | **どの画像でも** `/_next/image` を通る／`public/` の静的画像がHTMLから消える（#237 / #241） | [`docs/frontend/image-delivery.md`](../docs/frontend/image-delivery.md)                               |
 | `assert-font-preloads.mjs`      | 1ルートのフォントpreloadが10本以上になる（#90）                                             | [`docs/frontend/performance.md`](../docs/frontend/performance.md)                                     |
+| `assert-no-prerendered-404.mjs` | `generateStaticParams` が返したIDの詳細が 404 で事前描画される（#287）                      | [`docs/dev/microcms-fetch-failures.md`](../docs/dev/microcms-fetch-failures.md)                       |
 
 **先頭2本は検査対象が消えると空振りする。** 1本目は `EVENTS_VISIBLE` が false のとき、
 2本目は microCMS の画像が1枚もHTMLに出ないときで、それぞれログに `SKIP` / `NOTE` を出す。
@@ -172,6 +173,7 @@ microCMS の secrets を要求するので fork PR では必ず落ちる）。�
 なお2本目は**公開フラグが全て false でも空振りしない**（協賛企業はフラグ非依存）。
 `NOTE` が出たら「協賛の取得が0件」を疑うこと。
 3本目は全事前描画HTMLの `<head>` を対象にするため、HTMLが1枚でもあれば空振りしない。
+4本目は詳細ページが1枚も事前描画されていないとき（公開フラグ false・microCMS 未設定）に `NOTE` を出す。
 
 `pnpm type-check` が `next typegen` を前置しているのは、**`.next/types/validator.ts` が
 `.d.ts` ではなく `.ts` だから**である。`skipLibCheck: true` はこのファイルを守らないため、
@@ -260,6 +262,16 @@ CI 緑・マージ済みのまま本番だけが40分以上古いまま取り残
   - `special` は `type = special` のときのみ入力する著名人企画LP用のカスタムフィールド。中身は `logo` / `photos` / `openTime` / `goods` / `tickets` / `notices` ほか。詳細は `microcms/README.md`
   - `select` の値は `day1 : 10月31日（土）` のように **`値 : ラベル`** 形式。コード側は `split(":")` で先頭を取り出す
 - **Informations API**: `category` (sponsor/faq/other), `title`, `description`, `image`, `url`, `priority`
+
+### 取得に失敗したとき（#287）
+
+> [!IMPORTANT]
+> **取得関数で例外を `null` / `[]` に潰してよいのは、microCMS が「存在しない」と答えたとき
+> （`isMicrocmsNotFound()`、400 / 404）だけ。** 429 / 5xx を潰すと、実在するページが 404 で
+> 静的生成されてもビルドは成功し、ISR の再生成でも正常なキャッシュが 404 に置き換わる（どちらも実測）。
+> 取得は `client.get` ではなく `microcmsGet()`（`src/lib/microcms.ts`）を通すこと。
+> **SDK の `retry: true` は Next.js の fetch 重複排除に阻まれて効かない**ため、再試行はそちらにある。
+> 契約と実測は [`docs/dev/microcms-fetch-failures.md`](../docs/dev/microcms-fetch-failures.md) を参照。
 
 ### データ反映の仕組み（オンデマンド再検証）
 
