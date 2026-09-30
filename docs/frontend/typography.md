@@ -7,14 +7,14 @@
 
 東京都市大学 世田谷祭のブランドフォント。
 
-| 属性       | 値                                         |
-| ---------- | ------------------------------------------ |
-| フォント名 | Kaisei Opti（海星 Opti）                   |
-| 分類       | Japanese Mincho / Serif                    |
-| 制作       | Font Data Inc.                             |
-| 提供元     | Google Fonts                               |
-| ウェイト   | 400（Regular）/ 500（Medium）/ 700（Bold） |
-| ライセンス | SIL Open Font License 1.1                  |
+| 属性       | 値                                                                                        |
+| ---------- | ----------------------------------------------------------------------------------------- |
+| フォント名 | Kaisei Opti（海星 Opti）                                                                  |
+| 分類       | Japanese Mincho / Serif                                                                   |
+| 制作       | Font Data Inc.                                                                            |
+| 提供元     | Google Fonts                                                                              |
+| ウェイト   | 400（Regular）/ 700（Bold）。読み込んでいるのはこの2つ（500 を指定すると 400 で描かれる） |
+| ライセンス | SIL Open Font License 1.1                                                                 |
 
 ### フォントの特性
 
@@ -26,52 +26,60 @@ Kaisei Opti は毛筆書体（楷書）の筆法を残しつつ、現代的な�
 - 大サイズでの使用時に筆の抑揚が映える
 - ウェイト 700 はインパクトのある見出しに適する
 
-**制限・注意事項（重要）:**
+**注意:** 毛筆由来の筆跡（払い・止め・入り）が強く、**本文の連用には向かない。** 本文は `--font-sans` で描き、
+Kaisei Opti は見出しに使う（下の「どこに当たるか」）。
+過度に使うとデザインが「和風・和食店」的なトーンに偏るため、見出し以外へ広げるときは慎重に判断する。
 
-- 毛筆由来の筆跡（払い・止め・入り）が強く、**本文小サイズ（16px 以下）での連用は可読性が落ちる**
-- 欧文との混植では字幅の差が目立ちやすいため、英数字は別フォントの指定を推奨
-- 行間は最低 `1.8` 以上を確保すること（詰まると読みにくくなる）
-- 過度に使用するとデザインが「和風・和食店」的なトーンに偏るため、**使用箇所を見出し・大テキストに絞る**
+### 読み込み
 
-### 読み込み（Next.js）
-
-```tsx
-// src/app/layout.tsx
+```ts
 // src/components/layout/KaiseiFont.ts
-import { Kaisei_Opti } from "next/font/google";
-
-const kaiseiOpti = Kaisei_Opti({
-  weight: ["400", "700"],
+export const kaiseiOpti = Kaisei_Opti({
   subsets: ["latin"],
-  display: "swap",
+  weight: ["400", "700"],
   variable: "--font-kaisei-opti",
+  display: "swap",
+  preload: false,
 });
 ```
 
-`next/font` の変数をルートへ付けるとフォントCSSが全ページへ配信される。
-使用箇所のないフォントは将来用に読み込まず、必要になった時点で追加する。Kaisei Opti は
-ページ見出しでのみ遅延ロードし、本文はOSのシステムフォントを使用する。
-性能上の判断基準は [performance.md](./performance.md) を参照する。
+`loadKaiseiFont()`（`src/components/layout/loadKaiseiFont.ts`）がこのモジュールを遅延 import し、
+`document.body` へ変数のクラスを足して初めて `--font-kaisei-opti` が定義される。呼ぶ時点はページで違う。
 
-```css
-/* globals.css */
-:root {
-  --font-kaisei-opti: /* Next.js が注入 */;
-}
-```
+| ページ        | 読み込む時点                                                                                       | それまでの見出し      |
+| ------------- | -------------------------------------------------------------------------------------------------- | --------------------- |
+| トップ（`/`） | ABOUT / NEWS のセクションがビューポートへ近づいたとき（`AboutSection` / `NewsSectionInteractive`） | 端末の明朝（`serif`） |
+| それ以外      | ハイドレーション後（`DeferredKaiseiFontsLoader`）                                                  | 端末の明朝（`serif`） |
 
-### 使用用途と禁止事項
+見出しの `font-family` は `var(--font-kaisei-opti, "Kaisei Opti"), serif` で、**フォールバックを省いてはいけない**
+（理由は `globals.css` の `@theme` のコメント）。性能上の判断は [performance.md](./performance.md)。
 
-| 用途                      | 可否 | 備考                                                |
-| ------------------------- | ---- | --------------------------------------------------- |
-| ページ大見出し（H1/H2）   | 推奨 | 48px 以上、weight 700                               |
-| セクション見出し（H3/H4） | 可   | 32px 以上、weight 500 以上                          |
-| ロゴ・ブランド表記        | 推奨 | SVG または大サイズでの使用に限る                    |
-| キャッチコピー            | 可   | 日本語テキストに限定                                |
-| 本文（16px 以下）         | 禁止 | 読みにくい。本文はシステムフォントまたは sans-serif |
-| 英語テキスト              | 禁止 | 欧文グリフのバランスが崩れる                        |
-| 数字（価格・日時）        | 禁止 | 欧文専用フォントで揃えること                        |
-| UI ラベル・ボタン         | 禁止 | 操作性が落ちる                                      |
+### どこに当たるか
+
+**書体は要素で決まる。サイズ・言語・中身では決まらない。** 2026-09-30 に実装へ合わせた（下の NOTE）。
+
+| 対象                                   | 書体                         | 仕組み                                                                                                                                               |
+| -------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `h1` / `h2` / `h3`（サイズを問わない） | Kaisei Opti                  | `globals.css` の `@layer base`                                                                                                                       |
+| 上のうち、明示して戻した見出し         | `--font-sans`                | `font-sans` / インライン。`AboutHero` の `h1`、`SpecialGuestSection` の `h2`、`TimetableContent` の結果見出し、`NewsCard` の `h3`                    |
+| 見出し以外で明示した要素               | Kaisei Opti                  | `font-heading` / `font-serif` / インライン。`AboutHero` の「97」、`ContactForm` のお問い合わせ種別名、`HeroSection` の開催日（年・月・日の数字）ほか |
+| 本文・UI（上記以外すべて）             | `--font-sans`                | `body` の `font-sans`（`ui-sans-serif, system-ui, …`。Noto Sans JP は読み込んでいない）                                                              |
+| トップのヒーローの大見出し             | Dela Gothic One のサブセット | `font-hero-display`（8文字だけを自前配信）                                                                                                           |
+
+2026-09-30 の本番の実測（Kaisei Opti の読み込み後）: /about の `h2` / `h3` は 16〜36px のすべてが Kaisei Opti、
+フッターの `h2`（16px。英語の「Follow Us」を含む）も Kaisei Opti、404 の `h1` の「404」の数字も Kaisei Opti。
+sans だったのは明示して戻した `AboutHero` の `h1` だけだった。
+
+**運用:**
+
+- 見出しを sans にしたいときは、その見出しに `font-sans` を付ける（`h1`〜`h3` は既定で Kaisei Opti になる）
+- 見出し以外に Kaisei Opti を当てるときは `font-heading` を使う（`font-serif` も同じ値）
+- ウェイトは 400 / 700 のどちらかにする
+
+> [!NOTE]
+> 以前ここには「見出しは 32px 以上（H1/H2 は 48px 以上）」「本文（16px 以下）・英語・数字・UI ラベルに使わない」
+> という規約と、「`--text-3xl` 以下は sans-serif を基本とする」という注記があったが、**実装はどれも行っていなかった**
+> （`h1`〜`h3` にサイズも中身も見ずに当てる）。2026-09-30 に、規約のほうを実装に揃えた。
 
 ---
 
@@ -104,13 +112,7 @@ const kaiseiOpti = Kaisei_Opti({
 grep -rhoE '(^|[^a-z0-9-])(sm:|md:|lg:|xl:)?text-(xs|sm|base|lg|xl|[2-9]xl)\b' src | grep -oE 'text-[a-z0-9]+' | sort | uniq -c | sort -rn
 ```
 
-> [!WARNING]
-> **Kaisei Opti の適用範囲は、規約と実装が食い違っている（未解決）。**
-> 上の「使用用途と禁止事項」は見出しに 32px 以上を求め、以前この節も「`--text-3xl` 以下は sans-serif を基本とし、
-> Kaisei Opti は避ける」としていた。しかし `globals.css` の `@layer base` は **`h1` / `h2` / `h3` の全てに**
-> Kaisei Opti を当てており、サイズを見ない。たとえば企画詳細の404の見出し（`h2`、`text-2xl` = 24px）は Kaisei Opti で描かれる。
-> どちらに揃えるかはデザイン判断が要る。なお本文の書体 `--font-sans` は `ui-sans-serif, system-ui, …` で、
-> Noto Sans JP は読み込んでいない。
+> 見出しの書体（Kaisei Opti をどこに当てるか）はサイズでは決まらない。上の「どこに当たるか」を参照。
 
 ## 関連ドキュメント
 
@@ -120,4 +122,4 @@ grep -rhoE '(^|[^a-z0-9-])(sm:|md:|lg:|xl:)?text-(xs|sm|base|lg|xl|[2-9]xl)\b' s
 
 ---
 
-**最終更新日**: 2026-09-30（design.md から分割。フォントスケール表を Tailwind の既定値に合わせた）
+**最終更新日**: 2026-09-30（design.md から分割。フォントスケール表を Tailwind の既定値に合わせ、Kaisei Opti の適用範囲の規約を実装に揃えた）

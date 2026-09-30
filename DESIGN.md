@@ -90,11 +90,11 @@
 
 ### 3.1 フォント一覧（実装）
 
-| フォント名         | 分類           | ウェイト | CSS変数              | Preload | 用途                     |
-| ------------------ | -------------- | -------- | -------------------- | ------- | ------------------------ |
-| Kaisei Opti        | 明朝体（楷書） | 400, 700 | `--font-kaisei-opti` | false   | 見出し・ブランドフォント |
-| システムサンセリフ | ゴシック体     | OS依存   | `--font-sans`        | —       | 本文テキスト             |
-| システム丸ゴシック | ディスプレイ   | OS依存   | `font-hero-display`  | —       | ホームのヒーロー文字     |
+| フォント名         | 分類           | ウェイト | CSS変数              | Preload | 用途                                                |
+| ------------------ | -------------- | -------- | -------------------- | ------- | --------------------------------------------------- |
+| Kaisei Opti        | 明朝体（楷書） | 400, 700 | `--font-kaisei-opti` | false   | 見出し・ブランドフォント                            |
+| システムサンセリフ | ゴシック体     | OS依存   | `--font-sans`        | —       | 本文テキスト                                        |
+| Dela Gothic One    | ディスプレイ   | 400      | `font-hero-display`  | —       | ホームのヒーロー文字（8文字のサブセットを自前配信） |
 
 ### 3.2 font-family 指定
 
@@ -102,41 +102,33 @@
 /* 本文（デフォルト） */
 --font-sans: ui-sans-serif, system-ui, sans-serif;
 
-/* 見出し（h1, h2, h3 に自動適用） */
---font-heading: var(--font-kaisei-opti), serif;
---font-serif: var(--font-kaisei-opti), serif;
+/* 見出し（h1, h2, h3 に自動適用）。フォールバックを省かないこと（globals.css のコメント） */
+--font-heading: var(--font-kaisei-opti, "Kaisei Opti"), serif;
+--font-serif: var(--font-kaisei-opti, "Kaisei Opti"), serif;
 
 /* ヒーロー用（カスタムユーティリティ） */
 /* @utility font-hero-display */
-font-family: "Hiragino Maru Gothic ProN", "Arial Rounded MT Bold", sans-serif;
+font-family:
+  "Dela Gothic Hero", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
 ```
 
-### 3.3 Kaisei Opti 使用制限（重要）
+### 3.3 Kaisei Opti をどこに当てるか
 
-| 用途                      | 可否     | 備考                         |
-| ------------------------- | -------- | ---------------------------- |
-| ページ大見出し（H1/H2）   | 推奨     | 48px 以上、weight 700        |
-| セクション見出し（H3/H4） | 可       | 32px 以上、weight 500 以上   |
-| ロゴ・ブランド表記        | 推奨     | SVG または大サイズのみ       |
-| キャッチコピー            | 可       | 日本語テキストに限定         |
-| 本文（16px 以下）         | **禁止** | 可読性が低下する             |
-| 英語テキスト              | **禁止** | 欧文グリフのバランスが崩れる |
-| 数字（価格・日時）        | **禁止** | 欧文専用フォントで揃える     |
-| UI ラベル・ボタン         | **禁止** | 操作性が落ちる               |
+**書体は要素で決まる。サイズ・言語・中身では決まらない**（一次情報は
+[docs/frontend/typography.md](docs/frontend/typography.md) の「どこに当たるか」）。
 
-### 3.4 フォントスケール（モジュラースケール 1.25）
+- `h1` / `h2` / `h3` はサイズを問わず Kaisei Opti（`globals.css` の `@layer base`）
+- 見出しを sans にしたいときは、その見出しに `font-sans` を付ける
+- 見出し以外に当てるときは `font-heading` を使う。ウェイトは 400 / 700 のどちらか
 
-| Token         | Size | Weight  | Line Height | 主な用途             | フォント                   |
-| ------------- | ---- | ------- | ----------- | -------------------- | -------------------------- |
-| `--text-6xl`  | 60px | 700     | 1.1         | ページタイトル（H1） | Kaisei Opti                |
-| `--text-5xl`  | 48px | 700     | 1.2         | セクション大見出し   | Kaisei Opti                |
-| `--text-4xl`  | 38px | 700     | 1.3         | セクション見出し     | Kaisei Opti                |
-| `--text-3xl`  | 30px | 500-700 | 1.4         | カード見出し         | Kaisei Opti / Noto Sans JP |
-| `--text-2xl`  | 24px | 500     | 1.5         | サブ見出し           | Noto Sans JP               |
-| `--text-xl`   | 20px | 400-500 | 1.6         | リード文             | Noto Sans JP               |
-| `--text-base` | 16px | 400     | 1.75        | 本文テキスト         | Noto Sans JP               |
-| `--text-sm`   | 14px | 400     | 1.7         | 補足・キャプション   | Noto Sans JP               |
-| `--text-xs`   | 12px | 400     | 1.6         | ラベル・タグ         | Noto Sans JP               |
+以前ここにあった「見出しは 32px 以上」「本文・英語・数字・UI ラベルに使わない」は実装されていなかったため、
+2026-09-30 に実装へ揃えた。
+
+### 3.4 フォントスケール
+
+文字サイズと行送りは Tailwind の既定値をそのまま使う。値の表と使用数は
+[docs/frontend/typography.md](docs/frontend/typography.md) の「フォントスケール」にある
+（以前ここにあった「モジュラースケール 1.25」の表は実装に無い値だった）。
 
 ### 3.5 行間・字間
 
@@ -328,7 +320,7 @@ PICKUP ラベル等の装飾テキストで使用。
 - 日本語本文の line-height は 1.5 以上にする（推奨: 1.75）
 - 色のコントラスト比は WCAG AA 以上を確保する
 - コンポーネントの余白は Spacing Scale に従う
-- Kaisei Opti は 30px 以上の見出しに限定する
+- 見出しの書体は要素で決める（`h1`〜`h3` は Kaisei Opti、sans にするなら `font-sans` を明示）
 - z-index は 10 刻みの標準スケールのみ使用する
 - Primary 紫（primary-400）は CTA・リンク・装飾に限定する
 
@@ -338,7 +330,7 @@ PICKUP ラベル等の装飾テキストで使用。
 - 日本語本文に `line-height: 1.2` 以下を使わない
 - 全角・半角スペースを混在させない
 - テキスト色に純粋な `#000000` を使わない（`text-gray-900` を使用）
-- Kaisei Opti を本文（16px 以下）・英語・数字・UIラベルに使わない
+- 本文・UI に Kaisei Opti を当てない（見出し以外へ当てるのは `font-heading` を付けたときだけ）
 - Primary 紫を白背景の通常テキスト色に使わない（コントラスト不足）
 - `z-[45]` 等のアドホックな z-index 値を使わない
 
@@ -401,8 +393,8 @@ Line Height:  1.75
 ```
 このサイトのデザインシステムに従って、○○コンポーネントを作成してください。
 - プライマリカラー: oklch(68% 0.175 314deg)（実配信 #bf73e3）
-- 本文フォント: Noto Sans JP, sans-serif
-- 見出しフォント: Kaisei Opti, serif（30px以上のみ）
+- 本文フォント: ui-sans-serif, system-ui, sans-serif（システムフォント）
+- 見出しフォント: Kaisei Opti, serif（h1〜h3 に自動適用。sans にするなら font-sans を明示）
 - 行間: 本文は line-height: 1.75
 - カード背景: 淡紫背景のページは bg-white/10, rounded-2xl / 白いシート上は bg-white
 - ボーダー: 淡紫背景のページは border-gray-200/20 / 白いシート上は border-gray-200
