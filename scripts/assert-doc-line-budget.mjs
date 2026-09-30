@@ -70,7 +70,6 @@ const GRANDFATHERED = new Map([
   ["docs/frontend/page-transition.md", 540],
   ["docs/frontend/image-delivery.md", 530],
   ["docs/frontend/events-semantic-search.md", 496],
-  ["docs/dev/ci-env.md", 478],
   ["docs/frontend/performance.md", 450],
   ["docs/frontend/timetable-gantt.md", 448],
   ["docs/dev/legacy-site-deindex.md", 435],

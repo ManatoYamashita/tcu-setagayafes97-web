@@ -91,7 +91,7 @@ Production デプロイの完成を待つ（マージから実測45〜85秒）�
    > [!CAUTION]
    > **連続ポーリング禁止。** Vercel の bot 対策が発動して `x-vercel-mitigated: challenge` の 403 が
    > 返り続け、サイト障害と見分けがつかなくなる（2026-08-29 に実際に踏んでいる）。
-   > 詳細は [ci-env.md の「Vercel の本番反映」](./ci-env.md)。
+   > 詳細は [vercel-production-deploy.md](./vercel-production-deploy.md)。
 
 3. Vercel の Functions ログに `[revalidate] api=news ... paths=...` が出ていることを確認
 4. microCMS の Webhook 実行履歴でステータス 200 を確認
