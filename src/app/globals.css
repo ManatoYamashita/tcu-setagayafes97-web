@@ -151,8 +151,8 @@ body {
        blockquote  border-left-width: 0px  引用と地の文の区別が付かない
 
      順序付きリストの番号は体裁ではなく情報なので、消えることを許容できない。
-     CMS が実際に出力する要素だけを対象にする。入稿実績の無い要素（blockquote,
-     table, figure など）は、入稿されてから足すこと。詳細は #179。 */
+     CMS が実際に出力する要素だけを対象にする。blockquote や figure のように
+     入稿実績の無い要素は、入稿されてからスタイルを足すこと。詳細は #179。 */
   .prose p {
     margin-block: 1em;
     /* 日本語の本文は 1.5 では詰まる。Tailwind の text-base 既定（1.5）を上書きする。
@@ -202,6 +202,34 @@ body {
   .prose li {
     margin-block: 0.25em;
     line-height: 1.8;
+  }
+
+  /* richEditorV2 が返す table を、列幅が狭くても本文内で読めるように整える。
+     表・セルの枠線で行列の関係を示し、長い文字列はセル内で折り返す。 */
+  .prose table,
+  .event-rich-content table {
+    width: 100%;
+    max-width: 100%;
+    margin-block: 1em;
+    border: 1px solid var(--color-gray-300);
+    border-collapse: collapse;
+  }
+
+  .prose th,
+  .prose td,
+  .event-rich-content th,
+  .event-rich-content td {
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--color-gray-300);
+    text-align: start;
+    vertical-align: top;
+    overflow-wrap: anywhere;
+  }
+
+  .prose th,
+  .event-rich-content th {
+    background-color: var(--color-primary-50);
+    font-weight: 700;
   }
 }
 

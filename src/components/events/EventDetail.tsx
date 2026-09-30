@@ -191,7 +191,7 @@ export function EventDetail({ event }: EventDetailProps) {
             詳細
           </h2>
           <div
-            className="mt-5 text-base leading-8 text-gray-700 [&_a]:font-semibold [&_a]:text-primary-700 [&_a]:underline [&_h2]:mt-8 [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:mt-6 [&_h3]:font-serif [&_h3]:text-xl [&_h3]:font-bold [&_li]:ml-5 [&_li]:list-disc [&_ol]:space-y-2 [&_p+p]:mt-4 [&_ul]:space-y-2"
+            className="event-rich-content mt-5 text-base leading-8 text-gray-700 [&_a]:font-semibold [&_a]:text-primary-700 [&_a]:underline [&_h2]:mt-8 [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:mt-6 [&_h3]:font-serif [&_h3]:text-xl [&_h3]:font-bold [&_li]:ml-5 [&_li]:list-disc [&_ol]:space-y-2 [&_p+p]:mt-4 [&_ul]:space-y-2"
             dangerouslySetInnerHTML={{ __html: event.content }}
           />
         </section>
