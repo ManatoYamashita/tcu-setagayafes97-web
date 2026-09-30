@@ -194,7 +194,7 @@ CI はクリーンチェックアウトなので陳腐化しないが、**ロー
 CI 緑・マージ済みのまま本番だけが40分以上古いまま取り残された。Vercel 側にも
 「失敗したデプロイ」ではなく記録そのものが無いため、**放置すると誰も気づかない。**
 この Guard はその沈黙を破るためだけに存在する。復旧手順は
-[`docs/dev/ci-env.md`](../docs/dev/ci-env.md) の「取りこぼしからの復旧」を参照（#152）。
+[`docs/dev/vercel-production-deploy.md`](../docs/dev/vercel-production-deploy.md) の「取りこぼしからの復旧」を参照（#152）。**Hobby のデプロイ上限（24時間で100件）でも Guard は同じように落ちる**（Vercel ステータスが `Deployment rate limited`。同じ文書の「デプロイ数の上限で止まったとき」）。枠の節約のため **`docs/**` のブランチでは Vercel のデプロイを作らない**（`vercel.json`）。
 
 ### コミットメッセージ規約
 

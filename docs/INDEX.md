@@ -65,9 +65,12 @@
 - **[testing.md](./dev/testing.md)** - テスト方針（何をユニットテストにし、何を実ブラウザに回すか。#157）
   - **jsdom / happy-dom を入れてはいけない。** `getBoundingClientRect()` が常に 0 で #148 を原理的に検出できない
   - **テストの価値は「落ちること」でしか測れない。** 退行を注入して赤になるのを確かめる
-- **[ci-env.md](./dev/ci-env.md)** - GitHub Actions / Vercel の環境変数と公開フラグ、本番反映の判定
+- **[ci-env.md](./dev/ci-env.md)** - GitHub Actions / Vercel の環境変数と公開フラグ
   - **公開フラグは未設定でもエラーにならず黙って非公開になる。** 登録先は4箇所
   - **`vercel promote` は使わない。** Preview の環境変数の成果物が本番に出る
+- **[vercel-production-deploy.md](./dev/vercel-production-deploy.md)** - Vercel の本番反映の判定、取りこぼしからの復旧、デプロイ数の上限
+  - **Guard が落ちたら、コミットの Vercel ステータスを先に見る。** `Deployment rate limited` なら取りこぼしではなく Hobby の上限（24時間で100件）。待つしかない
+  - **`docs/**` のブランチでは Vercel のデプロイを作らない**（`vercel.json`）。`ignoreCommand` では中止したデプロイも数えるので節約にならない
 - **[domain-migration.md](./dev/domain-migration.md)** - `setagayafes.org` を第97回の正規ドメインにした手順と転送一覧
   - **rewrite プロキシは採らない。** trailing-slash リダイレクトと衝突して無限ループになる
 - **[96th-db-backup.md](./dev/96th-db-backup.md)** - 第96回 WordPress DB バックアップの照合情報と安全な取扱い
