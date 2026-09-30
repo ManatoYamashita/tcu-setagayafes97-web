@@ -74,9 +74,8 @@ pnpm build
 grep -rho '"x-next-cache-tags":"[^"]*"' .next/server/app --include=*.meta | tr ',' '\n' | sort -u
 ```
 
-> 公開フラグが `false` の間は `generateStaticParams()` が空を返し、
-> `/events/[id]` `/info/[id]` のページが1枚も生成されない＝タグも記録されない。
-> 動的ルートを検証するときは `NEXT_PUBLIC_EVENTS_VISIBLE=true NEXT_PUBLIC_NEWS_VISIBLE=true pnpm build` で確認する。
+> 詳細ページのタグは、microCMS に公開済みの企画・お知らせが存在するときに記録される。
+> 動的ルートの検証は `pnpm build` で確認する。
 
 ## microCMS 側の設定手順
 
@@ -136,10 +135,6 @@ grep -rho '"x-next-cache-tags":"[^"]*"' .next/server/app --include=*.meta | tr '
 
 ## Webhook では解決しないこと
 
-- **公開フラグ `NEXT_PUBLIC_*_VISIBLE` はビルド時に評価される。**
-  Webhook では切り替わらない。解禁作業には従来どおり再デプロイが要る（[ci-env.md](./ci-env.md)）。
-- `EVENTS_VISIBLE=false` の間は `getEventsList()` が microCMS へ問い合わせず `[]` を返すため、
-  再検証しても表示は「準備中」のまま。これは正常な挙動。
 - **トップの「おすすめ企画」は再検証のたびに並びが変わる。**
   `getFeaturedEvents()` が毎レンダーでシャッフルする仕様のため（`src/lib/events.ts`）。
 

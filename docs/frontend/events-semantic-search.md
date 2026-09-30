@@ -456,11 +456,11 @@ $5 は約 7,700 クエリに相当する（1クエリ $0.000649）。**残高を
 
 ### 自動
 
-| コマンド                                     | 見るもの                                                           |
-| -------------------------------------------- | ------------------------------------------------------------------ |
-| `pnpm test`                                  | fixture に対する退行テスト。**ライブ API は叩かない**              |
-| `pnpm lint`                                  | `SemanticSearchNotice.tsx` が `useSearchParams` を import できない |
-| `NEXT_PUBLIC_EVENTS_VISIBLE=true pnpm build` | `assert-events-static-html.mjs` が `SKIP` ではなく合格する         |
+| コマンド     | 見るもの                                                           |
+| ------------ | ------------------------------------------------------------------ |
+| `pnpm test`  | fixture に対する退行テスト。**ライブ API は叩かない**              |
+| `pnpm lint`  | `SemanticSearchNotice.tsx` が `useSearchParams` を import できない |
+| `pnpm build` | `assert-events-static-html.mjs` が合格する                         |
 
 ### 退行注入（実測）
 
@@ -484,7 +484,7 @@ $5 は約 7,700 クエリに相当する（1クエリ $0.000649）。**残高を
 node scripts/measure-semantic-search.mjs
 
 # fixture も書き出す
-NEXT_PUBLIC_SPECIAL_VISIBLE=false node scripts/measure-semantic-search.mjs --write
+node scripts/measure-semantic-search.mjs --write
 ```
 
 **Node 24 が要る**（型除去で `src/lib/*.ts` を直接読むため。`scripts/ts-module-loader.mjs`）。

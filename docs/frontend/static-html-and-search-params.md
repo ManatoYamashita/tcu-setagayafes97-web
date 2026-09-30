@@ -44,7 +44,7 @@
 生成物 `.next/server/app/<route>.html` を直接読みます。**属性の綴りまで含めて照合すること。**
 
 ```bash
-NEXT_PUBLIC_EVENTS_VISIBLE=true pnpm build
+pnpm build
 
 f=.next/server/app/events.html
 grep -o 'data-page-hero="true"' "$f" | wc -l    # ヒーローが描かれているか
@@ -106,7 +106,7 @@ grep -o '.\{160\}BAILOUT_TO_CLIENT_SIDE_RENDERING' "$f"
 
 ---
 
-## 実測（2026-09-03 / Next.js 16.1.0 / `NEXT_PUBLIC_EVENTS_VISIBLE=true pnpm build`）
+## 実測（2026-09-03 / Next.js 16.1.0 / `pnpm build`）
 
 `.next/server/app/events.html` を直接読んだ結果。
 
@@ -190,50 +190,9 @@ const EVENTS_FALLBACK_TREE = [
 `postbuild` にしていないのは、pnpm の `enable-pre-post-scripts` に依存させないため。
 既定値が変わったり `.npmrc` へ一行足されたりすると、**装置が黙って死ぬ。**
 
-### フラグが false の間も置いておいてよい
+### 毎ビルドで検査する
 
-**`NEXT_PUBLIC_EVENTS_VISIBLE` が `"true"` でなければ自動でスキップし、`true` になった
-瞬間から検査を始める。** 解禁のタイミングで誰かが検査を「足す」必要は無い。
-スキップ時も準備中ページが実際に描かれていることは確認するので、素通りではない。
-
-Vercel Preview は `EVENTS_VISIBLE=true` なので（[../dev/ci-env.md](../dev/ci-env.md) の
-Vercel 環境変数表。2026-09-05 に `vercel env ls` で再確認。**Production には登録が無い**）、
-**解禁を待たず現時点から Preview デプロイのゲートとして稼働している。**
-PR #173 の Preview ビルドログでも `pnpm run build` → アサーションの `OK` 行まで確認済み。
-
-### フラグは `next build` と同じ手順で読む
-
-> [!IMPORTANT]
-> **素の `process.env` を読んではいけない。** `next build` は `@next/env` を通して
-> `.env.production.local` → `.env.local` → `.env.production` → `.env` の順に解決するが、
-> `node scripts/...` はそのどれも読まない。**同じ `pnpm build` の中で、ページとアサーションが
-> 違うフラグ値を見ることになる。**
-
-`.env.example` は `NEXT_PUBLIC_EVENTS_VISIBLE=false` を含んだまま `.env.local` へコピーさせる
-運用なので、**解禁のリハーサルで `.env.local` を `true` にした瞬間に踏む。** そのとき
-`next build` は公開状態のページを描き、アサーションはフラグを `undefined` と見て
-「準備中の文言がありません」と、**事実と正反対のメッセージで exit 1 する。**
-
-対処として、スクリプト冒頭で `next` 本体と同じローダーを呼んでいる。
-
-```js
-import nextEnv from "@next/env"; // CommonJS のため .mjs からは default 経由で取り出す
-const { loadEnvConfig } = nextEnv;
-
-loadEnvConfig(process.cwd(), false); // 第2引数 false = 本番モード（.env.production 側を読む）
-```
-
-`@next/env` は `next` が内部で使っているパッケージそのもので、**バージョンを `next` と
-揃えて devDependencies へ固定してある**（lockfile には `importers` の参照が1つ増えるだけで、
-新しいパッケージは入らない）。シェルや CI が渡した値を `.env` ファイルより優先する挙動まで
-`next build` と同じになる。
-
-| 状況                                       | `next build` | アサーション（修正前）    | アサーション（修正後） |
-| ------------------------------------------ | ------------ | ------------------------- | ---------------------- |
-| `.env.local` に `true`                     | 公開で描画   | **false と誤認 → 落ちる** | true                   |
-| `.env.production` に `true`                | 公開で描画   | **false と誤認 → 落ちる** | true                   |
-| シェルで `true`（CI・Vercel）              | 公開で描画   | true                      | true                   |
-| シェルで `false` ＋ `.env.local` に `true` | 非公開で描画 | false                     | false（シェルが優先）  |
+企画一覧は常時公開するため、`scripts/assert-events-static-html.mjs` は毎ビルドで一覧UIの存在を検査する。CI と Vercel Preview も同じ条件で判定する。
 
 ### 何を見ているか
 
@@ -245,12 +204,9 @@ loadEnvConfig(process.cwd(), false); // 第2引数 false = 本番モード（.en
   **件数に依存する指標を合否条件にしてはいけない**（企画詳細リンクの本数は参考値として
   ログに出すだけ）
 
-> [!IMPORTANT]
-> **`data-page-hero` と `data-page-sheet` は判定に使えない。** `ComingSoon` も
-> `PageSheetLayout` を通るため、フラグが false の本番でも 1 件ずつ出る（2026-09-05 実測）。
-> #156 の表にある「0 → 1」は「境界なし かつ `EVENTS_VISIBLE=true`」限定の比較値である。
+`data-page-hero` と `data-page-sheet` だけでは一覧UIの存在を確認できない。
 
-### 退行注入で実測（2026-09-05 / `NEXT_PUBLIC_EVENTS_VISIBLE=true pnpm build`）
+### 退行注入で実測（2026-09-05 / `pnpm build`）
 
 | 状態                                                | `pnpm build` | 企画リンク |
 | --------------------------------------------------- | ------------ | ---------- |

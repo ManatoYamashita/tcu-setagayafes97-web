@@ -79,10 +79,10 @@
 
 著名人企画（MON7A）の告知導線として、次の2本を `next.config.ts` の `redirects()` に追加した。
 
-| リクエスト    | ステータス | 転送先                                               |
-| ------------- | ---------- | ---------------------------------------------------- |
-| `/97th/about` | **302**    | `/special/<eventId>`（非公開時は `/special`）        |
-| `/special`    | **302**    | `/special/<eventId>`（`SPECIAL_VISIBLE` が真のとき） |
+| リクエスト    | ステータス | 転送先               |
+| ------------- | ---------- | -------------------- |
+| `/97th/about` | **302**    | `/special/<eventId>` |
+| `/special`    | **302**    | `/special/<eventId>` |
 
 いずれも末尾スラッシュ付き（`/97th/about/`）でも同じ1ホップで着地する。`source` は末尾スラッシュなしの1本だけでよい。
 
@@ -95,7 +95,7 @@
 
    > **2026-09-19 追記。** かつてここには「ページ内の `redirect()` は HTTP ステータスに反映されず `<meta http-equiv="refresh">` へ格下げされるため、本物の転送を返せるのは `redirects()` と `proxy.ts` だけである」と書いていたが、**現在は事実でない。** 原因だったルート直下の `src/app/loading.tsx` は #217（`417e3a9`）で削除済みで、ページ内 `redirect()` は 307 を返す（`/events/special-event-mon7a` で実測）。**ただし `/97th/about` をここに置く理由は上記のとおり層の順序なので、この設定は動かさない。**
 
-転送先の企画IDは `src/data/special-banner.ts` の `eventId` を出典とする。トップページの告知セクションが参照しているものと同一で、設定側にベタ書きすると2箇所へ散るためである。非公開（`NEXT_PUBLIC_SPECIAL_VISIBLE` が真でない）の間は LP が `notFound()` を返すので、転送先を `/special` の準備中表示へ落とし、`/special` 自身の転送は出さない。
+転送先の企画IDは `src/data/special-banner.ts` の `eventId` を出典とする。トップページの告知セクションが参照しているものと同一で、設定側にベタ書きすると2箇所へ散るためである。表示制御は環境変数に依存しない。
 
 **2組目の著名人企画が公開されたら `/special` のエントリを削除すること。** `src/app/special/page.tsx` の一覧表示がそのまま復帰する。`src/app/sitemap.ts` の `/special` 除外判定も併せて見直す。
 

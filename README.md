@@ -51,18 +51,7 @@ cp .env.example .env.local
 | `CONTACT_TO_EMAIL`        | お問い合わせ送信先        |  -   |
 | `CONTACT_FROM_EMAIL`      | お問い合わせ送信元        |  -   |
 
-#### コンテンツ公開フラグ
-
-`"true"` のときだけ公開する。未設定・それ以外の値はすべて非公開（安全側デフォルト）。**ビルド時に評価されるため、値を変えたら再ビルド・再デプロイが必要。**
-
-| 変数名                              | 制御対象                                                                              |
-| ----------------------------------- | ------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_EVENTS_VISIBLE`        | `/events`・`/timetable`・おすすめ企画・企画詳細・sitemap の企画                       |
-| `NEXT_PUBLIC_NEWS_VISIBLE`          | `/info` 一覧                                                                          |
-| `NEXT_PUBLIC_SPECIAL_VISIBLE`       | 著名人企画（`type = special`）全般とトップの告知セクション。`EVENTS_VISIBLE` とは独立 |
-| `NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE` | 著名人企画詳細の物販欄のみ。`SPECIAL_VISIBLE` とは独立                                |
-
-組み合わせ表と注意点は [docs/dev/ci-env.md](./docs/dev/ci-env.md#コンテンツ公開フラグ) を参照。
+企画・お知らせ・著名人企画・物販は常時表示します。公開の可否は microCMS の公開状態で管理します。
 
 ### 開発コマンド
 
