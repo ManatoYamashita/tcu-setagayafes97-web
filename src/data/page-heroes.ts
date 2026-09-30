@@ -81,6 +81,13 @@ export const pageHeroes: Record<string, PageHeroData> = {
     imageSrc: "/images/photos/setagayafe97-image.avif",
     imageAlt: "来場ガイド",
   },
+  sponsors: {
+    title: "協賛・協力",
+    subtitle: "Sponsors",
+    description: "第97回東京都市大学世田谷祭を支えてくださる企業・団体の皆様",
+    imageSrc: "/images/photos/setagayafe97-image.avif",
+    imageAlt: "世田谷祭の会場風景",
+  },
   faq: {
     title: "よくある質問",
     subtitle: "FAQ",

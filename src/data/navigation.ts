@@ -117,6 +117,7 @@ export const navigationConfig = {
       titleKey: "aboutCommittee",
       links: [
         { labelKey: "about", href: "/about" },
+        { labelKey: "sponsors", href: "/about/sponsors" },
         { labelKey: "privacy", href: "/about/privacy" },
       ],
     },
