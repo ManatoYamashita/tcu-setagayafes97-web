@@ -24,7 +24,7 @@
  * ## 既存の超過はラチェットで扱う
  *
  * 導入時点で超えていたファイルは、そのときの行数を上限として下の `GRANDFATHERED` に記録してある。
- * 次の4つを落とす。
+ * 次の5つを落とす。
  *
  * | 種類      | 条件                                           | 直し方                                   |
  * | --------- | ---------------------------------------------- | ---------------------------------------- |
@@ -32,12 +32,14 @@
  * | `grew`    | 表にあるファイルが記録した上限を超えた         | 同じ行数を削るか、内容を別ファイルへ出す |
  * | `settled` | 表にあるファイルが 300 行以下になった          | 表からその行を消す                       |
  * | `missing` | 表にあるファイルが追跡されていない（改名・削除） | 表を直す（改名なら新しいパスで記録する） |
+ * | `shrunk`  | 表にあるファイルが上限より縮んだ（300 行はまだ超えている） | 表の上限を現在の行数へ下げる |
  *
  * `settled` と `missing` を落とすのは、**空振りする記録を残さない**ためである。
  * 分割しても記録が残ると、そのファイルは上限まで再び伸ばせてしまう。
  *
- * 上限より縮んだが 300 行はまだ超えている場合は、落とさずに NOTE を出す。
- * 上限を下げるかどうかは任意である（下げれば、縮めた分を再び伸ばせなくなる）。
+ * `shrunk` を落とすのは、**上限を実際の行数より緩いまま残さない**ためである（#322 で決定）。
+ * 残すと、削った分だけ再び伸ばせてしまう。上限は下がる一方で、上がることは無い。
+ * 代償として、表にあるファイルから行を削る PR は、同じ PR で表も直すことになる。
  *
  * ## 行の数え方
  *
@@ -92,12 +94,10 @@ function countLines(text) {
  *
  * @param {Map<string, number>} lineCounts 追跡 `.md` のパスと行数
  * @param {Map<string, number>} grandfathered 記録済みの超過と、その上限
- * @returns {{ violations: Array<{ kind: string, file: string, lines?: number, ceiling?: number }>,
- *             notes: Array<{ file: string, lines: number, ceiling: number }> }}
+ * @returns {Array<{ kind: string, file: string, lines?: number, ceiling?: number }>}
  */
 function judge(lineCounts, grandfathered) {
   const violations = [];
-  const notes = [];
 
   for (const [file, lines] of lineCounts) {
     const ceiling = grandfathered.get(file);
@@ -108,7 +108,7 @@ function judge(lineCounts, grandfathered) {
     } else if (lines <= LINE_LIMIT) {
       violations.push({ kind: "settled", file, lines, ceiling });
     } else if (lines < ceiling) {
-      notes.push({ file, lines, ceiling });
+      violations.push({ kind: "shrunk", file, lines, ceiling });
     }
   }
 
@@ -116,14 +116,14 @@ function judge(lineCounts, grandfathered) {
     if (!lineCounts.has(file)) violations.push({ kind: "missing", file, ceiling });
   }
 
-  return { violations, notes };
+  return violations;
 }
 
 /**
  * 実データを見る前に、数え方と判定そのものが正しいかを合成した入力で確かめる
  *
  * 判定が黙って甘くなる（fail-open）と、この検査は「緑なのに何も守っていない」装置になる。
- * 4種類の違反のそれぞれが検出され、境界（ちょうど 300 行・ちょうど上限）では落ちないことを見る。
+ * 5種類の違反のそれぞれが検出され、境界（ちょうど 300 行・ちょうど上限）では落ちないことを見る。
  */
 function runSelfCheck() {
   const failures = [];
@@ -155,16 +155,17 @@ function runSelfCheck() {
     ["shrunk.md", 350],
     ["settled.md", LINE_LIMIT],
   ]);
-  const { violations, notes } = judge(counts, table);
-  const kinds = violations.map((v) => `${v.kind}:${v.file}`).sort();
+  const kinds = judge(counts, table)
+    .map((v) => `${v.kind}:${v.file}`)
+    .sort();
 
   expect("違反の一覧", kinds, [
     "grew:grown.md",
     "missing:renamed.md",
     "new:over-limit.md",
     "settled:settled.md",
+    "shrunk:shrunk.md",
   ]);
-  expect("縮んだだけのファイルは NOTE", notes, [{ file: "shrunk.md", lines: 350, ceiling: 400 }]);
 
   if (failures.length > 0) {
     console.error(`${LABEL} FAIL: 判定の自己検査が ${failures.length} 件外れました。`);
@@ -195,14 +196,7 @@ for (const file of markdownFiles) {
   lineCounts.set(file, countLines(readFileSync(absolute, "utf8")));
 }
 
-const { violations, notes } = judge(lineCounts, GRANDFATHERED);
-
-for (const { file, lines, ceiling } of notes) {
-  console.log(
-    `${LABEL} NOTE: ${file} は ${lines} 行（記録した上限 ${ceiling} 行）。` +
-      `上限を ${lines} へ下げると、縮めた分を再び伸ばせなくなる（任意）。`
-  );
-}
+const violations = judge(lineCounts, GRANDFATHERED);
 
 if (violations.length > 0) {
   const MESSAGES = {
@@ -218,6 +212,9 @@ if (violations.length > 0) {
     missing: (v) =>
       `${v.file}: 追跡されていない（改名・削除）。GRANDFATHERED を直すこと` +
       `（改名したなら新しいパスで記録し直す。上限は ${v.ceiling} 行のまま）`,
+    shrunk: (v) =>
+      `${v.file}: ${v.lines} 行（記録した上限 ${v.ceiling} 行より ${v.ceiling - v.lines} 行縮んだ）。` +
+      `scripts/assert-doc-line-budget.mjs の GRANDFATHERED で上限を ${v.lines} へ下げること`,
   };
 
   console.error(`${LABEL} FAIL: ${violations.length} 件の違反があります。`);
@@ -237,5 +234,5 @@ if (violations.length > 0) {
 const withinLimit = [...lineCounts.values()].filter((lines) => lines <= LINE_LIMIT).length;
 console.log(
   `${LABEL} OK: 追跡 .md ${lineCounts.size}本 / ${LINE_LIMIT}行以下 ${withinLimit}本 / ` +
-    `上限つきで記録 ${GRANDFATHERED.size}本（伸びていない）。`
+    `上限つきで記録 ${GRANDFATHERED.size}本（上限と一致）。`
 );

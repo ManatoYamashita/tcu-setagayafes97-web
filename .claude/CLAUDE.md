@@ -45,7 +45,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### 命名・配置ガイド
 
 - ファイル名は `kebab-case.md`、目的が明確な名前
-- 1ファイルが 300 行超 or 技術領域が分岐 → 分割/ディレクトリ化（行数は `pnpm check:doc-lines` が追跡 `.md` 全部に検査する。既存の超過は上限つきで記録してあり、**伸ばすと CI で落ちる**。本ファイルも対象）
+- 1ファイルが 300 行超 or 技術領域が分岐 → 分割/ディレクトリ化（行数は `pnpm check:doc-lines` が追跡 `.md` 全部に検査する。既存の超過は上限つきで記録してあり、**伸ばすと CI で落ちる。縮めたら同じ PR で上限を下げる**。本ファイルも対象）
 - 機密情報（PII等）は `docs/` に保存しない
 - ドキュメントコミットは `DOC:` プレフィックス
 
