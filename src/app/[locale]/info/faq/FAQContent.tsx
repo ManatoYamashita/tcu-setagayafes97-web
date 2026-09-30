@@ -114,6 +114,7 @@ export function FAQContent({ initialFAQ }: FAQContentProps) {
 
   // AccordionItem 形式に変換
   const accordionItems: AccordionItem[] = filteredFAQ.map((faq) => ({
+    id: faq.id,
     title: faq.title,
     content: faq.description || "",
     defaultOpen: false,
@@ -233,9 +234,9 @@ function FilterButton({ label, isActive, onClick, count }: FilterButtonProps) {
       type="button"
       onClick={onClick}
       aria-pressed={isActive}
-      className={`rounded-full border px-5 py-2 text-sm font-semibold transition-colors focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 ${
+      className={`rounded-full border px-5 py-2 min-h-11 text-sm font-semibold transition-colors focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 ${
         isActive
-          ? "border-primary-600 bg-primary-600 text-white shadow-md"
+          ? "border-primary-600 bg-primary-600 text-white"
           : "border-gray-200 bg-gray-50 text-gray-700 hoverable:hover:border-gray-400 hoverable:hover:bg-white"
       }`}
     >
