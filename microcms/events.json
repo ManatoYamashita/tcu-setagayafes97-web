@@ -110,6 +110,17 @@
       "fieldId": "session",
       "name": "開催枠",
       "fields": [
+        {
+          "fieldId": "date",
+          "name": "日程",
+          "kind": "select",
+          "required": false,
+          "multipleSelect": false,
+          "selectItems": [
+            { "id": "session-day1-slot", "value": "day1 : 10月31日（土）" },
+            { "id": "session-day2-slot", "value": "day2 : 11月1日（日）" }
+          ]
+        },
         { "fieldId": "startTime", "name": "開始時刻", "kind": "text", "required": false },
         { "fieldId": "endTime", "name": "終了時刻", "kind": "text", "required": false }
       ]
