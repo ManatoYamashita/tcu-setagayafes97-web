@@ -1,5 +1,5 @@
 import type { Event, EventDate, EventSession } from "@/types/events";
-import type { TimetableEntry } from "@/types/timetable";
+import type { TimetableEntry, TimetableEventDetail } from "@/types/timetable";
 import {
   stages,
   extractStageId,
@@ -81,6 +81,54 @@ export function filterStageEvents(events: Event[]): TimetableEntry[] {
         },
       ];
     });
+  });
+}
+
+/**
+ * 企画詳細パネル用の補足情報を、企画IDごとに1件ずつ作る
+ *
+ * `filterStageEvents()` と同じ `Event[]` から作ること。対象の判定は重ねて持たず、
+ * 同じ種別（stage / special）だけを拾う。パネルで使うのは `TimetableEntry` に無い項目だけである。
+ */
+export function buildStageEventDetails(events: Event[]): Record<string, TimetableEventDetail> {
+  const details: Record<string, TimetableEventDetail> = {};
+
+  for (const event of events) {
+    if (event.type !== "stage" && event.type !== "special") continue;
+
+    details[event.id] = {
+      description: event.description,
+      sns: event.sns,
+      venue: [event.building?.trim(), event.place?.trim()].filter(Boolean).join(" "),
+      thumbnail: event.thumbnail?.url
+        ? {
+            url: event.thumbnail.url,
+            width: event.thumbnail.width ?? 0,
+            height: event.thumbnail.height ?? 0,
+          }
+        : undefined,
+    };
+  }
+
+  return details;
+}
+
+/**
+ * 開始時刻順に並べる。同時刻はステージIDの順
+ *
+ * 縦スタックの表示順と、企画詳細パネルの「前の企画 / 次の企画」が同じ並びであること。
+ * 元の配列は変更しない。
+ */
+export function sortEntriesByStart<T extends { event: TimetableEntry; stageId: string }>(
+  items: T[]
+): T[] {
+  return [...items].sort((a, b) => {
+    const startDiff =
+      (parseTimeToMinutes(a.event.startTime) ?? Number.POSITIVE_INFINITY) -
+      (parseTimeToMinutes(b.event.startTime) ?? Number.POSITIVE_INFINITY);
+
+    if (startDiff !== 0) return startDiff;
+    return a.stageId.localeCompare(b.stageId);
   });
 }
 

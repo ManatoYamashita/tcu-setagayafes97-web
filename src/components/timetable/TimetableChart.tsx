@@ -6,6 +6,8 @@ import { TimetableStackedList } from "./TimetableStackedList";
 interface TimetableChartProps {
   groups: StageGroup[];
   range: TimeRange;
+  /** カードを押したときに呼ぶ。企画詳細パネルを開く */
+  onSelect?: (entryKey: string) => void;
 }
 
 /**
@@ -23,7 +25,7 @@ interface TimetableChartProps {
  * 外枠に overflow-hidden を置かないこと。中のスクローラが自分で横スクロールを持っており、
  * 二重にクリップすると sticky な時刻ラベル列とフォーカスリングが欠ける。
  */
-export function TimetableChart({ groups, range }: TimetableChartProps) {
+export function TimetableChart({ groups, range, onSelect }: TimetableChartProps) {
   if (groups.length === 0) {
     return (
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-8 text-center">
@@ -36,12 +38,12 @@ export function TimetableChart({ groups, range }: TimetableChartProps) {
     <div className="bg-white sm:rounded-xl sm:border sm:border-gray-200 sm:p-4 lg:p-6">
       {/* デスクトップ: ガントチャート */}
       <div className="hidden lg:block">
-        <TimetableGantt groups={groups} range={range} />
+        <TimetableGantt groups={groups} range={range} onSelect={onSelect} />
       </div>
 
       {/* モバイル・タブレット: 縦スタック */}
       <div className="lg:hidden">
-        <TimetableStackedList groups={groups} />
+        <TimetableStackedList groups={groups} onSelect={onSelect} />
       </div>
     </div>
   );

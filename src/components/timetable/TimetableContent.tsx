@@ -1,33 +1,39 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { EventDate } from "@/types/events";
-import type { TimetableEntry } from "@/types/timetable";
+import type { TimetableEntry, TimetableEventDetail } from "@/types/timetable";
 import {
   countDistinctEvents,
   filterEventsByDate,
   filterEventsByStage,
   groupEventsByStage,
   listStageTabs,
+  sortEntriesByStart,
   warnUnresolvedStagePlaces,
 } from "@/lib/timetable";
 import { calculateTimeRange } from "@/lib/timetable-layout";
 import { isKnownStageId } from "@/data/stages";
 import { getTimetableDateLabel, TimetableTabs } from "./TimetableTabs";
 import { TimetableChart } from "./TimetableChart";
+import { TimetableEventPanel, type TimetablePanelView } from "./TimetableEventPanel";
 
 interface TimetableContentProps {
   /** `filterStageEvents()` で開催枠ごとに展開済みのブロック */
   initialEvents: TimetableEntry[];
+  /** 企画ID → 企画詳細パネルの補足情報。`buildStageEventDetails()` の結果 */
+  eventDetails: Record<string, TimetableEventDetail>;
 }
 
 /**
  * タイムテーブルコンテンツ
  * クライアントサイドで日程・ステージによるフィルタリング処理
  */
-export function TimetableContent({ initialEvents }: TimetableContentProps) {
+export function TimetableContent({ initialEvents, eventDetails }: TimetableContentProps) {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
   // URL Search Params から日程とステージを取得
   const dateParam = searchParams.get("date");
@@ -63,6 +69,76 @@ export function TimetableContent({ initialEvents }: TimetableContentProps) {
     warnUnresolvedStagePlaces(initialEvents);
   }, [initialEvents]);
 
+  // 企画詳細パネルの「前の企画 / 次の企画」。縦スタックと同じ開始時刻順で、
+  // 現在の日・ステージの絞り込みの中だけを行き来する。著名人企画は専用LPへ遷移するので含めない
+  const panelItems = useMemo(
+    () =>
+      sortEntriesByStart(
+        groups.flatMap((group) =>
+          group.events.map((event) => ({ event, stageName: group.name, stageId: group.id }))
+        )
+      ).filter((item) => item.event.type !== "special"),
+    [groups]
+  );
+
+  // パネルの開閉は URL が持つ（`?event=<entryKey>`）。戻る・共有・再読み込みがそのまま効く。
+  // 絞り込みの外（別の日のID等）や存在しないIDは、パネルを出さずに無視する
+  const eventParam = searchParams.get("event");
+  const panelView = useMemo<TimetablePanelView | null>(() => {
+    if (!eventParam) return null;
+    const index = panelItems.findIndex((item) => item.event.entryKey === eventParam);
+    if (index < 0) return null;
+
+    const { event, stageName } = panelItems[index];
+    return {
+      event,
+      stageName,
+      detail: eventDetails[event.id],
+      prev: index > 0 ? panelItems[index - 1] : null,
+      next: index < panelItems.length - 1 ? panelItems[index + 1] : null,
+    };
+  }, [eventParam, panelItems, eventDetails]);
+
+  // 操作でパネルを開いた（履歴に1件積んだ）ときだけ true。閉じるときに back() してよいかの判定に使う。
+  // 直リンクで開いた場合に back() すると、サイトの外へ出てしまう
+  const openedByPush = useRef(false);
+  useEffect(() => {
+    if (!eventParam) openedByPush.current = false;
+  }, [eventParam]);
+
+  const hrefWithEvent = useCallback(
+    (entryKey: string | null) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (entryKey) params.set("event", entryKey);
+      else params.delete("event");
+      const query = params.toString();
+      return query ? `${pathname}?${query}` : pathname;
+    },
+    [pathname, searchParams]
+  );
+
+  const handleSelect = useCallback(
+    (entryKey: string) => {
+      openedByPush.current = true;
+      router.push(hrefWithEvent(entryKey), { scroll: false });
+    },
+    [router, hrefWithEvent]
+  );
+
+  const handleNavigate = useCallback(
+    (entryKey: string) => router.replace(hrefWithEvent(entryKey), { scroll: false }),
+    [router, hrefWithEvent]
+  );
+
+  const handleClose = useCallback(() => {
+    if (openedByPush.current) {
+      openedByPush.current = false;
+      router.back();
+    } else {
+      router.replace(hrefWithEvent(null), { scroll: false });
+    }
+  }, [router, hrefWithEvent]);
+
   const hasEvents = groups.length > 0;
   // 2部制の企画はブロックが2つでも1企画として数える
   const eventCount = countDistinctEvents(groups.flatMap((group) => group.events));
@@ -95,7 +171,7 @@ export function TimetableContent({ initialEvents }: TimetableContentProps) {
         </div>
 
         {hasEvents ? (
-          <TimetableChart groups={groups} range={range} />
+          <TimetableChart groups={groups} range={range} onSelect={handleSelect} />
         ) : (
           // 企画が見つからない場合。
           // 「その他」の受け皿ができたことで、企画があるのに空の盤面が出る状態は無くなった
@@ -109,6 +185,8 @@ export function TimetableContent({ initialEvents }: TimetableContentProps) {
           </div>
         )}
       </section>
+
+      <TimetableEventPanel view={panelView} onClose={handleClose} onNavigate={handleNavigate} />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getEventsList } from "@/lib/events";
-import { filterStageEvents } from "@/lib/timetable";
+import { buildStageEventDetails, filterStageEvents } from "@/lib/timetable";
 import { TimetableContent } from "@/components/timetable/TimetableContent";
 import { ComingSoon } from "@/components/common/ComingSoon";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
@@ -72,6 +72,8 @@ export default async function TimetablePage() {
     : // 全企画を取得（最大200件）
       await getEventsList(200);
   const stageEvents = filterStageEvents(sourceEvents);
+  // 企画詳細パネル用の補足。全文（content）は載せず、パネルのリンク先に任せる
+  const eventDetails = buildStageEventDetails(sourceEvents);
 
   return (
     <PageSheetLayout hero={pageHeroes.timetable} heroSize="compact">
@@ -82,7 +84,7 @@ export default async function TimetablePage() {
         ルート直下へ loading.tsx を戻すと、この境界の有無に関わらず影響が全ページへ広がる。
       */}
       <Suspense fallback={<div className="min-h-[50vh]" />}>
-        <TimetableContent initialEvents={stageEvents} />
+        <TimetableContent initialEvents={stageEvents} eventDetails={eventDetails} />
       </Suspense>
     </PageSheetLayout>
   );

@@ -2,23 +2,33 @@ import type { SNSLinks as SNSLinksType } from "@/types/events";
 
 interface SNSLinksProps {
   sns?: SNSLinksType;
+  /** `panel` はタイムテーブルの企画詳細パネル用。見出しと余白を小さくする */
+  variant?: "page" | "panel";
 }
 
 /**
  * SNSリンクコンポーネント
  * Twitter, Instagram, Website のリンクを表示
  */
-export function SNSLinks({ sns }: SNSLinksProps) {
+export function SNSLinks({ sns, variant = "page" }: SNSLinksProps) {
   if (!sns || (!sns.twitter && !sns.instagram && !sns.website)) {
     return null;
   }
 
+  const isPanel = variant === "panel";
+
   return (
-    <section className="border-t border-gray-200 pt-10" aria-labelledby="event-links-heading">
-      <h3 id="event-links-heading" className="text-2xl font-bold tracking-tight text-gray-900">
+    <section
+      className={`border-t border-gray-200 ${isPanel ? "pt-5" : "pt-10"}`}
+      aria-labelledby="event-links-heading"
+    >
+      <h3
+        id="event-links-heading"
+        className={`font-bold tracking-tight text-gray-900 ${isPanel ? "text-base" : "text-2xl"}`}
+      >
         SNS・関連リンク
       </h3>
-      <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3">
+      <div className={`flex flex-wrap gap-x-6 gap-y-3 ${isPanel ? "mt-2" : "mt-5"}`}>
         {/* Twitter */}
         {sns.twitter && (
           <a

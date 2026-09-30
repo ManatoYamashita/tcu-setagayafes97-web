@@ -25,3 +25,18 @@ export type TimetableEntry = Pick<
   /** 開催枠が2つ以上ある企画だけ「第1部」などが入る */
   sessionLabel?: string;
 };
+
+/**
+ * 企画詳細パネルが表示する、企画ごとの補足情報
+ *
+ * `TimetableEntry` は枠ごとに展開されるため、ここへ詳細を載せると2部制の企画で重複する。
+ * そこで企画ID（`Event.id`）をキーにした別のマップとして渡す。
+ *
+ * **`content`（リッチテキストのHTML）は意図的に持たない。** Client Component へ直列化されるため、
+ * 全文はパネルの「企画ページで全文を見る」リンク先に任せる。
+ */
+export type TimetableEventDetail = Pick<Event, "description" | "sns"> & {
+  /** 建物名と場所を空白で繋いだ表記。どちらも未入力なら空文字 */
+  venue: string;
+  thumbnail?: { url: string; width: number; height: number };
+};
