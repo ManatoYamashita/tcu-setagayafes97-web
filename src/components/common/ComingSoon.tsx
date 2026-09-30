@@ -14,7 +14,7 @@ interface ComingSoonProps {
 
 /**
  * 準備中（Coming Soon）表示用の共通セクション
- * カラクり（歯車）モチーフを slow-spin させて、テーマと整合させる
+ * カラクリ（歯車）モチーフを slow-spin させて、テーマと整合させる
  */
 export function ComingSoon({
   title = "準備中です",

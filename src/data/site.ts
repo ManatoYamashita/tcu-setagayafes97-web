@@ -53,7 +53,7 @@ export const siteConfig = {
     siteName: "第97回東京都市大学世田谷祭",
     searchSiteName: "世田谷祭",
     siteUrl: process.env.NEXT_PUBLIC_URL || "https://setagayafes.org",
-    ogImage: "/ogp-v2.webp",
+    ogImage: "/ogp-v3.webp",
     searchThumbnail: "/images/brand/search-thumbnail-97.webp",
   },
 

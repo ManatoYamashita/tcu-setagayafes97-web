@@ -469,7 +469,7 @@ microCMS 側で AVIF 固定を選んだ4つの根拠のうち、**静的画像�
 
 | ファイル                                                 | role      | 理由                                                                                            |
 | -------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------------------- |
-| `public/ogp-v2.webp`                                     | `crawler` | OGP / `twitter:image`。X・Slack・LINE のクローラは AVIF を読まない                              |
+| `public/ogp-v3.webp`                                     | `crawler` | OGP / `twitter:image`。X・Slack・LINE のクローラは AVIF を読まない                              |
 | `public/images/brand/search-thumbnail-97.webp`           | `crawler` | JSON-LD の `primaryImageOfPage` と画像サイトマップ専用                                          |
 | `public/images/brand/favicon.png` / `public/favicon.ico` | `crawler` | `icons.icon` / `icons.apple` と JSON-LD の `Organization.logo`。apple-touch-icon は AVIF 非対応 |
 | `public/images/video-posters/access-tcu-setagaya.webp`   | `dual`    | `AppImage` と `<video poster>` の二重用途。poster の AVIF 解決は未実測で、17.0KB なので得も無い |

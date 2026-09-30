@@ -41,7 +41,7 @@
 | 言語             | TypeScript                                                             |
 | スタイリング     | TailwindCSS                                                            |
 | アニメーション   | GSAP                                                                   |
-| 3Dグラフィックス | Three.js / React Three Fiber（3Dマップは見送り。カラクり演出用に残置） |
+| 3Dグラフィックス | Three.js / React Three Fiber（3Dマップは見送り。カラクリ演出用に残置） |
 | CMS              | microCMS                                                               |
 | 多言語対応       | next-intl または next-i18next                                          |
 | ホスティング     | Vercel (Free Plan)                                                     |
