@@ -14,8 +14,8 @@ interface PageHeroProps extends PageHeroData {
 /**
  * セクションページ共通ヒーローコンポーネント
  *
- * - default: 70svh高。ブランド訴求を優先する通常ページ向け
- * - compact: 52svh高（lg以上は50svh）。一覧・検索など操作を優先するページ向け
+ * - compact（既定）: 52svh高（lg以上は50svh）。special 以外の全ページで共通
+ * - default: 70svh高。ブランド訴求を優先する著名人企画（/special）向け
  * - 画像あり: 画像70vw右寄せ、テキスト左下オーバーレイ
  * - 画像なし: テキストセンター表示
  * - Server Component（"use client" 不要）
@@ -30,7 +30,7 @@ export function PageHero({
   badgeAlt,
   ctaHref,
   ctaLabel = "View More",
-  size = "default",
+  size = "compact",
 }: PageHeroProps) {
   const hasImage = !!imageSrc;
   const heightClass =

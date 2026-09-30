@@ -8,8 +8,12 @@ Header と Hero の寸法、z-index のレイヤー、`position` の使い分け
 ## Header と Hero
 
 Header（`src/components/layout/Header.tsx`）は `sticky top-0 z-40` で、**フロー上に高さを占有する。**
-全画面ヒーローは Header の高さを引いた `h-[calc(100svh-var(--header-height))]` で持つ。
-`--header-height` の一次定義は `src/app/globals.css` の1箇所である。
+**special 以外の全ページのヒーローは compact（`h-[52svh] min-h-[360px] lg:h-[50svh]`）で揃える。**
+`PageHero` / `PageSheetLayout` の既定値が compact で、トップ（`HeroSection`）と委員会（`AboutHero`）も同じ値を持つ。
+`/special` だけが `heroSize="default"`（70svh）、`SpecialHero` だけが全画面（`calc(100svh - var(--header-height))`）を保つ。
+`--header-height` の一次定義は `src/app/globals.css` の1箇所で、いま参照するのは `SpecialHero` と 404 など。
+
+以降の全画面ヒーローの実測値・注意は、`SpecialHero` と、compact 化する前のトップ・委員会の記録として読むこと。
 
 2026-09-30 に本番トップで実測した値（詳細は [agent-browser-workflow.md](./agent-browser-workflow.md)）:
 
@@ -45,8 +49,8 @@ Header は `isAtTop` で高さが変わる2状態コンポーネントである�
 
 ### 全画面ヒーローの実装は3箇所で統一する
 
-`HeroSection`（トップ）・`AboutHero`（委員会）・`SpecialHero`（著名人企画LP）は
-いずれも `calc(100svh - var(--header-height))` を使う。
+（現在は `SpecialHero` のみ。トップと委員会は compact 化済み）`HeroSection`（トップ）・`AboutHero`（委員会）・`SpecialHero`（著名人企画LP）は
+いずれも `calc(100svh - var(--header-height))` を使っていた。
 
 Header は `sticky` であり **フロー上に高さを占有する**。
 `fixed` ではないため、ヒーローに単純な `100svh` を与えると
@@ -189,7 +193,7 @@ grep -rnE 'z-index[[:space:]]*:|zIndex[[:space:]]*:' src                   # CSS
 ## `svh` を使う（`vh` は使わない）
 
 モバイル Safari では `100vh` が URL バーを含む高さになり、実際の表示領域より大きい。
-**全画面ヒーローは3箇所とも `100svh` を使っている**（前節「全画面ヒーローの実装は3箇所で統一する」）。
+**全画面ヒーロー（現在は `SpecialHero`）は `100svh` を使う**（前節「全画面ヒーローの実装は3箇所で統一する」）。compact のヒーローも `svh` である。
 
 | 単位     | 意味                               | 用途                                   |
 | -------- | ---------------------------------- | -------------------------------------- |

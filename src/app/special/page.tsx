@@ -54,7 +54,7 @@ export const revalidate = 600;
 export default async function SpecialPage() {
   if (!SPECIAL_VISIBLE) {
     return (
-      <PageSheetLayout hero={pageHeroes.special}>
+      <PageSheetLayout hero={pageHeroes.special} heroSize="default">
         <ComingSoon
           title="著名人企画は準備中です"
           description="第97回東京都市大学世田谷祭にお招きするゲストは現在調整中です。発表までもうしばらくお待ちください。"
@@ -67,7 +67,7 @@ export default async function SpecialPage() {
 
   if (events.length === 0) {
     return (
-      <PageSheetLayout hero={pageHeroes.special}>
+      <PageSheetLayout hero={pageHeroes.special} heroSize="default">
         <ComingSoon
           title="著名人企画は準備中です"
           description="第97回東京都市大学世田谷祭にお招きするゲストは現在調整中です。発表までもうしばらくお待ちください。"
@@ -77,7 +77,7 @@ export default async function SpecialPage() {
   }
 
   return (
-    <PageSheetLayout hero={pageHeroes.special}>
+    <PageSheetLayout hero={pageHeroes.special} heroSize="default">
       <ul className="grid grid-cols-1 gap-6 py-4 sm:grid-cols-2 lg:grid-cols-3">
         {events.map((event) => (
           <li key={event.id}>

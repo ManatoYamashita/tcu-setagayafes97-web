@@ -132,7 +132,7 @@ export function AboutHero() {
   return (
     <section
       ref={sectionRef}
-      className="relative flex h-[calc(100svh-var(--header-height))] w-full items-center justify-center overflow-hidden"
+      className="relative flex h-[52svh] min-h-[360px] lg:h-[50svh] w-full items-center justify-center overflow-hidden"
     >
       {/*
         Layer 0: Grainient 背景
