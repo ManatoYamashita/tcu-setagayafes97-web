@@ -296,7 +296,7 @@ export function generateTimeAxis(range: TimeRange): string[] {
   return axis;
 }
 
-export type EventCardDensity = "full" | "compact" | "minimal";
+export type EventCardDensity = "detailed" | "full" | "compact" | "minimal";
 
 /**
  * 密度ごとに必要な「カード実寸」の高さ（px / border-box）
@@ -305,15 +305,20 @@ export type EventCardDensity = "full" | "compact" | "minimal";
  * `text-[0.9375rem]` 15px × `leading-[1.2]` = 18px、
  * `text-[0.8125rem]` 13px × `leading-tight` 1.25 = 16.25px）。
  *
- * | 密度    | border | padding        | 内容                                          | 計 |
- * | ------- | ------ | -------------- | --------------------------------------------- | -- |
- * | full    | 2      | 12（`py-1.5`） | タイトル2行 36 + 4 + 時刻 16.25 + 4 + 場所 16.25 = 76.5 | 90.5 |
- * | compact | 2      | 8（`py-1`）    | タイトル1行 17.5 + 時刻 16 = 33.5               | 43.5 |
+ * | 密度     | border | padding        | 内容                                                                      | 計     |
+ * | -------- | ------ | -------------- | ------------------------------------------------------------------------- | ------ |
+ * | detailed | 2      | 12（`py-1.5`） | タイトル2行 36 + 4 + 時刻 16.25 + 4 + 場所 16.25 + 4 + 団体名 16.25 = 96.75 | 110.75 |
+ * | full     | 2      | 12（`py-1.5`） | タイトル2行 36 + 4 + 時刻 16.25 + 4 + 団体名 16.25 = 76.5                   | 90.5   |
+ * | compact  | 2      | 8（`py-1`）    | タイトル1行 17.5 + 時刻・団体名 16 = 33.5                                  | 43.5   |
+ *
+ * `full` の3行目は団体名で、場所ではありません。場所はステージ列の見出しとおおむね重なりますが、
+ * 団体名は盤面のどこにも出ないためです（団体名が空の企画だけ場所を出します）。
  *
  * **余白ごと収まる高さを閾値にしています。** 「文字が切れない下限」（上側の padding だけ数える）で
  * 判定すると、下余白が 0 まで潰れたカードが出ます。
  */
 const DENSITY_MIN_CARD_HEIGHT_PX = {
+  detailed: 96.75 + 12 + CARD_BORDER_PX,
   full: 76.5 + 12 + CARD_BORDER_PX,
   compact: 33.5 + 8 + CARD_BORDER_PX,
 } as const;
@@ -335,6 +340,7 @@ const DENSITY_MIN_CARD_HEIGHT_PX = {
 export function getCardDensity(slotHeightPx: number): EventCardDensity {
   const cardHeightPx = slotHeightPx - CARD_GAP_PX;
 
+  if (cardHeightPx >= DENSITY_MIN_CARD_HEIGHT_PX.detailed) return "detailed";
   if (cardHeightPx >= DENSITY_MIN_CARD_HEIGHT_PX.full) return "full";
   if (cardHeightPx >= DENSITY_MIN_CARD_HEIGHT_PX.compact) return "compact";
   return "minimal";

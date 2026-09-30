@@ -30,6 +30,7 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
   // 支援技術から見えないため、盤面のカードは単体で自足している必要がある。
   const label = [
     event.title,
+    event.organizer,
     stageName,
     event.sessionLabel,
     `${event.startTime}から${event.endTime}`,
@@ -53,12 +54,22 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
   // 2部制の企画は、同じタイトルのカードが2枚並ぶ。どちらの枠かを時刻の前に添える
   const timeText = `${event.sessionLabel ? `${event.sessionLabel} ` : ""}${event.startTime}–${event.endTime}`;
 
+  // 団体名は盤面のどこにも出ない情報なので、どの密度でも落とさない。
+  // タイトルが「世田谷祭公演」のように団体名を含まない企画は、団体名が無いと見つけられない。
+  // 行を足せない密度では、既存の行の後ろへ細字で続ける（1行に収め、溢れた分は省略記号で切る）
+  const organizer = event.organizer ? (
+    <span className="ms-1.5 font-normal">{event.organizer}</span>
+  ) : null;
+
   // 高さが確保できないときは、優先度の低い情報から落とす。溢れさせて切ると
   // 「主催が途中で切れたカード」になり、読めない情報が場所だけ占めてしまう。
   if (density === "minimal") {
     return (
       <Link href={href} aria-label={label} className={`${cardClass} px-2 py-1`}>
-        <p className="text-xs font-bold leading-tight line-clamp-1">{event.title}</p>
+        <p className="truncate text-xs font-bold leading-tight">
+          {event.title}
+          {organizer}
+        </p>
       </Link>
     );
   }
@@ -67,23 +78,35 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
     return (
       <Link href={href} aria-label={label} className={`${cardClass} px-2 py-1`}>
         <p className="text-sm font-bold leading-tight line-clamp-1">{event.title}</p>
-        <p className="truncate text-xs font-medium">{timeText}</p>
+        <p className="truncate text-xs font-medium">
+          {timeText}
+          {organizer}
+        </p>
       </Link>
     );
   }
 
   // 縦の余白が `px-3` と揃わないのは、60分企画（カード実寸 92px）へ
-  // 15px のタイトル2行 + 13px の時刻・場所（計 76.5px）を余白ごと収めるため。
+  // 15px のタイトル2行 + 13px の時刻・団体名（計 76.5px）を余白ごと収めるため。
   // `py-3` に戻すと `getCardDensity` の閾値も連動して上がるため、
-  // 1時間企画が compact へ落ちて場所が表示されなくなる。
-  if (density === "full") {
+  // 1時間企画が compact へ落ちて団体名が時刻の後ろへ押し込まれる。
+  //
+  // full の3行目は団体名で、場所は detailed（約72分以上）でだけ出す。場所はステージ列の見出しと
+  // おおむね重なるが、団体名は盤面のどこにも出ないため。団体名が空の企画は場所で埋める。
+  if (density === "detailed" || density === "full") {
+    const lineClass = "truncate text-[0.8125rem] leading-tight";
     return (
       <Link href={href} aria-label={label} className={`${cardClass} px-3 py-1.5`}>
         <p className="mb-1 text-[0.9375rem] font-bold leading-[1.2] line-clamp-2">{event.title}</p>
-        <p className="mb-1 truncate text-[0.8125rem] font-semibold leading-tight tabular-nums">
-          {timeText}
-        </p>
-        <p className="truncate text-[0.8125rem] leading-tight">{event.place}</p>
+        <p className={`${lineClass} mb-1 font-semibold tabular-nums`}>{timeText}</p>
+        {density === "detailed" ? (
+          <>
+            <p className={`${lineClass} ${event.organizer ? "mb-1" : ""}`}>{event.place}</p>
+            {event.organizer ? <p className={lineClass}>{event.organizer}</p> : null}
+          </>
+        ) : (
+          <p className={lineClass}>{event.organizer || event.place}</p>
+        )}
       </Link>
     );
   }
