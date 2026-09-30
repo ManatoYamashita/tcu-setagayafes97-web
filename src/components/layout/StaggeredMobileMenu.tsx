@@ -5,7 +5,11 @@ import Link from "next/link";
 import { gsap } from "gsap";
 import { X } from "lucide-react";
 import { LanguageSwitcherInline } from "@/components/layout/LanguageSwitcher";
-import type { ChromeNavItem } from "@/components/layout/useChromeNav";
+import {
+  isChromePathActive,
+  isChromePathCurrent,
+  type ChromeNavItem,
+} from "@/components/layout/useChromeNav";
 import { siteConfig } from "@/data/site";
 
 /**
@@ -43,6 +47,7 @@ interface StaggeredMobileMenuProps {
   /** ロケール解決済みのナビ項目。Header の useChromeNav() から受け取る */
   items: readonly ChromeNavItem[];
   closeLabel: string;
+  pathname: string;
 }
 
 export function StaggeredMobileMenu({
@@ -50,6 +55,7 @@ export function StaggeredMobileMenu({
   onClose,
   items,
   closeLabel,
+  pathname,
 }: StaggeredMobileMenuProps) {
   const prevOpenRef = useRef(false);
 
@@ -360,9 +366,17 @@ export function StaggeredMobileMenu({
                     className / data-* をそのまま下の <a> へ渡すので一致し続ける。
                   */}
                   <Link
-                    className="sm-panel-item relative inline-block cursor-pointer pr-[1.4em] text-[1.8rem] font-normal leading-none tracking-[-1px] text-black no-underline transition-[background,color] duration-150 ease-linear"
+                    className={`sm-panel-item relative inline-block cursor-pointer pr-[1.4em] text-[1.8rem] leading-none tracking-[-1px] no-underline underline-offset-4 transition-[background,color] duration-150 ease-linear hover:underline ${
+                      isChromePathActive(pathname, item.href) ||
+                      Boolean(
+                        item.children?.some((child) => isChromePathActive(pathname, child.href))
+                      )
+                        ? "font-bold text-primary-600"
+                        : "font-normal text-black"
+                    }`}
                     href={item.href}
                     hrefLang={item.hrefLang}
+                    aria-current={isChromePathCurrent(pathname, item.href) ? "page" : undefined}
                     data-index={idx + 1}
                     onClick={onClose}
                   >
@@ -423,7 +437,7 @@ export function StaggeredMobileMenu({
   right: 0;
 }
 .sm-scope .sm-panel-item:hover {
-  color: var(--sm-accent, var(--color-primary-400));
+  color: var(--color-primary-600);
 }
 .sm-scope .sm-panel-list[data-numbering] {
   counter-reset: smItem;

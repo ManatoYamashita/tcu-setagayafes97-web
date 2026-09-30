@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { NavDropdown } from "@/components/layout/NavDropdown";
-import type { ChromeNavItem } from "@/components/layout/useChromeNav";
+import {
+  isChromePathActive,
+  isChromePathCurrent,
+  type ChromeNavItem,
+} from "@/components/layout/useChromeNav";
 
 interface DesktopNavProps {
   items: readonly ChromeNavItem[];
@@ -9,6 +13,7 @@ interface DesktopNavProps {
    * 例: /info/[id] にはパンくずの nav が同居する
    */
   label: string;
+  pathname: string;
 }
 
 /**
@@ -21,7 +26,7 @@ interface DesktopNavProps {
  * - children がない項目: 通常リンク
  * - children がある項目: NavDropdown を使用
  */
-export function DesktopNav({ items, label }: DesktopNavProps) {
+export function DesktopNav({ items, label, pathname }: DesktopNavProps) {
   return (
     <nav aria-label={label} className="hidden lg:block">
       {/*
@@ -31,23 +36,34 @@ export function DesktopNav({ items, label }: DesktopNavProps) {
         gap-6 なら 988px となり 36px の余裕ができる。xl 以降は元の間隔へ戻す。
       */}
       <ul className="flex gap-6 xl:gap-8">
-        {items.map((item) => (
-          // key は href ではなく id。href はロケールで変わるため
-          <li key={item.id}>
-            {item.children ? (
-              <NavDropdown item={item} />
-            ) : (
-              <Link
-                href={item.href}
-                prefetch={false}
-                hrefLang={item.hrefLang}
-                className="text-gray-900/80 transition-colors hover:text-gray-900"
-              >
-                {item.label}
-              </Link>
-            )}
-          </li>
-        ))}
+        {items.map((item) => {
+          const isActive =
+            isChromePathActive(pathname, item.href) ||
+            Boolean(item.children?.some((child) => isChromePathActive(pathname, child.href)));
+
+          return (
+            // key は href ではなく id。href はロケールで変わるため
+            <li key={item.id}>
+              {item.children ? (
+                <NavDropdown item={item} pathname={pathname} isActive={isActive} />
+              ) : (
+                <Link
+                  href={item.href}
+                  prefetch={false}
+                  hrefLang={item.hrefLang}
+                  aria-current={isChromePathCurrent(pathname, item.href) ? "page" : undefined}
+                  className={`underline-offset-4 transition-colors hover:underline ${
+                    isActive
+                      ? "font-bold text-primary-600 hover:text-primary-600"
+                      : "text-gray-900/80 hover:text-gray-900"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );

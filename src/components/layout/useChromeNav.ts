@@ -3,7 +3,11 @@
 import { useMemo } from "react";
 import { navigationConfig } from "@/data/navigation";
 import { getChromeMessages, type ChromeMessages } from "@/i18n/chrome-messages";
-import { localizeNavHref, type LocalizedNavHref } from "@/i18n/localized-pathnames";
+import {
+  localizeNavHref,
+  splitLocalePrefix,
+  type LocalizedNavHref,
+} from "@/i18n/localized-pathnames";
 import type { Locale } from "@/i18n/routing";
 import { useCurrentLocale } from "@/i18n/use-current-locale";
 
@@ -35,6 +39,27 @@ export interface ChromeNav {
   readonly footerSections: readonly ChromeFooterSection[];
   /** aria-label など、ナビ項目に紐づかない単発の文言 */
   readonly messages: ChromeMessages;
+}
+
+function normalizeChromePathname(pathname: string): string {
+  const normalized = splitLocalePrefix(pathname).pathname.replace(/\/+$/, "");
+  return normalized || "/";
+}
+
+/** 現在のパスがナビ項目のページまたはその配下かを判定する。 */
+export function isChromePathActive(pathname: string, href: string): boolean {
+  const currentPathname = normalizeChromePathname(pathname);
+  const targetPathname = normalizeChromePathname(href);
+
+  return (
+    currentPathname === targetPathname ||
+    (targetPathname !== "/" && currentPathname.startsWith(`${targetPathname}/`))
+  );
+}
+
+/** ナビ項目のリンク先が現在のページと一致するかを判定する。 */
+export function isChromePathCurrent(pathname: string, href: string): boolean {
+  return normalizeChromePathname(pathname) === normalizeChromePathname(href);
 }
 
 /**
@@ -76,11 +101,12 @@ export function buildChromeNav(locale: Locale): ChromeNav {
  * デスクトップとモバイルが同一の解決結果を共有することがコードから読み取れなくなる。
  * Footer はサーバーコンポーネントで props を渡せないため FooterNav が自前で呼ぶ。
  */
-export function useChromeNav(): ChromeNav {
-  const { locale } = useCurrentLocale();
+export function useChromeNav(): ChromeNav & { readonly pathname: string } {
+  const { locale, pathname } = useCurrentLocale();
 
   // 依存は pathname ではなく locale。Header はスクロールのたびに再レンダリング
   // する（isAtTop の useState）ため、これが無いと毎回オブジェクトを作り直して
   // 子の再レンダリングを誘発する。同一ロケール内の遷移でも参照を保てる。
-  return useMemo(() => buildChromeNav(locale), [locale]);
+  const nav = useMemo(() => buildChromeNav(locale), [locale]);
+  return useMemo(() => ({ ...nav, pathname }), [nav, pathname]);
 }

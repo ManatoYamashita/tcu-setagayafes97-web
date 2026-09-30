@@ -29,7 +29,7 @@ export function Header() {
   // ロケール解決はここで1回だけ行い、子へは props で流す。
   // 子でも呼ぶと usePathname() の購読と useMemo が二重になるうえ、
   // デスクトップナビとモバイルメニューが同じ結果を共有することが読み取れなくなる。
-  const { home, headerItems, messages } = useChromeNav();
+  const { home, headerItems, messages, pathname } = useChromeNav();
 
   const [isAtTop, setIsAtTop] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -127,7 +127,7 @@ export function Header() {
           </Link>
 
           {/* 中央: デスクトップナビ */}
-          <DesktopNav items={headerItems} label={messages.header.mainNav} />
+          <DesktopNav items={headerItems} label={messages.header.mainNav} pathname={pathname} />
 
           {/* 右: 言語切り替え + ハンバーガー */}
           <div className="flex items-center gap-3">
@@ -155,6 +155,7 @@ export function Header() {
           onClose={handleCloseMobileMenu}
           items={headerItems}
           closeLabel={messages.header.closeMenu}
+          pathname={pathname}
         />
       )}
     </>
