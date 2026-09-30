@@ -7,6 +7,7 @@ import { ChairpersonSection } from "@/components/about/ChairpersonSection";
 import { EventOverviewTable } from "@/components/about/EventOverviewTable";
 import { SponsorBanner } from "@/components/home/SponsorBanner";
 import { type Locale } from "@/i18n/routing";
+import { aboutPageContents } from "@/data/about";
 import { createPageMetadata } from "@/lib/metadata";
 import { createAboutStructuredData, serializeJsonLd } from "@/lib/structured-data";
 
@@ -57,6 +58,7 @@ export async function generateMetadata({
 export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const content = aboutPageContents[locale as Locale];
 
   /*
    * スキップリンク（Header）の遷移先。このページは AboutHero が PageHero ではないため
@@ -79,7 +81,12 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         }}
       />
 
-      <AboutHero />
+      {/*
+        3セクションは key={locale} で言語ごとに作り直す。GSAP（SplitText / ScrollTrigger）が
+        マウント時に一度だけ DOM を組み替えるため、言語切替で同じインスタンスを使い回すと
+        翻訳前の分割済み DOM が残る。
+      */}
+      <AboutHero key={locale} content={content.hero} />
 
       {/* 世田谷祭とは */}
       {/*
@@ -95,7 +102,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         絶対配置の装飾要素を持つため、白シートの内側に入れると rounded-t-3xl の
         角が欠ける。
       */}
-      <ChairpersonSection />
+      <ChairpersonSection key={locale} theme={content.theme} message={content.message} />
 
       {/* 開催概要 */}
       {/*
@@ -104,7 +111,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         インラインで再現している。
       */}
       <div className="relative z-10 -mt-6 mx-4 rounded-t-3xl bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] sm:mx-6 lg:mx-8">
-        <EventOverviewTable />
+        <EventOverviewTable content={content.overview} />
       </div>
 
       {/* 協賛企業 */}
