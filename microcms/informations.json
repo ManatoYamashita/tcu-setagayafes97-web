@@ -4,44 +4,66 @@
       "fieldId": "category",
       "name": "カテゴリ",
       "kind": "select",
+      "description": null,
       "required": true,
-      "multipleSelect": false,
-      "initialValue": ["DEFAULT"],
       "selectItems": [
         { "id": "JTUkzbRFIv", "value": "sponsor : 協賛企業" },
         { "id": "vVfH91UxAq", "value": "faq : FAQ" },
         { "id": "mCFnoWmiXG", "value": "other : その他" }
-      ]
+      ],
+      "multipleSelect": false,
+      "initialValue": ["DEFAULT"]
     },
     {
       "fieldId": "title",
       "name": "タイトル",
       "kind": "text",
-      "required": true
+      "description": null,
+      "required": true,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
     },
     {
       "fieldId": "description",
       "name": "概要",
       "kind": "text",
-      "required": false
+      "description": null,
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
     },
     {
       "fieldId": "image",
       "name": "画像",
       "kind": "media",
-      "required": false
+      "description": null,
+      "required": false,
+      "imageSizeValidation": null,
+      "initialValue": null
     },
     {
       "fieldId": "url",
       "name": "URL",
       "kind": "text",
-      "required": false
+      "description": null,
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
     },
     {
       "fieldId": "priority",
       "name": "表示順",
       "kind": "number",
-      "required": false
+      "description": null,
+      "required": false,
+      "numberSizeLimitValidation": null,
+      "initialValue": null
     }
   ],
   "customFields": []
