@@ -4,44 +4,97 @@
       "fieldId": "type",
       "name": "タイプ",
       "kind": "select",
+      "description": null,
       "required": true,
-      "multipleSelect": false,
-      "initialValue": ["DEFAULT"],
       "selectItems": [
         { "id": "VNtiIMqNtp", "value": "urgent : 緊急" },
         { "id": "ZQRpQmfZNU", "value": "news : お知らせ" },
         { "id": "4WTIaawKJA", "value": "other : その他" }
-      ]
+      ],
+      "multipleSelect": false,
+      "initialValue": ["DEFAULT"]
     },
     {
       "fieldId": "title",
       "name": "タイトル",
       "kind": "text",
-      "required": true
+      "description": null,
+      "required": true,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
     },
     {
       "fieldId": "thumbnail",
       "name": "サムネイル画像",
       "kind": "media",
-      "required": false
+      "description": null,
+      "required": false,
+      "imageSizeValidation": null,
+      "initialValue": null
     },
     {
       "fieldId": "description",
       "name": "概要",
       "kind": "textArea",
-      "required": true
+      "description": null,
+      "required": true,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "initialValue": null
     },
     {
       "fieldId": "content",
       "name": "本文",
       "kind": "richEditorV2",
-      "required": true
+      "description": null,
+      "required": true,
+      "richEditorV2Options": [
+        "headerOne",
+        "headerTwo",
+        "headerThree",
+        "headerFour",
+        "headerFive",
+        "undo",
+        "redo",
+        "paragraph",
+        "bold",
+        "italic",
+        "underline",
+        "strike",
+        "code",
+        "blockquote",
+        "codeBlock",
+        "listBullet",
+        "listOrdered",
+        "link",
+        "image",
+        "file",
+        "table",
+        "horizontalRule",
+        "textAlign",
+        "customClass",
+        "oembedly",
+        "clean",
+        "color",
+        "size"
+      ],
+      "richEditorV2ColorList": [],
+      "richEditorV2HideColorPicker": false,
+      "richEditorV2FontSizeList": [],
+      "customClassList": []
     },
     {
       "fieldId": "cta",
-      "name": "CTAリンク先URL",
+      "name": "詳しくはこちら",
       "kind": "text",
-      "required": false
+      "description": null,
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
     }
   ],
   "customFields": []

@@ -11,17 +11,22 @@
 
 ## ファイル一覧
 
-| ファイル            | 対象API                       | 実機との照合                         |
-| ------------------- | ----------------------------- | ------------------------------------ |
-| `news.json`         | News API（お知らせ）          | ⚠️ 2026-08-16 照合（要再照合。下記） |
-| `events.json`       | Events API（企画）            | ✅ 2026-09-30 エクスポートで置換     |
-| `informations.json` | Informations API（協賛・FAQ） | ⚠️ 2026-08-16 照合（要再照合。下記） |
+| ファイル            | 対象API                       | 実機との照合                     |
+| ------------------- | ----------------------------- | -------------------------------- |
+| `news.json`         | News API（お知らせ）          | ✅ 2026-09-30 エクスポートで置換 |
+| `events.json`       | Events API（企画）            | ✅ 2026-09-30 エクスポートで置換 |
+| `informations.json` | Informations API（協賛・FAQ） | ✅ 2026-09-30 エクスポートで置換 |
 
 > [!WARNING]
-> **2026-08-16 の「照合済み」は、`events.json` では必須設定が5項目食い違っていた**（2026-09-30 のエクスポートで判明。
-> 詳細は「Events API」節）。同じ日に照合した `news.json` / `informations.json` も同じ誤りを含む可能性があるので、
-> 次にそれらの API を触るときはエクスポートで置き換えること。**手で書き写さず、エクスポートをそのまま整形して置く**
-> （`pnpm exec prettier --write microcms/<api>.json`）。
+> **3本とも、手で書き写さず、管理画面のエクスポートをそのまま整形して置くこと**
+> （「API設定 > APIスキーマ > この設定をエクスポートする」→ `pnpm exec prettier --write microcms/<api>.json`）。
+> 2026-08-16 に手で「照合済み」とした写しは、2026-09-30 のエクスポートで次の食い違いが見つかった。
+>
+> | ファイル            | 食い違い                                                                                            |
+> | ------------------- | --------------------------------------------------------------------------------------------------- |
+> | `events.json`       | **必須設定5項目**（`title` / `organizer` / `description` / `content` / `place` が実機では任意）ほか |
+> | `news.json`         | `cta` の表示名（写し「CTAリンク先URL」、実機「詳しくはこちら」）                                    |
+> | `informations.json` | 食い違いなし（既定値のキーが増えただけ）                                                            |
 
 > [!NOTE]
 > **`select` の値はいずれの API も `値 : ラベル` 形式**（例: `urgent : 緊急`）で登録されています。
@@ -88,7 +93,7 @@ else links.website = sns;
 | thumbnail    | サムネイル画像 | media        |      | 解像度と縦横比の要件 → [docs/dev/microcms.md](../docs/dev/microcms.md) |
 | description  | 概要           | textArea     | ✓    |                                                                        |
 | content      | 本文           | richEditorV2 | ✓    |                                                                        |
-| cta          | CTAリンク先URL | text         |      | 記事詳細の「詳しくはこちら」に使う内部パスまたはHTTP(S) URL            |
+| cta          | 詳しくはこちら | text         |      | 記事詳細の「詳しくはこちら」に使う内部パスまたはHTTP(S) URL            |
 
 ### Events API (events.json)
 
