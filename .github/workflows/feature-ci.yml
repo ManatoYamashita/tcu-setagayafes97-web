@@ -55,6 +55,13 @@ jobs:
       - name: Check doc links
         run: pnpm run check:doc-links
 
+      # 追跡 .md が300行以下かを見る（#322）。規約は .claude/CLAUDE.md の「命名・配置ガイド」。
+      # 人の目しか無かったため、#318 では 326 行へ伸びたことにマージ直前まで気づかなかった。
+      # **導入時点ですでに超えていたファイルは上限つきで記録してあり、伸ばすと落ちる**（scripts/assert-doc-line-budget.mjs 冒頭）。
+      # git ls-files 以外に何も要求しないため、このジョブの「install だけで完結する」性質を崩さない。
+      - name: Check doc line budget
+        run: pnpm run check:doc-lines
+
       # Tailwind の走査範囲に、出力されうる禁止色ユーティリティが無いことを見る（#230）。
       # **ESLint はコメントを見ないが Tailwind は読む。** その死角で、消したはずの紫と桃の
       # ユーティリティが本番CSSへ出続けていた。git ls-files 以外に何も要求しないため、
