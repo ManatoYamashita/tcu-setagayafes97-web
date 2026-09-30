@@ -147,18 +147,17 @@ push 時は head をそのまま、PR 時は head を base へマージした結
 （Tailwind のソース走査はコメントも読むため、そこが死角になっていた。#230）。
 **リンク検査が見るのは相対リンクだけで、`#anchor` の存在と外部URLの到達性は射程外である**
 （見るもの・見ないものの一覧は `scripts/assert-doc-links.mjs` の冒頭）。
+secrets もビルド成果物も要求しないため、**fork からの PR でも結果が出る**。ここへ検査を足すときは、
+「install 以外に何も要求しないか」を基準に判断すること。要求するなら別ジョブにする。
 `Layout E2E` は**実ブラウザでしか捕まえられない事故に対する再発防止装置の置き場**で、
 現在2つ載っている。`/timetable` の盤面（#148）と、全ルート＋404画面の
 `<main id="content">` の1周検査（#177 A）である。
 **後者は生HTMLでは代替できない**（`/events` は生HTML 2個・ライブDOM 1個、
 動的404は生HTML 0個・ライブDOM 1個）。
 **新しいルートを足したら `e2e/landmarks/route-sweep.spec.ts` の表へ1行足すこと。**
-**このジョブは secrets を要求しないため、fork からの PR でも緑赤が出る唯一のジョブである**
-（`Build Check` は microCMS の secrets 不達で fork PR では必ず落ちる）。
+このジョブも secrets を要求しないため、fork からの PR でも同じ判定が出る。
+**`Build Check` は fork の PR では secrets が届かず、落ちずに空データのまま緑になる**（末尾の検査は `NOTE` で空振りする。#352）。
 設計は [`docs/frontend/layout-e2e.md`](../docs/frontend/layout-e2e.md) を参照。
-secrets もビルド成果物も要求しないため、**fork からの PR でも結果が出る**（`Build Check` は
-microCMS の secrets を要求するので fork PR では必ず落ちる）。ここへ検査を足すときは、
-「install 以外に何も要求しないか」を基準に判断すること。要求するなら別ジョブにする。
 
 ### ビルド末尾の検査
 
@@ -177,7 +176,7 @@ microCMS の secrets を要求するので fork PR では必ず落ちる）。�
 2本目は microCMS の画像が1枚もHTMLに出ないときで、それぞれログに `SKIP` / `NOTE` を出す。
 **その行が出ているときは、検査が効いていないと考えること。**
 なお2本目は**公開フラグが全て false でも空振りしない**（協賛企業はフラグ非依存）。
-`NOTE` が出たら「協賛の取得が0件」を疑うこと。
+`NOTE` が出たら「協賛の取得が0件」を疑うこと。**CI で出たら secrets の置き場所を疑う**（Repository secrets に置く。Environment secrets は `environment:` の無いジョブから空に見える。#352）。
 3本目は全事前描画HTMLの `<head>` を対象にするため、HTMLが1枚でもあれば空振りしない。
 4本目は詳細ページが1枚も事前描画されていないとき（公開フラグ false・microCMS 未設定）に `NOTE` を出す。
 
