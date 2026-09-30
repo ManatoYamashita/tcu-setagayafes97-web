@@ -4,220 +4,637 @@
       "fieldId": "date",
       "name": "開催日",
       "kind": "select",
+      "description": null,
       "required": true,
-      "multipleSelect": false,
-      "initialValue": ["DEFAULT"],
       "selectItems": [
         { "id": "hE8uK3VMWd", "value": "day1 : 10月31日（土）" },
         { "id": "ZAR08IMXOE", "value": "day2 : 11月1日（日）" },
         { "id": "9IDSx6LaXG", "value": "both : 両日" },
         { "id": "7Y0vbKo-EO", "value": "other : その他" }
-      ]
+      ],
+      "multipleSelect": false,
+      "initialValue": ["DEFAULT"]
     },
     {
       "fieldId": "type",
       "name": "企画タイプ",
       "kind": "select",
+      "description": "企画のタイプを選択",
       "required": true,
-      "multipleSelect": false,
-      "initialValue": ["DEFAULT"],
       "selectItems": [
         { "id": "vXKAN6bAHW", "value": "room : 教室企画" },
         { "id": "HiWE3JsSXV", "value": "stage : ステージ企画" },
-        { "id": "store-slot", "value": "store : 模擬店" },
         { "id": "MbWeQ2gfEg", "value": "special : スペシャル企画" },
+        { "id": "8jIwkiLAb2", "value": "store: 模擬店" },
         { "id": "251gQP6xuI", "value": "other : その他" }
-      ]
-    },
-    {
-      "fieldId": "place",
-      "name": "場所",
-      "kind": "text",
-      "required": true
-    },
-    {
-      "fieldId": "building",
-      "name": "建物番号",
-      "kind": "text",
-      "required": false
+      ],
+      "multipleSelect": false,
+      "initialValue": ["DEFAULT"]
     },
     {
       "fieldId": "title",
       "name": "タイトル",
       "kind": "text",
-      "required": true
-    },
-    {
-      "fieldId": "organizer",
-      "name": "主催団体",
-      "kind": "text",
-      "required": true
+      "description": null,
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
     },
     {
       "fieldId": "thumbnail",
       "name": "サムネイル",
       "kind": "media",
-      "required": false
+      "description": null,
+      "required": false,
+      "imageSizeValidation": null,
+      "initialValue": null
     },
     {
       "fieldId": "description",
       "name": "概要",
       "kind": "textArea",
-      "required": true
+      "description": null,
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "initialValue": null
+    },
+    {
+      "fieldId": "organizer",
+      "name": "主催団体",
+      "kind": "text",
+      "description": null,
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
     },
     {
       "fieldId": "content",
       "name": "詳細",
       "kind": "richEditorV2",
-      "required": true
+      "description": null,
+      "required": false,
+      "richEditorV2Options": [
+        "headerOne",
+        "headerTwo",
+        "headerThree",
+        "headerFour",
+        "headerFive",
+        "undo",
+        "redo",
+        "paragraph",
+        "bold",
+        "italic",
+        "underline",
+        "strike",
+        "code",
+        "blockquote",
+        "codeBlock",
+        "listBullet",
+        "listOrdered",
+        "link",
+        "image",
+        "file",
+        "table",
+        "horizontalRule",
+        "textAlign",
+        "customClass",
+        "oembedly",
+        "clean",
+        "color",
+        "size"
+      ],
+      "richEditorV2ColorList": [],
+      "richEditorV2HideColorPicker": false,
+      "richEditorV2FontSizeList": [],
+      "customClassList": []
+    },
+    {
+      "fieldId": "place",
+      "name": "場所",
+      "kind": "text",
+      "description": null,
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
+    },
+    {
+      "fieldId": "building",
+      "name": "建物番号",
+      "kind": "text",
+      "description": null,
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
     },
     {
       "fieldId": "startTime",
       "name": "開始時刻",
       "kind": "text",
-      "required": false
+      "description": "半角の HH:mm のみ（例 17:00）。開場時刻などは概要へ（著名人企画は「開場時刻」欄へ）",
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": {
+        "regexp": { "pattern": "^(([01]?[0-9]|2[0-3]):[0-5][0-9])?$", "flags": null }
+      },
+      "isUnique": false,
+      "initialValue": null
     },
     {
       "fieldId": "endTime",
       "name": "終了時刻",
       "kind": "text",
-      "required": false
-    },
-    {
-      "fieldId": "sessions",
-      "name": "開催枠",
-      "kind": "repeater",
+      "description": "半角の HH:mm のみ（例 19:00）。日ごとに違うときは開催枠の「日程」で分ける",
       "required": false,
-      "customFieldIds": ["session"]
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": {
+        "regexp": { "pattern": "^(([01]?[0-9]|2[0-3]):[0-5][0-9])?$", "flags": null }
+      },
+      "isUnique": false,
+      "initialValue": null
     },
     {
       "fieldId": "sns",
       "name": "SNS",
       "kind": "text",
-      "required": false
+      "description": null,
+      "required": false,
+      "textSizeLimitValidation": null,
+      "patternMatchValidation": null,
+      "isUnique": false,
+      "initialValue": null
     },
     {
       "fieldId": "special",
       "name": "著名人企画の詳細",
       "kind": "custom",
+      "description": null,
       "required": false,
       "listViewFieldId": "DEFAULT",
       "customFieldId": "specialDetail"
+    },
+    {
+      "fieldId": "sessions",
+      "name": "開催枠",
+      "kind": "repeater",
+      "description": null,
+      "required": false,
+      "repeaterCountLimitValidation": null,
+      "customFieldIds": ["session"]
     }
   ],
   "customFields": [
     {
-      "fieldId": "session",
-      "name": "開催枠",
-      "fields": [
-        {
-          "fieldId": "date",
-          "name": "日程",
-          "kind": "select",
-          "required": false,
-          "multipleSelect": false,
-          "selectItems": [
-            { "id": "session-day1-slot", "value": "day1 : 10月31日（土）" },
-            { "id": "session-day2-slot", "value": "day2 : 11月1日（日）" }
-          ]
-        },
-        { "fieldId": "startTime", "name": "開始時刻", "kind": "text", "required": false },
-        { "fieldId": "endTime", "name": "終了時刻", "kind": "text", "required": false }
-      ]
-    },
-    {
       "fieldId": "goodsItem",
       "name": "物販商品",
+      "fieldOrderByColumn": [["name", "color", "size", "price", "note", "isNew", "image"]],
       "fields": [
-        { "fieldId": "name", "name": "商品名", "kind": "text", "required": true },
-        { "fieldId": "color", "name": "カラー", "kind": "text", "required": false },
-        { "fieldId": "size", "name": "サイズ", "kind": "text", "required": false },
-        { "fieldId": "price", "name": "販売価格", "kind": "text", "required": false },
-        { "fieldId": "note", "name": "備考", "kind": "textArea", "required": false },
-        { "fieldId": "isNew", "name": "新グッズ", "kind": "boolean", "required": false },
-        { "fieldId": "image", "name": "商品画像", "kind": "media", "required": false }
+        {
+          "fieldId": "name",
+          "name": "商品名",
+          "kind": "text",
+          "description": null,
+          "required": true,
+          "textSizeLimitValidation": null,
+          "patternMatchValidation": null,
+          "isUnique": false,
+          "initialValue": null
+        },
+        {
+          "fieldId": "color",
+          "name": "カラー",
+          "kind": "text",
+          "description": null,
+          "required": false,
+          "textSizeLimitValidation": null,
+          "patternMatchValidation": null,
+          "isUnique": false,
+          "initialValue": null
+        },
+        {
+          "fieldId": "size",
+          "name": "サイズ",
+          "kind": "text",
+          "description": null,
+          "required": false,
+          "textSizeLimitValidation": null,
+          "patternMatchValidation": null,
+          "isUnique": false,
+          "initialValue": null
+        },
+        {
+          "fieldId": "price",
+          "name": "販売価格",
+          "kind": "text",
+          "description": null,
+          "required": false,
+          "textSizeLimitValidation": null,
+          "patternMatchValidation": null,
+          "isUnique": false,
+          "initialValue": null
+        },
+        {
+          "fieldId": "note",
+          "name": "備考",
+          "kind": "textArea",
+          "description": null,
+          "required": false,
+          "textSizeLimitValidation": null,
+          "patternMatchValidation": null,
+          "initialValue": null
+        },
+        {
+          "fieldId": "isNew",
+          "name": "新グッズ",
+          "kind": "boolean",
+          "description": null,
+          "required": false,
+          "initialValue": false
+        },
+        {
+          "fieldId": "image",
+          "name": "商品画像",
+          "kind": "media",
+          "description": null,
+          "required": false,
+          "imageSizeValidation": null,
+          "initialValue": null
+        }
       ]
     },
     {
       "fieldId": "ticketPlan",
       "name": "チケット券種",
+      "fieldOrderByColumn": [
+        ["name", "price", "salesPeriod", "method", "note", "buttonLabel", "buttonUrl"]
+      ],
       "fields": [
-        { "fieldId": "name", "name": "券種名", "kind": "text", "required": true },
-        { "fieldId": "price", "name": "料金", "kind": "text", "required": false },
+        {
+          "fieldId": "name",
+          "name": "券種名",
+          "kind": "text",
+          "description": null,
+          "required": true,
+          "textSizeLimitValidation": null,
+          "patternMatchValidation": null,
+          "isUnique": false,
+          "initialValue": null
+        },
+        {
+          "fieldId": "price",
+          "name": "料金",
+          "kind": "text",
+          "description": null,
+          "required": false,
+          "textSizeLimitValidation": null,
+          "patternMatchValidation": null,
+          "isUnique": false,
+          "initialValue": null
+        },
         {
           "fieldId": "salesPeriod",
           "name": "発売日・販売期間",
           "kind": "text",
-          "required": false
+          "description": null,
+          "required": false,
+          "textSizeLimitValidation": null,
+          "patternMatchValidation": null,
+          "isUnique": false,
+          "initialValue": null
         },
         {
           "fieldId": "method",
           "name": "販売方法・販売場所",
           "kind": "richEditorV2",
-          "required": false
+          "description": null,
+          "required": false,
+          "richEditorV2Options": [
+            "headerOne",
+            "headerTwo",
+            "headerThree",
+            "headerFour",
+            "headerFive",
+            "undo",
+            "redo",
+            "paragraph",
+            "bold",
+            "italic",
+            "underline",
+            "strike",
+            "code",
+            "blockquote",
+            "codeBlock",
+            "listBullet",
+            "listOrdered",
+            "link",
+            "image",
+            "file",
+            "table",
+            "horizontalRule",
+            "textAlign",
+            "customClass",
+            "oembedly",
+            "clean",
+            "color",
+            "size"
+          ],
+          "richEditorV2ColorList": [],
+          "richEditorV2HideColorPicker": false,
+          "richEditorV2FontSizeList": [],
+          "customClassList": []
         },
-        { "fieldId": "note", "name": "注意事項", "kind": "textArea", "required": false },
+        {
+          "fieldId": "note",
+          "name": "注意事項",
+          "kind": "textArea",
+          "description": null,
+          "required": false,
+          "textSizeLimitValidation": null,
+          "patternMatchValidation": null,
+          "initialValue": null
+        },
         {
           "fieldId": "buttonLabel",
           "name": "購入ボタンのラベル",
           "kind": "text",
-          "required": false
+          "description": null,
+          "required": false,
+          "textSizeLimitValidation": null,
+          "patternMatchValidation": null,
+          "isUnique": false,
+          "initialValue": null
         },
-        { "fieldId": "buttonUrl", "name": "購入ページURL", "kind": "text", "required": false }
+        {
+          "fieldId": "buttonUrl",
+          "name": "購入ページURL",
+          "kind": "text",
+          "description": null,
+          "required": false,
+          "textSizeLimitValidation": null,
+          "patternMatchValidation": null,
+          "isUnique": false,
+          "initialValue": null
+        }
       ]
     },
     {
       "fieldId": "noticeSection",
       "name": "注意事項",
+      "fieldOrderByColumn": [["heading", "body"]],
       "fields": [
-        { "fieldId": "heading", "name": "見出し", "kind": "text", "required": true },
-        { "fieldId": "body", "name": "本文", "kind": "richEditorV2", "required": false }
+        {
+          "fieldId": "heading",
+          "name": "見出し",
+          "kind": "text",
+          "description": null,
+          "required": true,
+          "textSizeLimitValidation": null,
+          "patternMatchValidation": null,
+          "isUnique": false,
+          "initialValue": null
+        },
+        {
+          "fieldId": "body",
+          "name": "本文",
+          "kind": "richEditorV2",
+          "description": null,
+          "required": false,
+          "richEditorV2Options": [
+            "headerOne",
+            "headerTwo",
+            "headerThree",
+            "headerFour",
+            "headerFive",
+            "undo",
+            "redo",
+            "paragraph",
+            "bold",
+            "italic",
+            "underline",
+            "strike",
+            "code",
+            "blockquote",
+            "codeBlock",
+            "listBullet",
+            "listOrdered",
+            "link",
+            "image",
+            "file",
+            "table",
+            "horizontalRule",
+            "textAlign",
+            "customClass",
+            "oembedly",
+            "clean",
+            "color",
+            "size"
+          ],
+          "richEditorV2ColorList": [],
+          "richEditorV2HideColorPicker": false,
+          "richEditorV2FontSizeList": [],
+          "customClassList": []
+        }
       ]
     },
     {
       "fieldId": "specialDetail",
       "name": "著名人企画の詳細",
+      "fieldOrderByColumn": [
+        ["logo", "photos", "openTime", "goods", "goodsNote", "tickets", "ticketNote", "notices"]
+      ],
       "fields": [
-        { "fieldId": "logo", "name": "アーティストロゴ", "kind": "media", "required": false },
+        {
+          "fieldId": "logo",
+          "name": "アーティストロゴ",
+          "kind": "media",
+          "description": null,
+          "required": false,
+          "imageSizeValidation": null,
+          "initialValue": null
+        },
         {
           "fieldId": "photos",
-          "name": "アーティスト写真（追加）",
+          "name": " アーティスト写真（追加）",
           "kind": "mediaList",
-          "required": false
+          "description": null,
+          "required": false,
+          "imageSizeValidation": null,
+          "mediaListLayout": "HORIZONTAL_SCROLL",
+          "initialValue": []
         },
-        { "fieldId": "openTime", "name": "開場時刻", "kind": "text", "required": false },
+        {
+          "fieldId": "openTime",
+          "name": "開場時刻",
+          "kind": "text",
+          "description": null,
+          "required": false,
+          "textSizeLimitValidation": null,
+          "patternMatchValidation": null,
+          "isUnique": false,
+          "initialValue": null
+        },
         {
           "fieldId": "goods",
           "name": "物販",
           "kind": "repeater",
+          "description": null,
           "required": false,
+          "repeaterCountLimitValidation": null,
           "customFieldIds": ["goodsItem"]
         },
         {
           "fieldId": "goodsNote",
           "name": "物販の補足",
           "kind": "richEditorV2",
-          "required": false
+          "description": null,
+          "required": false,
+          "richEditorV2Options": [
+            "headerOne",
+            "headerTwo",
+            "headerThree",
+            "headerFour",
+            "headerFive",
+            "undo",
+            "redo",
+            "paragraph",
+            "bold",
+            "italic",
+            "underline",
+            "strike",
+            "code",
+            "blockquote",
+            "codeBlock",
+            "listBullet",
+            "listOrdered",
+            "link",
+            "image",
+            "file",
+            "table",
+            "horizontalRule",
+            "textAlign",
+            "customClass",
+            "oembedly",
+            "clean",
+            "color",
+            "size"
+          ],
+          "richEditorV2ColorList": [],
+          "richEditorV2HideColorPicker": false,
+          "richEditorV2FontSizeList": [],
+          "customClassList": []
         },
         {
           "fieldId": "tickets",
           "name": "チケット販売",
           "kind": "repeater",
+          "description": null,
           "required": false,
+          "repeaterCountLimitValidation": null,
           "customFieldIds": ["ticketPlan"]
         },
         {
           "fieldId": "ticketNote",
           "name": "チケットの補足",
           "kind": "richEditorV2",
-          "required": false
+          "description": null,
+          "required": false,
+          "richEditorV2Options": [
+            "headerOne",
+            "headerTwo",
+            "headerThree",
+            "headerFour",
+            "headerFive",
+            "undo",
+            "redo",
+            "paragraph",
+            "bold",
+            "italic",
+            "underline",
+            "strike",
+            "code",
+            "blockquote",
+            "codeBlock",
+            "listBullet",
+            "listOrdered",
+            "link",
+            "image",
+            "file",
+            "table",
+            "horizontalRule",
+            "textAlign",
+            "customClass",
+            "oembedly",
+            "clean",
+            "color",
+            "size"
+          ],
+          "richEditorV2ColorList": [],
+          "richEditorV2HideColorPicker": false,
+          "richEditorV2FontSizeList": [],
+          "customClassList": []
         },
         {
           "fieldId": "notices",
           "name": "注意事項",
           "kind": "repeater",
+          "description": null,
           "required": false,
+          "repeaterCountLimitValidation": null,
           "customFieldIds": ["noticeSection"]
+        }
+      ]
+    },
+    {
+      "fieldId": "session",
+      "name": "開催枠",
+      "fieldOrderByColumn": [["startTime", "endTime", "date"]],
+      "fields": [
+        {
+          "fieldId": "startTime",
+          "name": "開始時刻",
+          "kind": "text",
+          "description": "半角の HH:mm のみ（例 17:00）。開場時刻などは概要（説明文）へ",
+          "required": false,
+          "textSizeLimitValidation": null,
+          "patternMatchValidation": {
+            "regexp": { "pattern": "^(([01]?[0-9]|2[0-3]):[0-5][0-9])?$", "flags": null }
+          },
+          "isUnique": false,
+          "initialValue": null
+        },
+        {
+          "fieldId": "endTime",
+          "name": "終了時刻",
+          "kind": "text",
+          "description": "半角の HH:mm のみ（例 19:00）。日ごとに違うときは開催枠の「日程」で分ける",
+          "required": false,
+          "textSizeLimitValidation": null,
+          "patternMatchValidation": {
+            "regexp": { "pattern": "^(([01]?[0-9]|2[0-3]):[0-5][0-9])?$", "flags": null }
+          },
+          "isUnique": false,
+          "initialValue": null
+        },
+        {
+          "fieldId": "date",
+          "name": "日程",
+          "kind": "select",
+          "description": null,
+          "required": false,
+          "selectItems": [
+            { "id": "NuWARfoFDu", "value": "day1 : 10月31日（土）" },
+            { "id": "WbzjwjQyu3", "value": "day2 : 11月1日（日）" }
+          ],
+          "multipleSelect": false,
+          "initialValue": ["DEFAULT"]
         }
       ]
     }
