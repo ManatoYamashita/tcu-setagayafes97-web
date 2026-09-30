@@ -63,7 +63,7 @@ const LINE_LIMIT = 300;
  * 減らすのは、分割して 300 行以下になったとき（`settled`）と、改名・削除したとき（`missing`）。
  */
 const GRANDFATHERED = new Map([
-  ["docs/frontend/design.md", 802],
+  ["docs/frontend/design.md", 767],
   ["docs/frontend/layout-patterns.md", 789],
   ["DESIGN.md", 688],
   [".claude/CLAUDE.md", 666],
