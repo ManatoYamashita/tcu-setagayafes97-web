@@ -47,6 +47,36 @@ test.describe("モバイル幅", () => {
     await expect(page.locator("[data-timetable-list-item]").first()).toContainText("アリーナ");
   });
 
+  test("30分刻みの時刻見出しで区切り、企画の無い目盛りは出さない（#302）", async ({
+    timetablePage: page,
+  }) => {
+    const ticks = await page
+      .locator("[data-timetable-list-tick]")
+      .evaluateAll((items) => items.map((item) => item.getAttribute("data-timetable-list-tick")));
+
+    // 10:40 は 10:30 の目盛りに属するため見出しを重ねない。14:45 は 14:30 の目盛り
+    expect(ticks).toEqual([
+      "09:30",
+      "10:30",
+      "11:00",
+      "12:00",
+      "13:00",
+      "13:30",
+      "14:30",
+      "15:00",
+      "17:30",
+    ]);
+    await expect(page.locator("[data-timetable-list-tick]").first()).toBeVisible();
+  });
+
+  test("号館付きのアリーナ表記もアリーナとして出す（#302）", async ({ timetablePage: page }) => {
+    const item = page.locator("[data-timetable-list-item]", {
+      hasText: "著名人ステージ（検証用）",
+    });
+    await expect(item).toContainText("アリーナ");
+    await expect(item).not.toContainText("その他");
+  });
+
   test("2部制の企画は、どちらの部かを添えて2件出す（#281）", async ({ timetablePage: page }) => {
     const items = page.locator("[data-timetable-list-item]", { hasText: "2部制ステージ" });
     await expect(items).toHaveCount(2);
