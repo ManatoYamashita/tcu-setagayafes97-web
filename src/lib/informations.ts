@@ -1,4 +1,5 @@
 import { isMicrocmsConfigured, isMicrocmsNotFound, microcmsGet } from "./microcms";
+import { SPONSORS_CACHE_TAG } from "./revalidate-targets";
 import type {
   Information,
   InformationListResponse,
@@ -73,6 +74,12 @@ export async function getSponsorsList(): Promise<Information[]> {
       queries: {
         limit: 100,
         orders: "-priority",
+      },
+      customRequestInit: {
+        next: {
+          revalidate: 600,
+          tags: [SPONSORS_CACHE_TAG],
+        },
       },
     });
     // select は API の filters で絞れない（上記コメント参照）。正規化後の値で絞る

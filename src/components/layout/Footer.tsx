@@ -2,6 +2,7 @@ import { AppImage } from "@/components/ui/AppImage";
 import { siteConfig } from "@/data/site";
 import { FooterNav } from "@/components/layout/FooterNav";
 import { SocialIcons } from "@/components/ui/SocialIcons";
+import { SponsorBanner } from "@/components/layout/SponsorBanner";
 
 /**
  * 共通フッター
@@ -14,7 +15,8 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <div className="bg-secondary">
+    <div className="bg-white">
+      <SponsorBanner />
       <footer className="relative bg-primary-600 rounded-t-3xl">
         <div className="container mx-auto px-4 py-8">
           {/* ロゴ: 左上 */}

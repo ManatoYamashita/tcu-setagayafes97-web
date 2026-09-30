@@ -5,7 +5,6 @@ import { AboutHero } from "@/components/about/AboutHero";
 import { FestivalIntroSection } from "@/components/about/FestivalIntroSection";
 import { ChairpersonSection } from "@/components/about/ChairpersonSection";
 import { EventOverviewTable } from "@/components/about/EventOverviewTable";
-import { SponsorBanner } from "@/components/home/SponsorBanner";
 import { type Locale } from "@/i18n/routing";
 import { createPageMetadata } from "@/lib/metadata";
 import { createAboutStructuredData, serializeJsonLd } from "@/lib/structured-data";
@@ -13,14 +12,12 @@ import { createAboutStructuredData, serializeJsonLd } from "@/lib/structured-dat
 /**
  * 再検証間隔（Webhook 障害時のフォールバック）
  *
- * このページは末尾で `<SponsorBanner />` を描画しており、その中で microCMS の
- * `informations` を読んでいる。主系は Webhook によるオンデマンド再検証
+ * 共通 RootLayout の Footer 直前に SponsorBanner が描画され、microCMS の
+ * `informations` を読む。主系は Webhook によるオンデマンド再検証
  * （`src/app/api/revalidate/route.ts`）で、こちらは通知を取りこぼしたときの保険である。
  *
- * **この宣言を外すと新規協賛が永久に反映されなくなる。**
- * 宣言が無い間、`/{ja,en,zh,ko}/about` は `initialRevalidateSeconds: false` であり、
- * 同じ `informations` を `revalidate = 600` で描画している `/about/sponsors` と
- * 食い違っていた。値を揃えてある。
+ * SponsorBanner のデータ取得にも `revalidate = 600` を設定しているが、ページ側も
+ * 同じ間隔を保ち、Webhook の通知漏れ後にこのルートが更新されるようにする。
  */
 export const revalidate = 600;
 
@@ -106,9 +103,6 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       <div className="relative z-10 -mt-6 mx-4 rounded-t-3xl bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] sm:mx-6 lg:mx-8">
         <EventOverviewTable />
       </div>
-
-      {/* 協賛企業 */}
-      <SponsorBanner />
     </main>
   );
 }

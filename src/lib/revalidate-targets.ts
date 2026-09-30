@@ -1,9 +1,9 @@
 /**
- * microCMS の API（エンドポイント名）と、その内容を描画しているページの対応表。
+ * microCMS の API（エンドポイント名）と、その内容を描画しているページ・共有データタグの対応表。
  *
  * `src/app/api/revalidate/route.ts` が Webhook を受けたときに、ここを引いて
- * `revalidatePath()` を呼ぶ。`src/i18n/localized-pathnames.ts` と同じ性格のモジュールで、
- * 「app ディレクトリの実態と同期していなければならない知識」を1箇所に閉じ込めている。
+ * `revalidatePath()` / `revalidateTag()` を呼ぶ。`src/i18n/localized-pathnames.ts` と同じ性格の
+ * モジュールで、「app ディレクトリの実態と同期していなければならない知識」を1箇所に閉じ込めている。
  *
  * ## 仕組み: revalidatePath はパスの API ではなくタグの API である
  *
@@ -54,6 +54,9 @@ export const MICROCMS_APIS = ["news", "events", "informations"] as const;
 
 export type MicrocmsApi = (typeof MICROCMS_APIS)[number];
 
+/** 共通 Footer の協賛バナーを全ルートから失効させるためのタグ */
+export const SPONSORS_CACHE_TAG = "sponsors";
+
 export interface RevalidateTarget {
   /** `revalidatePath()` へ渡すパス。動的ルートは `[id]` を含むパターン形で書く */
   readonly path: string;
@@ -97,6 +100,11 @@ export const REVALIDATE_TARGETS: Record<MicrocmsApi, readonly RevalidateTarget[]
     { path: "/[locale]/about", type: "page" }, // SponsorBanner（4ロケール）
     { path: "/[locale]/info/faq", type: "page" },
   ],
+};
+
+/** API → 共有データキャッシュタグ。ページ一覧に収まらない共通表示の失効に使う */
+export const REVALIDATE_TAGS: Partial<Record<MicrocmsApi, readonly string[]>> = {
+  informations: [SPONSORS_CACHE_TAG],
 };
 
 /**

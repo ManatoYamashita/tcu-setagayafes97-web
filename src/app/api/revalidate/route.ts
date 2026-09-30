@@ -1,14 +1,14 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { isMicrocmsApi, REVALIDATE_TARGETS } from "@/lib/revalidate-targets";
+import { isMicrocmsApi, REVALIDATE_TAGS, REVALIDATE_TARGETS } from "@/lib/revalidate-targets";
 
 /**
  * microCMS Webhook 受け口（オンデマンド再検証）
  *
- * microCMS の「カスタム通知」Webhook から POST を受け取り、該当ページのキャッシュを破棄する。
- * 対応表は `src/lib/revalidate-targets.ts` にある。
+ * microCMS の「カスタム通知」Webhook から POST を受け取り、該当ページと共有データのキャッシュを破棄する。
+ * パスとキャッシュタグの対応表は `src/lib/revalidate-targets.ts` にある。
  *
  * 各ページの `export const revalidate` は削除していない。microCMS の Webhook は
  * **失敗しても再送されない**ため、通知の取りこぼしを時間ベース ISR が拾う二段構えにしている。
@@ -146,13 +146,18 @@ export async function POST(request: NextRequest) {
     }
 
     const revalidated = targets.map((target) => target.path);
+    const revalidatedTags = REVALIDATE_TAGS[api] ?? [];
+
+    for (const tag of revalidatedTags) {
+      revalidateTag(tag, { expire: 0 });
+    }
 
     // Vercel の Functions ログで発火を確認する唯一の手段になるため、成功時も必ず1行残す。
     console.log(
-      `[revalidate] api=${api} id=${id ?? "-"} type=${type ?? "-"} paths=${revalidated.join(",")}`
+      `[revalidate] api=${api} id=${id ?? "-"} type=${type ?? "-"} paths=${revalidated.join(",")} tags=${revalidatedTags.join(",")}`
     );
 
-    return NextResponse.json({ success: true, api, revalidated, now: Date.now() });
+    return NextResponse.json({ success: true, api, revalidated, revalidatedTags, now: Date.now() });
   } catch (error) {
     console.error("[revalidate] 再検証中にエラーが発生しました:", error);
 
