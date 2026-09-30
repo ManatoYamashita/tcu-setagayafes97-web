@@ -203,13 +203,18 @@ else links.website = sns;
 | category     | カテゴリ | select | ✓    | `sponsor : 協賛企業` / `faq : FAQ` / `other : その他` |
 | title        | タイトル | text   | ✓    |                                                       |
 | description  | 概要     | text   |      | **1行テキスト。** textArea ではない                   |
-| image        | 画像     | media  |      |                                                       |
+| image        | 画像     | media  |      | 任意。無ければ社名を文字で表示（下記）                |
 | url          | URL      | text   |      |                                                       |
 | priority     | 表示順   | number |      |                                                       |
 
 > [!NOTE]
 > **`description` は1行テキストです。** 協賛企業の紹介文を複数行で入稿したい場合は、
 > 管理画面で textArea へ変更したうえで本ファイルも同期してください（型定義への影響はありません）。
+
+> [!NOTE]
+> **協賛企業の `image` は空でも表示されます。** トップ・ABOUT のロゴ帯では社名を文字で流し、
+> `/about/sponsors` ではロゴ枠の中に社名を置きます。1件も落としません（#332。以前は画像の無い協賛が
+> ロゴ帯から黙って消えていました）。判定は `src/lib/sponsor-logos.ts` の `toSponsorLogos()` にあります。
 
 ## JSON の書き方
 
