@@ -79,7 +79,7 @@
   - **SDK の `retry: true` は Next.js の中で効かない。** 再試行は `microcmsGet()` が持つ
 - **[event-sessions.md](./dev/event-sessions.md)** - 企画の開催枠（`sessions`、2部制）の入稿と正規化の契約（#281 / #305）
   - **`sessions` は任意のまま運用する。** 必須にすると既存の企画が保存できない
-  - **時刻欄は `HH:mm` だけ。** 開場時刻などを書き添えると、タイムテーブルと構造化データから黙って消える
+  - **時刻欄は `HH:mm` だけ。** 開場時刻などを書き添えると、タイムテーブルと構造化データから黙って消える。開場時刻の置き場は `special.openTime`
 - **[draft-preview.md](./dev/draft-preview.md)** - microCMS の画面プレビューで下書きを本番と同じ詳細ページに出す仕組み
   - **`draftKey` を `searchParams` で受け取らない。`cookies()` を無条件に呼ばない。** どちらもルートが動的化して ISR が失われる
 - **[content-revalidation.md](./dev/content-revalidation.md)** - Webhook によるオンデマンド再検証の仕組みと microCMS 側の設定
