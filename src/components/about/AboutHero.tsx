@@ -133,7 +133,7 @@ export function AboutHero({ content }: { content: AboutPageContent["hero"] }) {
   return (
     <section
       ref={sectionRef}
-      className="relative flex h-[52svh] min-h-[360px] lg:h-[50svh] w-full items-center justify-center overflow-hidden"
+      className="relative flex h-[calc(100svh-var(--header-height))] min-h-[420px] w-full items-center justify-center overflow-hidden sm:min-h-[460px] lg:min-h-[560px]"
     >
       {/*
         Layer 0: Grainient 背景
@@ -171,8 +171,15 @@ export function AboutHero({ content }: { content: AboutPageContent["hero"] }) {
         style={{ top: "45%" }}
       />
 
-      {/* Layer 2: 右下テキストブロック — 「97」を主役にした縦積みレイアウト */}
-      <div className="absolute bottom-20 right-6 z-20 text-right sm:bottom-16 sm:right-8 lg:bottom-20 lg:right-12">
+      {/*
+        Layer 2: 右下テキストブロック — 「97」を主役にした縦積みレイアウト
+
+        上端を帯の下端（45% + バンド半高 + 余白12px）に固定した領域の底へ寄せる。
+        バンド半高は GSAP の halfBand（30 / 40 / 50px。768 / 1024px 境界）と揃えてあり、
+        変えるときは両方を動かすこと。領域に収まる高さは Hero の min-h が保証する
+        （見出しの高さ: 約105 / 135 / 165px）。
+      */}
+      <div className="absolute inset-x-0 bottom-0 top-[calc(45%+42px)] z-20 flex items-end justify-end px-6 pb-20 text-right sm:px-8 sm:pb-16 md:top-[calc(45%+52px)] lg:top-[calc(45%+62px)] lg:px-12 lg:pb-20">
         <h1 ref={titleRef} className="leading-tight" style={{ fontFamily: "var(--font-sans)" }}>
           <span className="block text-2xl font-semibold tracking-[0.08em] text-gray-900 sm:text-3xl lg:text-4xl">
             {ordinalPrefix}
@@ -228,7 +235,7 @@ export function AboutHero({ content }: { content: AboutPageContent["hero"] }) {
       {/* Layer 2: スクロールインジケーター */}
       <div
         ref={scrollRef}
-        className="absolute bottom-6 left-1/2 z-20 hidden -translate-x-1/2 flex-col items-center gap-2 sm:flex"
+        className="absolute bottom-6 left-1/2 z-20 hidden -translate-x-1/2 flex-col items-center gap-2 md:flex"
         role="presentation"
         aria-label={scrollIndicator}
       >
