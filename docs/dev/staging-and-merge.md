@@ -125,12 +125,36 @@ t=0 のまま固まり、ヒーロー SVG が 0×0 のまま発火しないこ�
 2. `git diff --stat origin/main "$TREE"` — 変更範囲が PR の説明と一致しているか
 3. **その作業が既に `main` へ別経路で入っていないか** — 入っていればマージは巻き戻しになる
 4. **PR が閉じる Issue を GitHub が認識しているか** — `gh pr view <N> --json closingIssuesReferences --jq '.closingIssuesReferences[].number'`
+5. **ブランチを切った後に `main` 側でも同じファイルが変わっていないか** — 変わっていたら、マージ結果を手元に作って検査を流す（下記）
 
 3 も実際に起きた。PR #116 の内容は別コミット（`bf56d1a`）で `main` へ入っており、
 しかも `main` 側の実装のほうが後発で改善を含んでいた。**マージしていれば改善を打ち消していた。**
 
 4 は 2026-09-30 に起きた。#306 の本文に `Closes #287` と書いたが認識されず、マージ後も Issue が
 開いたまま残った（原因は未調査）。空ならマージ前に本文を直すか、マージ後に手で閉じる。
+
+5 が要るのは、**PR の CI が検証したのは「その時点の `main`」へマージした結果**だからである。
+CI の後に `main` が進むと、実際にマージされる組み合わせは誰も検証していない。
+競合が無くても、`main` 側で足された文章が、この PR で移したセクションを古い場所で指していることがある
+（2026-09-30 の #311 で、`main` 側でも `.claude/CLAUDE.md` と `docs/INDEX.md` が変わっていた。
+このときは問題なかったが、確かめるまで分からなかった）。
+
+```bash
+git fetch origin
+B=$(git merge-base origin/main HEAD)
+
+# 両側で変わったファイル。空なら 5 は通過
+comm -12 <(git diff --name-only "$B" HEAD | sort) <(git diff --name-only "$B" origin/main | sort)
+
+# 出力があれば、マージ結果を作って検査する（worktree で行う。コミットはしない）
+git merge --no-commit --no-ff origin/main
+pnpm check:doc-links && pnpm format:check   # コードも触っているなら lint / type-check / test も
+git merge --abort
+```
+
+> [!CAUTION]
+> **マージ後に `main` の状態を測るときは、先に `git fetch` すること。** 取得していない
+> `origin/main` は古いままで、#311 の直後に分割前の行数（569行）を読んで誤認しかけた。
 
 ## 関連ドキュメント
 
@@ -139,4 +163,4 @@ t=0 のまま固まり、ヒーロー SVG が 0×0 のまま発火しないこ�
 
 ---
 
-**最終更新日**: 2026-09-30（git.md から分割。マージ前チェックリストに Issue の認識を追加）
+**最終更新日**: 2026-09-30（git.md から分割。マージ前チェックリストに Issue の認識と、両側で変わったファイルの検査を追加）
