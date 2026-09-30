@@ -3,10 +3,16 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import type { ChromeNavItem } from "@/components/layout/useChromeNav";
+import {
+  isChromePathActive,
+  isChromePathCurrent,
+  type ChromeNavItem,
+} from "@/components/layout/useChromeNav";
 
 interface NavDropdownProps {
   item: ChromeNavItem;
+  pathname: string;
+  isActive: boolean;
 }
 
 /**
@@ -19,7 +25,7 @@ interface NavDropdownProps {
  * - Escape で閉じたときはトリガーへフォーカスを戻す（パネル内のリンクから押しても）
  * - Enter / Space は `<button>` のネイティブな click に任せる
  */
-export function NavDropdown({ item }: NavDropdownProps) {
+export function NavDropdown({ item, pathname, isActive }: NavDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -99,7 +105,11 @@ export function NavDropdown({ item }: NavDropdownProps) {
         onClick={handleClick}
         aria-expanded={isOpen}
         aria-haspopup="true"
-        className="flex items-center gap-1 text-gray-900/80 transition-colors hover:text-gray-900 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
+        className={`flex items-center gap-1 underline-offset-4 transition-colors hover:underline focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 ${
+          isActive
+            ? "font-bold text-primary-600 hover:text-primary-600"
+            : "text-gray-900/80 hover:text-gray-900"
+        }`}
       >
         {item.label}
         <ChevronDown
@@ -109,18 +119,27 @@ export function NavDropdown({ item }: NavDropdownProps) {
 
       {isOpen && (
         <div className="absolute left-0 top-full z-60 mt-2 min-w-[200px] rounded-lg border border-gray-200 bg-white py-2">
-          {item.children?.map((child) => (
-            // key は href ではなく id。href はロケールで変わるため
-            <Link
-              key={child.id}
-              href={child.href}
-              hrefLang={child.hrefLang}
-              className="block px-4 py-2 text-sm text-gray-900/80 transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-primary-600"
-              onClick={() => setIsOpen(false)}
-            >
-              {child.label}
-            </Link>
-          ))}
+          {item.children?.map((child) => {
+            const isChildActive = isChromePathActive(pathname, child.href);
+
+            return (
+              // key は href ではなく id。href はロケールで変わるため
+              <Link
+                key={child.id}
+                href={child.href}
+                hrefLang={child.hrefLang}
+                aria-current={isChromePathCurrent(pathname, child.href) ? "page" : undefined}
+                className={`block px-4 py-2 text-sm underline-offset-4 transition-colors hover:bg-gray-100 hover:underline focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-primary-600 ${
+                  isChildActive
+                    ? "font-bold text-primary-600 hover:text-primary-600"
+                    : "text-gray-900/80 hover:text-gray-900"
+                }`}
+                onClick={() => setIsOpen(false)}
+              >
+                {child.label}
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>
