@@ -309,7 +309,7 @@ export function StaggeredMobileMenu({
         {/* プレレイヤー */}
         <div
           ref={preLayersRef}
-          className="sm-prelayers pointer-events-none absolute top-0 right-0 bottom-0 z-[5]"
+          className="sm-prelayers pointer-events-none absolute top-0 right-0 bottom-0 z-10"
           aria-hidden="true"
         >
           {PRE_COLORS.map((c, i) => (
@@ -325,7 +325,7 @@ export function StaggeredMobileMenu({
         <aside
           id="staggered-menu-panel"
           ref={panelRef}
-          className="staggered-menu-panel pointer-events-auto absolute top-0 right-0 z-10 flex h-full flex-col overflow-y-auto bg-white p-[4em_2em_2em_2em] backdrop-blur-[12px]"
+          className="staggered-menu-panel pointer-events-auto absolute top-0 right-0 z-20 flex h-full flex-col overflow-y-auto bg-white p-[4em_2em_2em_2em] backdrop-blur-[12px]"
           style={{ WebkitBackdropFilter: "blur(12px)" }}
           aria-hidden={!isOpen}
           inert={!isOpen}
