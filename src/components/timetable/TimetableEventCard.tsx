@@ -38,23 +38,17 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
     .filter(Boolean)
     .join("／");
 
-  // 左アクセントは primary-600（白いシート上で 7.45:1）。primary-light は 2.43:1 しかなく、
-  // 装飾線としても読めない（docs/frontend/design.md「コントラスト比（アクセシビリティ）」）。
-  // hover:border-* は border-color を全辺へ当てて border-left-color を上書きするため、
-  // ホバー時の左色も明示している。
-  // 面も bg-white で不透明に持つ。bg-white/10 は白いシート上では結果的に同じ色になるが、
-  // 淡紫背景を前提にしたトークンであり、下地が変わったときに黙って崩れる。
+  // 面は primary-700（白文字で 11.2:1）。ホバーで primary-600（同 7.45:1）へ明るくする。
+  // primary-400 以下へ寄せると白文字が AA に届かない（docs/frontend/design.md「コントラスト比」）。
+  // 枠線は透明で 1px を残す。`getCardDensity` の閾値が上下の border 2px を含めて計算しているため、
+  // 枠ごと外すとカード内の高さ配分がずれる。
   //
   // focus リングを ring-inset にしているのは、盤面が overflow-x-auto のスクロールコンテナで、
-  // 外向きの outline / ring がクリップされて見えなくなるため。
-  const base =
-    "block h-full overflow-hidden rounded-lg bg-white border border-gray-200 transition-colors " +
-    "hoverable:hover:border-gray-400 focus-visible:outline-none focus-visible:ring-2 " +
-    "focus-visible:ring-inset focus-visible:ring-primary-600";
-  const ganttAccent = density
-    ? "border-l-4 border-l-primary-600 hoverable:hover:border-l-primary-700"
-    : "";
-  const cardClass = `${base} ${ganttAccent}`;
+  // 外向きの outline / ring がクリップされて見えなくなるため。暗色の面の上なので色は白を使う。
+  const cardClass =
+    "block h-full overflow-hidden rounded-lg border border-transparent bg-primary-700 text-white " +
+    "transition-colors hoverable:hover:bg-primary-600 focus-visible:outline-none " +
+    "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white";
 
   // 2部制の企画は、同じタイトルのカードが2枚並ぶ。どちらの枠かを時刻の前に添える
   const timeText = `${event.sessionLabel ? `${event.sessionLabel} ` : ""}${event.startTime}–${event.endTime}`;
@@ -64,7 +58,7 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
   if (density === "minimal") {
     return (
       <Link href={href} aria-label={label} className={`${cardClass} px-2 py-1`}>
-        <p className="text-xs font-bold leading-tight text-gray-900 line-clamp-1">{event.title}</p>
+        <p className="text-xs font-bold leading-tight line-clamp-1">{event.title}</p>
       </Link>
     );
   }
@@ -72,8 +66,8 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
   if (density === "compact") {
     return (
       <Link href={href} aria-label={label} className={`${cardClass} px-2 py-1`}>
-        <p className="text-sm font-bold leading-tight text-gray-900 line-clamp-1">{event.title}</p>
-        <p className="truncate text-xs font-medium text-primary-700">{timeText}</p>
+        <p className="text-sm font-bold leading-tight line-clamp-1">{event.title}</p>
+        <p className="truncate text-xs font-medium">{timeText}</p>
       </Link>
     );
   }
@@ -85,13 +79,11 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
   if (density === "full") {
     return (
       <Link href={href} aria-label={label} className={`${cardClass} px-3 py-1.5`}>
-        <p className="mb-1 text-[0.9375rem] font-bold leading-[1.2] text-gray-900 line-clamp-2">
-          {event.title}
-        </p>
-        <p className="mb-1 truncate text-[0.8125rem] font-semibold leading-tight text-primary-700 tabular-nums">
+        <p className="mb-1 text-[0.9375rem] font-bold leading-[1.2] line-clamp-2">{event.title}</p>
+        <p className="mb-1 truncate text-[0.8125rem] font-semibold leading-tight tabular-nums">
           {timeText}
         </p>
-        <p className="truncate text-[0.8125rem] leading-tight text-gray-700">{event.place}</p>
+        <p className="truncate text-[0.8125rem] leading-tight">{event.place}</p>
       </Link>
     );
   }
@@ -101,26 +93,26 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
     <Link href={href} className={`${cardClass} p-4`}>
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <p className="flex items-baseline gap-1 font-sans tabular-nums">
-          <time dateTime={event.startTime} className="text-lg font-bold text-gray-900">
+          <time dateTime={event.startTime} className="text-lg font-bold">
             {event.startTime}
           </time>
           <span className="sr-only">から</span>
-          <span className="text-sm text-gray-400" aria-hidden="true">
+          <span className="text-sm" aria-hidden="true">
             –
           </span>
-          <time dateTime={event.endTime} className="text-sm font-semibold text-gray-700">
+          <time dateTime={event.endTime} className="text-sm font-semibold">
             {event.endTime}
           </time>
         </p>
         {(stageName || event.sessionLabel) && (
           <span className="flex flex-wrap gap-1">
             {event.sessionLabel && (
-              <span className="rounded-full border border-primary-200 px-2 py-0.5 text-xs font-semibold text-primary-700">
+              <span className="rounded-full border border-primary-200 px-2 py-0.5 text-xs font-semibold">
                 {event.sessionLabel}
               </span>
             )}
             {stageName && (
-              <span className="rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700">
+              <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-primary-700">
                 {stageName}
               </span>
             )}
@@ -128,14 +120,10 @@ export function TimetableEventCard({ event, density, stageName }: TimetableEvent
         )}
       </div>
 
-      <p className="mt-2 text-base font-bold leading-snug text-pretty text-gray-900">
-        {event.title}
-      </p>
-      <p className="mt-2 text-sm leading-relaxed text-gray-700">{event.place}</p>
+      <p className="mt-2 text-base font-bold leading-snug text-pretty">{event.title}</p>
+      <p className="mt-2 text-sm leading-relaxed">{event.place}</p>
 
-      {event.organizer ? (
-        <p className="mt-1 text-sm leading-relaxed text-gray-600">{event.organizer}</p>
-      ) : null}
+      {event.organizer ? <p className="mt-1 text-sm leading-relaxed">{event.organizer}</p> : null}
     </Link>
   );
 }
