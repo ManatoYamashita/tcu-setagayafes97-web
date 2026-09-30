@@ -17,6 +17,7 @@ import type { Event, EventSession } from "@/types/events";
  * | ---------------------- | ---------------------------------------------- |
  * | 7A の 13:00 と 13:30   | 同一ステージの時間重なり → レーン分割           |
  * | 体育館の 09:30 開始    | レンジの下端が10時より前へ広がること           |
+ * | ９号館アリーナの企画   | 号館付きのアリーナ表記がアリーナ列へ入ること   |
  * | 中庭の 19:00 終了      | レンジの上端が18時より後ろへ広がること         |
  * | 7B の 15分企画         | MIN_EVENT_HEIGHT_PX と minimal 密度            |
  * | ホールの 30分企画      | compact 密度                                   |
@@ -118,10 +119,10 @@ export const stageEventFixtures: Event[] = [
   fixture("fx-gym-2", {
     date: "day1",
     type: "special",
-    place: "体育館 メインアリーナ",
+    // 実データの入稿表記（#302）。体育館表記の fx-gym-1 と同じアリーナ列へ入ること
+    place: "９号館アリーナ",
     title: "著名人ステージ（検証用）",
     organizer: "実行委員会",
-    building: "体育館",
     startTime: "15:00",
     endTime: "17:00",
   }),

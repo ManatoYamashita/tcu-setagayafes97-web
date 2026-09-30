@@ -69,7 +69,11 @@ test.describe("タブと絞り込み", () => {
     );
   });
 
-  test("アリーナのタブで体育館メインアリーナの企画に絞られる", async ({ timetablePage: page }) => {
+  test("アリーナのタブで体育館表記と号館付きアリーナ表記の企画に絞られる", async ({
+    timetablePage: page,
+  }) => {
+    // 「体育館 メインアリーナ」と「９号館アリーナ」（実データの表記。#302）の2件。
+    // 号館付きを除外する判定へ戻すと後者が「その他」へ落ちて1件になる
     await page.locator(`${STAGE_TABS} button`, { hasText: "アリーナ" }).click();
 
     await expect(page.locator(`${STAGE_TABS} button[aria-pressed="true"]`)).toHaveText("アリーナ");

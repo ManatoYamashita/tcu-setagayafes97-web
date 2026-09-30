@@ -9,6 +9,7 @@ import {
   calculateTimeRange,
   generateTimeAxis,
   getCardDensity,
+  getTimeAxisTick,
   layoutStageEvents,
   parseTimeToMinutes,
   type TimeRange,
@@ -350,6 +351,30 @@ describe("generateTimeAxis", () => {
 
   it("退化したレンジでも1目盛りを返す", () => {
     expect(generateTimeAxis({ startHour: 12, endHour: 12 })).toEqual(["12:00"]);
+  });
+});
+
+describe("getTimeAxisTick", () => {
+  it("開始時刻以前で最も近い30分目盛りを返す", () => {
+    expect(getTimeAxisTick("10:00")).toBe("10:00");
+    expect(getTimeAxisTick("10:29")).toBe("10:00");
+    expect(getTimeAxisTick("10:30")).toBe("10:30");
+    expect(getTimeAxisTick("10:40")).toBe("10:30");
+    expect(getTimeAxisTick("9:05")).toBe("09:00");
+  });
+
+  it("盤面の目盛りと同じ表記を返す", () => {
+    // 画面幅で刻みや表記が食い違わないこと
+    const axis = generateTimeAxis({ startHour: 9, endHour: 19 });
+    for (const tick of axis) {
+      expect(getTimeAxisTick(tick)).toBe(tick);
+    }
+  });
+
+  it("形式が不正なら null を返す", () => {
+    expect(getTimeAxisTick("1000")).toBeNull();
+    expect(getTimeAxisTick("17:00(会場16：30)")).toBeNull();
+    expect(getTimeAxisTick(undefined)).toBeNull();
   });
 });
 

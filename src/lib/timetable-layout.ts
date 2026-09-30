@@ -275,8 +275,20 @@ export function layoutStageEvents(
   return positioned;
 }
 
-/** 時間軸の目盛り間隔（分）。ラベルと罫線で共有する */
+/**
+ * 時間軸の目盛り間隔（分）
+ *
+ * 盤面のラベルと罫線、モバイル縦スタックの時刻見出しで共有する。
+ * 片方だけ変えると、画面幅によって目盛りの刻みが食い違う。
+ */
 export const TIME_AXIS_STEP_MINUTES = 30;
+
+/** 0時からの分を "HH:mm" にする */
+function formatMinutes(minutes: number): string {
+  const hour = Math.floor(minutes / 60) % 24;
+  const minute = minutes % 60;
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+}
 
 /**
  * 時間軸の目盛りを生成
@@ -289,11 +301,23 @@ export function generateTimeAxis(range: TimeRange): string[] {
     minutes <= range.endHour * 60;
     minutes += TIME_AXIS_STEP_MINUTES
   ) {
-    const hour = Math.floor(minutes / 60) % 24;
-    const minute = minutes % 60;
-    axis.push(`${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`);
+    axis.push(formatMinutes(minutes));
   }
   return axis;
+}
+
+/**
+ * 開始時刻が属する目盛り（開始時刻以前で最も近い目盛り）を返す
+ *
+ * モバイル縦スタックの時刻見出しに使います。`10:40` 開始は `10:30` の目盛りに属します。
+ * 形式が不正なら `null` を返します。
+ *
+ * @returns `"10:30"` など。`generateTimeAxis()` が返す目盛りと同じ表記
+ */
+export function getTimeAxisTick(time: string | undefined | null): string | null {
+  const minutes = parseTimeToMinutes(time);
+  if (minutes === null) return null;
+  return formatMinutes(Math.floor(minutes / TIME_AXIS_STEP_MINUTES) * TIME_AXIS_STEP_MINUTES);
 }
 
 export type EventCardDensity = "full" | "compact" | "minimal";
