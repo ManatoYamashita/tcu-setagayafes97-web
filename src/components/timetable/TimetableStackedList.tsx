@@ -12,7 +12,7 @@ interface TimetableStackedListProps {
  * ガント盤面は最小でも 972px（時間軸 72px + 5列 × 180px）を要求するため、
  * 狭い画面では成立しない。時刻による位置づけを諦めて、全ステージ横断の時系列リストにする。
  *
- * 盤面と DOM を2本持っているのは、`docs/frontend/layout-patterns.md`「DOM 2枚持ちを避ける」の
+ * 盤面と DOM を2本持っているのは、`docs/frontend/layout-responsive.md`「DOM 2枚持ちを避ける」の
  * **例外**である。同ドキュメントの指針は「形状差が Tailwind のバリアントだけで表現できる場合」を
  * 対象にしており、今回は縦位置が `style={{ top, height }}` のインラインスタイルに載っている。
  * インラインスタイルにレスポンシブバリアントは存在せず、JS でブレークポイントを見て切り替えると

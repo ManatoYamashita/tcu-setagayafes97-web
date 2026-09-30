@@ -170,7 +170,7 @@ export default async function EventPage({ params }: EventPageProps) {
         {/*
           白帯は全幅のまま敷きたいので、背景を持つ <nav> と幅を決める層を分ける。
           内側の mx-* はシート（<main>）と同じ値でなければ左端が揃わない。
-          詳細は docs/frontend/layout-patterns.md「全幅の背景を持つ節」を参照。
+          詳細は docs/frontend/layout-width-and-alignment.md「全幅の背景を持つ節」を参照。
         */}
         <nav className="event-detail-entrance-nav bg-white py-4" aria-label="パンくずリスト">
           <div className="mx-4 sm:mx-6 lg:mx-8">
