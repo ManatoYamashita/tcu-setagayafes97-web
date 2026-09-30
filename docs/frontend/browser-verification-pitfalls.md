@@ -111,10 +111,20 @@ Bounds must be at least 50% within visible screen space.
 agent-browser set viewport 375 812
 ```
 
-**`open <url> --viewport 375x812` は効かない**（2026-09-02 実測。`agent-browser close` を
-挟んでも `window.innerWidth` は 1280 のままだった）。`screenshot` に付ける形も同様に信用しない。
-サブコマンドの `set viewport <w> <h>` は確実に反映される（実測: `innerWidth` が 375 になり、
-`lg:hidden` / `hidden lg:block` の切り替わりも追随した）。
+**viewport を変えられるのは `set viewport <w> <h>` だけである。** 他の書き方はどれも効かない
+（agent-browser 0.38.1、2026-09-30 に `innerWidth` とスクリーンショットの寸法で実測）。
+
+| 書き方                                 | 結果                                                                                          |
+| -------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `set viewport 375 812`                 | **効く。** `innerWidth` 375・画像 375×812。以降に別 URL を `open` しても保たれる              |
+| `open <url> --viewport 375x812`        | 効かない。起動済みでも、`close` の直後の新規起動でも既定幅（1000）のまま                      |
+| `screenshot <path> --viewport 375x667` | **効かないうえに有害。** `--viewport` が出力先ファイル名になり、作業ディレクトリに PNG が残る |
+| `eval "window.resizeTo(375, 667)"`     | 効かない                                                                                      |
+
+ヘルプ（`agent-browser --help` / `open --help` / `screenshot --help`）にも `--viewport` は載っていない。
+**知らないフラグはエラーにならず黙って無視されるか、位置引数として飲み込まれる。**
+2026-09-02 の実測（`open --viewport` で `innerWidth` 1280 のまま）とも矛盾しない。
+`set viewport` では `lg:hidden` / `hidden lg:block` の切り替わりも追随する。
 
 ### B. コンテナ幅を直接絞る
 
@@ -151,7 +161,8 @@ document.documentElement.scrollWidth > document.documentElement.clientWidth; // 
 > })()"
 > ```
 >
-> また **`--viewport` はセッション再利用時に無視される。** 幅を変えるたびに `agent-browser close` を挟むこと。
+> なお以前ここにあった「`--viewport` はセッション再利用時に無視されるので `close` を挟む」は誤りだった。
+> **`close` を挟んでも `--viewport` は効かない**（上表）。幅は `set viewport` で変える。
 
 ## 外部SPAの管理画面は「操作」に使わない
 
