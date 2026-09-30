@@ -60,6 +60,7 @@ export function TimetableEventCard({
     stageName,
     event.sessionLabel,
     `${event.startTime}から${event.endTime}`,
+    event.openTime ? `開場${event.openTime}` : undefined,
     event.place,
   ]
     .filter(Boolean)
@@ -79,6 +80,12 @@ export function TimetableEventCard({
 
   // 2部制の企画は、同じタイトルのカードが2枚並ぶ。どちらの枠かを時刻の前に添える
   const timeText = `${event.sessionLabel ? `${event.sessionLabel} ` : ""}${event.startTime}–${event.endTime}`;
+
+  // 開場時刻は高さを増やさず、時刻の行の後ろへ続ける（密度の閾値は行数で決まっているため）。
+  // 溢れた分は truncate で切れる。全文は aria-label が伝える
+  const openText = event.openTime ? (
+    <span className="ms-1.5 font-normal">開場 {event.openTime}</span>
+  ) : null;
 
   // 団体名は盤面のどこにも出ない情報なので、どの密度でも落とさない。
   // タイトルが「世田谷祭公演」のように団体名を含まない企画は、団体名が無いと見つけられない。
@@ -106,6 +113,7 @@ export function TimetableEventCard({
         <p className="text-sm font-bold leading-tight line-clamp-1">{event.title}</p>
         <p className="truncate text-xs font-medium">
           {timeText}
+          {openText}
           {organizer}
         </p>
       </Link>
@@ -124,7 +132,10 @@ export function TimetableEventCard({
     return (
       <Link {...linkProps} aria-label={label} className={`${cardClass} px-3 py-1.5`}>
         <p className="mb-1 text-[0.9375rem] font-bold leading-[1.2] line-clamp-2">{event.title}</p>
-        <p className={`${lineClass} mb-1 font-semibold tabular-nums`}>{timeText}</p>
+        <p className={`${lineClass} mb-1 font-semibold tabular-nums`}>
+          {timeText}
+          {openText}
+        </p>
         {density === "detailed" ? (
           <>
             <p className={`${lineClass} ${event.organizer ? "mb-1" : ""}`}>{event.place}</p>
@@ -168,6 +179,8 @@ export function TimetableEventCard({
           </span>
         )}
       </div>
+
+      {event.openTime ? <p className="mt-1 text-sm tabular-nums">開場 {event.openTime}</p> : null}
 
       <p className="mt-2 text-base font-bold leading-snug text-pretty">{event.title}</p>
       <p className="mt-2 text-sm leading-relaxed">{event.place}</p>

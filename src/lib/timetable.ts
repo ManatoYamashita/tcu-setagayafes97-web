@@ -53,6 +53,10 @@ export function filterStageEvents(events: Event[]): TimetableEntry[] {
       if (session.startTime === "") warnUnreadable(session, undefined);
     }
 
+    // 開場時刻は著名人企画の専用欄にだけある（それ以外は説明文に書く運用。event-sessions.md）。
+    // 全枠に同じ値を載せる。日ごとに開場が違う企画は、専用欄ではなく説明文で伝える
+    const openTime = event.special?.openTime?.trim() || undefined;
+
     // 呼び名は詳細ページと同じ labelSessions() から取る。
     // 読めない枠を落とした後の数で付け直すと、詳細ページと「第n部」が食い違う
     return labelSessions(event.sessions).flatMap((session, index): TimetableEntry[] => {
@@ -78,6 +82,7 @@ export function filterStageEvents(events: Event[]): TimetableEntry[] {
           endTime: session.endTime,
           entryKey: `${event.id}#${index}`,
           sessionLabel: session.label,
+          openTime,
         },
       ];
     });

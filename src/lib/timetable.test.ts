@@ -30,6 +30,26 @@ describe("filterStageEvents", () => {
     expect(kept).toContain("fx-gym-2"); // type: special
   });
 
+  it("著名人企画の開場時刻を各枠へ引き継ぎ、空白だけの入力は無視する", () => {
+    const base = fixture("open", {
+      date: "day1",
+      type: "special",
+      place: "ホール",
+      title: "開場つき",
+      organizer: "実行委員会",
+      startTime: "15:00",
+      endTime: "17:00",
+    });
+    const withOpen = (openTime: string): Event => ({
+      ...base,
+      special: { fieldId: "specialDetail", openTime },
+    });
+
+    expect(filterStageEvents([withOpen(" 14:30 ")])[0].openTime).toBe("14:30");
+    expect(filterStageEvents([withOpen("  ")])[0].openTime).toBeUndefined();
+    expect(filterStageEvents([base])[0].openTime).toBeUndefined();
+  });
+
   it("時刻を解釈できない企画を落とす", () => {
     // 盤面は座標を計算できない企画を描けないが縦スタックは描けてしまうため、
     // 入口で揃えないと「デスクトップに無いのにモバイルには出る企画」が生まれる
