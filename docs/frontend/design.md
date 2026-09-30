@@ -656,59 +656,19 @@ Aboutページの開催概要は、カード状の枠や行ごとの区切りを
 
 ---
 
-## CSS 変数まとめ
+## CSS 変数
 
-```css
-:root {
-  /* ===== Colors ===== */
-  /* Primary */
-  --color-primary-50: oklch(95% 0.035 314deg);
-  --color-primary-100: oklch(88% 0.07 314deg);
-  --color-primary-200: oklch(80% 0.11 314deg);
-  --color-primary-300: oklch(74% 0.14 314deg);
-  --color-primary-400: oklch(68% 0.175 314deg); /* 実配信 #bf73e3 — HLC H319/L64/C70 */
-  --color-primary-500: oklch(57% 0.175 314deg);
-  --color-primary-600: oklch(47% 0.165 314deg);
-  --color-primary-700: oklch(37% 0.14 314deg);
-  --color-primary-900: oklch(18% 0.075 314deg);
+**一次定義は `src/app/globals.css` の `@theme` の1箇所であり、本文書へ値を写さない。** 一覧はそこを読む。
 
-  /* Alias */
-  --color-primary: var(--color-primary-400);
-
-  /* Secondary Brand Color */
-  --color-secondary: oklch(79.5% 0.108 314deg); /* 実配信 #d5a7ed — HLC H319/L79.5/C11 */
-
-  /* Neutrals */
-  --color-gray-50: oklch(97% 0 0deg);
-  --color-gray-100: oklch(93% 0 0deg);
-  --color-gray-200: oklch(86% 0 0deg);
-  --color-gray-400: oklch(65% 0 0deg);
-  --color-gray-600: oklch(45% 0 0deg);
-  --color-gray-700: oklch(35% 0 0deg);
-  --color-gray-900: oklch(13% 0 0deg);
-
-  /* Semantic */
-  --color-bg: var(--color-secondary); /* 淡い紫背景 */
-  --color-text: var(--color-gray-900);
-  --color-text-muted: var(--color-gray-600);
-  --color-border: var(--color-gray-200);
-  --color-accent: var(--color-primary);
-
-  /* ===== Typography ===== */
-  --font-display: var(--font-kaisei-opti), "Hiragino Mincho Pro", "Yu Mincho", serif;
-  --font-body: ui-sans-serif, system-ui, sans-serif, "Hiragino Sans", sans-serif;
-
-  --text-xs: 0.75rem; /* 12px */
-  --text-sm: 0.875rem; /* 14px */
-  --text-base: 1rem; /* 16px */
-  --text-xl: 1.25rem; /* 20px */
-  --text-2xl: 1.5rem; /* 24px */
-  --text-3xl: 1.875rem; /* 30px */
-  --text-4xl: 2.375rem; /* 38px */
-  --text-5xl: 3rem; /* 48px */
-  --text-6xl: 3.75rem; /* 60px */
-}
+```bash
+grep -nE '^[[:space:]]*--(color|font)-' src/app/globals.css
 ```
+
+2026-09-30 まで、ここに `:root` の写し（34変数）を載せていたが、**11変数（`--font-display` / `--font-body` /
+`--text-xs`〜`--text-6xl`）は `globals.css` に存在せず**、`--color-accent` の値も違っていた
+（実体は `var(--color-primary-400)`）。逆に実在する `--color-gray-500` などが載っていなかった。
+写しは必ず古くなるため削除した。フォントは `--font-sans` / `--font-serif` / `--font-heading` で、
+文字サイズは CSS 変数を定義せず Tailwind 既定の `text-*` を使っている（上のフォントスケール表は目安であり、変数名ではない）。
 
 ---
 
@@ -804,4 +764,4 @@ const href = document.querySelector("link[rel=stylesheet]").href;
 
 ---
 
-**最終更新日**: 2026-09-19
+**最終更新日**: 2026-09-30（実体と食い違っていた「CSS 変数まとめ」を一次定義への参照に置き換えた）
