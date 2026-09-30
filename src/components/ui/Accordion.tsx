@@ -1,71 +1,36 @@
-"use client";
-
-import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type {
-  AccordionItem as AccordionItemType,
-  AccordionItemProps,
-  AccordionProps,
-} from "@/types/accordion";
-
-/**
- * 個別のアコーディオンアイテムコンポーネント
- * クリックまたはキーボード操作（Enter/Space）で開閉可能
- */
-function AccordionItem({ item, index }: AccordionItemProps) {
-  const [isOpen, setIsOpen] = useState(item.defaultOpen ?? false);
-
-  // キーボード操作のハンドラー
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      setIsOpen(!isOpen);
-    }
-  };
-
-  return (
-    <div className="rounded-lg border border-gray-200 bg-gray-50">
-      {/* アコーディオンのヘッダー部分 */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        onKeyDown={handleKeyDown}
-        aria-expanded={isOpen}
-        aria-controls={`accordion-content-${index}`}
-        className="flex w-full items-center justify-between p-4 text-left hover:bg-gray-100"
-      >
-        <span className="text-base font-semibold text-gray-900 md:text-lg">{item.title}</span>
-        <ChevronDown
-          className={cn("h-5 w-5 flex-shrink-0 text-gray-900/60", isOpen && "rotate-180")}
-        />
-      </button>
-
-      {/* アコーディオンのコンテンツ部分 */}
-      <div
-        id={`accordion-content-${index}`}
-        className={cn("overflow-hidden", isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0")}
-      >
-        <div className="border-t border-gray-200 p-4">
-          <p className="whitespace-pre-wrap text-sm text-gray-900/90 md:text-base">
-            {item.content}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
+import type { AccordionProps } from "@/types/accordion";
 
 /**
  * Accordionコンポーネント
- * 複数のアコーディオンアイテムを表示
- * FAQページなどで使用
+ *
+ * ネイティブの `<details>` / `<summary>` で作る。開閉・キーボード操作（Enter / Space）・
+ * 閉じた内容の非表示・ページ内検索（Ctrl+F）での自動展開はブラウザが担うため、
+ * 状態・ARIA 属性・キー処理は持たない。
+ *
+ * - 複数を同時に開けるよう、排他用の `name` 属性は付けない
+ * - 内容の高さに上限を付けないこと。かつて `max-h-screen` ＋ `overflow-hidden` で
+ *   画面より高い回答が途中で切れていた
+ * - `key` は必ず `item.id` にする。位置（index）だと、絞り込みで並びが変わったとき
+ *   開いた状態が別の項目へ移る
+ *
+ * FAQページで使用。
  */
 export function Accordion({ items, className }: AccordionProps) {
   return (
-    <div className={cn("space-y-3", className)}>
-      {items.map((item, index) => (
-        <AccordionItem key={index} item={item} index={index} />
+    <div className={cn("divide-y divide-gray-200 border-y border-gray-200", className)}>
+      {items.map((item) => (
+        <details key={item.id} open={item.defaultOpen} className="group">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-4 text-left hoverable:hover:text-primary-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 [&::-webkit-details-marker]:hidden">
+            <span className="text-base font-semibold text-gray-900 md:text-lg">{item.title}</span>
+            <ChevronDown
+              aria-hidden="true"
+              className="h-5 w-5 flex-shrink-0 text-gray-600 group-open:rotate-180"
+            />
+          </summary>
+          <p className="whitespace-pre-wrap pb-5 leading-8 text-gray-700">{item.content}</p>
+        </details>
       ))}
     </div>
   );

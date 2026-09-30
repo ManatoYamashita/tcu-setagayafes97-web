@@ -3,6 +3,8 @@
  */
 
 export interface AccordionItem {
+  /** 一意な識別子。絞り込みで並びが変わっても「開いた状態」が別の項目へ移らないよう、key に使う */
+  id: string;
   /** アコーディオンのタイトル（質問など） */
   title: string;
   /** アコーディオンのコンテンツ（回答など） */
@@ -16,11 +18,4 @@ export interface AccordionProps {
   items: AccordionItem[];
   /** カスタムクラス名 */
   className?: string;
-}
-
-export interface AccordionItemProps {
-  /** アコーディオンアイテム */
-  item: AccordionItem;
-  /** インデックス（一意なキーとして使用） */
-  index: number;
 }
