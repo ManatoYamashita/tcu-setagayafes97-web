@@ -116,6 +116,32 @@ describe("filterStageEvents の開催枠の展開（#281）", () => {
   });
 });
 
+describe("filterStageEvents の日程つき開催枠（#305）", () => {
+  // 両日開催で、日ごとに終了が違う企画（実データの Jazz Festival）
+  const perDay = fixture("per-day", {
+    date: "both",
+    type: "stage",
+    place: "中庭",
+    title: "日ごとに時刻が違う企画",
+    organizer: "検証用",
+    sessions: [
+      { date: "day1", startTime: "11:00", endTime: "16:00" },
+      { date: "day2", startTime: "11:00", endTime: "15:00" },
+    ],
+  });
+  const entries = filterStageEvents([perDay]);
+
+  it("枠ごとに、その日だけのブロックにする", () => {
+    expect(filterEventsByDate(entries, "day1").map((entry) => entry.endTime)).toEqual(["16:00"]);
+    expect(filterEventsByDate(entries, "day2").map((entry) => entry.endTime)).toEqual(["15:00"]);
+  });
+
+  it("各日1枠なので「第n部」を付けず、各日1企画と数える", () => {
+    expect(entries.map((entry) => entry.sessionLabel)).toEqual([undefined, undefined]);
+    expect(countDistinctEvents(filterEventsByDate(entries, "day2"))).toBe(1);
+  });
+});
+
 describe("countDistinctEvents", () => {
   it("2部制の企画をブロック数ではなく1企画として数える", () => {
     const hall = filterEventsByStage(day1Events, "ホール");

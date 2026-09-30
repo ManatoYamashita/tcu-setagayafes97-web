@@ -114,9 +114,14 @@ export interface SpecialDetail {
  */
 export interface RawEventSession {
   fieldId: "session";
+  /** 日程（select。`["day1 : 10月31日（土）"]` 形式）。両日開催で日ごとに時刻が違う企画のため（#305） */
+  date?: string[] | string;
   startTime?: string;
   endTime?: string;
 }
+
+/** 開催枠が持てる日程。`both` / `other` は枠の日程として意味を持たないため含めない */
+export type SessionDate = "day1" | "day2";
 
 /**
  * 開催枠1つ（正規化済み）
@@ -126,6 +131,11 @@ export interface RawEventSession {
  * （`filterStageEvents()`）。
  */
 export interface EventSession {
+  /**
+   * 枠の日程。**値があれば、その枠はその日だけに開催されます**（#305）。
+   * 無ければ企画の `date` に従います。値の無い枠にはキー自体を持たせません
+   */
+  date?: SessionDate;
   startTime: string;
   endTime: string;
 }
