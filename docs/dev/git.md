@@ -90,7 +90,12 @@ refactor/<refactor-target>   # リファクタリング
 **ジョブを分ける基準は「`pnpm install` 以外に何を要求するか」である。** install だけで済む検査
 （lint / format / 型 / ユニットテスト / ドキュメントの相対リンク / 禁止色 / 静的画像）は
 `Static Checks` に束ね、ブラウザを要求する検査は `Layout E2E`、microCMS の secrets を要求する
-検査は `Build Check` に置く。`Build Check` は secrets が届かない fork の PR では必ず落ちる。
+検査は `Build Check` に置く。**`Build Check` は secrets が届かない fork の PR でも落ちない。**
+`src/lib/microcms.ts` は資格情報が空なら警告を出して空データを返すため、ビルドは緑になり、
+末尾の検査は `NOTE` を出して空振りする（#352）。
+**secrets は Repository secrets に置くこと。** Environment secrets は `environment:` を宣言しないジョブからは
+空文字に見える。2026-09-30 までは Production environment にしか無く、ログが残る最古の
+2026-07-22 以降、`Build Check` は一度も microCMS を読めていなかった（それ以前はログが失効していて未確認）。
 型チェックは `Build Check` と重複するが、secrets を要求せず短時間で落ちる検査として
 `Static Checks` にも置いてある。共通のセットアップは `.github/actions/setup` にある。
 

@@ -112,8 +112,8 @@ jobs:
         run: pnpm exec playwright install --with-deps --only-shell chromium
 
       # env を渡さないのは意図的である。フィクスチャ経路は getEventsList() を
-      # 呼ばないため microCMS のシークレットが要らない。**このジョブだけは
-      # fork からの PR でも緑赤が出る**（build ジョブは secrets 不達で必ず落ちる）。
+      # 呼ばないため microCMS のシークレットが要らない。fork からの PR でも同じ判定が出る
+      # （build ジョブは fork PR では secrets が届かず、落ちずに空データのまま緑になる。#352）。
       - name: Run layout assertions
         run: pnpm run test:e2e
 
@@ -139,6 +139,8 @@ jobs:
       - name: Setup
         uses: ./.github/actions/setup
 
+      # secrets は Repository secrets に置く。Environment secrets はこのジョブ（environment: 無し）から
+      # 空文字に見え、ビルドは空データのまま成功して末尾の検査が NOTE で空振りする（#352）。
       - name: Build project
         run: pnpm run build
         env:
