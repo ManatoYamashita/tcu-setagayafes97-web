@@ -16,6 +16,27 @@
 - **`.gitignore` で除外したドキュメントは、本索引でリンクにしません。** 存在しないファイルへのリンクは
   リンク切れ検査に引っかかり、読んだ人に「消えた」と誤解させます。パス名をコード表記で書き、
   除外の理由と入手方法を添えてください。
+- **ドキュメントを分割したら、元ファイルの行が分割後のどこかに残っているかを機械的に照合します。**
+  分割は「移すだけ」のつもりでも行が落ちます（2026-09-30 の #311 では、設計理由の1行を拾い漏らしていました）。
+  下のスクリプトが列挙した行が、**意図した削除と書き換えだけであること**を確かめてから完了とします。
+  列挙された行は PR の本文に理由付きで載せてください。
+
+  ```bash
+  # 使い方: 元ファイル → 分割後のファイル（作業ツリー）。元は origin/main から読む
+  python3 - docs/dev/<元>.md docs/dev/<元>.md docs/dev/<新>.md <<'EOF'
+  import os, subprocess, sys
+  orig, *news = sys.argv[1:]
+  base = os.environ.get("BASE", "origin/main")
+  before = subprocess.run(["git", "show", f"{base}:{orig}"], capture_output=True, text=True, check=True).stdout.splitlines()
+  kept = {l.strip() for path in news for l in open(path)}
+  lost = [(i, l.strip()) for i, l in enumerate(before, 1) if l.strip() and l.strip() not in kept]
+  print(f"{orig}: {len(lost)} 行が分割後のどのファイルにも無い")
+  for i, l in lost: print(f"  {i}: {l[:100]}")
+  EOF
+  ```
+
+  **ファイル名を zsh の変数に入れて `cat $FILES` のように渡さないこと。** zsh は引用符の無い変数を
+  単語分割しないため、複数のファイルが1つのパスとして渡り、照合が黙って空振りします（#311 で実際に踏みました）。
 
 ## ディレクトリ構成（最小セット）
 
@@ -137,6 +158,7 @@ docs/
   - **`git add -A` / `git add .` は禁止。** 複数エージェントが同じ作業ツリーを触るため、別作業の未コミット変更を無差別に取り込む。巻き込み時の復旧手順あり
   - **マージ前は `merge-tree` で「消えるファイル」を確認する。** GitHub の `CLEAN` は競合が無いことしか意味せず、マージでファイルが消えないことは保証しない。worktree での実動確認手順あり
   - **マージ前に `closingIssuesReferences` を見る。** 本文に `Closes #N` と書いても認識されないことがある（#306 → #287 が開いたまま残った）
+  - **CI の後に `main` が進んでいたら、両側で変わったファイルを確かめる。** CI が検証したのはその時点の `main` との組み合わせだけ。あればマージ結果を手元に作って検査を流す
 
 - **[testing.md](./dev/testing.md)** - テスト方針（#157）
   - **算術で表せる不変条件はユニットテスト、盤面が 0px でないことなど DOM が要るものは実ブラウザ**という切り分け
