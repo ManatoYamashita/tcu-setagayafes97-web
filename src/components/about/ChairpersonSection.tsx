@@ -6,37 +6,12 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 
-import { aboutConfig } from "@/data/about";
+import { aboutConfig, type AboutPageContent } from "@/data/about";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
-const {
-  themeLabel,
-  heading,
-  briefDescription,
-  messageLabel,
-  messageHeading,
-  name,
-  position,
-  image,
-  subImage,
-  imageAlt,
-  message,
-} = aboutConfig.chairpersonMessage;
-
-/**
- * データ中の改行を実マークアップへ落とす。
- *
- * white-space: pre-line / pre-wrap に頼ったままだと SplitText の行分割が
- * 空白の畳み込み（reduceWhiteSpace の既定値 true）に影響されるため、
- * 改行は <br /> と個別の <p> で表現する。
- */
-const headingLines = heading.split("\n");
-// 単一の \n 区切り。元は pre-line で「行送りのみ・段落間の余白なし」だったので、
-// margin が 0 の <p>（preflight）を連続させると見た目が一致する。
-const briefParagraphs = briefDescription.split("\n");
-// 空行区切り。空行 1 つ分（= leading-[2] の 1 行）を space-y-7 sm:space-y-8 で再現する。
-const messageParagraphs = message.split(/\n\s*\n/).map((paragraph) => paragraph.trim());
+// 言語に依存しない画像パスだけをモジュール直下で読む。文言は props（ロケール別）。
+const { image, subImage } = aboutConfig.chairpersonMessage;
 
 /**
  * 装飾三角形（lg以上のみ）。
@@ -93,7 +68,37 @@ const TRIANGLE_CLIP = "polygon(50% 0%, 0% 100%, 100% 100%)";
  * 各要素が画面内に入るとそれぞれ入場する（ScrollTrigger, once）。
  * 見出しとテーマ解説は SplitText で行単位に分割してリヴィールする。
  */
-export function ChairpersonSection() {
+export function ChairpersonSection({
+  theme,
+  message: messageContent,
+}: {
+  theme: AboutPageContent["theme"];
+  message: AboutPageContent["message"];
+}) {
+  const { label: themeLabel, heading, description: briefDescription } = theme;
+  const {
+    label: messageLabel,
+    heading: messageHeading,
+    name,
+    position,
+    imageAlt,
+    body: message,
+  } = messageContent;
+
+  /*
+   * データ中の改行を実マークアップへ落とす。
+   *
+   * white-space: pre-line / pre-wrap に頼ったままだと SplitText の行分割が
+   * 空白の畳み込み（reduceWhiteSpace の既定値 true）に影響されるため、
+   * 改行は <br /> と個別の <p> で表現する。
+   */
+  const headingLines = heading.split("\n");
+  // 単一の \n 区切り。元は pre-line で「行送りのみ・段落間の余白なし」だったので、
+  // margin が 0 の <p>（preflight）を連続させると見た目が一致する。
+  const briefParagraphs = briefDescription.split("\n");
+  // 空行区切り。空行 1 つ分（= leading-[2] の 1 行）を space-y-7 sm:space-y-8 で再現する。
+  const messageParagraphs = message.split(/\n\s*\n/).map((paragraph) => paragraph.trim());
+
   const sectionRef = useRef<HTMLElement>(null);
   const themeLabelRef = useRef<HTMLParagraphElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);

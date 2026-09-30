@@ -1,3 +1,5 @@
+import type { Locale } from "@/i18n/routing";
+
 /**
  * About（委員会について）情報
  */
@@ -156,10 +158,8 @@ export type AboutConfig = typeof aboutConfig;
  * 本文だけを置き、事実の一次定義を二重に持たない。
  *
  * `accessPageContent` / `accessPageContents` と同じ `Record<Locale, Content>`
- * パターンで4言語を持つ。`/about` の既存セクション（AboutHero・
- * ChairpersonSection・EventOverviewTable）は4ロケールとも日本語本文を配信して
- * おり、hreflang だけが相互宣言されている状態にある（2026-09-03 実測）。
- * 新設分で同じ状態を増やさないため、最初から翻訳を持たせる。
+ * パターンで4言語を持つ。`/about` の残り3セクション（AboutHero・
+ * ChairpersonSection・EventOverviewTable）の文言は `aboutPageContents` が持つ（#361）。
  */
 export interface FestivalIntroContent {
   label: string;
@@ -333,3 +333,275 @@ export const festivalIntroContents = {
     ],
   },
 } as const satisfies Record<string, FestivalIntroContent>;
+
+/**
+ * `/about` のヒーロー・共通テーマと委員長挨拶・開催概要の表示文言（#361）
+ *
+ * `festivalIntroContents` と同じ `Record<Locale, Content>` パターンで4言語を持つ。
+ * ja は `aboutConfig` の値をそのまま参照し、一次定義を二重に持たない。
+ * 画像パスなど言語に依存しない値は `aboutConfig.chairpersonMessage` に残す。
+ *
+ * TODO(委員会確認): en / zh / ko は機械翻訳相当のドラフトで、委員会・留学生の確認前。
+ * 要確認項目は Issue #361 の末尾を参照（委員長氏名の読み、「カラクリ」の扱い、
+ * 組織名の公式訳、ko 標語の語尾、繁体字の要否、改行位置）。
+ */
+export interface AboutPageContent {
+  hero: {
+    /** 「第」「The 」など、序数の数字の前に置く語。空白が要るなら末尾に含める */
+    ordinalPrefix: string;
+    /** 「回」「th」など、序数の数字の後ろに置く語 */
+    ordinalSuffix: string;
+    /** 数字と接尾辞の間に余白を置くか（CJK は true、「97th」は false） */
+    ordinalSuffixGap: boolean;
+    university: string;
+    committee: string;
+    scrollIndicator: string;
+  };
+  theme: {
+    label: string;
+    /** `\n` で改行する */
+    heading: string;
+    /** `\n` で段落を分ける */
+    description: string;
+  };
+  message: {
+    label: string;
+    heading: string;
+    name: string;
+    position: string;
+    imageAlt: string;
+    /** 空行で段落を分ける */
+    body: string;
+  };
+  overview: {
+    heading: string;
+    items: readonly { label: string; value: string }[];
+  };
+}
+
+const { chairpersonMessage, overview: jaOverview, hero: jaHero } = aboutConfig;
+
+export const aboutPageContents = {
+  ja: {
+    hero: {
+      ordinalPrefix: "第",
+      ordinalSuffix: "回",
+      ordinalSuffixGap: true,
+      university: jaHero.university,
+      committee: "世田谷祭実行委員会",
+      scrollIndicator: jaHero.scrollIndicator,
+    },
+    theme: {
+      label: chairpersonMessage.themeLabel,
+      heading: chairpersonMessage.heading,
+      description: chairpersonMessage.briefDescription,
+    },
+    message: {
+      label: chairpersonMessage.messageLabel,
+      heading: chairpersonMessage.messageHeading,
+      name: chairpersonMessage.name,
+      position: chairpersonMessage.position,
+      imageAlt: chairpersonMessage.imageAlt,
+      body: chairpersonMessage.message,
+    },
+    overview: { heading: "開催概要", items: jaOverview.items },
+  },
+  en: {
+    hero: {
+      ordinalPrefix: "The ",
+      ordinalSuffix: "th",
+      ordinalSuffixGap: false,
+      university: "Tokyo City University",
+      committee: "Setagaya Festival Organizing Committee",
+      scrollIndicator: "( scroll down )",
+    },
+    theme: {
+      label: "THEME",
+      heading: "Toward Moments That Exceed Expectations,\nLet's Move Forward Together",
+      description:
+        'The shared theme of the Tokyo City University festivals carries the spirit of cherishing the history and traditions that both campuses have built up, while continuing to take on new challenges beyond them.\n"Toward Moments That Exceed Expectations" expresses our determination to keep pursuing the festival\'s potential without settling for the present, so that we can deliver experiences that go beyond what visitors imagine. Rather than resting on past successes, we take on new challenges to create moments that only a festival can produce.\n"Let\'s Move Forward Together" means building the festival by cooperating across campuses and roles, widening our connections with many people. Together with fellow students, local residents and everyone who visits, we will create a festival that stays in everyone\'s heart.\nMay it be a special moment for everyone involved. We aim for a festival that embodies the unity and energy of Tokyo City University.',
+    },
+    message: {
+      label: "MESSAGE",
+      heading: "Message from the Chairperson",
+      // TODO(委員会確認): 氏名の読み・ローマ字表記が確定するまで漢字のまま出す
+      name: chairpersonMessage.name,
+      position:
+        "Chairperson, The 97th Tokyo City University Setagaya Festival Organizing Committee",
+      imageAlt: "Scenes from the Setagaya Festival",
+      body: `
+Thank you very much for visiting the 97th Tokyo City University Setagaya Festival. All of us on the organizing committee have been looking forward to today, when we can welcome you to the Setagaya Campus.
+
+This year's theme is "Karakuri" (mechanical ingenuity). We wanted to express the beauty and harmony of diverse personalities fitting together with precision to set something large in motion.
+
+We are grateful that the number of participating groups and food stalls has grown this year. To let you enjoy the entire Setagaya Campus as a stage, we have decorated every corner of it. From lively stages to distinctive food stalls, each project links up across the campus like the intricate mechanism of a "karakuri" and resonates pleasantly together. Please feel for yourself the many creative projects that students have prepared with such passion for this day.
+
+We would also like to take this opportunity to express our deepest thanks to the local residents for their kind understanding, to our corporate sponsors for their generous support, and to everyone at the university who made this festival possible.
+
+May today, when every wish sets out in motion like a "karakuri", be an unforgettable day full of surprise and delight for you. Please enjoy the 97th Tokyo City University Setagaya Festival to the very end.
+      `.trim(),
+    },
+    overview: {
+      heading: "Event Overview",
+      items: [
+        { label: "Name", value: "The 97th Tokyo City University Setagaya Festival" },
+        {
+          label: "Shared theme\nCampus theme",
+          value:
+            '"Toward Moments That Exceed Expectations, Let\'s Move Forward Together"\n"Karakuri"',
+        },
+        { label: "Dates", value: "Saturday, October 31, 2026\nSunday, November 1, 2026" },
+        {
+          label: "Venue",
+          value:
+            "Tokyo City University Setagaya Campus\n1-28-1 Tamatsutsumi, Setagaya-ku, Tokyo 158-8557",
+        },
+        {
+          label: "Organizers and supporters",
+          value:
+            "Organizers: Tokyo City University Festival Steering Committee, The 97th Tokyo City University Setagaya Festival Organizing Committee\nSupporters: Tokyo City University, Tokyo City University Supporters' Association",
+        },
+        {
+          label: "Official social media",
+          value:
+            "Website: setagayafes.org\nX (Twitter): @setagayafes_tcu\nInstagram: @setagayafes_sfa",
+        },
+        {
+          label: "Contact",
+          value:
+            "The 97th Tokyo City University Setagaya Festival Organizing Committee\n1-28-1 Tamatsutsumi, Setagaya-ku, Tokyo 158-8557\nOrganizing Committee Office, Tokyo City University Setagaya Festival\nTel: 03-3703-8423 (direct)\nE-mail: sfa@setagayafes.org",
+        },
+      ],
+    },
+  },
+  zh: {
+    hero: {
+      ordinalPrefix: "第",
+      ordinalSuffix: "届",
+      ordinalSuffixGap: true,
+      university: "东京都市大学",
+      committee: "世田谷祭执行委员会",
+      scrollIndicator: "( scroll down )",
+    },
+    theme: {
+      label: "THEME",
+      heading: "迈向超越期待的瞬间，\n携手前行",
+      description:
+        "东京都市大学校园文化节的共同主题，承载着珍视两个校区一路积累的历史与传统，并继续挑战更远处的心愿。\n“迈向超越期待的瞬间”，体现了我们不满足于现状、不断探索校园文化节可能性的决心，以便为来访者带来超出想象的感动与体验。我们不会停留在过去的成功上，而是不断迎接新的挑战，创造只有校园文化节才能诞生的特别瞬间。\n“携手前行”，则意味着跨越校区与立场彼此协作，拓展与更多人的联系，共同打造这场校园文化节。与同学们、当地居民以及前来参观的各位一起，创造一场让所有人都难以忘怀的校园文化节。\n愿它成为每一位参与者的特别时刻。我们致力于举办一场体现东京都市大学凝聚力与热情的校园文化节。",
+    },
+    message: {
+      label: "MESSAGE",
+      heading: "执行委员长致辞",
+      // TODO(委员会确认): 姓名的读音和表记确定前，保持汉字原样
+      name: chairpersonMessage.name,
+      position: "第97届东京都市大学世田谷祭执行委员会 执行委员长",
+      imageAlt: "世田谷祭现场",
+      body: `
+衷心感谢您光临第97届东京都市大学世田谷祭。全体执行委员都在期待着今天，能在世田谷校区迎接各位的到来。
+
+今年世田谷祭的主题是“机关（からくり）”。我们希望表现出多样的个性精密地组合在一起、共同推动一件大事的那种美感与和谐。
+
+今年很荣幸，参与团体与摊位的数量有所增加。为了让大家能把整个世田谷校区当作舞台尽情游玩，我们在校园的每个角落都做了丰富的装饰。从热闹的舞台到各处个性十足的摊位，每一项企划都像“机关”的精巧装置一样在校内各处相互连动、愉快地共鸣。请您务必亲身感受学生们为这一天倾注热情、充满巧思的各种企划。
+
+此外，在本次文化节的举办过程中，我们也借此机会，向平日里给予温暖理解的当地居民、提供大力支持的赞助企业，以及支持文化节举办的学校相关人士，致以衷心的感谢。
+
+愿所有心意都像“机关”一样运转起来的今天，成为让各位充满惊喜与感动、难以忘怀的一天。请您尽情享受第97届东京都市大学世田谷祭，直到最后。
+      `.trim(),
+    },
+    overview: {
+      heading: "举办概要",
+      items: [
+        { label: "名称", value: "第97届东京都市大学世田谷祭" },
+        {
+          label: "共同主题\n校区主题",
+          value: "“迈向超越期待的瞬间，携手前行”\n“机关（からくり）”",
+        },
+        { label: "日期", value: "2026年10月31日（周六）\n2026年11月1日（周日）" },
+        {
+          label: "会场",
+          value: "东京都市大学 世田谷校区\n〒158-8557 东京都世田谷区玉堤1-28-1",
+        },
+        {
+          label: "主办·支持",
+          value:
+            "主办：东京都市大学 校园文化节运营委员会、第97届东京都市大学世田谷祭执行委员会\n支持：东京都市大学、东京都市大学 后援会",
+        },
+        {
+          label: "官方社交媒体",
+          value:
+            "Website：setagayafes.org\nX (Twitter)：@setagayafes_tcu\nInstagram：@setagayafes_sfa",
+        },
+        {
+          label: "联系方式",
+          value:
+            "东京都市大学世田谷祭执行委员会\n〒158-8557 东京都世田谷区玉堤1-28-1\n东京都市大学世田谷祭执行委员会室\n电话：03-3703-8423（直拨）\n电子邮件：sfa@setagayafes.org",
+        },
+      ],
+    },
+  },
+  ko: {
+    hero: {
+      ordinalPrefix: "제",
+      ordinalSuffix: "회",
+      ordinalSuffixGap: true,
+      university: "도쿄도시대학",
+      committee: "세타가야사이 실행위원회",
+      scrollIndicator: "( scroll down )",
+    },
+    theme: {
+      label: "THEME",
+      heading: "기대를 뛰어넘는 순간을 향해,\n함께 나아갑시다",
+      description:
+        "도쿄도시대학 학원제 공통 테마에는 두 캠퍼스가 쌓아 온 역사와 전통을 소중히 이어 가면서, 그 너머로 계속 도전하겠다는 마음이 담겨 있습니다.\n‘기대를 뛰어넘는 순간을 향해’에는 방문하시는 분들의 상상을 뛰어넘는 감동과 경험을 전하기 위해, 현재에 만족하지 않고 학원제의 가능성을 계속 추구하겠다는 결의가 있습니다. 지금까지의 성공에 머무르지 않고 새로운 도전을 거듭하여, 학원제이기에 만들어 낼 수 있는 특별한 순간을 목표로 합니다.\n또한 ‘함께 나아갑시다’에는 캠퍼스와 입장을 넘어 서로 협력하고 더 많은 사람과의 인연을 넓히며 학원제를 만들어 간다는 뜻이 있습니다. 학생들은 물론 지역 주민과 방문해 주시는 분들과 함께, 모두의 마음에 남는 학원제를 만들겠습니다.\n관련된 모든 분에게 특별한 순간이 되도록. 도쿄도시대학의 결속과 열기를 구현하는 학원제를 지향합니다.",
+    },
+    message: {
+      label: "MESSAGE",
+      heading: "실행위원장 인사말",
+      // TODO(위원회 확인): 이름의 읽기와 표기가 확정될 때까지 한자 그대로 표시
+      name: chairpersonMessage.name,
+      position: "제97회 도쿄도시대학 세타가야사이 실행위원회 실행위원장",
+      imageAlt: "세타가야사이 현장",
+      body: `
+제97회 도쿄도시대학 세타가야사이에 방문해 주셔서 진심으로 감사드립니다. 실행위원 일동은 오늘 이곳 세타가야 캠퍼스에서 여러분을 맞이할 수 있기를 손꼽아 기다려 왔습니다.
+
+올해 세타가야사이의 테마는 ‘카라쿠리(からくり)’입니다. 다양한 개성이 정교하게 맞물려 하나의 큰 것을 움직여 가는, 그런 아름다움과 조화를 표현하고 싶다는 마음을 담았습니다.
+
+올해는 감사하게도 참가 단체와 노점의 수가 늘어, 세타가야 캠퍼스 전체를 무대로 즐기실 수 있도록 캠퍼스 구석구석을 다채롭게 장식했습니다. 활기찬 무대부터 곳곳의 개성 넘치는 노점까지, 하나하나의 기획이 마치 ‘카라쿠리’의 정교한 장치처럼 교내 곳곳에서 이어지며 기분 좋게 어우러지고 있습니다. 이날을 위해 학생들이 열정을 쏟아 준비한 아이디어 가득한 기획들을 꼭 직접 느껴 보시기 바랍니다.
+
+또한 이번 학원제를 개최하면서 평소 따뜻하게 이해해 주시는 지역 주민 여러분, 크나큰 후원을 해 주신 협찬 기업 여러분, 그리고 개최를 뒷받침해 주신 대학 관계자 여러분께 이 자리를 빌려 깊이 감사드립니다.
+
+모든 마음이 ‘카라쿠리’처럼 움직이기 시작하는 오늘이, 여러분께 놀라움과 감동으로 가득한 잊지 못할 하루가 되기를 바랍니다. 부디 끝까지 제97회 도쿄도시대학 세타가야사이를 마음껏 즐겨 주세요.
+      `.trim(),
+    },
+    overview: {
+      heading: "개최 개요",
+      items: [
+        { label: "명칭", value: "제97회 도쿄도시대학 세타가야사이" },
+        {
+          label: "공통 테마\n캠퍼스 테마",
+          value: "‘기대를 뛰어넘는 순간을 향해, 함께 나아갑시다’\n‘카라쿠리(からくり)’",
+        },
+        { label: "일시", value: "2026년 10월 31일(토)\n2026년 11월 1일(일)" },
+        {
+          label: "장소",
+          value: "도쿄도시대학 세타가야 캠퍼스\n〒158-8557 도쿄도 세타가야구 다마쓰쓰미 1-28-1",
+        },
+        {
+          label: "주최·후원",
+          value:
+            "주최: 도쿄도시대학 학원제 운영위원회, 제97회 도쿄도시대학 세타가야사이 실행위원회\n후원: 도쿄도시대학, 도쿄도시대학 후원회",
+        },
+        {
+          label: "공식 SNS",
+          value:
+            "Website: setagayafes.org\nX (Twitter): @setagayafes_tcu\nInstagram: @setagayafes_sfa",
+        },
+        {
+          label: "문의처",
+          value:
+            "제97회 도쿄도시대학 세타가야사이 실행위원회\n〒158-8557 도쿄도 세타가야구 다마쓰쓰미 1-28-1\n도쿄도시대학 세타가야사이 실행위원회실\n전화: 03-3703-8423(직통)\n이메일: sfa@setagayafes.org",
+        },
+      ],
+    },
+  },
+} as const satisfies Record<Locale, AboutPageContent>;

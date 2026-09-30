@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { gsap } from "gsap";
-import { aboutConfig } from "@/data/about";
+import type { AboutPageContent } from "@/data/about";
 import { OPENER_FAILSAFE_MS, shouldWaitForOpener } from "@/lib/motion";
 
 const Grainient = dynamic(() => import("@/components/ui/Grainient"), {
@@ -21,8 +21,9 @@ const Grainient = dynamic(() => import("@/components/ui/Grainient"), {
  * - 上下マスクがGSAPで分離するアニメーション
  * - 右下にページタイトル + スクロールインジケーター
  */
-export function AboutHero() {
-  const { university, scrollIndicator } = aboutConfig.hero;
+export function AboutHero({ content }: { content: AboutPageContent["hero"] }) {
+  const { ordinalPrefix, ordinalSuffix, ordinalSuffixGap, university, committee, scrollIndicator } =
+    content;
 
   const sectionRef = useRef<HTMLElement>(null);
   const upperMaskRef = useRef<HTMLDivElement>(null);
@@ -174,7 +175,7 @@ export function AboutHero() {
       <div className="absolute bottom-20 right-6 z-20 text-right sm:bottom-16 sm:right-8 lg:bottom-20 lg:right-12">
         <h1 ref={titleRef} className="leading-tight" style={{ fontFamily: "var(--font-sans)" }}>
           <span className="block text-2xl font-semibold tracking-[0.08em] text-gray-900 sm:text-3xl lg:text-4xl">
-            第
+            {ordinalPrefix}
             {/*
               地色は gray-50（実配信 #f5f5f5）。60px/700 は大テキスト扱いで要求 3:1。
 
@@ -209,7 +210,7 @@ export function AboutHero() {
             >
               97
             </span>
-            <span className="ml-1 sm:ml-2">回</span>
+            <span className={ordinalSuffixGap ? "ml-1 sm:ml-2" : undefined}>{ordinalSuffix}</span>
           </span>
           {/*
             正式名は「第97回東京都市大学世田谷祭実行委員会」。大学名を見出しの外へ出すと
@@ -219,7 +220,7 @@ export function AboutHero() {
             {university}
           </span>
           <span className="block text-2xl font-semibold tracking-[0.08em] text-gray-900 sm:text-3xl lg:text-4xl">
-            世田谷祭実行委員会
+            {committee}
           </span>
         </h1>
       </div>
