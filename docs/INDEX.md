@@ -94,7 +94,7 @@
   - **配信される紫は `#bf73e3`**（仕様 HEX `#CD79EE` ではない）。コントラストは実配信値で測る
   - **Tailwind 既定パレットを直接使わない。** `@theme` に無い色名はエラーも警告も出ずに既定値へ落ちる
 - **[typography.md](./frontend/typography.md)** - Kaisei Opti の読み込みと使い分け、文字サイズと行送り（Tailwind の既定値）
-  - **Kaisei Opti の適用範囲は規約と実装が食い違っている（未解決）。** 規約は 32px 以上、実装は `h1`〜`h3` 全てに当てる
+  - **Kaisei Opti は要素で決まる（`h1`〜`h3` はサイズを問わず）。** sans にしたい見出しは `font-sans` を明示する（2026-09-30 に規約を実装へ揃えた）
 - **[access-page-design.md](./frontend/access-page-design.md)** - Access ページの情報設計・地図・経路・フォーカス表示・モーション方針
 - **[special-ticket-cta.md](./frontend/special-ticket-cta.md)** - 著名人企画 LP のモバイルチケット導線（固定 CTA・退避条件・320px の検証契約）
 - **[image-delivery.md](./frontend/image-delivery.md)** - 画像配信の経路（microCMS は imgix、`public/` は事前 AVIF）
