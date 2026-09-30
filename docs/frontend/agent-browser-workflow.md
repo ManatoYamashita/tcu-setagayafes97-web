@@ -1,356 +1,188 @@
 # agent-browser ワークフロー
 
-本ドキュメントでは、**agent-browser** を使用したデザイン再現・デバッグ・テストの標準フローを定義します。
-
----
-
-## 概要
-
-agent-browser は、参考サイトとローカル実装を **数値的・視覚的に比較** するための強力なツールです。このワークフローに従うことで、デザイン再現の品質を担保し、属人的な判断を排除できます。
-
-**主要なユースケース:**
-
-1. 参考サイトのレイアウト・スタイルの精密分析
-2. ローカル実装との数値比較（Header高さ、z-index階層、viewport占有率）
-3. レスポンシブデザインのクロスブラウザ・クロスviewportテスト
-4. Layout Shift・z-index競合などのデバッグ
-
----
+**agent-browser** でレイアウトを数値で測り、参考サイトやローカル実装と比べるための手順。
+コマンドと測定値はすべて agent-browser 0.38.1 で 2026-09-30 に本番（`https://setagayafes.org/`）で実行して確かめた。
 
 > [!IMPORTANT]
-> **測る前に [browser-observation-limits.md](./browser-observation-limits.md) を読んでください。**
-> 実行環境は一定ではありません。`framesIn1s` を測らずに得た観測値は報告できません。
->
-> 検証がうまくいかないときは [browser-verification-pitfalls.md](./browser-verification-pitfalls.md) も確認してください。
-> `resize_window` が viewport を変えない、`grep` の正規表現、`.next` のキャッシュなど、
-> **手順そのものが誤診を生む実例**をまとめています。
+> **測る前に [browser-observation-limits.md](./browser-observation-limits.md) を読むこと。**
+> 実行環境は一定ではなく、`framesIn1s` を測らずに得た観測値は報告できない。
+> うまくいかないときは [browser-verification-pitfalls.md](./browser-verification-pitfalls.md)
+> （viewport の変え方・ハイドレーション前の読み取り・`.next` のキャッシュなど、**手順そのものが誤診を生む実例**）。
 
----
+## 前提 — `eval` が返すのは最後の式の値だけ
 
-## デザイン再現 3ステップ
+**`agent-browser eval` の出力は、評価した最後の式の値である。`console.log()` の中身は返らない**
+（`console.log()` 自体の値は `undefined` なので `null` と表示される）。ログを見るには別途
+`agent-browser console` を叩く必要があり、どの `eval` の出力かも混ざる。
 
-### Step 1: 参考サイト分析（Analyze）
+**測定スニペットは `JSON.stringify(...)` を最後の式にして値を返す。** 以前この文書に載っていた
+スニペットは `console.log` / `console.table` で出力していたため、そのまま実行すると `null` しか表示されなかった。
+待機が要るときは非同期 IIFE で包んで `return` する（トップレベル `await` は受け付けない）。
 
-**目的:** 参考サイトのレイアウト構造を **数値で** 把握する
-
-**実施内容:**
-
-1. agent-browserで参考サイトにアクセス
-2. 主要要素（Header、Hero、Footer等）の高さ・位置を測定
-3. z-index階層を可視化
-4. viewport占有率を計算
-5. スクリーンショット取得（複数viewport）
-
-**例: Header高さ測定**
-
-```javascript
-// agent-browser eval コマンドで実行
-const header = document.querySelector("header");
-console.log("=== Header分析 ===");
-console.log("Header高さ:", header.offsetHeight, "px");
-console.log("position:", getComputedStyle(header).position);
-console.log("z-index:", getComputedStyle(header).zIndex);
-console.log("viewport占有率:", ((header.offsetHeight / window.innerHeight) * 100).toFixed(2), "%");
-```
-
-**例: Hero Section分析**
-
-```javascript
-const hero = document.querySelector("section"); // または適切なセレクタ
-console.log("=== Hero Section ===");
-console.log("Hero高さ:", hero.offsetHeight, "px");
-console.log("Hero top位置:", hero.offsetTop, "px");
-console.log("実効占有率:", ((hero.offsetHeight / window.innerHeight) * 100).toFixed(2), "%");
-```
-
-**スクリーンショット取得:**
+## 基本操作
 
 ```bash
-agent-browser set viewport 1920 1080 && agent-browser screenshot /tmp/reference-desktop.png
-agent-browser set viewport 768 1024  && agent-browser screenshot /tmp/reference-tablet.png
-agent-browser set viewport 375 667   && agent-browser screenshot /tmp/reference-mobile.png
+# 開く（Vercel のページは読み込み完了を待てずにタイムアウト表示が出ることがある。表示されていれば測れる）
+agent-browser open https://setagayafes.org/
+
+# 読み込み完了を待つ。URL も一緒に見ること（下の CAUTION）
+agent-browser eval 'location.href + " " + document.readyState'
+
+# 同じサイト内の遷移（open がタイムアウトする場合もこちらは通る）
+agent-browser eval "location.href='https://setagayafes.org/events'; 1"
+
+# モーションを止める（レイアウトを測る・撮るときは先に実行する。下の NOTE）
+agent-browser set media reduced-motion
+
+# viewport を変える（幅を変えられるのはこれだけ）
+agent-browser set viewport 375 667
+
+# スクリーンショット（幅は直前の set viewport で決まる）
+agent-browser screenshot /tmp/screenshot.png
+
+# ページの console 出力を見る
+agent-browser console
 ```
 
 > [!WARNING]
-> **`screenshot <path> --viewport WxH` と書いてはいけない。** agent-browser 0.38.1 には
-> `screenshot` の `--viewport` オプションが無く、**`--viewport` が出力先のファイル名として解釈される。**
-> viewport は変わらず、作業ディレクトリに `--viewport` という名前の PNG が残る（2026-09-30 実測）。
-> 幅は必ず `set viewport` で変える。詳細は [browser-verification-pitfalls.md](./browser-verification-pitfalls.md)。
+> **`screenshot <path> --viewport WxH` と書いてはいけない。** `--viewport` が出力先のファイル名として
+> 解釈され、viewport は変わらず、作業ディレクトリに `--viewport` という PNG が残る。
+> `open --viewport` と `window.resizeTo()` も効かない（[browser-verification-pitfalls.md](./browser-verification-pitfalls.md) の表）。
 
----
+> [!CAUTION]
+> **`readyState` だけで読み込み完了を判定しない。** `open` がタイムアウトするとページは `about:blank` のまま残り、
+> **`about:blank` の `readyState` も `"complete"` である。** そのまま測るとすべての要素が `null` になる
+> （2026-09-30、本文のスニペットを検証中に実際に踏んだ）。`location.href` が対象の URL になっていることも確かめる。
+> 開けないときは `eval "location.href='<URL>'; 1"` で遷移させる。
 
-### Step 2: ローカル実装（Implement）
+> [!CAUTION]
+> **`set viewport` は、対象のページを開いてから実行する。** 同じサイト内の遷移では幅が保たれたが、
+> `about:blank` で `set viewport` してから本番を開くと既定幅（1000×678）へ戻った（2026-09-30 実測）。
+> **測定値には必ず `innerWidth` を含める。** 幅が変わっていなくても、値だけ見れば正常に見える。
 
-**目的:** Step 1 で得た数値目標に基づいて実装
+## 測定スニペット
 
-**実施内容:**
+### Header と Hero の配置
 
-1. Header高さ、Hero配置、z-index階層を参考サイトに合わせる
-2. CSS変数やTailwindクラスで調整
-3. レスポンシブブレークポイントを考慮
-
-**重要な設計パターン:**
-
-- **Header/Hero統合:** `min-h-[calc(100vh-var(--header-height))]` でHeader高さを引いた実効100vhを実現
-- **z-index管理:** 標準スケール（10/20/30/40/60）に従う（詳細は `layout-patterns.md` 参照）
-- **レスポンシブ高さ:** `100vh` vs `100svh`（モバイルSafari対策）
-
----
-
-### Step 3: 比較検証（Verify）
-
-**目的:** 参考サイトとローカル実装の **数値的・視覚的一致** を確認
-
-**実施内容:**
-
-1. agent-browserでローカルサイト（`http://localhost:3000`）にアクセス
-2. Step 1 と同じ測定コマンドを実行
-3. 数値の差分を確認（許容誤差: ±2px程度）
-4. スクリーンショットを並列表示して視覚比較
-
-**例: ローカルサイト測定**
-
-```javascript
-const header = document.querySelector("header");
-const hero = document.querySelector("section");
-
-console.log("=== ローカル実装の検証 ===");
-console.log("Header高さ:", header.offsetHeight, "px"); // 目標: 107px（スクロール前。layout-patterns.md）
-console.log("Hero top位置:", hero.offsetTop, "px"); // 目標: Header高さと一致（Header直下）
-console.log("Hero高さ:", hero.offsetHeight, "px"); // 目標: 1016px（1080 - 64）
-console.log("実効占有率:", ((hero.offsetHeight / window.innerHeight) * 100).toFixed(2), "%"); // 目標: ~94%
-
-// ✅ チェック
-if (hero.offsetTop === header.offsetHeight) {
-  console.log("✅ HeroがHeader直下から開始しています");
-} else {
-  console.warn(
-    "⚠️ HeroがHeader直下から始まっていません（差分:",
-    hero.offsetTop - header.offsetHeight,
-    "px）"
-  );
-}
+```js
+(() => {
+  const header = document.querySelector("header");
+  const hero = document.querySelector("main section, section");
+  const style = getComputedStyle(header);
+  return JSON.stringify({
+    innerWidth,
+    innerHeight,
+    header: { height: header.offsetHeight, position: style.position, zIndex: style.zIndex },
+    hero: { top: hero.offsetTop, height: hero.offsetHeight },
+    heroStartsBelowHeader: hero.offsetTop === header.offsetHeight,
+  });
+})();
 ```
 
-**スクリーンショット並列比較:**
+2026-09-30 の本番トップページ:
+
+| viewport  | `header.height` | `hero.top` | `hero.height` | 内訳                           |
+| --------- | --------------- | ---------- | ------------- | ------------------------------ |
+| 1920×1080 | 107             | 107        | 992           | 1080 − 88（`--header-height`） |
+| 375×667   | 107             | 107        | 579           | 667 − 88                       |
+
+**Hero の高さは「viewport − 実際の Header 高さ」ではない。** Hero は
+`h-[calc(100svh-var(--header-height))]` で、`--header-height` は `5.5rem`（88px）の近似値である。
+Header の実高はスクロール前 107px / 後 77px で、一次情報は [layout-patterns.md](./layout-patterns.md) の表。
+
+### z-index の一覧
+
+```js
+JSON.stringify(
+  [...document.querySelectorAll("*")]
+    .map((el) => ({ el, style: getComputedStyle(el) }))
+    .filter(({ style }) => style.position !== "static" && style.zIndex !== "auto")
+    .map(({ el, style }) => ({
+      tag: el.tagName.toLowerCase(),
+      zIndex: Number(style.zIndex),
+      position: style.position,
+      label: (el.id || String(el.className)).slice(0, 40),
+    }))
+    .sort((a, b) => b.zIndex - a.zIndex)
+);
+```
+
+2026-09-30 の本番では、z-40 以上はスキップリンク（`a`、z-50、`fixed`）と Header（z-40、`sticky`）の2つ。
+**モーションを止めずにデスクトップ幅で開くと、オープナーの全画面レイヤー（`Opener.tsx`、`z-[51]`）も出る。**
+自動操作下では GSAP が始まらずに覆ったまま残ることがあるため、先に `set media reduced-motion` を実行する。
+**z-40 以上が Header だけとは限らない。** スキップリンク・下書きバナー・モバイルメニューが z-50、
+言語切替とナビのドロップダウンが z-60 を使っている。値の方針は [layout-patterns.md](./layout-patterns.md) の標準スケール。
+
+### Layout Shift（CLS）
+
+```js
+(async () => {
+  const shifts = await new Promise((resolve) => {
+    const entries = [];
+    new PerformanceObserver((list) => entries.push(...list.getEntries())).observe({
+      type: "layout-shift",
+      buffered: true,
+    });
+    setTimeout(() => resolve(entries), 1000);
+  });
+  const cls = shifts.filter((e) => !e.hadRecentInput).reduce((sum, e) => sum + e.value, 0);
+  return JSON.stringify({ innerWidth, cls: Number(cls.toFixed(4)), shifts: shifts.length });
+})();
+```
+
+`hadRecentInput` の付いたシフト（操作直後のもの）は CLS に数えない。本番トップの 1920×1080 で `cls: 0`。
+**読み込み直後に測ること。** 観測は `buffered: true` でそれまでの分も拾うが、ページを操作した後の値は意味が変わる。
+
+## デザイン再現の手順
+
+1. **参考サイトを測る** — 参考サイト（[.claude/CLAUDE.md](../../.claude/CLAUDE.md) のデザイン仕様）を開き、
+   `set viewport` で幅を決めてから上のスニペットを流し、スクリーンショットを撮る
+2. **実装する** — 高さ・z-index の方針は [layout-patterns.md](./layout-patterns.md) に従う
+3. **同じ幅で同じスニペットを流して比べる** — 差分は数値で見る。スクリーンショットは並べて目視する
 
 ```bash
-# 参考サイトとローカルのスクリーンショットを並べて表示
-open /tmp/reference-desktop.png /tmp/localhost-desktop.png
+# スニペットをファイルに置いてから流す（ファイル名は任意。リポジトリには置いていない）
+agent-browser set viewport 1920 1080
+agent-browser eval "$(cat /tmp/measure-layout.js)"
+agent-browser screenshot /tmp/reference.png
 ```
 
----
+## レスポンシブ検証
 
-## 数値測定手法とコマンド集
+| デバイス | viewport  | 用途                      |
+| -------- | --------- | ------------------------- |
+| Mobile   | 375×667   | iPhone SE / 8 相当        |
+| Tablet   | 768×1024  | iPad 相当                 |
+| Desktop  | 1920×1080 | 一般的な FHD ディスプレイ |
 
-### Header高さ測定
-
-```javascript
-const header = document.querySelector("header");
-console.log("Header高さ:", header.offsetHeight, "px");
-console.log("viewport占有率:", ((header.offsetHeight / window.innerHeight) * 100).toFixed(2), "%");
-```
-
-### Hero Section配置確認
-
-```javascript
-const hero = document.querySelector("section"); // または適切なセレクタ
-console.log("Hero top位置:", hero.offsetTop, "px"); // Header直下なら header.offsetHeight と一致
-console.log("Hero高さ:", hero.offsetHeight, "px");
-console.log("Hero bottom位置:", hero.offsetTop + hero.offsetHeight, "px");
-```
-
-### z-index階層可視化
-
-```javascript
-// positioned要素（position: static以外）のz-index一覧
-Array.from(document.querySelectorAll("*"))
-  .filter((el) => {
-    const style = getComputedStyle(el);
-    return style.position !== "static" && style.zIndex !== "auto";
-  })
-  .map((el) => ({
-    tag: el.tagName,
-    class: el.className.slice(0, 50),
-    zIndex: parseInt(getComputedStyle(el).zIndex),
-    position: getComputedStyle(el).position,
-  }))
-  .sort((a, b) => b.zIndex - a.zIndex)
-  .forEach((item) => console.table([item]));
-```
-
-### z-index競合の強調表示
-
-```javascript
-// z-50以上の要素を赤枠で強調（Header以外に存在すべきでない）
-document.querySelectorAll("*").forEach((el) => {
-  const zIndex = parseInt(getComputedStyle(el).zIndex);
-  if (zIndex >= 50) {
-    el.style.outline = "3px solid red";
-    console.warn("⚠️ z-50以上の要素を検出:", el.tagName, el.className);
-  }
-});
-```
-
-### viewport占有率計算
-
-```javascript
-const element = document.querySelector("selector");
-console.log("占有率:", ((element.offsetHeight / window.innerHeight) * 100).toFixed(2), "%");
-```
-
----
-
-## レスポンシブテスト標準手順
-
-### テスト対象viewport
-
-| デバイス | viewport  | 用途                    |
-| -------- | --------- | ----------------------- |
-| Mobile   | 375×667   | iPhone SE / 8 相当      |
-| Tablet   | 768×1024  | iPad 相当               |
-| Desktop  | 1920×1080 | 一般的なFHDディスプレイ |
-
-### 各viewportでの確認項目
-
-**共通チェック項目:**
-
-- [ ] Header高さが適切（スクロール前 107px / スクロール後 77px。一次情報は [layout-patterns.md](./layout-patterns.md) の表）
-- [ ] Hero top位置 === Header高さ（Header直下配置）
-- [ ] Hero実効高さ === viewport高さ - Header高さ
-- [ ] z-index階層が正しい（Header: z-40、Hero内最上位: z-30以下）
-- [ ] Layout Shiftが発生しない（CLS < 0.1）
-
-**viewport別の測定とスクリーンショット:**
-
-viewport はページ内の JS からは変えられない（`window.resizeTo()` は効かない）。
-**幅ごとに `set viewport` で切り替えてから測る。** 以前ここにあった「配列を回して3回ログを出す」JS は
-viewport を一度も変えておらず、同じ値に3つのラベルを付けていただけだった。
+対応下限の 320px は Layout E2E が測っている（[layout-e2e.md](./layout-e2e.md)）。
 
 ```bash
 # read で分けるのは zsh でも動かすため（zsh は引用符の無い変数を単語分割しない）
 for vp in "375 667 mobile" "768 1024 tablet" "1920 1080 desktop"; do
   read -r w h name <<< "$vp"
   agent-browser set viewport "$w" "$h"
-  agent-browser eval 'JSON.stringify({
-    innerWidth,
-    header: document.querySelector("header").offsetHeight,
-    heroTop: document.querySelector("section").offsetTop,
-  })'
+  agent-browser eval "$(cat /tmp/measure-layout.js)"
   agent-browser screenshot "/tmp/localhost-$name.png"
 done
 ```
 
-**測った値に `innerWidth` を必ず含める。** 幅が変わっていないまま3回測っても、値だけ見れば正常に見える。
+各幅で確かめること:
 
----
+- `innerWidth` が指定した幅になっている（なっていなければ以降の値は無意味）
+- `heroStartsBelowHeader` が `true`
+- `hero.height` が `innerHeight − 88`
+- 横スクロールが出ていない（`document.documentElement.scrollWidth <= innerWidth`）
 
-## デバッグワークフロー
+## 関連ドキュメント
 
-### Layout Shift検出
-
-**問題:** Header/Hero境界でのガタつき、スクロール時のズレ
-
-**検出方法:**
-
-```javascript
-// CLS (Cumulative Layout Shift) 測定
-new PerformanceObserver((list) => {
-  for (const entry of list.getEntries()) {
-    if (entry.value > 0.1) {
-      console.warn("⚠️ Layout Shift検出:", entry.value, entry);
-    } else {
-      console.log("✅ Layout Shift良好:", entry.value);
-    }
-  }
-}).observe({ type: "layout-shift", buffered: true });
-```
-
-**対策例:**
-
-- Header高さを固定（CSS変数化）
-- `min-h-[calc(100vh-var(--header-height))]` でHero高さを動的計算
-- `pt-16`（または適切なpadding）でHeader高さ分を確保
-
-### z-index競合確認
-
-**問題:** Header要素とHero内要素が同じz-indexで競合、HTML順序に依存した不安定な重なり
-
-**検出方法:**
-
-```javascript
-// z-40以上の要素を抽出（Header以外に存在すべきでない）
-const highZIndexElements = Array.from(document.querySelectorAll("*")).filter((el) => {
-  const style = getComputedStyle(el);
-  return style.position !== "static" && parseInt(style.zIndex) >= 40;
-});
-
-console.log("z-40以上の要素数:", highZIndexElements.length);
-highZIndexElements.forEach((el) => {
-  console.log(el.tagName, el.className, "z-index:", getComputedStyle(el).zIndex);
-});
-
-// ✅ 期待値: Headerのみ（1要素）
-// ❌ 問題: 複数要素が存在
-```
-
-**対策例:**
-
-- `layout-patterns.md` の標準スケールに従う
-- アドホックな値（`z-[45]`等）を排除
-- Header: `z-40`、Hero内最上位: `z-30`、Hero内ベース: `z-20/10`
-
----
-
-## よく使うagent-browserコマンド
-
-### 基本操作
-
-```bash
-# ページにアクセス
-agent-browser goto https://example.com
-
-# JavaScriptコードを実行
-agent-browser eval "console.log('Hello, World!')"
-
-# viewport変更（以降の open でも保たれる）
-agent-browser set viewport 375 667
-
-# スクリーンショット取得（幅は直前の set viewport で決まる）
-agent-browser screenshot /tmp/screenshot.png
-```
-
-### 複合コマンド例
-
-```bash
-# 参考サイト分析 → スクリーンショット取得 → ローカル比較
-agent-browser set viewport 1920 1080
-agent-browser goto https://sumitomoexpo.com/
-agent-browser eval "$(cat measure-header.js)"  # 測定スクリプトファイル
-agent-browser screenshot /tmp/reference.png
-
-agent-browser goto http://localhost:3000
-agent-browser eval "$(cat measure-header.js)"
-agent-browser screenshot /tmp/localhost.png
-```
-
----
-
-## まとめ
-
-本ワークフローに従うことで:
-
-- ✅ **デザイン再現の品質担保**: 参考サイトとの数値的一致を確認
-- ✅ **属人的判断の排除**: 測定コマンドによる客観的評価
-- ✅ **デバッグ効率向上**: Layout Shift、z-index競合の早期発見
-- ✅ **レスポンシブテストの標準化**: 3 viewportsでの一貫した検証
-
-**関連ドキュメント:**
-
-- [layout-patterns.md](./layout-patterns.md) - Header/Hero統合パターン、z-index管理
-- [../dev/microcms.md](../dev/microcms.md) - 管理画面が自動操作に適さない理由、カスタムフィールドの制約
+- [browser-observation-limits.md](./browser-observation-limits.md) - 観測の前提と限界
+- [browser-verification-pitfalls.md](./browser-verification-pitfalls.md) - 検証手順そのものが誤る実例
+- [layout-patterns.md](./layout-patterns.md) - Header / Hero の寸法、z-index の標準スケール
+- [../dev/microcms.md](../dev/microcms.md) - 管理画面が自動操作に適さない理由
 
 ---
 
 **作成日:** 2026-02-07
-**最終更新:** 2026-08-16
+**最終更新:** 2026-09-30（実測に合わせて全面改訂。`console.log` では値が返らないスニペット、古い寸法、
+存在しない `measure-header.js` を除いた）
