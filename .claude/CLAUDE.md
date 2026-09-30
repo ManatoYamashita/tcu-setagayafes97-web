@@ -45,7 +45,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### 命名・配置ガイド
 
 - ファイル名は `kebab-case.md`、目的が明確な名前
-- 1ファイルが 300 行超 or 技術領域が分岐 → 分割/ディレクトリ化
+- 1ファイルが 300 行超 or 技術領域が分岐 → 分割/ディレクトリ化（行数は `pnpm check:doc-lines` が追跡 `.md` 全部に検査する。既存の超過は上限つきで記録してあり、**伸ばすと CI で落ちる**。本ファイルも対象）
 - 機密情報（PII等）は `docs/` に保存しない
 - ドキュメントコミットは `DOC:` プレフィックス
 
@@ -89,6 +89,9 @@ pnpm format
 
 # ドキュメントの相対リンク切れ検査（追跡 .md のみを対象にする。設計は scripts/assert-doc-links.mjs 冒頭）
 pnpm check:doc-links
+
+# 追跡 .md が300行以下かの検査（既存の超過は上限つきで記録。設計は scripts/assert-doc-line-budget.mjs 冒頭）
+pnpm check:doc-lines
 
 # 禁止色ユーティリティが Tailwind の走査範囲に無いことの検査（コメントも見る。設計は scripts/assert-no-restricted-colors.mjs 冒頭）
 pnpm check:colors
@@ -139,7 +142,7 @@ refactor/<refactor-target> # リファクタリング
 push 時は head をそのまま、PR 時は head を base へマージした結果を検証する。**両方走る場合、それは重複ではなく別種の検証である。**
 
 `Static Checks` は **`pnpm install` だけで完結する検査**（lint / format / 型 / ユニットテスト /
-ドキュメントの相対リンク / 禁止色ユーティリティ）を束ねたジョブである。
+ドキュメントの相対リンク・行数 / 禁止色ユーティリティ）を束ねたジョブである。
 **禁止色の検査が `Static Checks` にあるのは、ESLint がコメントを見ないからである**
 （Tailwind のソース走査はコメントも読むため、そこが死角になっていた。#230）。
 **リンク検査が見るのは相対リンクだけで、`#anchor` の存在と外部URLの到達性は射程外である**
