@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
-import { Download, FileText, AlertCircle } from "lucide-react";
+import { Download } from "lucide-react";
+import Link from "next/link";
+import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
+import { FactList } from "@/components/ui/FactList";
+import { pageHeroes } from "@/data/page-heroes";
 import { createPageMetadata } from "@/lib/metadata";
+
 /**
  * メタデータ
  */
@@ -28,146 +33,87 @@ const pamphlets = [
   },
 ];
 
+const notes = [
+  "パンフレットはPDF形式で提供しています。",
+  "印刷してご来場いただくと便利です。",
+  "紙のパンフレットは当日、各案内所にて配布しています。",
+  "内容は予告なく変更される場合があります。最新情報は当サイトでご確認ください。",
+];
+
+/** 文中のリンク。色ではなく下線で示し、ホバーは hoverable でゲートする（docs/frontend/design.md） */
+const linkClassName =
+  "font-semibold text-gray-900 underline decoration-gray-400 underline-offset-4 hoverable:hover:text-primary-700 hoverable:hover:decoration-primary-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600";
+
 /**
  * パンフレットダウンロードページ
+ *
+ * `<main id="content">` は PageSheetLayout が出す。
  */
 export default function PamphletPage() {
+  // 準備中の案内は、公開前のパンフレットが1つでも残っている間だけ出す
+  const hasPending = pamphlets.some((pamphlet) => !pamphlet.isAvailable);
+
   return (
-    <main
-      id="content"
-      tabIndex={-1}
-      className="min-h-screen bg-secondary focus-visible:outline-none"
-    >
-      {/* ページヘッダー */}
-      <div className="bg-secondary py-16 text-gray-900">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center gap-3">
-            <FileText className="h-10 w-10 md:h-12 md:w-12" />
-            <h1 className="text-4xl font-bold md:text-5xl">パンフレット</h1>
-          </div>
-          <p className="mt-4 text-center text-lg opacity-90">
-            第97回東京都市大学世田谷祭の公式パンフレットをダウンロード
-          </p>
-        </div>
-      </div>
+    <PageSheetLayout hero={pageHeroes.pamphlet}>
+      <div className="mx-auto max-w-3xl space-y-14 sm:space-y-16">
+        {hasPending && (
+          <section aria-labelledby="pamphlet-pending-heading">
+            <h2 id="pamphlet-pending-heading" className="mb-3 text-2xl font-bold text-gray-900">
+              パンフレット準備中
+            </h2>
+            <p className="leading-8 text-gray-700">
+              現在、パンフレットを準備中です。公開まで今しばらくお待ちください。
+              <br />
+              最新情報は
+              <Link href="/info" className={linkClassName}>
+                お知らせ
+              </Link>
+              でご確認いただけます。
+            </p>
+          </section>
+        )}
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="mx-auto max-w-4xl">
-          {/* 準備中のお知らせ */}
-          <div className="mb-8 rounded-lg border border-blue-200 bg-blue-50 p-6">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
-              <div>
-                <p className="font-semibold text-blue-900">パンフレット準備中</p>
-                <p className="mt-1 text-sm text-blue-700">
-                  現在、パンフレットを準備中です。公開まで今しばらくお待ちください。
-                  <br />
-                  最新情報は
-                  <a href="/info" className="underline hover:text-blue-900">
-                    お知らせ
-                  </a>
-                  でご確認いただけます。
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* パンフレット一覧 */}
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-1">
-            {pamphlets.map((pamphlet) => (
-              <article
-                key={pamphlet.id}
-                className="overflow-hidden rounded-lg border border-gray-200/20 bg-white/10 shadow-sm"
+        {pamphlets.map((pamphlet) => (
+          <section key={pamphlet.id} aria-labelledby={`pamphlet-${pamphlet.id}-heading`}>
+            <h2
+              id={`pamphlet-${pamphlet.id}-heading`}
+              className="mb-3 text-2xl font-bold text-gray-900"
+            >
+              {pamphlet.title}
+            </h2>
+            <p className="mb-6 leading-8 text-gray-700">{pamphlet.description}</p>
+            <FactList
+              items={[
+                { label: "ページ数", value: `${pamphlet.pages}ページ` },
+                { label: "ファイルサイズ", value: pamphlet.fileSize },
+                // 公開前は操作できるものが無いので、ボタンではなく状態として示す
+                ...(pamphlet.isAvailable ? [] : [{ label: "ダウンロード", value: "準備中" }]),
+              ]}
+            />
+            {pamphlet.isAvailable && (
+              <a
+                href={pamphlet.fileUrl}
+                download
+                className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-lg bg-primary-600 px-6 py-3 font-semibold text-white hoverable:hover:bg-primary-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
               >
-                <div className="lg:flex">
-                  {/* 表紙画像 */}
-                  <div className="relative aspect-[3/4] lg:w-64 lg:flex-shrink-0">
-                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary to-primary-600">
-                      <div className="text-center text-gray-900">
-                        <FileText className="mx-auto mb-2 h-16 w-16 opacity-50" />
-                        <p className="text-sm font-semibold">表紙画像準備中</p>
-                      </div>
-                    </div>
-                    {/* 準備中バッジ */}
-                    {!pamphlet.isAvailable && (
-                      <div className="absolute right-2 top-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold text-gray-900">
-                        準備中
-                      </div>
-                    )}
-                  </div>
+                <Download aria-hidden="true" className="h-5 w-5" />
+                <span>PDFをダウンロード</span>
+              </a>
+            )}
+          </section>
+        ))}
 
-                  {/* パンフレット情報 */}
-                  <div className="flex flex-1 flex-col justify-between p-6">
-                    <div>
-                      <h2 className="mb-3 text-2xl font-bold text-gray-900">{pamphlet.title}</h2>
-                      <p className="mb-4 text-gray-900/90">{pamphlet.description}</p>
-
-                      {/* メタ情報 */}
-                      <dl className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <dt className="font-semibold text-gray-900/60">ページ数</dt>
-                          <dd className="text-gray-900">{pamphlet.pages}ページ</dd>
-                        </div>
-                        <div>
-                          <dt className="font-semibold text-gray-900/60">ファイルサイズ</dt>
-                          <dd className="text-gray-900">{pamphlet.fileSize}</dd>
-                        </div>
-                      </dl>
-                    </div>
-
-                    {/* ダウンロードボタン */}
-                    <div className="mt-6">
-                      {pamphlet.isAvailable ? (
-                        <a
-                          href={pamphlet.fileUrl}
-                          download
-                          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-semibold text-primary-600 transition-[color,background-color,border-color,box-shadow] hover:bg-white/90 hover:shadow-lg md:w-auto"
-                        >
-                          <Download className="h-5 w-5" />
-                          <span>PDFをダウンロード</span>
-                        </a>
-                      ) : (
-                        <button
-                          disabled
-                          className="inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-white/15 px-6 py-3 font-semibold text-gray-900/60 md:w-auto"
-                        >
-                          <Download className="h-5 w-5" />
-                          <span>準備中</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </article>
+        <section aria-labelledby="pamphlet-about-heading">
+          <h2 id="pamphlet-about-heading" className="mb-5 text-2xl font-bold text-gray-900">
+            パンフレットについて
+          </h2>
+          <ul className="list-disc space-y-1.5 pl-5 leading-8 text-gray-700 marker:text-gray-400">
+            {notes.map((note) => (
+              <li key={note}>{note}</li>
             ))}
-          </div>
-
-          {/* 補足情報 */}
-          <div className="mt-8 rounded-lg border border-gray-200/20 bg-white/10 p-6">
-            <h3 className="mb-4 text-lg font-bold text-gray-900">パンフレットについて</h3>
-            <ul className="space-y-2 text-sm text-gray-900/90">
-              <li className="flex items-start gap-2">
-                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-secondary"></span>
-                <span>パンフレットはPDF形式で提供しています。</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-secondary"></span>
-                <span>印刷してご来場いただくと便利です。</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-secondary"></span>
-                <span>紙のパンフレットは当日、各案内所にて配布しています。</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-secondary"></span>
-                <span>
-                  内容は予告なく変更される場合があります。最新情報は当サイトでご確認ください。
-                </span>
-              </li>
-            </ul>
-          </div>
-        </div>
+          </ul>
+        </section>
       </div>
-    </main>
+    </PageSheetLayout>
   );
 }

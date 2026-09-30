@@ -88,4 +88,11 @@ export const pageHeroes: Record<string, PageHeroData> = {
     imageSrc: "/images/photos/setagayafe97-image.avif",
     imageAlt: "よくある質問",
   },
+  pamphlet: {
+    title: "パンフレット",
+    subtitle: "Pamphlet",
+    description: "第97回東京都市大学世田谷祭の公式パンフレットをダウンロード",
+    imageSrc: "/images/photos/setagayafe97-image.avif",
+    imageAlt: "パンフレット",
+  },
 };
