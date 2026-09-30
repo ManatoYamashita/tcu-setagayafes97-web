@@ -154,11 +154,13 @@ export function Opener() {
 
   return (
     <div ref={containerRef} className="opener-container" data-opener-active="true">
-      {/* 紫レイヤー（最初から最後まで濃い紫のまま、最後に下へ抜ける） */}
+      {/* 紫レイヤー（最初から最後まで濃い紫のまま、最後に下へ抜ける）。
+          z-60 はページ全体を覆う層。Header（40）とスキップリンク・下書きバナー（50）より上に出す
+          （docs/frontend/layout-patterns.md「z-index のレイヤー」） */}
       <div
         ref={primaryLayerRef}
         style={{ backgroundColor: "#7B2D8E" }}
-        className="fixed inset-0 z-[51] overflow-hidden flex items-center justify-center will-change-transform"
+        className="fixed inset-0 z-60 overflow-hidden flex items-center justify-center will-change-transform"
         aria-hidden="true"
       >
         {/* アイコンラッパー */}
