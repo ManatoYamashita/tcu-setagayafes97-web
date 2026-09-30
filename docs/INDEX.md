@@ -71,7 +71,9 @@
   - **削除リクエストの失効は 2027-03-05 前後。** その1ヶ月前に `noindex` の生存を再確認する
 - **[microcms.md](./dev/microcms.md)** - microCMS API の制約と実装パターン（limit・select・カスタムフィールド・画像）
   - **select の選択肢を増やしたら正規化関数も直す。** 直さないと新しい値が黙って `other` に落ちる
-  - **記事本文のテーブルは HTML のまま描画し罫線を指定する。** 記事編集は Aside で確認済みだが、スキーマ操作は手作業にする（#300）
+  - **スキーマ操作は記事本文の編集と異なる。** 作成・変更は実マウスイベントで操作を確認する
+- **[microcms-rich-tables.md](./dev/microcms-rich-tables.md)** - リッチテキストの表の入稿・表示と Aside での記事編集（#300）
+  - **表は HTML のまま描画し、外枠とセル罫線を指定する。** 画像への置き換えは不要
 - **[microcms-fetch-failures.md](./dev/microcms-fetch-failures.md)** - 取得に失敗したときの扱いと本番での確認（#287）
   - **`null` / `[]` に潰してよいのは 400 / 404 だけ。** 429 / 5xx を潰すと実在ページが 404 で生成されてもビルドが通る
   - **SDK の `retry: true` は Next.js の中で効かない。** 再試行は `microcmsGet()` が持つ
