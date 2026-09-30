@@ -98,6 +98,59 @@ rm -rf .next/cache/fetch-cache
 NODE_OPTIONS="--require ./inject-429.cjs" NEXT_PUBLIC_EVENTS_VISIBLE=true pnpm build
 ```
 
+## 本番での確認（マージ後）
+
+取得や 404 の扱いを変えたら、Production デプロイの完了後に次の2つを確かめる。
+2026-09-30、#301 と #306 のマージ後にこの手順で確認した。
+
+### 実在する URL は全件叩く
+
+**実在する ID を1件だけ叩いても、「実在するページは 200」は示せない。** 壊れ方は
+「一部のページだけ 404 で生成される」形で現れる（#287 では 98 ページ中の全てか一部）。
+サイトマップに載っている詳細 URL を全件叩き、ステータスを集計する。
+
+```bash
+curl -s https://setagayafes.org/sitemap.xml \
+  | grep -oE '<loc>[^<]*/(events|special|info)/[^<]+</loc>' | sed 's/<\/*loc>//g' \
+  | while read -r u; do curl -s -o /dev/null -w '%{http_code}\n' "$u"; sleep 0.1; done \
+  | sort | uniq -c
+# 2026-09-30:  115 200（企画 98・著名人企画 1・info 16）
+```
+
+**全行が `200` なら合格。** 1件でも `404` があれば、そのページは 404 のまま事前描画されている。
+0.1 秒間隔の115本では bot 対策は発動しなかった。**間隔を詰めないこと。**
+`403` と `x-vercel-mitigated: challenge` が出たら、それはサイトの障害ではなく bot 対策である
+（[ci-env.md](./ci-env.md)）。
+
+存在しない ID のほうは代表だけでよい。`/events/e2e-no-such-event`・`/events/存在しないID`
+（URL エンコードして叩く）・`/info/<不存在>`・`/special/<不存在>` がすべて 404 になること。
+なお `/events/..%2F..` は **Vercel のエッジが 400 を返し、アプリへ届かない**。アプリの判定の確認には使えない。
+
+### 404 画面の中身は実ブラウザで見る
+
+**HTML を grep しても、404 画面の中身が表示されているかは判定できない。**
+動的ルートの `not-found.tsx` は、そのルートの**実在するページの RSC ペイロードにも埋め込まれている**。
+2026-09-30 の本番で、企画詳細 404 の目印（`data-event-not-found-illustration`）は
+200 の企画ページの HTML にも1件ずつ入っていた。グローバル 404 の画像パス
+（`/images/illustrations/404.avif`）に至っては全ページに入っている。
+
+表示されているかは、実ブラウザで要素が可視かどうかで判定する。
+判定の書き方は `e2e/not-found/event-detail.spec.ts` と同じで、本番の URL へ向けるだけでよい。
+
+```js
+// node で実行（@playwright/test はリポジトリの依存にある）
+import { chromium } from "@playwright/test";
+const browser = await chromium.launch();
+const page = await browser.newPage({ reducedMotion: "reduce" });
+for (const path of ["/events/e2e-no-such-event", "/events/0tal5owl37"]) {
+  const response = await page.goto(`https://setagayafes.org${path}`);
+  const img = page.locator("[data-event-not-found-illustration] img");
+  console.log(path, response.status(), await img.isVisible());
+}
+await browser.close();
+// 2026-09-30: 404 は true（natural 896px → 192px 表示）、実在する企画は false
+```
+
 ## 再発防止
 
 `pnpm build` の末尾で `scripts/assert-no-prerendered-404.mjs` が、`_not-found` 以外の
@@ -114,4 +167,4 @@ NODE_OPTIONS="--require ./inject-429.cjs" NEXT_PUBLIC_EVENTS_VISIBLE=true pnpm b
 
 ---
 
-**最終更新日**: 2026-09-30
+**最終更新日**: 2026-09-30（本番での確認手順を追加）

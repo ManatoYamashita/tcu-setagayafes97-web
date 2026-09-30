@@ -64,6 +64,14 @@ refactor/<refactor-target>   # リファクタリング
 
 4. **レビュー & マージ**: PR を確認後、main へマージ
 
+   **マージする前に、PR が閉じる Issue を GitHub が認識しているかを確かめる。**
+   2026-09-30 の #306 では、本文の `Closes #287` が認識されず、マージ後も Issue が開いたまま残った
+   （原因は未調査）。空ならマージ前に本文を直すか、マージ後に手で閉じる。
+
+   ```bash
+   gh pr view <N> --json closingIssuesReferences --jq '.closingIssuesReferences[].number'
+   ```
+
 5. **削除**: マージ後は不要なブランチを削除
    ```bash
    git branch -d feature/your-feature
