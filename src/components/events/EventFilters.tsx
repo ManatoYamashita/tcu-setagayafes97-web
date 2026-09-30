@@ -188,7 +188,7 @@ export function EventFilters({ filters, buildingOptions }: EventFiltersProps) {
 
       <div id="event-filters-panel" className={`space-y-6 lg:block ${isOpen ? "" : "hidden"}`}>
         {/* 日程フィルター */}
-        <fieldset className="m-0 min-w-0 border-0 p-0">
+        <fieldset className="mx-0 min-w-0 border-0 p-0">
           <legend className="m-0 mb-2 block p-0 text-sm font-semibold text-gray-900/90">
             開催日
           </legend>
@@ -211,7 +211,7 @@ export function EventFilters({ filters, buildingOptions }: EventFiltersProps) {
         </fieldset>
 
         {/* 企画種別フィルター */}
-        <fieldset className="m-0 min-w-0 border-0 p-0">
+        <fieldset className="mx-0 min-w-0 border-0 p-0">
           <legend className="m-0 mb-2 block p-0 text-sm font-semibold text-gray-900/90">
             企画種別
           </legend>
