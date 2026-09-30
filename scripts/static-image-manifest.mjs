@@ -110,13 +110,13 @@ const APP_IMAGES = [
   {
     path: "public/images/photos/tcu-7.avif",
     source: "assets/source/images/photos/tcu-7.webp",
-    // 原画 1100x620。`fill` + `object-cover` + `transform: scale(1.3)` で
-    // 画面幅いっぱいの帯に敷く。デスクトップでは原画のほうが小さいので据え置き。
-    box: { width: 1100, height: 620 },
+    // 原画 1877x1026。`fill` + `object-cover` + `transform: scale(1.3)` で
+    // 画面幅いっぱいの帯に敷く。旧 1100px 幅ではデスクトップで拡大されるため、原画の画素数を保持する。
+    box: { width: 1877, height: 1026 },
     fit: "inside",
     kind: "photo",
-    // 背景写真。手前に clip-path のリビール演出と本文が乗るので品質は落とせる。
-    quality: 30,
+    // 背景写真。Q27 は実測 72,363 B で、既存の 76,000 B 上限内に収まる。
+    quality: 27,
     maxBytes: 76000,
     note: "NewsSectionInteractive の背景帯",
   },
