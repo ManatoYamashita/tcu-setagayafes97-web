@@ -139,7 +139,7 @@
       "fieldId": "startTime",
       "name": "開始時刻",
       "kind": "text",
-      "description": "半角の HH:mm のみ（例 17:00）。開場時刻などは概要へ（著名人企画は「開場時刻」欄へ）",
+      "description": "半角の HH:mm のみ（例 17:00）。開場時刻は「著名人企画の詳細」内の「開場時刻」欄へ（概要に書いてもタイムテーブルには出ません）",
       "required": false,
       "textSizeLimitValidation": null,
       "patternMatchValidation": {
@@ -601,7 +601,7 @@
           "fieldId": "startTime",
           "name": "開始時刻",
           "kind": "text",
-          "description": "半角の HH:mm のみ（例 17:00）。開場時刻などは概要（説明文）へ",
+          "description": "半角の HH:mm のみ（例 17:00）。開場時刻は「著名人企画の詳細」内の「開場時刻」欄へ（概要に書いてもタイムテーブルには出ません）",
           "required": false,
           "textSizeLimitValidation": null,
           "patternMatchValidation": {
