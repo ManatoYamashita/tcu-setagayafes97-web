@@ -12,11 +12,6 @@ import { buildLocalePath } from "@/lib/metadata";
  * `src/app/` 配下にはテストを置けない（ルートとして解釈される）ため、
  * 検査したい組み立て処理はここへ置く。
  *
- * `SPECIAL_VISIBLE` を引数で受けるのも同じ理由である。`src/data/site.ts` の
- * 定数はモジュールスコープで `process.env` を評価するので、環境変数を切り替える
- * テストは `vi.resetModules()` と動的 import を要求し、
- * 「動的 import で得た値は静的 import と別実体」という落とし穴を踏む。
- * 引数にすれば純粋関数になり、そのすべてが不要になる。
  */
 export interface StaticPageEntry {
   pathname: string;
@@ -101,24 +96,17 @@ function localeAlternates(pathname: string): Record<string, string> {
 }
 
 export interface BuildStaticSitemapOptions {
-  /**
-   * `SPECIAL_VISIBLE`。真の間 `/special` は著名人企画LPへ302転送されるため
-   * （`next.config.ts` の `redirects()`）、転送元をサイトマップから落とす。
-   * 載せたままだと Search Console が「リダイレクトあり」として除外する。
-   */
-  specialVisible: boolean;
   /** CMS を読むページの最終更新日。省略したページは STATIC_PAGE_LAST_MODIFIED を使う */
   cmsLastModified?: Readonly<Record<string, Date>>;
 }
 
 export function buildStaticSitemapEntries({
-  specialVisible,
   cmsLastModified = {},
-}: BuildStaticSitemapOptions): MetadataRoute.Sitemap {
+}: BuildStaticSitemapOptions = {}): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = [];
 
   for (const page of STATIC_PAGES) {
-    if (specialVisible && page.pathname === "/special") continue;
+    if (page.pathname === "/special") continue;
 
     const lastModified =
       cmsLastModified[page.pathname] ??

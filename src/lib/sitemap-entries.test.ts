@@ -15,7 +15,7 @@ import {
  * 多言語URLが1件も載っていなかった（#33）。どちらも lint / build を通過する種類の
  * 欠陥なので、算術で固定する。
  */
-const entries = buildStaticSitemapEntries({ specialVisible: false });
+const entries = buildStaticSitemapEntries();
 
 describe("URL", () => {
   it("重複が無い", () => {
@@ -102,7 +102,6 @@ describe("lastModified", () => {
   it("CMS 由来の日付を渡すと静的な既定値より優先される", () => {
     const cmsDate = new Date("2030-01-02T03:04:05.000Z");
     const withCms = buildStaticSitemapEntries({
-      specialVisible: false,
       cmsLastModified: { "/about": cmsDate },
     });
     const about = withCms.find((entry) => entry.url.endsWith("/about"));
@@ -111,17 +110,8 @@ describe("lastModified", () => {
 });
 
 describe("転送元の除外", () => {
-  /**
-   * SPECIAL_VISIBLE が真の間、/special は著名人企画LPへ302転送される。
-   * 転送元を載せると Search Console が「リダイレクトあり」として除外する。
-   */
-  it("specialVisible のとき /special を落とす", () => {
-    const visible = buildStaticSitemapEntries({ specialVisible: true });
-    expect(visible.some((entry) => entry.url.endsWith("/special"))).toBe(false);
-  });
-
-  it("specialVisible でないとき /special を載せる", () => {
-    expect(entries.some((entry) => entry.url.endsWith("/special"))).toBe(true);
+  it("/special の転送元を載せない", () => {
+    expect(entries.some((entry) => entry.url.endsWith("/special"))).toBe(false);
   });
 });
 

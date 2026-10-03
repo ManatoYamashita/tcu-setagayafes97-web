@@ -4,7 +4,7 @@ import { NewsSection } from "@/components/home/NewsSection";
 import { FeaturedEvents } from "@/components/home/FeaturedEvents";
 import { SpecialGuestSection } from "@/components/special/SpecialGuestSection";
 import { getLatestHeroNews, getNewsList } from "@/lib/news";
-import { NEWS_VISIBLE, siteConfig } from "@/data/site";
+import { siteConfig } from "@/data/site";
 import { createHomeStructuredData, serializeJsonLd } from "@/lib/structured-data";
 
 const homeStructuredData = createHomeStructuredData();
@@ -19,9 +19,7 @@ const AboutSection = dynamic(() =>
  * 第97回東京都市大学世田谷祭の公式Webサイト
  */
 export default async function Home() {
-  const [heroNews, newsList] = NEWS_VISIBLE
-    ? await Promise.all([getLatestHeroNews(), getNewsList(8)])
-    : [null, []];
+  const [heroNews, newsList] = await Promise.all([getLatestHeroNews(), getNewsList(8)]);
 
   return (
     <main id="content" tabIndex={-1} className="overflow-x-clip focus-visible:outline-none">
@@ -38,7 +36,7 @@ export default async function Home() {
         <SpecialGuestSection />
         <AboutSection />
       </div>
-      <NewsSection newsList={newsList} isVisible={NEWS_VISIBLE} />
+      <NewsSection newsList={newsList} />
       <FeaturedEvents />
     </main>
   );

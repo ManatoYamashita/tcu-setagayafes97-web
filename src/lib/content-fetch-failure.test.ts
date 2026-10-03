@@ -16,14 +16,6 @@ vi.mock("@/lib/microcms", async (importOriginal) => ({
   isMicrocmsConfigured: true,
 }));
 
-// 公開フラグが false だと問い合わせ自体をしないため、全て true に固定する
-vi.mock("@/data/site", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/data/site")>()),
-  EVENTS_VISIBLE: true,
-  NEWS_VISIBLE: true,
-  SPECIAL_VISIBLE: true,
-}));
-
 const { getEventById, getEventsList, getSpecialEventById, getSpecialEvents, getFeaturedEvents } =
   await import("@/lib/events");
 const { getNewsById, getNewsList } = await import("@/lib/news");

@@ -98,15 +98,10 @@ export default defineConfig({
     stderr: "pipe",
 
     env: {
-      // フィクスチャ経路。この2つが揃うと getEventsList() は呼ばれないため、
+      // フィクスチャ経路では getEventsList() を呼ばないため、
       // microCMS のシークレットが要りません（fork PR でも走ります）。
-      NEXT_PUBLIC_EVENTS_VISIBLE: "true",
       NEXT_PUBLIC_TIMETABLE_FIXTURE: "1",
 
-      // ローカルの .env.local と CI とで DOM が変わらないよう、残りのフラグも固定する
-      NEXT_PUBLIC_NEWS_VISIBLE: "false",
-      NEXT_PUBLIC_SPECIAL_VISIBLE: "false",
-      NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE: "false",
       NEXT_TELEMETRY_DISABLED: "1",
     },
   },

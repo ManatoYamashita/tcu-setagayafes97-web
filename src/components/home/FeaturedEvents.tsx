@@ -1,6 +1,5 @@
 import dynamic from "next/dynamic";
 import { getFeaturedEvents } from "@/lib/events";
-import { EVENTS_VISIBLE } from "@/data/site";
 import { FeaturedGearScene } from "./FeaturedGearScene";
 
 // 初期ビューポート外のカルーセルをトップページ初期JSから分離する。
@@ -11,18 +10,12 @@ const FeaturedCarousel = dynamic(() =>
 /**
  * おすすめ企画セクション
  * 左: 縦書きタイトル+ナビ / 右: 横スクロールカルーセル
- * EVENTS_VISIBLE が false の間はセクションごと非表示
  *
  * 背面にカラクリの3D歯車を装飾として置く。カルーセル化のリファクタリング
  * （11d0e73）で旧12カラムグリッドごと外れていたものを、新レイアウトに
  * 合わせて背景装飾として復帰させたもの。
  */
 export async function FeaturedEvents() {
-  // 企画非公開期間はセクションごと非表示（フェッチも行わない）
-  if (!EVENTS_VISIBLE) {
-    return null;
-  }
-
   const events = await getFeaturedEvents();
   const featured = events.slice(0, 6);
 

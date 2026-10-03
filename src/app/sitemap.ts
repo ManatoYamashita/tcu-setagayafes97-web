@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 import { getEventsList, getSpecialEvents } from "@/lib/events";
 import { getNewsList } from "@/lib/news";
-import { siteConfig, SPECIAL_VISIBLE } from "@/data/site";
+import { siteConfig } from "@/data/site";
 import { buildStaticSitemapEntries } from "@/lib/sitemap-entries";
 
 /**
@@ -57,7 +57,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
   // 動的ページ: 著名人企画LP
-  // SPECIAL_VISIBLE が false の間は getSpecialEvents() が空を返すため、URLは出力されない
   let specialPages: MetadataRoute.Sitemap = [];
   try {
     const specials = await getSpecialEvents();
@@ -98,7 +97,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]);
 
   const staticPages = buildStaticSitemapEntries({
-    specialVisible: SPECIAL_VISIBLE,
     cmsLastModified: {
       ...(homeUpdatedAt ? { "/": homeUpdatedAt } : {}),
       ...(newsUpdatedAt ? { "/info": newsUpdatedAt } : {}),

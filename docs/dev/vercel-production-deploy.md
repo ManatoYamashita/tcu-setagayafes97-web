@@ -192,15 +192,6 @@ curl -sL "$URL" | grep -o '<探しているマークアップ>'
 
 独自ドメイン側の challenge も数分で自然に解除されます。
 
-> [!WARNING]
-> **本ファイルの登録状況の表と実例は、いずれも記載時点のスナップショットです。**
-> 「2026-08-17 実測」「実例：…の登録漏れ（2026-08-17）」を**現在の状態と読まないでください。**
-> フラグが今どうなっているかは、公開ドメインの実応答でしか確定しません。
->
-> ```bash
-> curl -sL https://setagayafes.org/special | grep -c 準備中   # 0 なら公開済み
-> ```
-
 ## `vercel promote` は使わない
 
 > [!CAUTION]
@@ -208,13 +199,10 @@ curl -sL "$URL" | grep -o '<探しているマークアップ>'
 
 本プロジェクトは同名の環境変数を環境ごとに別値で登録しています。`vercel env ls` の `environments` 列で確認できます。
 
-| 変数                          | 登録状況                                           |
-| ----------------------------- | -------------------------------------------------- |
-| `MICROCMS_SERVICE_DOMAIN`     | **Production と Preview で別行＝別値**             |
-| `MICROCMS_API_KEY`            | Production, Preview で共有／Development は別       |
-| `NEXT_PUBLIC_EVENTS_VISIBLE`  | **Preview のみ登録**（Production は未登録＝false） |
-| `NEXT_PUBLIC_NEWS_VISIBLE`    | Production, Preview で共有                         |
-| `NEXT_PUBLIC_SPECIAL_VISIBLE` | Production, Preview で共有                         |
+| 変数                      | 登録状況                                     |
+| ------------------------- | -------------------------------------------- |
+| `MICROCMS_SERVICE_DOMAIN` | **Production と Preview で別行＝別値**       |
+| `MICROCMS_API_KEY`        | Production, Preview で共有／Development は別 |
 
 `MICROCMS_SERVICE_DOMAIN` が環境別なので、`promote` すると **Preview の microCMS サービスから取得したコンテンツが本番に出ます。** 正しい操作は Production 環境変数での再ビルドです。
 
@@ -284,7 +272,7 @@ curl -s https://<production deployment url>/robots.txt | grep Sitemap
 
 ## 関連ドキュメント
 
-- [ci-env.md](./ci-env.md) - GitHub Actions / Vercel の環境変数と公開フラグ
+- [ci-env.md](./ci-env.md) - GitHub Actions / Vercel の環境変数とシークレット登録順
 - [staging-and-merge.md](./staging-and-merge.md) - マージ前チェックリスト
 - `.github/workflows/production-deploy-guard.yml` - Production デプロイが作られたかを確かめる Guard
 

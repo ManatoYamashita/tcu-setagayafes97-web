@@ -65,9 +65,8 @@
 - **[testing.md](./dev/testing.md)** - テスト方針（何をユニットテストにし、何を実ブラウザに回すか。#157）
   - **jsdom / happy-dom を入れてはいけない。** `getBoundingClientRect()` が常に 0 で #148 を原理的に検出できない
   - **テストの価値は「落ちること」でしか測れない。** 退行を注入して赤になるのを確かめる
-- **[ci-env.md](./dev/ci-env.md)** - GitHub Actions / Vercel の環境変数と公開フラグ
-  - **公開フラグは未設定でもエラーにならず黙って非公開になる。** 登録先は4箇所
-  - **`vercel promote` は使わない。** Preview の環境変数の成果物が本番に出る
+- **[ci-env.md](./dev/ci-env.md)** - GitHub Actions / Vercel の環境変数とシークレット登録順
+  - **表示制御の環境変数は廃止済み。** 公開状態は microCMS で管理する
 - **[vercel-production-deploy.md](./dev/vercel-production-deploy.md)** - Vercel の本番反映の判定、取りこぼしからの復旧、デプロイ数の上限
   - **Guard が落ちたら、コミットの Vercel ステータスを先に見る。** `Deployment rate limited` なら取りこぼしではなく Hobby の上限（24時間で100件）。待つしかない
   - **`docs/**` のブランチでは Vercel のデプロイを作らない**（`vercel.json`）。`ignoreCommand` では中止したデプロイも数えるので節約にならない

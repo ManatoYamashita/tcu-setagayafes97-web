@@ -156,7 +156,7 @@ secrets もビルド成果物も要求しないため、**fork からの PR で�
 動的404は生HTML 0個・ライブDOM 1個）。
 **新しいルートを足したら `e2e/landmarks/route-sweep.spec.ts` の表へ1行足すこと。**
 このジョブも secrets を要求しないため、fork からの PR でも同じ判定が出る。
-**`Build Check` は secrets と公開フラグが空なら先頭ステップで落ちる。ただし fork の PR は例外で、空データのまま緑になる**（#352）。
+**`Build Check` は microCMS の secrets と `NEXT_PUBLIC_URL` が空なら先頭ステップで落ちる。ただし fork の PR は例外で、空データのまま緑になる**（#352 / #360）。
 設計は [`docs/frontend/layout-e2e.md`](../docs/frontend/layout-e2e.md) を参照。
 
 ### ビルド末尾の検査
@@ -172,13 +172,10 @@ secrets もビルド成果物も要求しないため、**fork からの PR で�
 | `assert-font-preloads.mjs`      | 1ルートのフォントpreloadが10本以上になる（#90）                                             | [`docs/frontend/performance.md`](../docs/frontend/performance.md)                                     |
 | `assert-no-prerendered-404.mjs` | `generateStaticParams` が返したIDの詳細が 404 で事前描画される（#287）                      | [`docs/dev/microcms-fetch-failures.md`](../docs/dev/microcms-fetch-failures.md)                       |
 
-**先頭2本は検査対象が消えると空振りする。** 1本目は `EVENTS_VISIBLE` が false のとき、
-2本目は microCMS の画像が1枚もHTMLに出ないときで、それぞれログに `SKIP` / `NOTE` を出す。
-**その行が出ているときは、検査が効いていないと考えること。**
-なお2本目は**公開フラグが全て false でも空振りしない**（協賛企業はフラグ非依存）。
-`NOTE` が出たら「協賛の取得が0件」を疑うこと。**CI で出たら microCMS の取得結果を疑う**（資格情報の空は先頭ステップが落とす。#352）。
-3本目は全事前描画HTMLの `<head>` を対象にするため、HTMLが1枚でもあれば空振りしない。
-4本目は詳細ページが1枚も事前描画されていないとき（公開フラグ false・microCMS 未設定）に `NOTE` を出す。
+`assert-events-static-html.mjs` は毎ビルド `/events` の一覧UIを検査する。
+`assert-no-image-optimizer.mjs` は microCMS の画像が1枚もHTMLに出ないとき `NOTE` を出す。
+CI で `NOTE` が出たら microCMS の取得結果を確認する。資格情報が空なら先頭ステップで落ちる（#352）。
+`assert-no-prerendered-404.mjs` は詳細ページが1枚も事前描画されていないとき `NOTE` を出す。
 
 `pnpm type-check` が `next typegen` を前置しているのは、**`.next/types/validator.ts` が
 `.d.ts` ではなく `.ts` だから**である。`skipLibCheck: true` はこのファイルを守らないため、
@@ -304,8 +301,7 @@ microCMS の入稿は **Webhook 経由で十数秒（実測10〜15秒）**で本
 - `revalidatePath("/events/[id]")` — 動的ルートには `type` が要る
 - `revalidatePath("/sitemap.xml", "page")` — メタデータルートの派生タグは `/route`。`type` を付けない
 
-**公開フラグ `NEXT_PUBLIC_*_VISIBLE` はビルド時評価であり、Webhook では切り替わらない。**
-解禁作業には従来どおり再デプロイが要る。
+企画・ニュース・著名人企画の表示は microCMS の公開状態で管理する。Webhook は公開済みコンテンツの変更を再検証する。
 
 ### 下書きの確認（画面プレビュー）
 
@@ -395,7 +391,6 @@ microCMS の編集画面にある「画面プレビュー」から、**公開せ
 `three` / `@react-three/fiber` はカラクリのギア演出（`src/components/three/`）用です。3Dマップとは無関係で、おすすめ企画セクションの背景装飾として稼働しています（2026-08-10 復活）。
 
 - 読み込みは `next/dynamic` の `ssr: false`。クライアントチャンクは 860K（brotli 185K）で全チャンク中最大
-- `EVENTS_VISIBLE=false` の間はセクションごと非表示のため、チャンクも読み込まれない
 - モーション軽減設定時は `frameloop="demand"` でレンダーループごと停止する
 - `@react-three/drei` は依存にあるが未使用
 
@@ -472,7 +467,7 @@ microCMS の編集画面にある「画面プレビュー」から、**公開せ
 > 過不足なく揃うため `exhaustive-deps` は何も言わない。後者で効果と `useCallback` の中から
 > `hasMore` を読むこと自体を禁じて塞いだ）、そして `pnpm build` の末尾へ連結した
 > `scripts/assert-events-static-html.mjs`（`<Suspense>` 境界の消失と fallback の格下げを落とす。
-> **`EVENTS_VISIBLE` が false の間はスキップし、true になると自動で有効化する**）。
+> 毎ビルド検査する）。
 > 判定方法・fallback の設計・実測値は
 > [`docs/frontend/static-html-and-search-params.md`](../docs/frontend/static-html-and-search-params.md) を参照。
 
@@ -591,8 +586,7 @@ Hero の直下へ入れた時点で要素高が 2004px → 3105px（390px 幅）
 primary-50 → primary-100 間の 64.9% から 26.7% まで後退した。
 
 Hero は `h-[calc(100svh-var(--header-height))]` なので、`svh` で持てば
-後続コンテンツの量から完全に独立する。`SPECIAL_VISIBLE=false` で著名人企画が
-消えても Hero の見た目が変わらないのはこのため（実測の画素差: Hero 0/255、ABOUT 最大 3/255）。
+後続コンテンツの量から独立して Hero の見た目を保つ。
 
 このブロックへセクションを足し引きする場合は、`%` へ戻さずに
 Hero 下端（`100svh - 5.5rem`）へ来る色で停止位置を判断すること。

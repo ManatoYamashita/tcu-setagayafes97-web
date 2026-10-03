@@ -7,7 +7,7 @@
 
 | 状況                                                    | 詳細系（`get*ById`） | 一覧系（`get*List` ほか） |
 | ------------------------------------------------------- | -------------------- | ------------------------- |
-| 公開フラグが false / microCMS 未設定（CI）              | `null`               | `[]`                      |
+| microCMS 未設定（CI）                                   | `null`               | `[]`                      |
 | microCMS が「存在しない」と答えた（400 / 404）          | `null` → 404         | —                         |
 | 本当に0件                                               | —                    | `[]`                      |
 | **429 / 5xx / ネットワーク**（2回再試行しても回復せず） | **投げる**           | **投げる**                |
@@ -95,7 +95,7 @@ Data Cache に残っており、消さないと microCMS へ1本も問い合わ�
 # 詳細取得にだけ 429 を返す注入（リポジトリには置いていない。下記は要旨）
 #   globalThis.fetch を包み、/\.microcms\.io\/api\/v1\/events\/[^/?]+/ に 429 を返す
 rm -rf .next/cache/fetch-cache
-NODE_OPTIONS="--require ./inject-429.cjs" NEXT_PUBLIC_EVENTS_VISIBLE=true pnpm build
+NODE_OPTIONS="--require ./inject-429.cjs" pnpm build
 ```
 
 ## 本番での確認（マージ後）

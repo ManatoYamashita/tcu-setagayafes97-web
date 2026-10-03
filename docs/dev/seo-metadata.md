@@ -76,7 +76,7 @@
   各件に **自分自身を含む** 全言語の `alternates.languages` を持たせる。Next.js の
   直列化は自己参照を補完しない。
 - `priority` と `changeFrequency` は Google が無視する。チューニングしない。
-- 302転送元（`SPECIAL_VISIBLE` が真のときの `/special`）は載せない。Search Console が
+- 302転送元の `/special`は載せない。Search Console が
   「リダイレクトあり」として除外するため。
 
 ## 404 と不在ページ

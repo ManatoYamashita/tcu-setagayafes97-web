@@ -95,9 +95,9 @@ refactor/<refactor-target>   # リファクタリング
 2026-09-30 までは secrets が Production environment にしか無く、`environment:` を宣言しない
 `Build Check` からは空文字に見えていた。ログが残る最古の 2026-07-22 以降、一度も microCMS を
 読めていなかった（それ以前はログが失効していて未確認。#352）。
-**そのため `Build Check` の先頭ステップは、`MICROCMS_*` の2本と Variables 5本（`NEXT_PUBLIC_URL` と `*_VISIBLE` の4本）が
+**そのため `Build Check` の先頭ステップは、`MICROCMS_*` の2本と `NEXT_PUBLIC_URL` が
 空なら install より前に落とす。** 例外は fork からの PR で、secrets が渡らないため先頭ステップを飛ばし、
-空データのまま緑になる。secrets は Repository secrets に、フラグは Repository variables に置くこと。
+空データのまま緑になる。secrets は Repository secrets に、URL は Repository variables に置くこと。
 型チェックは `Build Check` と重複するが、secrets を要求せず短時間で落ちる検査として
 `Static Checks` にも置いてある。共通のセットアップは `.github/actions/setup` にある。
 

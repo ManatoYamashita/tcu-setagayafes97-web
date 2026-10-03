@@ -93,15 +93,11 @@ Next.js 16.1 の実装（`next/dist/server/request/draft-mode.js`）では、`dr
 `pnpm build` の末尾に連結された `scripts/assert-events-static-html.mjs` と、
 `.next/server/app/events/*.html` の有無で確認できる。
 
-### 公開フラグを跨ぐ
+### 下書きだけを表示する
 
-`getEventById()` / `getSpecialEventById()` / `getNewsById()` は、**draftKey が渡された場合に限り
-`NEXT_PUBLIC_*_VISIBLE` のガードを跨ぐ。**
-
-[`src/data/site.ts`](../../src/data/site.ts) は「著名人は解禁日が契約で決まる。microCMS 側を
-下書きにするだけで済ませず、必ずこのフラグでも塞ぐこと」と求めている。それでもプレビューを
-通すのは、**解禁前のLPを確認したいという要求が、フラグが false のときにこそ発生する**ため。
-ここを塞ぐとプレビュー機能の意味が無くなる。
+通常の詳細ページ取得は microCMS が公開済みとするコンテンツだけを読む。
+画面プレビューは `/api/draft` が取得した `draftKey` を渡し、下書きの内容を表示する。
+公開前の著名人企画も、microCMS 側で下書きのまま確認する。
 
 守りは二重になっている。
 
@@ -109,9 +105,6 @@ Next.js 16.1 の実装（`next/dist/server/request/draft-mode.js`）では、`dr
 | ------------ | -------------------------------------------------------- |
 | シークレット | `MICROCMS_DRAFT_SECRET` を知らないと `/api/draft` が 401 |
 | draftKey     | その時点で有効なキーが無いと microCMS が 404 を返す      |
-
-**公開ルート（draftKey を伴わない通常のアクセス）の判定は一切変えていない。**
-フラグが false の間、URL を直接叩いても従来どおり 404 になる。
 
 ### プレビュー中に出さないもの
 

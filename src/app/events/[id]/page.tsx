@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getEventById, getEventsList } from "@/lib/events";
-import { siteConfig, SPECIAL_VISIBLE } from "@/data/site";
+import { siteConfig } from "@/data/site";
 import { EventDetail } from "@/components/events/EventDetail";
 import { RelatedEvents } from "@/components/events/RelatedEvents";
 import { DraftPreviewBanner } from "@/components/layout/DraftPreviewBanner";
@@ -86,9 +86,6 @@ export default async function EventPage({ params }: EventPageProps) {
   // プレビュー中は転送しない。遷移先は /api/draft が下書きの type を見て既に決めており、
   // ここで再度飛ばすと cookie の id と一致しない URL へ送って下書きを見失う
   if (!draft && event.type === "special") {
-    if (!SPECIAL_VISIBLE) {
-      notFound();
-    }
     redirect(`/special/${event.id}`);
   }
 

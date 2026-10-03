@@ -365,7 +365,7 @@ microCMS の実データはステージ企画が1件しかなく、しかも `pl
 次で差し替わります。
 
 ```bash
-NEXT_PUBLIC_EVENTS_VISIBLE=true NEXT_PUBLIC_TIMETABLE_FIXTURE=1 pnpm dev
+NEXT_PUBLIC_TIMETABLE_FIXTURE=1 pnpm dev
 ```
 
 分岐は `process.env.NODE_ENV` を見ており、本番ビルドでは到達不能コードになって

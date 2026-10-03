@@ -159,7 +159,7 @@ fallback 自身が bailout し、ページ本体が静的HTMLから丸ごと消�
 fallback には**絞り込み後の全件**を渡している。描かれるのは先頭12件だけで、配列の参照が
 `EventsContent` の `initialEvents` と同一なので Flight ペイロードにも重複して載らない。
 
-### HTMLサイズ（`NEXT_PUBLIC_EVENTS_VISIBLE=true pnpm build`）
+### HTMLサイズ（`pnpm build`）
 
 |                            | raw         | gzip -9    |
 | -------------------------- | ----------- | ---------- |

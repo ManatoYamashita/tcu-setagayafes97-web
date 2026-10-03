@@ -99,7 +99,7 @@ if (unexpected404.length > 0) {
 
 if (detailPages === 0) {
   console.log(
-    `${LABEL} NOTE: microCMS 由来の詳細ページが1枚も事前描画されていません（公開フラグが false か、microCMS が未設定）。` +
+    `${LABEL} NOTE: microCMS 由来の詳細ページが1枚も事前描画されていません（microCMS が未設定か、公開コンテンツが0件）。` +
       "この状態では本検査は何も守っていません。"
   );
 }

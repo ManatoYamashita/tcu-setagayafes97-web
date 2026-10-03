@@ -270,14 +270,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
         <p className="text-xs md:text-sm tracking-[0.2em] text-primary-600 mt-2 md:mt-3">
           {siteConfig.openTime} - {siteConfig.closeTime}
         </p>
-        {/*
-          モバイル用CTA（md以上では非表示）
-
-          著名人企画は SPECIAL_VISIBLE で判定しない。未解禁でも /special は準備中ページ
-          として成立し、「今年も著名人企画がある」ことを伏せる必要はないため
-          （出演者名は出ない）。ヘッダーナビも同じ方針で常時表示している。
-          詳細は src/data/navigation.ts のコメントを参照。
-        */}
+        {/* モバイル用CTA（md以上では非表示） */}
         <div className="flex flex-wrap items-center gap-3 mt-4 md:hidden">
           <Link
             href="/events"

@@ -38,22 +38,13 @@
  *
  * 2 が要る。`AppImage` から `unoptimized` が外れると静的画像は全部 `/_next/image` へ回り、
  * **`public/` のパスがHTMLから消える。** 1 だけでも捕まるが、逆に「静的画像を
- * 描かなくなった」種類の退行は 1 では見えない。静的画像は公開フラグに依存しないので、
- * 0本は常に異常である。
+ * 描かなくなった」種類の退行は 1 では見えない。静的画像が0本なら常に異常である。
  *
  * 背景と設計は docs/frontend/image-delivery.md を参照。
  */
 
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
-/*
- * `@next/env` は CommonJS のため、`.mjs` から名前付き import できない
- * （Node 20 が `Named export 'loadEnvConfig' not found` で落ちる）。default 経由で取り出す。
- */
-import nextEnv from "@next/env";
-
-const { loadEnvConfig } = nextEnv;
-
 /** `next build` が事前描画したHTMLの置き場 */
 const APP_DIR = path.resolve(process.cwd(), ".next/server/app");
 
@@ -69,7 +60,7 @@ const IMGIX_MARKER = "images.microcms-assets.io/";
  * `public/` の静的画像が実体のパスで出ている目印。
  *
  * `AppImage` から `unoptimized` が外れるとこれが 0 本になり、同時に
- * `/_next/image` が増える。公開フラグに依存しないので 0 本は常に異常である。
+ * `/_next/image` が増える。0 本は常に異常である。
  */
 const STATIC_IMAGE_PATTERN =
   /(?:src|href)="\/(?:images|materials)\/[^"]+\.(?:avif|webp|png|jpe?g)"/;
@@ -81,22 +72,6 @@ function fail(message, hint) {
   if (hint) console.error(hint);
   process.exit(1);
 }
-
-/*
- * 公開フラグは `next build` と同じ手順で解決する。素の `process.env` だけを見ると、
- * `.env.local` で解禁した手元のビルドと食い違う（assert-events-static-html.mjs と同じ理由）。
- */
-loadEnvConfig(process.cwd(), false, {
-  info: () => {},
-  error: (...args) => console.error(LABEL, ...args),
-});
-
-/** microCMS の画像がHTMLへ出うるかどうか。すべて false なら検査対象が存在しない */
-const CONTENT_FLAGS = {
-  NEXT_PUBLIC_EVENTS_VISIBLE: process.env.NEXT_PUBLIC_EVENTS_VISIBLE === "true",
-  NEXT_PUBLIC_NEWS_VISIBLE: process.env.NEXT_PUBLIC_NEWS_VISIBLE === "true",
-  NEXT_PUBLIC_SPECIAL_VISIBLE: process.env.NEXT_PUBLIC_SPECIAL_VISIBLE === "true",
-};
 
 function collectHtmlFiles(dir) {
   const found = [];
@@ -198,24 +173,15 @@ if (staticImageCount === 0) {
   );
 }
 
-const enabledFlags = Object.entries(CONTENT_FLAGS)
-  .filter(([, on]) => on)
-  .map(([name]) => name);
-
 if (imgixCount === 0) {
   /*
    * 違反は無いが、imgix の画像も1枚も無い状態。検査が空振りしている可能性があるため
    * 黙って成功にはしない。ただし合否条件にもしない。microCMS の入稿状況と取得の成否で
    * 0 枚はいつでも起こりうるうえ、その区別はここでは付かない。
    */
-  const flagState =
-    enabledFlags.length === 0
-      ? "公開フラグはすべて false"
-      : `公開フラグ（${enabledFlags.join(", ")}）は有効`;
   console.warn(
-    `${LABEL} NOTE: 違反はありませんが、imgix 経由の画像も検出できませんでした（${flagState}）。` +
-      ` 協賛企業（SponsorBanner / /about/sponsors）はどの公開フラグにも依存しないため、` +
-      `本来はフラグが全て false でも microCMS の画像がHTMLに出ます。` +
+    `${LABEL} NOTE: 違反はありませんが、imgix 経由の画像も検出できませんでした。` +
+      ` 協賛企業（SponsorBanner / /about/sponsors）などの microCMS 画像もHTMLに出ていません。` +
       ` 0枚ということは協賛の取得が0件だった可能性が高く、検査は空振りしています` +
       `（HTML ${htmlFiles.length} 枚を走査）。`
   );

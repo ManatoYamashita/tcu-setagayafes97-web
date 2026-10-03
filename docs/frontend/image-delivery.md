@@ -422,8 +422,7 @@ microCMS の画像が1枚もHTMLに出ないと、検査対象が消える。そ
 成功扱いにする（入稿0件や取得失敗と区別が付かないため合否条件にしない）。
 
 > [!IMPORTANT]
-> **公開フラグが全て false でも空振りしない。** 協賛企業（`SponsorBanner` と
-> `/about/sponsors`）は `NEXT_PUBLIC_*_VISIBLE` のどれにも依存せず、常に microCMS を読む。
+> **協賛企業の画像も検査対象。** `SponsorBanner` と `/about/sponsors` は microCMS を読む。
 > したがって `NOTE` が出るのは「協賛の取得が0件だった」ときであり、**それは正常ではなく
 > 異常の合図である。** ログに `NOTE` が出ているときは、検査が効いていないと考えること。
 

@@ -135,25 +135,18 @@ jobs:
     steps:
       # 資格情報が空でも src/lib/microcms.ts は空データを返し、ビルドは緑になる。
       # そのせいで 2026-09-30 まで Build Check は microCMS を一度も読めていなかった（#352）。
-      # 公開フラグも未登録だと黙って false になり、本番と違うページを検査する。
       # 空なら install より先に落とす。値が誤っている場合は microCMS が 401 を返し、
       # microcmsGet() が例外を投げてビルドが落ちるため、ここでは有無だけを見る。
       # fork からの PR には secrets が渡らないので、同じリポジトリの push / PR に限る。
-      - name: Require microCMS secrets and publish flags
+      - name: Require build credentials and URL
         if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
         env:
           MICROCMS_SERVICE_DOMAIN: ${{ secrets.MICROCMS_SERVICE_DOMAIN }}
           MICROCMS_API_KEY: ${{ secrets.MICROCMS_API_KEY }}
           NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
-          NEXT_PUBLIC_EVENTS_VISIBLE: ${{ vars.NEXT_PUBLIC_EVENTS_VISIBLE }}
-          NEXT_PUBLIC_NEWS_VISIBLE: ${{ vars.NEXT_PUBLIC_NEWS_VISIBLE }}
-          NEXT_PUBLIC_SPECIAL_VISIBLE: ${{ vars.NEXT_PUBLIC_SPECIAL_VISIBLE }}
-          NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE: ${{ vars.NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE }}
         run: |
           missing=""
-          for name in MICROCMS_SERVICE_DOMAIN MICROCMS_API_KEY NEXT_PUBLIC_URL \
-            NEXT_PUBLIC_EVENTS_VISIBLE NEXT_PUBLIC_NEWS_VISIBLE \
-            NEXT_PUBLIC_SPECIAL_VISIBLE NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE; do
+          for name in MICROCMS_SERVICE_DOMAIN MICROCMS_API_KEY NEXT_PUBLIC_URL; do
             if [ -z "${!name}" ]; then
               missing="$missing $name"
             fi
@@ -164,7 +157,7 @@ jobs:
             exit 1
           fi
 
-          echo "microCMS の secrets 2本と Variables 5本がすべて届いています。"
+          echo "microCMS の secrets 2本と NEXT_PUBLIC_URL が届いています。"
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -181,8 +174,3 @@ jobs:
           MICROCMS_API_KEY: ${{ secrets.MICROCMS_API_KEY }}
           NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
           NEXT_PUBLIC_GTM_ID: ${{ vars.NEXT_PUBLIC_GTM_ID }}
-          # 未設定は "true" 以外として扱われ、安全側（非公開）でビルドされる
-          NEXT_PUBLIC_EVENTS_VISIBLE: ${{ vars.NEXT_PUBLIC_EVENTS_VISIBLE }}
-          NEXT_PUBLIC_NEWS_VISIBLE: ${{ vars.NEXT_PUBLIC_NEWS_VISIBLE }}
-          NEXT_PUBLIC_SPECIAL_VISIBLE: ${{ vars.NEXT_PUBLIC_SPECIAL_VISIBLE }}
-          NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE: ${{ vars.NEXT_PUBLIC_SPECIAL_GOODS_VISIBLE }}
