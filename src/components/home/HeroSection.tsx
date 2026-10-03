@@ -169,10 +169,10 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
     <section
       ref={sectionRef}
       id="hero-section"
-      className="w-full h-[52svh] min-h-[360px] lg:h-[50svh] relative z-10 overflow-hidden flex items-center justify-center pb-16 md:pb-20 lg:pb-24"
+      className="w-full h-[calc(100svh-var(--header-height))] relative z-10 overflow-hidden flex items-center justify-center pb-16 md:pb-20 lg:pb-24"
     >
       {/* [z-20] ロゴ画像（中央配置） */}
-      <div className="relative z-20 flex w-full max-w-[75vw] -translate-y-10 items-center justify-center sm:max-w-[50vw] sm:-translate-y-6 md:max-w-[min(35vw,36svh)] md:translate-y-0 lg:max-w-[min(30vw,34svh)]">
+      <div className="relative z-20 flex w-full max-w-[75vw] -translate-y-10 items-center justify-center sm:max-w-[50vw] sm:-translate-y-6 md:max-w-[35vw] md:translate-y-0 lg:max-w-[30vw]">
         <AppImage
           src="/images/brand/favicon-outline.avif"
           alt="世田谷祭のアイコン"
@@ -188,7 +188,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
       {/* [z-30] h1 タイトル（2行アーチ型・アイコンの上に重なる） */}
       <h1
         ref={h1Ref}
-        className="absolute z-30 w-[85vw] sm:w-[70vw] md:w-[min(55vw,62svh)] lg:w-[min(50vw,62svh)] will-change-transform hero-entrance-target -translate-y-10 sm:-translate-y-6 md:translate-y-0"
+        className="absolute z-30 w-[85vw] sm:w-[70vw] md:w-[55vw] lg:w-[50vw] will-change-transform hero-entrance-target -translate-y-10 sm:-translate-y-6 md:translate-y-0"
       >
         <svg
           viewBox="0 0 600 280"

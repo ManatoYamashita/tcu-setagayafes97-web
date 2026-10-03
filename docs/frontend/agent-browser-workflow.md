@@ -86,7 +86,7 @@ agent-browser console
 | 1920×1080 | 107             | 107        | 992           | 1080 − 88（`--header-height`） |
 | 375×667   | 107             | 107        | 579           | 667 − 88                       |
 
-**Hero の高さは「viewport − 実際の Header 高さ」ではない。** 上の実測は compact 化（2026-09-30）前のトップで、当時の Hero は
+**Hero の高さは「viewport − 実際の Header 高さ」ではない。** 上の実測は全画面ヒーローのトップ（compact に統一しない方針）で、Hero は
 `h-[calc(100svh-var(--header-height))]` で、`--header-height` は `5.5rem`（88px）の近似値である。
 Header の実高はスクロール前 107px / 後 77px で、一次情報は [layout-patterns.md](./layout-patterns.md) の表。
 

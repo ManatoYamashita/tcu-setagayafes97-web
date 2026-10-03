@@ -20,6 +20,14 @@
   分割は「移すだけ」のつもりでも行が落ちます（#311 では設計理由の1行を拾い漏らしていました）。
   列挙された行が**意図した削除と書き換えだけであること**を確かめ、PR の本文に理由付きで載せてください。
   使い方は `scripts/check-doc-split.mjs` の冒頭にあります。
+- **文書の中の値や名前を直すときは、同じ値・名前をリポジトリの文書全体で検索し、全ての箇所を直します。**
+  同じ事実は1つのファイルの中にも、ファイルをまたいでも何度も書かれています。1箇所だけ直すと残りが嘘になります
+  （#354 では `DESIGN.md` のクイックリファレンスに `--font-noto-sans-jp` を残し、#366 で直しました。
+  「本文の行間 1.75」は同じファイルの4箇所にありました）。
+
+  ```bash
+  git grep -n -e '1\.75' -e 'noto-sans-jp' -- docs DESIGN.md .claude AGENTS.md README.md
+  ```
 
 ## ドキュメント一覧
 
@@ -57,9 +65,12 @@
 - **[testing.md](./dev/testing.md)** - テスト方針（何をユニットテストにし、何を実ブラウザに回すか。#157）
   - **jsdom / happy-dom を入れてはいけない。** `getBoundingClientRect()` が常に 0 で #148 を原理的に検出できない
   - **テストの価値は「落ちること」でしか測れない。** 退行を注入して赤になるのを確かめる
-- **[ci-env.md](./dev/ci-env.md)** - GitHub Actions / Vercel の環境変数と公開フラグ、本番反映の判定
+- **[ci-env.md](./dev/ci-env.md)** - GitHub Actions / Vercel の環境変数と公開フラグ
   - **公開フラグは未設定でもエラーにならず黙って非公開になる。** 登録先は4箇所
   - **`vercel promote` は使わない。** Preview の環境変数の成果物が本番に出る
+- **[vercel-production-deploy.md](./dev/vercel-production-deploy.md)** - Vercel の本番反映の判定、取りこぼしからの復旧、デプロイ数の上限
+  - **Guard が落ちたら、コミットの Vercel ステータスを先に見る。** `Deployment rate limited` なら取りこぼしではなく Hobby の上限（24時間で100件）。待つしかない
+  - **`docs/**` のブランチでは Vercel のデプロイを作らない**（`vercel.json`）。`ignoreCommand` では中止したデプロイも数えるので節約にならない
 - **[domain-migration.md](./dev/domain-migration.md)** - `setagayafes.org` を第97回の正規ドメインにした手順と転送一覧
   - **rewrite プロキシは採らない。** trailing-slash リダイレクトと衝突して無限ループになる
 - **[96th-db-backup.md](./dev/96th-db-backup.md)** - 第96回 WordPress DB バックアップの照合情報と安全な取扱い
