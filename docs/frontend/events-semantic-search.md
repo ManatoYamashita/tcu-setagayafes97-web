@@ -19,16 +19,16 @@ Jev はテキストを生成せず、**型付きの判断**（Choice / Noul / Sc
 
 ## 実装の分担
 
-| ファイル                                         | 役割                                                           |
-| ------------------------------------------------ | -------------------------------------------------------------- |
-| `src/lib/typesafe.ts`                            | `POST /v1/systemone` の薄い `fetch()` ラッパ。**サーバー専用** |
-| `src/lib/semantic-search.ts`                     | 純粋関数。リクエストの組み立て・答えの解釈・第4段のゲート判定  |
-| `src/app/api/search/route.ts`                    | 公開の判断。検証の順序・レート制限・キャッシュヘッダ           |
-| `src/lib/rate-limit.ts`                          | トークンバケット（保険）                                       |
-| `src/components/events/useSemanticSearch.ts`     | クライアントからの問い合わせとキャッシュ                       |
-| `src/components/events/SemanticSearchNotice.tsx` | 状態表示。**`EVENTS_FALLBACK_TREE` に登録済み**                |
-| `src/components/events/EventsContent.tsx`        | ゲートの適用と、現在の絞り込みとの積集合                       |
-| `scripts/measure-semantic-search.mjs`            | 実測と fixture の採取。**CI では走らない。課金あり**           |
+| ファイル                                         | 役割                                                                                                                                     |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/typesafe.ts`                            | `POST /v1/systemone` の薄い `fetch()` ラッパ。**サーバー専用**                                                                           |
+| `src/lib/semantic-search.ts`                     | 純粋関数。リクエストの組み立て・答えの解釈・第4段のゲート判定                                                                            |
+| `src/app/api/search/route.ts`                    | 公開の判断。検証の順序・レート制限・キャッシュヘッダ                                                                                     |
+| `src/lib/rate-limit.ts`                          | トークンバケット（保険）                                                                                                                 |
+| `src/components/events/useSemanticSearch.ts`     | クライアントからの問い合わせとキャッシュ                                                                                                 |
+| `src/components/events/SemanticSearchNotice.tsx` | 状態表示。待機中は回転表示を出し、`EventsView` が一覧を `EventGridSkeleton` へ差し替える。**どちらも `EVENTS_FALLBACK_TREE` に登録済み** |
+| `src/components/events/EventsContent.tsx`        | ゲートの適用と、現在の絞り込みとの積集合                                                                                                 |
+| `scripts/measure-semantic-search.mjs`            | 実測と fixture の採取。**CI では走らない。課金あり**                                                                                     |
 
 ## SDK は入れない
 

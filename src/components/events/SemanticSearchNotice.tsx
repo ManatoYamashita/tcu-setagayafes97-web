@@ -1,3 +1,4 @@
+import { Loader2 } from "lucide-react";
 import type { SemanticOutcome } from "@/lib/semantic-search";
 
 export interface SemanticSearchNoticeProps {
@@ -33,11 +34,17 @@ export function SemanticSearchNotice({ outcome, query }: SemanticSearchNoticePro
 
   return (
     <p
-      className="mb-4 rounded-lg bg-primary-50 px-4 py-3 text-sm text-gray-700"
+      className="mb-4 flex items-center gap-2 rounded-lg bg-primary-50 px-4 py-3 text-sm text-gray-700"
       role="status"
       aria-live="polite"
     >
-      {messages[outcome]}
+      {outcome === "loading" && (
+        <Loader2
+          className="h-4 w-4 shrink-0 animate-spin text-primary-600 motion-reduce:animate-none"
+          aria-hidden="true"
+        />
+      )}
+      <span>{messages[outcome]}</span>
     </p>
   );
 }
