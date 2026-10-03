@@ -2,6 +2,7 @@ import type { Event } from "@/types/events";
 import { buildEventsQuery, type FilterParams } from "@/lib/filters";
 import type { BuildingFilterOption } from "@/data/filter-options";
 import { EventFilters } from "./EventFilters";
+import { EventGridSkeleton } from "./EventGridSkeleton";
 import { EventInfiniteList } from "./EventInfiniteList";
 import { SemanticSearchNotice, type SemanticSearchNoticeProps } from "./SemanticSearchNotice";
 
@@ -73,6 +74,8 @@ export function EventsView({
    */
   const listKey = `${buildEventsQuery(filters) || "all"}${semantic?.outcome ? `|${semantic.outcome}` : ""}`;
 
+  const isSearching = semantic?.outcome === "loading";
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="lg:grid lg:grid-cols-[300px_1fr] lg:gap-8">
@@ -112,22 +115,33 @@ export function EventsView({
           {/* 意味検索（第4段）の状態。リテラル検索で当たったときは描かれない */}
           {semantic && <SemanticSearchNotice {...semantic} />}
 
-          {/* 検索結果件数 */}
-          <div className="mb-6 flex items-center justify-between">
-            <p className="text-sm text-gray-700" role="status" aria-live="polite">
-              <span className="font-semibold text-gray-900">{events.length}</span>{" "}
-              件の企画が見つかりました
-            </p>
-          </div>
+          {isSearching ? (
+            /*
+              意味検索の応答待ち。リテラル検索が0件のときだけここへ来るので、そのまま描くと
+              「0 件の企画が見つかりました」と空の一覧が出て、探している最中なのか
+              見つからなかったのかが区別できない。件数と一覧を骨格へ差し替える
+            */
+            <EventGridSkeleton count={4} />
+          ) : (
+            <>
+              {/* 検索結果件数 */}
+              <div className="mb-6 flex items-center justify-between">
+                <p className="text-sm text-gray-700" role="status" aria-live="polite">
+                  <span className="font-semibold text-gray-900">{events.length}</span>{" "}
+                  件の企画が見つかりました
+                </p>
+              </div>
 
-          {/* 企画グリッド（無限スクロール） */}
-          <EventInfiniteList
-            key={listKey}
-            events={events}
-            initialVisibleCount={initialVisibleCount}
-            step={step}
-            filters={filters}
-          />
+              {/* 企画グリッド（無限スクロール） */}
+              <EventInfiniteList
+                key={listKey}
+                events={events}
+                initialVisibleCount={initialVisibleCount}
+                step={step}
+                filters={filters}
+              />
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import { eventsHref, type FilterParams } from "@/lib/filters";
 import {
   dateFilterOptions,
@@ -80,6 +80,15 @@ export function EventFilters({ filters, buildingOptions }: EventFiltersProps) {
    * 入力欄は常に追従させ、URL へ送るのだけを待たせます。
    */
   const [isComposing, setIsComposing] = useState(false);
+
+  /**
+   * 入力した語が、まだ一覧へ反映されていない間
+   *
+   * 打鍵からデバウンス（300ms）を経て URL が変わるまで、一覧は動かない。その間に何も
+   * 出さないと、検索が効いていないように見える。入力欄の中に回転表示を出して知らせる。
+   * IME の変換中は送信自体が止まっているため、変換が済むまでは出さない。
+   */
+  const isKeywordPending = !isComposing && keywordDraft !== currentKeyword;
 
   /**
    * 最後に自分が URL へ送った値
@@ -263,21 +272,29 @@ export function EventFilters({ filters, buildingOptions }: EventFiltersProps) {
           >
             キーワード検索
           </label>
-          <input
-            type="text"
-            id="keyword-search"
-            placeholder="例: 9号館のダンス"
-            value={keywordDraft}
-            onChange={(e) => {
-              setKeywordDraft(e.target.value);
-              setIsComposing(Boolean((e.nativeEvent as InputEvent).isComposing));
-            }}
-            onCompositionEnd={(e) => {
-              setIsComposing(false);
-              setKeywordDraft(e.currentTarget.value);
-            }}
-            className="w-full rounded-lg border border-gray-400 bg-white px-4 py-2 text-base text-gray-900 placeholder-gray-600 focus:border-gray-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600 sm:text-sm"
-          />
+          <div className="relative">
+            <input
+              type="text"
+              id="keyword-search"
+              placeholder="例: 9号館のダンス"
+              value={keywordDraft}
+              onChange={(e) => {
+                setKeywordDraft(e.target.value);
+                setIsComposing(Boolean((e.nativeEvent as InputEvent).isComposing));
+              }}
+              onCompositionEnd={(e) => {
+                setIsComposing(false);
+                setKeywordDraft(e.currentTarget.value);
+              }}
+              className="w-full rounded-lg border border-gray-400 bg-white py-2 pr-10 pl-4 text-base text-gray-900 placeholder-gray-600 focus:border-gray-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600 sm:text-sm"
+            />
+            {isKeywordPending && (
+              <Loader2
+                className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 animate-spin text-gray-600 motion-reduce:animate-none"
+                aria-hidden="true"
+              />
+            )}
+          </div>
           <p className="mt-2 text-xs text-gray-700">
             企画名・団体名・場所・紹介文から探します。文章のまま入力できます。
           </p>

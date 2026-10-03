@@ -15,6 +15,7 @@ const EVENTS_FALLBACK_TREE = [
   "src/components/events/EventFilters.tsx",
   "src/components/events/EventInfiniteList.tsx",
   "src/components/events/EventGrid.tsx",
+  "src/components/events/EventGridSkeleton.tsx",
   "src/components/events/EventCard.tsx",
   "src/components/events/SemanticSearchNotice.tsx",
 ];
