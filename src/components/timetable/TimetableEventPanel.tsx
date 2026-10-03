@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ArrowUpRight, X } from "lucide-react";
 import { AppImage } from "@/components/ui/AppImage";
+import { SlidePanel } from "@/components/ui/SlidePanel";
 import { Badge } from "@/components/ui/Badge";
 import { SNSLinks } from "@/components/events/SNSLinks";
 import { EventMediaPlaceholder } from "@/components/events/EventMediaPlaceholder";
@@ -34,12 +34,6 @@ interface TimetableEventPanelProps {
   onNavigate: (entryKey: string) => void;
 }
 
-/**
- * 退場アニメーションが `animationend` を出さなかったときの保険（ms）。
- * `globals.css` の `.timetable-panel[data-closing]` の所要時間より長くすること。
- */
-const CLOSE_FALLBACK_MS = 320;
-
 const dateBadgeLabels = { day1: "1日目", day2: "2日目", both: "両日", other: "その他" } as const;
 const typeBadgeLabels = { stage: "ステージ", special: "スペシャル" } as const;
 
@@ -60,98 +54,16 @@ function timeText(event: TimetableEntry): string {
 /**
  * タイムテーブルの企画詳細パネル
  *
- * ネイティブ `<dialog>` を `showModal()` で開く。フォーカストラップ・Esc・背景の inert・
- * top layer（z-index が要らない）を標準で得られる。デスクトップでは右からのパネル、
- * 狭い画面では下からのボトムシートになる。形状と動きは `globals.css` の `.timetable-panel`。
- *
- * 入場・退場とも CSS keyframes で動かす。`@starting-style` + `overlay` の方式は退場が
- * Firefox / Safari で効かないため採らない。退場だけ JS で `data-closing` を付け、
- * アニメーションの終了を待ってから `close()` する。
+ * 開閉の機構（`<dialog>`・退場アニメーション・Esc・背景の押下）は `SlidePanel` が持つ。
+ * ここは中身と、前後の企画への移動だけを受け持つ。
  *
  * 設計判断は docs/frontend/timetable-event-panel.md を参照。
  */
 export function TimetableEventPanel({ view, onClose, onNavigate }: TimetableEventPanelProps) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const isOpen = view !== null;
-
-  // 退場中も内容を描くため、最後に開いていた内容を保持する。
-  // render 中の setState は「props が変わったら state を合わせる」公式の書き方で、
-  // view の同一性が変わらない限り再描画は1回で止まる。
-  const [snapshot, setSnapshot] = useState<TimetablePanelView | null>(view);
-  if (view !== null && view !== snapshot) setSnapshot(view);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-
-    if (isOpen) {
-      delete dialog.dataset.closing;
-      if (!dialog.open) dialog.showModal();
-      return;
-    }
-
-    if (!dialog.open) return;
-
-    let done = false;
-    const finish = () => {
-      if (done) return;
-      done = true;
-      delete dialog.dataset.closing;
-      dialog.close();
-      setSnapshot(null);
-    };
-    const onEnd = (e: AnimationEvent) => {
-      if (e.target === dialog) finish();
-    };
-
-    dialog.dataset.closing = "";
-    dialog.addEventListener("animationend", onEnd);
-    const timer = window.setTimeout(finish, CLOSE_FALLBACK_MS);
-
-    return () => {
-      // 退場の途中で開き直された（または unmount された）場合
-      window.clearTimeout(timer);
-      dialog.removeEventListener("animationend", onEnd);
-    };
-  }, [isOpen]);
-
-  // unmount 時に top layer へ残さない
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    return () => {
-      if (dialog?.open) dialog.close();
-    };
-  }, []);
-
-  // Esc。ネイティブの閉じ方に任せると URL と状態が食い違うため、自前の閉じる処理へ流す
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-
-    const onCancel = (e: Event) => {
-      e.preventDefault();
-      onClose();
-    };
-    dialog.addEventListener("cancel", onCancel);
-    return () => dialog.removeEventListener("cancel", onCancel);
-  }, [onClose]);
-
-  const current = view ?? snapshot;
-  // 背景の押下は dialog 自身が target になる。中身は dialog を隙間なく覆うため、
-  // パネルの内側を押して誤って閉じることはない。Safari は `closedby` 未対応なのでこの経路が必須
-  const handleClick = (e: React.MouseEvent<HTMLDialogElement>) => {
-    if (e.target === dialogRef.current) onClose();
-  };
-
   return (
-    <dialog
-      ref={dialogRef}
-      className="timetable-panel"
-      aria-labelledby="timetable-panel-title"
-      onClick={handleClick}
-    >
-      {current && <PanelBody view={current} onClose={onClose} onNavigate={onNavigate} />}
-    </dialog>
+    <SlidePanel open={view !== null} onClose={onClose} labelledBy="timetable-panel-title">
+      {view && <PanelBody view={view} onClose={onClose} onNavigate={onNavigate} />}
+    </SlidePanel>
   );
 }
 

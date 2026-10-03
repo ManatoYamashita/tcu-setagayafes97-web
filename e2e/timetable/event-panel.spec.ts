@@ -1,6 +1,6 @@
 import { expect, test } from "../fixtures";
 
-const PANEL = "dialog.timetable-panel";
+const PANEL = "dialog.slide-panel";
 const CARD = "[data-timetable-event] a";
 const TITLE = "軽音楽部 ライブステージ";
 

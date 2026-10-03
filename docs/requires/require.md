@@ -338,7 +338,7 @@ interface Information {
 #### 4.7.2 協賛・協力 (/about/sponsors)
 
 - Informations APIから取得（category: 'sponsor'）。約30社想定
-- 画像・説明・URL のいずれかを持つ協賛はロゴ付きカード（リンクは任意）、社名しか無い協賛は小さなタイルで並べる（`src/lib/sponsor-list.ts`。#337）
+- 全社を同じ大きさのロゴ（画像が無ければ団体名）タイルで `priority` 順に並べる。画像・説明・URL のいずれかを持つ協賛だけが押せて、押すとスライドパネル（`SlidePanel`。タイムテーブルと同じ機構）に説明・Web サイトを出す。社名しか無い協賛は押せない（`src/lib/sponsor-list.ts` の `hasSponsorDetails`。#371）
 - 導線: トップと `/about` の協賛バー（`SponsorBanner`）の CTA、フッターの「委員会について」節
 
 #### 4.7.3 お問い合わせフォーム (/info/contact)

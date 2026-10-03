@@ -16,6 +16,8 @@ export const sponsorsPageContent = {
   emptyMessage: "現在、協賛・協力の情報は準備中です。",
   /** 協賛先の Web サイトへのリンク文言 */
   websiteLabel: "Webサイトを見る",
+  /** 詳細パネルの閉じるボタンの名前 */
+  closeLabel: "協賛の詳細を閉じる",
 } as const;
 
 /** トップ・委員会ページの協賛バーから一覧ページへ誘導する CTA */
