@@ -136,7 +136,7 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
                       src={imageUrl}
                       alt={event.title}
                       fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="object-cover transition-transform duration-500 motion-safe:group-hover:scale-105"
                       sizes="340px"
                     />
 
