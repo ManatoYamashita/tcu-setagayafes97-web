@@ -100,9 +100,15 @@
 
 ### フロントエンド関連（frontend/）
 
-- **[design.md](./frontend/design.md)** - デザインシステム（カラートークン、コントラスト、CSS 変数）
-  - **配信される紫は `#bf73e3`**（仕様 HEX `#CD79EE` ではない）。コントラストは実配信値で測る
+- **[design.md](./frontend/design.md)** - デザインシステムの入口（カラートークン、Semantic Color、背景の装飾、CSS 変数）
+  - **配信される紫は `#bf73e3`**（仕様 HEX `#CD79EE` ではない）
+  - **装飾のぼかし（`radial-gradient`）は `closest-side` で箱に内接させる**（#387。`circle` の既定は縦長の箱で端が切れる）
+- **[color-contrast.md](./frontend/color-contrast.md)** - 実配信値の測り方とコントラスト比
+  - **コントラストは実配信値で測る。** 配信CSSの `#hex` は既定パレットではフォールバック（誰も見ていない色）
+- **[color-rules.md](./frontend/color-rules.md)** - 色の使用規約と、それを守る ESLint・`check:colors`
   - **Tailwind 既定パレットを直接使わない。** `@theme` に無い色名はエラーも警告も出ずに既定値へ落ちる
+- **[interaction-states.md](./frontend/interaction-states.md)** - ホバー（`hoverable`）とキーボードフォーカスの規約
+- **[prose.md](./frontend/prose.md)** - microCMS のリッチテキスト（`prose`）の規則。`@tailwindcss/typography` は未導入
 - **[typography.md](./frontend/typography.md)** - Kaisei Opti の読み込みと使い分け、文字サイズと行送り（Tailwind の既定値）
   - **Kaisei Opti は要素で決まる（`h1`〜`h3` はサイズを問わず）。** sans にしたい見出しは `font-sans` を明示する（2026-09-30 に規約を実装へ揃えた）
 - **[access-page-design.md](./frontend/access-page-design.md)** - Access ページの情報設計・地図・経路・フォーカス表示・モーション方針

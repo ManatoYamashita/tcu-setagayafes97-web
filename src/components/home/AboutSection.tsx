@@ -144,7 +144,7 @@ export function AboutSection() {
     >
       {/* z-0: 背景グラデーションblob（ピンク系グロウ）。
           大きさは closest-side（要素に内接する楕円）で決める。circle の既定は farthest-corner で、
-          モバイルの縦長の箱（390px 幅で 172×705px）では左右の端に色が残り、縦の直線に切れていた（#387） */}
+          モバイルの縦長の箱（390px 幅で 172×705px）では左右の端に色が残り、縦の直線に切れていた（#387。docs/frontend/design.md「背景の装飾」） */}
       <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
         <div
           className="animate-blob absolute top-[10%] right-[5%] md:right-[0%] h-[50%] w-[45%] rounded-full"

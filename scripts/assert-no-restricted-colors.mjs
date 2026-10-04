@@ -184,7 +184,7 @@ function main() {
     `\n**コメントの中でも同じ扱いになります。** Tailwind のソース走査はテキスト走査なので、
 コメントに書いたクラス名もそのまま配信CSSへ出ます。説明したいときは
 「既定パレットの紫の500段」のように接頭辞なしで書いてください
-（docs/frontend/design.md「コメントの中のクラス名」）。`
+（docs/frontend/color-rules.md「コメントの中のクラス名」）。`
   );
   process.exitCode = 1;
 }

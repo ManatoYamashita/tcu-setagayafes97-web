@@ -200,12 +200,12 @@ export function AboutHero({ content }: { content: AboutPageContent["hero"] }) {
               終点を1段だけ暗くすれば足りる。桃の400段は 2.53 で届かないが500段は 3.29 で通る。
               始点の既定パレット紫は eslint.config.mjs が禁止しているためブランド紫へ置き換えた
               （色相差 15° 未満でブランド紫と区別されないため）。
-              桃の500段は special バッジと同じ段で、docs/frontend/design.md が
+              桃の500段は special バッジと同じ段で、docs/frontend/color-rules.md が
               「残している非ブランド色相」として明記している。
 
               桃の500段とブランド紫の500段は、フォールバックの #hex と lab() が一致するため
               上の描画色をそのまま比の計算に使える（食い違うのは既定パレットの高彩度段。
-              docs/frontend/design.md「実配信HEXは2つある」）。
+              docs/frontend/color-contrast.md「『実配信HEX』は2つある」）。
 
               **ここにクラス名を原形で書かないこと。** Tailwind のソース走査はコメントも
               読むため、書いた瞬間に使っていないユーティリティが配信CSSへ出る。

@@ -78,7 +78,7 @@ const FENCE = /^ {0,3}(`{3,}|~{3,})/;
  * 剥がしてから fence を判定する。剥がさないと `> ```bash` が fence として認識されず、
  * **引用の中のコードブロックだけが走査対象に残る。** 現在3箇所ある
  * （`docs/dev/ci-env.md` / `docs/frontend/browser-verification-pitfalls.md` /
- * `docs/frontend/design.md`）。
+ * `docs/frontend/color-contrast.md`）。
  */
 const BLOCKQUOTE = /^(?: {0,3}>\s?)+/;
 

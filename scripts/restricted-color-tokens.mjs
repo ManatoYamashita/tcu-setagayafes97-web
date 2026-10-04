@@ -10,7 +10,7 @@
  *
  * #227 では禁止リストが `eslint.config.mjs` の中に4つの正規表現として直接置かれていた。
  * 検査を1本足すと同じ表現が2箇所に増え、**片方だけ直したときに片方をすり抜ける。**
- * `docs/frontend/design.md` は「`@theme` へ段を足したら禁止リストから外すこと」と
+ * `docs/frontend/color-rules.md` は「`@theme` へ段を足したら禁止リストから外すこと」と
  * 書いているが、外す場所が2箇所あると「外したつもりで外れていない」が起こる。
  *
  * **`@theme` へ段を足したときに触るのは、このファイル1箇所だけである。**
@@ -25,7 +25,7 @@ export const RESTRICTED_PURPLE = {
   /** `50` / `100`〜`900` / `950`。`(?![0-9])` は `purple-5000` のような別語への誤爆を防ぐ */
   pattern: "(?:purple|violet|fuchsia)-(?:50|950|[1-9]00)(?![0-9])",
   message:
-    "Tailwind 既定の purple / violet / fuchsia は使えません。ブランドと色相差が 15° 未満で、別色として認識されないためです。primary-* の同じ段へ置き換えてください（docs/frontend/design.md「紫はすべて primary-* を使う」）。",
+    "Tailwind 既定の purple / violet / fuchsia は使えません。ブランドと色相差が 15° 未満で、別色として認識されないためです。primary-* の同じ段へ置き換えてください（docs/frontend/color-rules.md「紫はすべて primary-* を使う」）。",
 };
 
 /**
@@ -36,7 +36,7 @@ export const RESTRICTED_GRAY = {
   id: "gray",
   pattern: "gray-(?:300|800|950)(?![0-9])",
   message:
-    "gray-300 / gray-800 / gray-950 は @theme に定義がなく、既定の青みがかったスレートへ落ちます。gray-200 など定義済みの段へ寄せるか、globals.css の @theme へ段を足してこの規則から外してください（docs/frontend/design.md「Tailwind 既定パレットを直接使わない」）。",
+    "gray-300 / gray-800 / gray-950 は @theme に定義がなく、既定の青みがかったスレートへ落ちます。gray-200 など定義済みの段へ寄せるか、globals.css の @theme へ段を足してこの規則から外してください（docs/frontend/color-rules.md「Tailwind 既定パレットを直接使わない」）。",
 };
 
 /** 両ガードが参照する禁止トークンの全件 */

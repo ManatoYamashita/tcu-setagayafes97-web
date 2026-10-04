@@ -50,7 +50,7 @@
   /* 前景テキスト・アイコンに使ってはいけない。ページ背景 --color-secondary との
      コントラストは 1.23:1、白10%を重ねたカードでも 1.32:1 しかなく、ほぼ同色になる。
      暗色背景時代の名残であり、淡紫背景の現行デザインでは装飾用途に限る。
-     淡紫背景上のテキストは --color-primary-700(5.64:1) を使うこと（docs/frontend/design.md）。
+     淡紫背景上のテキストは --color-primary-700(5.64:1) を使うこと（docs/frontend/color-contrast.md）。
      比率も上の各行の HEX も、Lightning CSS が oklch から変換した出力CSSの実配信値である。
 
      ブランドカラーの一次定義はこのファイルだけで、配信されるのは #bf73e3 である。
@@ -130,7 +130,7 @@ body {
   .prose a {
     /* Primary(実配信 #bf73e3) は白背景の通常テキストでコントラスト 3.10:1 となり
        WCAG AA を満たさない。本文中のインラインリンクには 7.45:1 の
-       primary-dark(実配信 #7b359a) を使う。詳細は docs/frontend/design.md */
+       primary-dark(実配信 #7b359a) を使う。詳細は docs/frontend/prose.md */
     color: var(--color-primary-dark);
     text-decoration: none;
     text-underline-offset: 2px;

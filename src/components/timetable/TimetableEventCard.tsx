@@ -67,7 +67,7 @@ export function TimetableEventCard({
     .join("／");
 
   // 面は primary-700（白文字で 11.2:1）。ホバーで primary-600（同 7.45:1）へ明るくする。
-  // primary-400 以下へ寄せると白文字が AA に届かない（docs/frontend/design.md「コントラスト比」）。
+  // primary-400 以下へ寄せると白文字が AA に届かない（docs/frontend/color-contrast.md「コントラスト比」）。
   // 枠線は透明で 1px を残す。`getCardDensity` の閾値が上下の border 2px を含めて計算しているため、
   // 枠ごと外すとカード内の高さ配分がずれる。
   //

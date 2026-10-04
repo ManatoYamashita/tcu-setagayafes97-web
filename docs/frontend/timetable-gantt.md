@@ -4,7 +4,7 @@
 そこへ至った事故の記録です。
 
 関連: [layout-patterns.md](./layout-patterns.md)（レイアウト全般） /
-[design.md](./design.md)（白いシート上のコントラスト） /
+[color-contrast.md](./color-contrast.md)（白いシート上のコントラスト） /
 [browser-verification-pitfalls.md](./browser-verification-pitfalls.md)（検証手順）
 
 ---

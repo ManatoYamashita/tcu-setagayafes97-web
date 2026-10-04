@@ -91,7 +91,7 @@ const RESTRICTED_COLOR_SELECTORS = RESTRICTED_COLOR_TOKENS.flatMap(({ pattern, m
  * | `primary-600` | 7.45:1       | 推奨 |
  * | `primary-700` | 11.2:1       | 推奨 |
  *
- * `globals.css` の `--color-primary` にも `docs/frontend/design.md` にも
+ * `globals.css` の `--color-primary` にも `docs/frontend/color-contrast.md` にも
  * 「前景テキストに使ってはいけない」と書いてあったが、**文書は人間が読まなければ効かない。**
  * 2026-09-22 の監査で5箇所（privacy / faq / FeaturedCarousel / SponsorModal /
  * TicketTable）が残っていた。#95 は同じ欠陥を 2026-08-24 に起票し、
@@ -110,7 +110,7 @@ const WHITE_ON_BRAND_PATTERN =
   "(?=[\\s\\S]*(?:^|\\s)bg-(?:primary|accent)(?:-(?:400|300|200|100|50))?(?![-\\w]))(?=[\\s\\S]*(?:^|\\s)text-white(?![-\\w]))";
 
 const WHITE_ON_BRAND_MESSAGE =
-  "ブランドカラー（--color-primary / --color-accent = 実配信 #bf73e3）の上に白文字を置くと 3.10:1 で、WCAG AA の 4.5:1 に届きません（#95）。bg-primary-600（7.45:1）か bg-primary-700（11.2:1）を使ってください。値の一覧は docs/frontend/design.md「コントラスト比」。";
+  "ブランドカラー（--color-primary / --color-accent = 実配信 #bf73e3）の上に白文字を置くと 3.10:1 で、WCAG AA の 4.5:1 に届きません（#95）。bg-primary-600（7.45:1）か bg-primary-700（11.2:1）を使ってください。値の一覧は docs/frontend/color-contrast.md「コントラスト比」。";
 
 /**
  * 前景色に別名 `text-primary` / `text-accent` を使うことの禁止（#270）
@@ -185,7 +185,7 @@ const RESTRICTED_CONTRAST_SELECTORS = [
  *
  * 正しい形は `focus-visible:outline-3 focus-visible:outline-offset-3
  * focus-visible:outline-primary-600`（暗色の下地では `outline-white`）。
- * 値の選び方は docs/frontend/access-page-design.md「フォーカスリング」。
+ * 値の選び方は docs/frontend/interaction-states.md「キーボードフォーカス」。
  *
  * **射程外（意図的）**
  *
@@ -198,7 +198,7 @@ const FOCUS_OUTLINE_REMOVAL_PATTERN =
   "(?:^|\\s)(?:[a-z-]+:)*focus:outline-(?:none|hidden)(?![-\\w])";
 
 const FOCUS_OUTLINE_REMOVAL_MESSAGE =
-  "focus:outline-none / focus:outline-hidden でネイティブのフォーカス表示を消さないでください（#176）。代替リングが 3:1 に届かない事故が10ファイルで起きていました。focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600（暗色の下地では outline-white）を使ってください。詳細は docs/frontend/access-page-design.md。";
+  "focus:outline-none / focus:outline-hidden でネイティブのフォーカス表示を消さないでください（#176）。代替リングが 3:1 に届かない事故が10ファイルで起きていました。focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600（暗色の下地では outline-white）を使ってください。詳細は docs/frontend/interaction-states.md。";
 
 /**
  * 上の3つと同じ理由でここへ出す。`no-restricted-syntax` を使うブロックすべてで展開すること。
@@ -237,7 +237,7 @@ const config = [
     //
     // この事故は lint / format / 型 / ユニットテスト / build / Layout E2E のすべてを
     // 通過する。#179 の監査で見つかったときには約50箇所まで広がっていた。
-    // docs/frontend/design.md にも書いてあるが、**文書は人間が読まなければ効かない**
+    // docs/frontend/color-rules.md にも書いてあるが、**文書は人間が読まなければ効かない**
     // （#154 で同じ轍を踏んでいる。上の #156 の規則と同じ理由でここへ置く）。
     //
     // 走査対象は文字列リテラルとテンプレート文字列である。

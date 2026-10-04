@@ -19,7 +19,7 @@ interface FAQFilterDef {
   keywords: string[];
 }
 
-/** 文中・文末のリンク。色ではなく下線で示し、ホバーは hoverable でゲートする（docs/frontend/design.md） */
+/** 文中・文末のリンク。色ではなく下線で示し、ホバーは hoverable でゲートする（docs/frontend/interaction-states.md） */
 const linkClassName =
   "font-semibold text-gray-900 underline decoration-gray-400 underline-offset-4 hoverable:hover:text-primary-700 hoverable:hover:decoration-primary-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600";
 
