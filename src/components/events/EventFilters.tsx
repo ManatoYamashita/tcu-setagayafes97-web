@@ -1,20 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, Loader2 } from "lucide-react";
+import { Loader2, Search, SlidersHorizontal } from "lucide-react";
 import { eventsHref, type FilterParams } from "@/lib/filters";
-import {
-  dateFilterOptions,
-  typeFilterOptions,
-  type BuildingFilterOption,
-} from "@/data/filter-options";
+import type { BuildingFilterOption } from "@/data/filter-options";
+import { EventFilterFields } from "./EventFilterFields";
+import { EventFilterSheet } from "./EventFilterSheet";
 
 interface EventFiltersProps {
   /** 現在のフィルター。遷移先URLの組み立てと選択状態の表示に使う */
   filters: FilterParams;
   /** 建物の選択肢。実データに存在する建物だけが渡ってくる（`listBuildingOptions`） */
   buildingOptions: BuildingFilterOption[];
+  /** 現在の絞り込み結果の件数。lg 未満のシートの閉じるボタンに出す */
+  resultCount: number;
+  /** 意味検索（第4段）の応答待ち。件数が確定していない */
+  isSearching: boolean;
 }
 
 /** キーワード入力からURL反映までのデバウンス時間（ms） */
@@ -30,14 +32,25 @@ const KEYWORD_DEBOUNCE_MS = 300;
  * `useRouter()` / `useState()` / `useEffect()` は bailout を起こさないのでそのまま使えます。
  *
  * **このパネルは親の `<aside>` ごと sticky で画面内に留まる**（#239）。スクロールしても
- * 絞り込みへ戻れるようにするためで、高さの上限（`max-h`）はその前提とセットで要る。
+ * 絞り込みへ戻れるようにするためです。
  *
- * `lg` 未満では開閉可能なパネルにする。開催日・種別・建物・キーワードの4項目が
- * 常に全展開されていると、モバイルで最初のカードが画面外に押し出されるため。
- * 既定は折りたたみだが、URLに絞り込み条件が既にある場合（深いリンク・戻る/進む）は
- * 自動展開してその場で文脈が見えるようにする。
+ * ブレークポイントで形が変わります（#376）。
+ *
+ * - `lg` 以上: サイドバーに全項目を並べる（高さの上限 `max-h` は sticky とセットで要る）
+ * - `lg` 未満: キーワード入力と「条件」ボタンだけの細いバーが追従し、開催日・種別・建物は
+ *   ボトムシート（`EventFilterSheet`）で選ぶ。全項目を追従させると、開いた瞬間に画面の
+ *   7割を占めてカードが見えなくなるため（390x844 で 612px。2026-10-04 実測）
+ *
+ * 2つの形は**DOM の並び順と表示切替だけ**で作り分けます。キーワード入力は1要素のままで、
+ * 両方の形で同じものを使います（IME・デバウンスの状態を二重に持たないため）。
+ * 設計は docs/frontend/events-filter-sheet.md を参照。
  */
-export function EventFilters({ filters, buildingOptions }: EventFiltersProps) {
+export function EventFilters({
+  filters,
+  buildingOptions,
+  resultCount,
+  isSearching,
+}: EventFiltersProps) {
   const router = useRouter();
 
   const currentDate = filters.date ?? "all";
@@ -45,15 +58,26 @@ export function EventFilters({ filters, buildingOptions }: EventFiltersProps) {
   const currentBuilding = filters.building ?? "all";
   const currentKeyword = filters.keyword ?? "";
 
-  const activeFilterCount = [
+  /**
+   * シートで選ぶ項目のうち、選択中の数（「条件」ボタンのバッジ）
+   *
+   * キーワードは数えない。lg 未満でもバーに常に見えているため、数えると二重に知らせることになる。
+   */
+  const sheetFilterCount = [
     currentDate !== "all",
     currentType !== "all",
     currentBuilding !== "all",
-    currentKeyword !== "",
   ].filter(Boolean).length;
-  const hasActiveFilters = activeFilterCount > 0;
 
-  const [isOpen, setIsOpen] = useState(hasActiveFilters);
+  /**
+   * lg 未満のシートの開閉
+   *
+   * **URL に条件があっても自動では開かない。** かつては深いリンクで自動展開していたが、
+   * 展開したまま追従するため、`?type=stage` で来た来場者は最初のカードを画面外
+   * （y=1388px / 844px）に押し出されていた。条件の有無はバッジで知らせる。
+   */
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const closeSheet = useCallback(() => setIsSheetOpen(false), []);
 
   /**
    * キーワードの入力中の値
@@ -146,7 +170,7 @@ export function EventFilters({ filters, buildingOptions }: EventFiltersProps) {
   };
 
   /**
-   * フィルターをリセット
+   * フィルターをリセット（lg 以上のサイドバー。キーワードも含めて全部戻す）
    */
   const handleReset = () => {
     lastSentRef.current = "";
@@ -154,39 +178,30 @@ export function EventFilters({ filters, buildingOptions }: EventFiltersProps) {
     router.push("/events", { scroll: false });
   };
 
+  /**
+   * シートの項目だけを戻す（lg 未満）
+   *
+   * キーワードは戻さない。シートの外（検索バー）にあり、来場者が入力した語を
+   * シートの操作で黙って消すと、何が起きたのか分からなくなるため。
+   */
+  const handleClearSheetFilters = () => {
+    handleFilterChange({ date: "all", type: "all", building: "all" });
+  };
+
   return (
     /*
-      高さの上限は sticky 化（#239）とセットで要る。親の <aside> が画面上部へ貼り付くため、
-      これが無いと開いた瞬間にパネルが画面を縦いっぱいに占め、カードが1枚も見えなくなる。
+      lg 未満: キーワード入力と「条件」ボタンを横に並べた細いバー（枠は入力欄とボタンが持つ）
+      lg 以上: 枠つきのカードに見出し・全項目・キーワードを縦に並べる
+
+      lg の高さの上限は sticky 化（#239）とセットで要る。親の <aside> が画面上部へ貼り付くため、
+      これが無いと項目が多いときにパネルが画面を縦いっぱいに占める。
       ヘッダー（--header-height）と上下の余白を引いた残りが上限。
     */
-    <div className="max-h-[calc(100svh-var(--header-height)-2rem)] overflow-y-auto rounded-lg border border-gray-200 bg-white p-4 lg:p-6">
-      {/*
-        折りたたみ時は下マージンを持たせない。lg 未満ではこのバーが貼り付いたまま
-        常に画面上部を占有するため、閉じているときの高さは 1px でも削る
-        （16px の差でカード1枚分の見え方が変わる）。lg では常に開いているので残す。
-      */}
-      <div className={`flex items-center justify-between lg:mb-4 ${isOpen ? "mb-4" : ""}`}>
-        <h2 className="hidden text-lg font-bold text-gray-900 lg:block">絞り込み</h2>
+    <div className="flex items-center gap-2 lg:block lg:max-h-[calc(100svh-var(--header-height)-2rem)] lg:overflow-y-auto lg:rounded-lg lg:border lg:border-gray-200 lg:bg-white lg:p-6">
+      <div className="mb-4 hidden items-center justify-between lg:flex">
+        <h2 className="text-lg font-bold text-gray-900">絞り込み</h2>
         <button
           type="button"
-          onClick={() => setIsOpen((open) => !open)}
-          aria-expanded={isOpen}
-          aria-controls="event-filters-panel"
-          className="flex items-center gap-2 text-lg font-bold text-gray-900 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 lg:hidden"
-        >
-          <span>絞り込み</span>
-          {hasActiveFilters && (
-            <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-600 px-1.5 text-xs font-semibold text-white">
-              {activeFilterCount}
-            </span>
-          )}
-          <ChevronDown
-            className={`h-5 w-5 text-gray-700 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-            aria-hidden="true"
-          />
-        </button>
-        <button
           onClick={handleReset}
           className="text-sm text-gray-900 underline hoverable:hover:text-gray-900/80 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
           aria-label="フィルターをリセット"
@@ -195,111 +210,97 @@ export function EventFilters({ filters, buildingOptions }: EventFiltersProps) {
         </button>
       </div>
 
-      <div id="event-filters-panel" className={`space-y-6 lg:block ${isOpen ? "" : "hidden"}`}>
-        {/* 日程フィルター */}
-        <fieldset className="mx-0 min-w-0 border-0 p-0">
-          <legend className="m-0 mb-2 block p-0 text-sm font-semibold text-gray-900/90">
-            開催日
-          </legend>
-          <div className="flex flex-wrap gap-2">
-            {dateFilterOptions.map((option) => (
-              <button
-                key={option.value}
-                onClick={() => handleFilterChange({ date: option.value })}
-                className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 ${
-                  currentDate === option.value
-                    ? "border-primary-600 bg-primary-600 text-white"
-                    : "border-gray-200 bg-gray-50 text-gray-700 hoverable:hover:border-gray-400 hoverable:hover:bg-white"
-                }`}
-                aria-pressed={currentDate === option.value}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-
-        {/* 企画種別フィルター */}
-        <fieldset className="mx-0 min-w-0 border-0 p-0">
-          <legend className="m-0 mb-2 block p-0 text-sm font-semibold text-gray-900/90">
-            企画種別
-          </legend>
-          <div className="flex flex-wrap gap-2">
-            {typeFilterOptions.map((option) => (
-              <button
-                key={option.value}
-                onClick={() => handleFilterChange({ type: option.value })}
-                className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 ${
-                  currentType === option.value
-                    ? "border-primary-600 bg-primary-600 text-white"
-                    : "border-gray-200 bg-gray-50 text-gray-700 hoverable:hover:border-gray-400 hoverable:hover:bg-white"
-                }`}
-                aria-pressed={currentType === option.value}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-
-        {/* 建物フィルター（企画が1件以上ある建物だけを出す） */}
-        <div>
-          <label
-            htmlFor="building-filter"
-            className="mb-2 block text-sm font-semibold text-gray-900/90"
-          >
-            建物
-          </label>
-          <select
-            id="building-filter"
-            value={currentBuilding}
-            onChange={(e) => handleFilterChange({ building: e.target.value })}
-            className="w-full rounded-lg border border-gray-400 bg-white px-4 py-2 text-base text-gray-900 focus:border-gray-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600 sm:text-sm"
-          >
-            {buildingOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* キーワード検索 */}
-        <div>
-          <label
-            htmlFor="keyword-search"
-            className="mb-2 block text-sm font-semibold text-gray-900/90"
-          >
-            キーワード検索
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              id="keyword-search"
-              placeholder="例: 9号館のダンス"
-              value={keywordDraft}
-              onChange={(e) => {
-                setKeywordDraft(e.target.value);
-                setIsComposing(Boolean((e.nativeEvent as InputEvent).isComposing));
-              }}
-              onCompositionEnd={(e) => {
-                setIsComposing(false);
-                setKeywordDraft(e.currentTarget.value);
-              }}
-              className="w-full rounded-lg border border-gray-400 bg-white py-2 pr-10 pl-4 text-base text-gray-900 placeholder-gray-600 focus:border-gray-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600 sm:text-sm"
-            />
-            {isKeywordPending && (
-              <Loader2
-                className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 animate-spin text-gray-600 motion-reduce:animate-none"
-                aria-hidden="true"
-              />
-            )}
-          </div>
-          <p className="mt-2 text-xs text-gray-700">
-            企画名・団体名・場所・紹介文から探します。文章のまま入力できます。
-          </p>
-        </div>
+      {/* lg 以上のサイドバー。lg 未満では同じ項目をシートの中に描く */}
+      <div className="hidden lg:block">
+        <EventFilterFields
+          filters={filters}
+          buildingOptions={buildingOptions}
+          onChange={handleFilterChange}
+        />
       </div>
+
+      {/*
+        キーワード検索。両方の形で同じ1要素を使う。
+        `id="keyword-search"` は scripts/assert-events-static-html.mjs が静的HTMLの目印にしている
+      */}
+      <div className="min-w-0 flex-1 lg:mt-6">
+        <label
+          htmlFor="keyword-search"
+          className="sr-only lg:not-sr-only lg:mb-2 lg:block lg:text-sm lg:font-semibold lg:text-gray-900/90"
+        >
+          キーワード検索
+        </label>
+        <div className="relative">
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-600 lg:hidden"
+            aria-hidden="true"
+          />
+          <input
+            type="search"
+            id="keyword-search"
+            enterKeyHint="search"
+            placeholder="例: 9号館のダンス"
+            value={keywordDraft}
+            onChange={(e) => {
+              setKeywordDraft(e.target.value);
+              setIsComposing(Boolean((e.nativeEvent as InputEvent).isComposing));
+            }}
+            onCompositionEnd={(e) => {
+              setIsComposing(false);
+              setKeywordDraft(e.currentTarget.value);
+            }}
+            onKeyDown={(e) => {
+              // 確定キーでソフトウェアキーボードを閉じ、結果を見せる。IME の確定とは区別する
+              if (e.key === "Enter" && !e.nativeEvent.isComposing) e.currentTarget.blur();
+            }}
+            className="h-11 w-full rounded-lg border border-gray-400 bg-white pr-10 pl-9 text-base text-gray-900 placeholder-gray-600 focus:border-gray-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600 lg:h-auto lg:py-2 lg:pl-4 lg:text-sm"
+          />
+          {isKeywordPending && (
+            <Loader2
+              className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 animate-spin text-gray-600 motion-reduce:animate-none"
+              aria-hidden="true"
+            />
+          )}
+        </div>
+        <p className="mt-2 hidden text-xs text-gray-700 lg:block">
+          企画名・団体名・場所・紹介文から探します。文章のまま入力できます。
+        </p>
+      </div>
+
+      {/* lg 未満: 開催日・種別・建物はシートで選ぶ */}
+      <button
+        type="button"
+        onClick={() => setIsSheetOpen(true)}
+        aria-haspopup="dialog"
+        aria-label={
+          sheetFilterCount > 0 ? `絞り込み条件（${sheetFilterCount}件を選択中）` : "絞り込み条件"
+        }
+        className="relative inline-flex h-11 shrink-0 items-center gap-1.5 rounded-lg border border-gray-400 bg-white px-3 text-sm font-semibold text-gray-900 transition-colors hoverable:hover:bg-gray-50 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600 lg:hidden"
+      >
+        <SlidersHorizontal className="size-4" aria-hidden="true" />
+        条件
+        {sheetFilterCount > 0 && (
+          <span
+            className="inline-flex size-5 items-center justify-center rounded-full bg-primary-600 text-xs font-bold text-white tabular-nums"
+            aria-hidden="true"
+            data-filter-count
+          >
+            {sheetFilterCount}
+          </span>
+        )}
+      </button>
+
+      <EventFilterSheet
+        isOpen={isSheetOpen}
+        onClose={closeSheet}
+        filters={filters}
+        buildingOptions={buildingOptions}
+        onChange={handleFilterChange}
+        onClear={handleClearSheetFilters}
+        activeCount={sheetFilterCount}
+        resultCount={resultCount}
+        isSearching={isSearching}
+      />
     </div>
   );
 }

@@ -460,7 +460,7 @@ microCMS の編集画面にある「画面プレビュー」から、**公開せ
 > この危険が残るのは `/events` である。** ルート直下の1枚が消えた後も、`/timetable` と
 > `/events` はどちらも静的HTMLに本体が入っていることを実測で確認済み（2026-09-19）。
 > **再発防止装置は3つある。** `eslint.config.mjs` の `no-restricted-imports`（fallback ツリーの
-> 5ファイルが `useSearchParams` を import できない）、同じく `eslint.config.mjs` の
+> 各ファイルが `useSearchParams` を import できない）、同じく `eslint.config.mjs` の
 > `react-hooks/exhaustive-deps: "error"` と `no-restricted-syntax` の2本組
 > （`EventInfiniteList.tsx` に限る。#239 で observer が張り直されず一覧が12件で止まった。
 > **格上げだけでは足りない** — 打ち切り条件も依存配列も `hasMore` へ**揃えて**戻すと依存は

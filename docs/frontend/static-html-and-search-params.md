@@ -151,16 +151,20 @@ CLS が 0 なのは、スクロール位置0の視界をヒーローが占めて
 #154 は同じ不変条件を JSDoc とドキュメントで守ろうとしたが、それらは人間が読まなければ
 効かない（[../dev/testing.md](../dev/testing.md)「なぜ入れたか」）。
 
-`eslint.config.mjs` が、**fallback として描かれる5ファイルに `useSearchParams` の import を
+`eslint.config.mjs` が、**fallback として描かれるファイル群に `useSearchParams` の import を
 禁じている。**
 
 ```js
 const EVENTS_FALLBACK_TREE = [
   "src/components/events/EventsView.tsx",
   "src/components/events/EventFilters.tsx",
+  "src/components/events/EventFilterFields.tsx",
+  "src/components/events/EventFilterSheet.tsx",
   "src/components/events/EventInfiniteList.tsx",
   "src/components/events/EventGrid.tsx",
+  "src/components/events/EventGridSkeleton.tsx",
   "src/components/events/EventCard.tsx",
+  "src/components/events/SemanticSearchNotice.tsx",
 ];
 ```
 

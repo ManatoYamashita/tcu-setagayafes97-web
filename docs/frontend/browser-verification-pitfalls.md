@@ -32,7 +32,7 @@ const t = document.body.innerText;
 ({
   hydrated: !t.includes("読み込み中"),
   countLine: (t.match(/\d+\s*件[^\n]*/) || [null])[0],
-  value: document.getElementById("building-filter")?.value,
+  value: document.querySelector("aside select")?.value, // id は useId() なので固定値で引けない（#376）
 });
 ```
 
