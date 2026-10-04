@@ -63,7 +63,7 @@ const CONFIG_ENTRY = /^\s*\*\s*-\s*e2e\/([^/\s]+)\/\s*—/gm;
 const COUNT_SENTENCES = [
   { file: LAYOUT_DOC, pattern: /現在(\d+)つの装置が載っています/g },
   { file: LAYOUT_DOC, pattern: /現在載っている(\d+)つ/g },
-  { file: CLAUDE_MD, pattern: /時点で(\d+)つある/g },
+  { file: CLAUDE_MD, pattern: /現在(\d+)つある/g },
 ];
 
 /** 「構成」見出しの直後にある最初のコードブロック */
@@ -114,7 +114,9 @@ function captureAll(pattern, text) {
  */
 function judge({ tracked, tableDirs, treeFiles, configDirs, counts }) {
   const violations = [];
-  const dirs = new Set(tracked.filter((file) => file.includes("/")).map((file) => file.split("/")[0]));
+  const dirs = new Set(
+    tracked.filter((file) => file.includes("/")).map((file) => file.split("/")[0])
+  );
 
   const compareDirs = (listed, prefix) => {
     if (listed === null) {
@@ -123,7 +125,8 @@ function judge({ tracked, tableDirs, treeFiles, configDirs, counts }) {
     }
     const listedSet = new Set(listed);
     for (const dir of dirs) {
-      if (!listedSet.has(dir)) violations.push({ kind: `${prefix}-missing`, subject: `e2e/${dir}/` });
+      if (!listedSet.has(dir))
+        violations.push({ kind: `${prefix}-missing`, subject: `e2e/${dir}/` });
     }
     for (const dir of listedSet) {
       if (!dirs.has(dir)) violations.push({ kind: `${prefix}-stale`, subject: `e2e/${dir}/` });
@@ -269,7 +272,10 @@ runSelfCheck();
 const ROOT = execFileSync("git", ["rev-parse", "--show-toplevel"], { encoding: "utf8" }).trim();
 
 /** 追跡ファイルの `e2e/` 配下。`-z` はパスに空白や非ASCIIが入っても壊れないため */
-const tracked = execFileSync("git", ["ls-files", "-z", "--", "e2e"], { cwd: ROOT, encoding: "utf8" })
+const tracked = execFileSync("git", ["ls-files", "-z", "--", "e2e"], {
+  cwd: ROOT,
+  encoding: "utf8",
+})
   .split("\0")
   .filter(Boolean)
   // 追跡されているが作業ツリーから消したファイル（コミット前の削除）。消えたものとして扱う
@@ -296,16 +302,26 @@ const violations = judge({
 });
 
 if (violations.length > 0) {
+  /** judge() の `unreadable` が返す短い名前を、どこを読めなかったかの説明へ戻す */
+  const SOURCES = {
+    table: `${LAYOUT_DOC} 冒頭の表（先頭のセルが \`e2e/<dir>/\` の行）`,
+    tree: `${LAYOUT_DOC}「## 構成」直後のコードブロック`,
+    config: `${PLAYWRIGHT_CONFIG} 冒頭のコメント（\` * - e2e/<dir>/ — \` の行）`,
+  };
   const MESSAGES = {
-    "table-missing": (v) => `${LAYOUT_DOC} 冒頭の表に ${v.subject} の行が無い。対象と防いでいる事故を1行で足すこと`,
-    "table-stale": (v) => `${LAYOUT_DOC} 冒頭の表の ${v.subject} は存在しない。行を消すか、新しい名前へ直すこと`,
+    "table-missing": (v) =>
+      `${LAYOUT_DOC} 冒頭の表に ${v.subject} の行が無い。対象と防いでいる事故を1行で足すこと`,
+    "table-stale": (v) =>
+      `${LAYOUT_DOC} 冒頭の表の ${v.subject} は存在しない。行を消すか、新しい名前へ直すこと`,
     "tree-missing": (v) => `${LAYOUT_DOC}「構成」のツリーに ${v.subject} が無い。足すこと`,
-    "tree-stale": (v) => `${LAYOUT_DOC}「構成」のツリーの ${v.subject} は存在しない。消すか、新しい名前へ直すこと`,
+    "tree-stale": (v) =>
+      `${LAYOUT_DOC}「構成」のツリーの ${v.subject} は存在しない。消すか、新しい名前へ直すこと`,
     "config-missing": (v) => `${PLAYWRIGHT_CONFIG} 冒頭のコメントに ${v.subject} が無い。足すこと`,
-    "config-stale": (v) => `${PLAYWRIGHT_CONFIG} 冒頭のコメントの ${v.subject} は存在しない。消すこと`,
+    "config-stale": (v) =>
+      `${PLAYWRIGHT_CONFIG} 冒頭のコメントの ${v.subject} は存在しない。消すこと`,
     count: (v) => `${v.subject} の装置数が実態と違う（${v.detail}）。数を直すこと`,
     unreadable: (v) =>
-      `${v.subject} を読み取れない。文言や書式を変えたなら scripts/assert-e2e-guard-list.mjs の正規表現も直すこと`,
+      `${SOURCES[v.subject] ?? v.subject} を読み取れない。文言や書式を変えたなら scripts/assert-e2e-guard-list.mjs の正規表現も直すこと`,
   };
 
   console.error(`${LABEL} FAIL: ${violations.length} 件の違反があります。`);
@@ -313,12 +329,18 @@ if (violations.length > 0) {
     console.error(`  [${violation.kind}] ${MESSAGES[violation.kind](violation)}`);
   }
   console.error("");
-  console.error("  装置を足したら、表・「構成」・playwright.config.ts の冒頭・装置数を同じコミットで更新する。");
-  console.error("  この検査は Git の追跡対象だけを見ます。新規ファイルは `git add` してから数えます。");
+  console.error(
+    "  装置を足したら、表・「構成」・playwright.config.ts の冒頭・装置数を同じコミットで更新する。"
+  );
+  console.error(
+    "  この検査は Git の追跡対象だけを見ます。新規ファイルは `git add` してから数えます。"
+  );
   process.exit(1);
 }
 
-const dirCount = new Set(tracked.filter((file) => file.includes("/")).map((file) => file.split("/")[0])).size;
+const dirCount = new Set(
+  tracked.filter((file) => file.includes("/")).map((file) => file.split("/")[0])
+).size;
 console.log(
   `${LABEL} OK: 装置 ${dirCount}つ / 追跡ファイル ${tracked.length}本が、表・構成・` +
     `${PLAYWRIGHT_CONFIG} の冒頭・装置数（${COUNT_SENTENCES.length}か所）と一致しています。`
