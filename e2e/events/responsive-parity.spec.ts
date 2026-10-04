@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 /**
  * /events の絞り込み（#376）
@@ -25,6 +25,25 @@ async function gotoEvents(page: Page, query = "") {
   // Suspense の中身が本来の位置へ移されるまで待つ（#309。e2e/fixtures.ts の冒頭を参照）
   await expect(page.locator('div[hidden][id^="S:"]')).toHaveCount(0);
   await expect(page.locator("#keyword-search")).toBeVisible();
+}
+
+/**
+ * React がこの要素のハイドレーションを終えるまで待つ（#391）
+ *
+ * 上の gotoEvents の待ちはサーバーの HTML でも満たされるため、ハイドレーション前に抜けうる。
+ * その間に DOM へ子要素を足すと、React はサーバーの HTML に無い要素として不整合を検知し、
+ * 境界ごとクライアントで描き直して足した要素を消す（CI で spacer が約100ms後に消えた）。
+ *
+ * `__reactFiber$` は React がハイドレーションした要素へ付ける内部キーで、子の照合を終えた
+ * 後に付く。名前が変わればこの待ちが時間切れで落ちるため、黙って素通りすることは無い。
+ */
+async function waitForHydration(locator: Locator) {
+  await expect
+    .poll(
+      () => locator.evaluate((el) => Object.keys(el).some((k) => k.startsWith("__reactFiber$"))),
+      { message: "React のハイドレーションが終わらない", timeout: 30_000 }
+    )
+    .toBe(true);
 }
 
 const sheet = (page: Page) => page.locator("aside dialog.slide-panel");
@@ -54,6 +73,17 @@ async function statusCount(page: Page) {
 }
 
 test.describe("/events の絞り込み（lg 未満）", () => {
+  // ハイドレーション不整合は pageerror として届く。拾わないと、テストが DOM を壊したときに
+  // 「バーの位置が -594」のような結果だけが残り、原因へ辿れない（#391）
+  let pageErrors: string[] = [];
+  test.beforeEach(({ page }) => {
+    pageErrors = [];
+    page.on("pageerror", (error) => pageErrors.push(error.message.split("\n")[0]));
+  });
+  test.afterEach(() => {
+    expect(pageErrors, "ページ内で未捕捉の例外が発生している").toEqual([]);
+  });
+
   test("条件付きURLでも開かず、細いバーだけが出る。選択数はバッジで示す", async ({ page }) => {
     await gotoEvents(page, "?type=stage");
 
@@ -70,8 +100,11 @@ test.describe("/events の絞り込み（lg 未満）", () => {
 
   test("スクロールしてもバーが画面上部に貼り付く", async ({ page }) => {
     await gotoEvents(page);
-    // CI では一覧が0件で、ページが短く追従を観測できない。一覧の側へ高さを足す
-    await page.locator("aside + div").evaluate((el) => {
+    // CI では一覧が0件で、ページが短く追従を観測できない。一覧の側へ高さを足す。
+    // ハイドレーション前に足すと React に消される（#391）
+    const list = page.locator("aside + div");
+    await waitForHydration(list);
+    await list.evaluate((el) => {
       const spacer = document.createElement("div");
       spacer.style.height = "4000px";
       el.append(spacer);
