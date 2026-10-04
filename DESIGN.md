@@ -413,7 +413,7 @@ Line Height:  1.5 (既定) / 読み物の本文は 1.625〜2.0 (leading-*)
 >
 > 実装例は `src/components/timetable/` 配下。どのページが白いシートかは
 > `PageSheetLayout` の利用箇所で判断する。**白いシート上の取りこぼしは #149 で追跡している。**
-> 比率の根拠は `docs/frontend/design.md`「コントラスト比」（すべて実配信値）。
+> 比率の根拠は `docs/frontend/color-contrast.md`「コントラスト比」（すべて実配信値）。
 
 #### 白いシート上の値（早見表）
 
@@ -434,8 +434,8 @@ Line Height:  1.5 (既定) / 読み物の本文は 1.625〜2.0 (leading-*)
 > `border-gray-400`（3.23:1）を使う。実装例は `src/components/timetable/TimeAxis.tsx`。
 >
 > **白いシート上で `bg-white text-primary` を選択状態に使ってはいけない。** 面が下地と同色になり、
-> 状態が 3.10:1 の紫文字だけで伝わることになる（`docs/frontend/design.md`「Primary 紫は
-> 白背景での通常テキストに使用禁止」）。`bg-primary-600 text-white`（7.45:1）へ反転させ、
+> 状態が 3.10:1 の紫文字だけで伝わることになる（`docs/frontend/color-contrast.md` の
+> 「コントラスト比（アクセシビリティ）」）。`bg-primary-600 text-white`（7.45:1）へ反転させ、
 > 併せて `aria-pressed` で色以外にも状態を出すこと。実装例は
 > `src/components/timetable/TimetableTabs.tsx`。
 

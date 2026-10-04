@@ -32,7 +32,7 @@ export function getTimetableDateLabel(date: EventDate): string {
 // 白地では未選択タブが純白（枠は 1.08:1）になり、下地と分離しなかった。
 // 選択タブも bg-white + text-primary で、面が消えたうえに文字が 3.10:1 しかなく AA を満たさない。
 //
-// 白いシート上の基準は docs/frontend/design.md「コントラスト比（アクセシビリティ）」に従う。比率は出力CSSの実配信値で算出している。
+// 白いシート上の基準は docs/frontend/color-contrast.md「コントラスト比（アクセシビリティ）」に従う。比率は出力CSSの実配信値で算出している。
 // - 未選択: border-gray-400（#8f8f8f / 3.23:1）の枠 + 白面
 // - 選択:   bg-primary-600（#7b359a）に白文字で 7.45:1
 // 状態を色だけで伝えないよう aria-pressed を併記する。

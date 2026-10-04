@@ -1,7 +1,7 @@
 # タイポグラフィ
 
 ブランドフォント Kaisei Opti の読み込みと使い分け、文字サイズと行送り。
-[design.md](./design.md) から分割した（2026-09-30）。色とコントラストは design.md にある。
+[design.md](./design.md) から分割した（2026-09-30）。色は design.md、コントラストは [color-contrast.md](./color-contrast.md) にある。
 
 ## ブランドフォント — Kaisei Opti
 
@@ -116,7 +116,7 @@ grep -rhoE '(^|[^a-z0-9-])(sm:|md:|lg:|xl:)?text-(xs|sm|base|lg|xl|[2-9]xl)\b' s
 
 ## 関連ドキュメント
 
-- [design.md](./design.md) - カラーシステム・コントラスト・CSS 変数
+- [design.md](./design.md) - カラーシステム・CSS 変数（コントラストは [color-contrast.md](./color-contrast.md)）
 - [performance.md](./performance.md) - Webフォントの配信と preload の検査
 - Google Fonts: Kaisei Opti — https://fonts.google.com/specimen/Kaisei+Opti
 

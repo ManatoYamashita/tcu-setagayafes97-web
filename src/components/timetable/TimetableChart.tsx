@@ -20,7 +20,7 @@ interface TimetableChartProps {
  * このコンポーネントは PageSheetLayout の白いシート（bg-white）の上に載る。
  * 面は不透明色で持ち、bg-white/10 は使わない（白地では純白になり下地と分離しない）。
  * 枠は border-gray-200（#d1d1d1 / 1.53:1）。判断基準は
- * docs/frontend/design.md「コントラスト比（アクセシビリティ）」を参照。
+ * docs/frontend/color-contrast.md「コントラスト比（アクセシビリティ）」を参照。
  *
  * 外枠に overflow-hidden を置かないこと。中のスクローラが自分で横スクロールを持っており、
  * 二重にクリップすると sticky な時刻ラベル列とフォーカスリングが欠ける。
