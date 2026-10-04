@@ -1,4 +1,5 @@
 import { siteConfig } from "@/data/site";
+import { getChromeMessages } from "@/i18n/chrome-messages";
 import { buildLocalePath } from "@/lib/metadata";
 import { type Locale } from "@/i18n/routing";
 
@@ -159,7 +160,7 @@ export function createAboutStructuredData(locale: Locale) {
         "@type": "AboutPage",
         "@id": `${canonical}#webpage`,
         url: canonical,
-        name: siteConfig.metadata.siteName,
+        name: getChromeMessages(locale).brand.name,
         inLanguage: locale,
         isPartOf: { "@id": websiteId },
         about: [{ "@id": festivalId }, { "@id": organizationId }],

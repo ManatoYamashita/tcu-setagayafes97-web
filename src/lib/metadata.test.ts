@@ -129,4 +129,20 @@ describe("createPageMetadata のタイトル", () => {
     const meta = createPageMetadata({ ...base, title: siteConfig.metadata.siteName });
     expect(meta.title).toEqual({ absolute: siteConfig.metadata.siteName });
   });
+
+  it("日本語以外ではサイト名の接尾辞もロケール別になる", () => {
+    const meta = createPageMetadata({ ...base, title: "Contact", locale: "en", localized: true });
+    expect(meta.title).toEqual({
+      absolute: "Contact | The 97th Tokyo City University Setagaya Festival",
+    });
+    expect(meta.title).not.toEqual(
+      expect.objectContaining({ absolute: expect.stringMatching(/[ぁ-んァ-ヶ一-龥]/) })
+    );
+  });
+
+  it("日本語のサイト名は siteConfig と一致する（chrome JSON の出典と食い違わない）", () => {
+    const meta = createPageMetadata({ ...base, title: "お問い合わせ" });
+    expect(meta.title).toEqual({ absolute: `お問い合わせ | ${siteConfig.metadata.siteName}` });
+    expect(meta.openGraph?.siteName).toBe(siteConfig.metadata.searchSiteName);
+  });
 });
