@@ -12,6 +12,7 @@ import { RESTRICTED_COLOR_TOKENS } from "./scripts/restricted-color-tokens.mjs";
  */
 const EVENTS_FALLBACK_TREE = [
   "src/components/events/EventsView.tsx",
+  "src/components/events/EventResults.tsx",
   "src/components/events/EventFilters.tsx",
   "src/components/events/EventFilterFields.tsx",
   "src/components/events/EventFilterSheet.tsx",
