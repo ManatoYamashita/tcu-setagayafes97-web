@@ -1,14 +1,16 @@
 # レイアウトの実測アサーション（Playwright）
 
 実ブラウザでしか捕まえられない事故に対する、**再発防止装置の置き場**です。
-**「E2E を増やしていく基盤」ではありません。** 載っている装置の一部を次に示します。
+**「E2E を増やしていく基盤」ではありません。** 現在5つの装置が載っています。
+**装置を足したら、この表・下の「構成」・`playwright.config.ts` の冒頭を同じコミットで更新すること。**
 
-| 装置             | 対象                 | 防いでいる事故                                                                                            |
-| ---------------- | -------------------- | --------------------------------------------------------------------------------------------------------- |
-| `e2e/timetable/` | `/timetable`         | #148 — 盤面が `height: 100%` の解決失敗で 0px に潰れる                                                    |
-| `e2e/landmarks/` | 全ルート＋404画面    | #177 A — `<main id="content">` の付け忘れ・二重・空振り                                                   |
-| `e2e/not-found/` | グローバル404画面    | #249 — モバイルの読み順とイラスト寸法の退行                                                               |
-| `e2e/opener/`    | `/access` → `/about` | #402 — サイト内からのフルロードでオープナーが再生される（[opener-entry-only.md](./opener-entry-only.md)） |
+| 装置             | 対象                            | 防いでいる事故                                                                                                                        |
+| ---------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `e2e/timetable/` | `/timetable`                    | #148 — 盤面が `height: 100%` の解決失敗で 0px に潰れる / #338 — 企画詳細パネルの開閉・前後移動                                        |
+| `e2e/landmarks/` | 全ルート＋404画面               | #177 A — `<main id="content">` の付け忘れ・二重・空振り                                                                               |
+| `e2e/not-found/` | 404画面（グローバル・企画詳細） | #249 — モバイルの読み順とイラスト寸法の退行 / #301 — 企画詳細の404で歯車のイラストが欠ける                                            |
+| `e2e/events/`    | `/events`（lg 未満・以上）      | #376 — 絞り込みバーの追従とボトムシート / #392 — 絞り込み後に結果の先頭がずれる（[events-filter-sheet.md](./events-filter-sheet.md)） |
+| `e2e/opener/`    | `/access` → `/about`            | #402 — サイト内からのフルロードでオープナーが再生される（[opener-entry-only.md](./opener-entry-only.md)）                             |
 
 関連: [timetable-gantt.md](./timetable-gantt.md)（盤面の設計） /
 [landmarks-and-skip-link.md](./landmarks-and-skip-link.md)（ランドマークの契約） /
@@ -121,13 +123,20 @@ const USE_FIXTURE =
 ```
 e2e/
 ├── fixtures.ts                      # 測定系の生存確認・共通フィクスチャ
+├── events/
+│   ├── responsive-parity.spec.ts    # 絞り込みバーの追従・ボトムシート・lg 以上のサイドバー [mobile]
+│   └── results-scroll.spec.ts       # 絞り込み後に結果の先頭が追従バーの直下へ来る        [mobile]
+├── landmarks/
+│   └── route-sweep.spec.ts          # 全ルート＋404画面の <main id="content"> が1つ    [desktop]
 ├── not-found/
+│   ├── event-detail.spec.ts         # 企画詳細の404に歯車のイラストが出る              [desktop]
 │   └── responsive-parity.spec.ts    # 読み順・見出し間隔・画像幅             [mobile]
 ├── opener/
 │   └── in-site-reload.spec.ts       # 入口では再生・サイト内のフルロードでは非再生 [desktop]
 └── timetable/
     ├── board-geometry.spec.ts       # 盤面高さ・座標の写像・レーン分割・レンジ  [desktop]
     ├── card-density.spec.ts         # カード実寸 24px・内容の溢れ              [desktop]
+    ├── event-panel.spec.ts          # 企画詳細パネル（?event=・前後移動・ボトムシート） [desktop]
     ├── tabs-and-filtering.spec.ts   # 押下状態・その他タブ・レンジの算出元      [desktop]
     ├── scroll-containment.spec.ts   # 横スクロールが盤面内で完結               [desktop]
     └── responsive-parity.spec.ts    # 縦スタック・件数一致・初期画面の操作到達 [mobile]
@@ -137,10 +146,10 @@ e2e/
 スクローラが約 1070px となり、**横スクロールの検証が実際に成立する**幅として選んでいます。
 
 `mobile` の 320px は対応下限かつ `lg`(1024px) 未満で、盤面ではなく
-`TimetableStackedList` が出ます。カード本文幅250px以上と404画面の読み順・画像幅も
-この条件で検証します。タイムテーブル固有の `compact` ヒーローにより、日程選択の下端が
+`TimetableStackedList` が出ます。カード本文幅250px以上と404画面の読み順・画像幅、
+`/events` の絞り込みバーもこの条件で検証します（`/events` の lg 以上のケースは spec 側で幅を指定します）。タイムテーブル固有の `compact` ヒーローにより、日程選択の下端が
 初期ビューポート内へ収まることも同じ実測で固定します。
-`desktop` project は `testIgnore` で `responsive-parity.spec.ts` を除外しています
+`desktop` project は `testIgnore` で `responsive-parity.spec.ts` と `results-scroll.spec.ts` を除外しています
 （除外しないと desktop 幅でモバイル用の検証が走って落ちます）。
 
 ### 期待値は定数から導出する
@@ -196,7 +205,7 @@ CI では `webServer.stdout: "pipe"` により **dev サーバのコンパイル
 **「E2E の基盤ができた」と読んで他ページへ広げないこと。** 誰も見ないジョブが育ちます。
 
 足す価値があるのは、**ビルドも型もユニットテストも通るのに、ブラウザが解決したときにだけ
-壊れるもの**に限ります。現在載っている2つはどちらもこの条件を満たしています。
+壊れるもの**に限ります。現在載っている5つはどれもこの条件を満たしています。
 
 - #148（盤面）— CSS の百分率高さが解決されるかはレイアウトエンジンの仕事
 - #177 A（ランドマーク）— **生HTMLを数えると答えが違う。** 2026-09-19 の実測で
@@ -204,6 +213,8 @@ CI では `webServer.stdout: "pipe"` により **dev サーバのコンパイル
   `/events/<存在しないID>` は生HTML 0個・ライブDOM 1個（`notFound()` がシェル送出後に
   差し込まれる）。`curl | grep -c` も `assert-*.mjs` も使えない
 - #249（404モバイル）— 要素の上下関係と画像の実表示幅はレイアウトエンジンが解決する
+- #376 / #392（`/events` の絞り込み）— `position: sticky` が貼り付くか、スクロール位置がどこへ着地するかは実際にスクロールしないと決まらない
+- #402（オープナー）— 遷移種別と `document.referrer` は実ブラウザの遷移でしか値が決まらない
 
 ### ランドマークの1周検査（`e2e/landmarks/route-sweep.spec.ts`）
 
