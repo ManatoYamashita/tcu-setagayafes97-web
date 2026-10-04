@@ -156,6 +156,17 @@ git merge --abort
 > **マージ後に `main` の状態を測るときは、先に `git fetch` すること。** 取得していない
 > `origin/main` は古いままで、#311 の直後に分割前の行数（569行）を読んで誤認しかけた。
 
+### マージ後の確認
+
+1. **リモートのブランチが消えたか** — `git ls-remote --heads origin <branch>` が空であること
+2. **閉じるはずの Issue が閉じたか** — `gh issue view <N> --json state --jq .state`（上の 4 の取りこぼし）
+3. **本番デプロイが作られたか** — `main` の `Production Deploy Guard` が success であること（[vercel-production-deploy.md](./vercel-production-deploy.md)）
+
+1 は 2026-10-04 に起きた。detached HEAD のツリーで `gh pr merge --delete-branch` を実行すると、
+マージは成功するが、ローカルの後始末で `could not determine current branch` を出して止まり、
+**リモートのブランチ削除まで届かない**（#394）。
+`--delete-branch` を付けずにマージし、`git push origin --delete <branch>` で消してから 1 を確かめる。
+
 ## 関連ドキュメント
 
 - [git.md](./git.md) - ブランチ戦略・CI・コミット規約
@@ -163,4 +174,4 @@ git merge --abort
 
 ---
 
-**最終更新日**: 2026-09-30（git.md から分割。マージ前チェックリストに Issue の認識と、両側で変わったファイルの検査を追加）
+**最終更新日**: 2026-10-04（マージ後の確認を追加。リモートブランチの削除漏れ、#394）
