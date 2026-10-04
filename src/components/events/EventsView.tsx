@@ -4,6 +4,7 @@ import type { BuildingFilterOption } from "@/data/filter-options";
 import { EventFilters } from "./EventFilters";
 import { EventGridSkeleton } from "./EventGridSkeleton";
 import { EventInfiniteList } from "./EventInfiniteList";
+import { EventResults } from "./EventResults";
 import { SemanticSearchNotice, type SemanticSearchNoticeProps } from "./SemanticSearchNotice";
 
 interface EventsViewProps {
@@ -120,9 +121,10 @@ export function EventsView({
 
         {/*
           結果一覧。PageSheetLayout が <main> を出すようになったため div に戻す。
-          ここはサイドバー（aside）と並ぶ一区画であり、ページの main ではない
+          ここはサイドバー（aside）と並ぶ一区画であり、ページの main ではない。
+          絞り込みが変わったら先頭へ寄せるため、EventResults（client）が div を出す（#392）
         */}
-        <div>
+        <EventResults filterKey={buildEventsQuery(filters)}>
           {/* 意味検索（第4段）の状態。リテラル検索で当たったときは描かれない */}
           {semantic && <SemanticSearchNotice {...semantic} />}
 
@@ -153,7 +155,7 @@ export function EventsView({
               />
             </>
           )}
-        </div>
+        </EventResults>
       </div>
     </div>
   );
