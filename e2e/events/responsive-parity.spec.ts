@@ -36,12 +36,15 @@ async function gotoEvents(page: Page, query = "") {
  *
  * `__reactFiber$` は React がハイドレーションした要素へ付ける内部キーで、子の照合を終えた
  * 後に付く。名前が変わればこの待ちが時間切れで落ちるため、黙って素通りすることは無い。
+ *
+ * 待ちの上限は expect の既定（10秒）に任せる。テスト全体の上限（30秒）と同じ値にすると、
+ * 待ち自身より先にテスト全体が時間切れになり、失敗の理由が `Test timeout` と表示される。
  */
 async function waitForHydration(locator: Locator) {
   await expect
     .poll(
       () => locator.evaluate((el) => Object.keys(el).some((k) => k.startsWith("__reactFiber$"))),
-      { message: "React のハイドレーションが終わらない", timeout: 30_000 }
+      { message: "React のハイドレーションが終わらない" }
     )
     .toBe(true);
 }
