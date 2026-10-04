@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getEventsList } from "@/lib/events";
 import {
   resolveVisibleCount,
@@ -11,6 +10,7 @@ import {
 import { EventsContent } from "@/components/events/EventsContent";
 import { EventsView } from "@/components/events/EventsView";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
+import { SpecialEventBanner } from "@/components/special/SpecialEventBanner";
 import { SpecialGuestSection } from "@/components/special/SpecialGuestSection";
 import { pageHeroes } from "@/data/page-heroes";
 import { createPageMetadata } from "@/lib/metadata";
@@ -50,27 +50,7 @@ export default async function EventsPage() {
 
   return (
     <PageSheetLayout hero={pageHeroes.events}>
-      {/* 著名人企画への導線 */}
-      <Link
-        href="/special"
-        className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-primary/30 bg-primary/5 px-5 py-4 transition-colors hover:bg-primary/10 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
-      >
-        <span>
-          <span className="block text-xs font-semibold uppercase tracking-[0.2em] text-primary-600">
-            Special
-          </span>
-          <span className="block font-bold text-gray-900">著名人企画</span>
-        </span>
-        <svg
-          className="h-5 w-5 shrink-0 text-primary-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
-      </Link>
+      <SpecialEventBanner />
 
       {/*
         企画一覧コンテンツ
