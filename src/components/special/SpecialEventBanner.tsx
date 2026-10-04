@@ -8,7 +8,7 @@ export function SpecialEventBanner() {
   return (
     <Link
       href={`/special/${specialBanner.eventId}`}
-      className="group relative isolate block overflow-hidden bg-primary-900 text-white focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-primary-600"
+      className="group relative isolate block overflow-hidden rounded-t-lg bg-primary-900 text-white focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-primary-600"
     >
       <span className="absolute inset-y-0 right-0 w-[52%] [clip-path:polygon(20%_0,100%_0,100%_100%,0_100%)] sm:w-[48%]">
         <AppImage
