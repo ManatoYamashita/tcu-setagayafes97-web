@@ -142,20 +142,21 @@ export function AboutSection() {
       ref={sectionRef}
       className="relative z-0 -mt-48 pt-72 pb-40 lg:pt-80 lg:pb-52 overflow-visible"
     >
-      {/* z-0: 背景グラデーションblob（ピンク系グロウ） */}
+      {/* z-0: 背景グラデーションblob（ピンク系グロウ）。
+          大きさは closest-side（要素に内接する楕円）で決める。circle の既定は farthest-corner で、
+          モバイルの縦長の箱（390px 幅で 172×705px）では左右の端に色が残り、縦の直線に切れていた（#387） */}
       <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
         <div
           className="animate-blob absolute top-[10%] right-[5%] md:right-[0%] h-[50%] w-[45%] rounded-full"
           style={{
-            background: "radial-gradient(circle at center, rgba(255,140,200,0.4), transparent 70%)",
+            background: "radial-gradient(closest-side, rgba(255,140,200,0.4), transparent)",
             animation: "blob-drift-2 20s ease-in-out infinite",
           }}
         />
         <div
           className="animate-blob absolute top-[40%] left-[0%] md:-left-[5%] h-[45%] w-[40%] rounded-full"
           style={{
-            background:
-              "radial-gradient(circle at center, rgba(255,160,210,0.35), transparent 70%)",
+            background: "radial-gradient(closest-side, rgba(255,160,210,0.35), transparent)",
             animation: "blob-drift-1 24s ease-in-out infinite",
             animationDelay: "-8s",
           }}
@@ -163,7 +164,7 @@ export function AboutSection() {
         <div
           className="animate-blob absolute bottom-[5%] right-[15%] h-[40%] w-[35%] rounded-full"
           style={{
-            background: "radial-gradient(circle at center, rgba(255,180,220,0.4), transparent 70%)",
+            background: "radial-gradient(closest-side, rgba(255,180,220,0.4), transparent)",
             animation: "blob-drift-2 18s ease-in-out infinite",
             animationDelay: "-11s",
           }}
