@@ -14,8 +14,11 @@ import { expect, test, type Page } from "@playwright/test";
  * 設計は docs/frontend/events-filter-sheet.md を参照。
  */
 
-/** 追従するバーの高さの上限。入力欄とボタン（44px）＋上下の余白（8px ×2）＝60px */
-const MAX_BAR_HEIGHT = 64;
+/** 追従するバーの高さの上限。入力欄とボタン（44px）＋上の余白（21px）＋下の余白（8px）＝73px */
+const MAX_BAR_HEIGHT = 77;
+
+/** 貼り付いたバーとピル型ヘッダーの間に空ける余白（1rem） */
+const STUCK_GAP = 16;
 
 async function gotoEvents(page: Page, query = "") {
   await page.goto(`/events${query}`);
@@ -81,6 +84,17 @@ test.describe("/events の絞り込み（lg 未満）", () => {
         .evaluate((el) => Math.round(el.getBoundingClientRect().top));
       // top-[calc(var(--header-height)-1rem)] = 72px
       expect(top).toBe(72);
+    }).toPass();
+
+    // 隙間は aside の padding で取る。top を下げるとカードが透けるため、上と合わせて両方を見る。
+    // ヘッダーはピル型へ 300ms かけて縮むので、縮み終わるまで待つ
+    await expect(async () => {
+      const gap = await page.evaluate(() => {
+        const pill = document.querySelector("header > div")!.getBoundingClientRect();
+        const bar = document.querySelector("aside > div")!.getBoundingClientRect();
+        return Math.round(bar.top - pill.bottom);
+      });
+      expect(gap, "貼り付いたバーがヘッダーに密着している").toBe(STUCK_GAP);
     }).toPass();
   });
 

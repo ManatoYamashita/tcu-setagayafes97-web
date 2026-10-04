@@ -90,7 +90,7 @@ export function EventsView({
           見た目は変わらないので、外すと静かに追従だけが失われます。
 
           `lg` 未満では通常フローの中で貼り付きます。追従するのはキーワード入力と「条件」ボタンの
-          細いバー（44px + 上下 8px）だけで、開催日・種別・建物はボトムシートへ逃がしています（#376）。
+          細いバー（44px + 上 21px・下 8px）だけで、開催日・種別・建物はボトムシートへ逃がしています（#376）。
           背景を白で敷き、左右は `-mx-4 px-4` で
           シートの端まで伸ばしています。敷かないと、背後を流れるカードが透けて重なります。
           `z-20` はカードより上・ヘッダー（`z-40`）より下という意味です。
@@ -102,10 +102,14 @@ export function EventsView({
           `DIV.grid` を返した）。72px まで上げてピルの背後へ 5px 潜り込ませると隙間が消えます。
           ヘッダーは `z-40` なので、潜り込んだぶんは隠れて見えません。
 
+          **上の余白は `pt-[calc(1rem+5px)]` で取ります。** 貼り付いたバーとピルの間を 1rem 空けるためで、
+          潜り込んだ 5px ＋ 1rem です。`top` を下げて空けると、その隙間をカードが通り抜けます。
+          余白を aside の `padding` にすれば `bg-white` が隙間を埋めるため、空いて見えても透けません。
+
           `lg` 側は逆に +1rem の余白を取ります。カードは右カラムにあり aside の背後を
           通らないため、隙間が見た目の問題になりません。
         */}
-        <aside className="sticky top-[calc(var(--header-height)-1rem)] z-20 -mx-4 mb-8 self-start bg-white px-4 py-2 lg:top-[calc(var(--header-height)+1rem)] lg:mx-0 lg:mb-0 lg:bg-transparent lg:px-0 lg:py-0">
+        <aside className="sticky top-[calc(var(--header-height)-1rem)] z-20 -mx-4 mb-8 self-start bg-white px-4 pt-[calc(1rem+5px)] pb-2 lg:top-[calc(var(--header-height)+1rem)] lg:mx-0 lg:mb-0 lg:bg-transparent lg:px-0 lg:py-0">
           <EventFilters
             filters={filters}
             buildingOptions={buildingOptions}
