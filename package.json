@@ -18,6 +18,7 @@
     "check:doc-lines": "node scripts/assert-doc-line-budget.mjs",
     "check:colors": "node scripts/assert-no-restricted-colors.mjs",
     "check:images": "node scripts/assert-static-image-budget.mjs",
+    "check:e2e-guards": "node scripts/assert-e2e-guard-list.mjs",
     "docs:split-check": "node scripts/check-doc-split.mjs",
     "images:optimize": "node scripts/optimize-static-images.mjs",
     "prepare": "husky",
