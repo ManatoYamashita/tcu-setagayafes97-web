@@ -48,7 +48,6 @@ cp .env.example .env.local
 | `NEXT_PUBLIC_GTM_ID`      | Google Tag Manager ID     |  -   |
 | `SMTP_HOST` / `SMTP_PORT` | SMTP サーバー設定         |  -   |
 | `SMTP_USER` / `SMTP_PASS` | SMTP 認証情報             |  -   |
-| `CONTACT_TO_EMAIL`        | お問い合わせ送信先        |  -   |
 | `CONTACT_FROM_EMAIL`      | お問い合わせ送信元        |  -   |
 
 企画・お知らせ・著名人企画・物販は常時表示します。公開の可否は microCMS の公開状態で管理します。
