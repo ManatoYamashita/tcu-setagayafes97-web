@@ -4,9 +4,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
 import { FactList } from "@/components/ui/FactList";
 import { pageHeroes, type PageHeroData } from "@/data/page-heroes";
-import { privacyPolicyConfig } from "@/data/privacy";
+import { privacyPolicyShared, resolvePrivacyPolicy } from "@/data/privacy";
 import { Link } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
+import { routing, type Locale } from "@/i18n/routing";
 import { createPageMetadata } from "@/lib/metadata";
 
 /**
@@ -65,6 +65,24 @@ function PolicyList({ items }: { items: readonly string[] }) {
   );
 }
 
+/** `Intl` へ渡す BCP 47 タグ。ロケールごとの日付表記に使う */
+const INTL_LOCALES = {
+  ja: "ja-JP",
+  en: "en-US",
+  zh: "zh-CN",
+  ko: "ko-KR",
+} as const satisfies Record<Locale, string>;
+
+/** ISO 形式の日付を、ロケール別の表記へ整形する（UTC 基準でタイムゾーンによるずれを防ぐ） */
+function formatPolicyDate(isoDate: string, locale: Locale): string {
+  return new Intl.DateTimeFormat(INTL_LOCALES[locale], {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(isoDate));
+}
+
 /**
  * プライバシーポリシーページ
  */
@@ -77,6 +95,7 @@ export default async function PrivacyPolicyPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("privacy");
+  const tHeroAlt = await getTranslations("pageHeroAlt");
 
   /**
    * ヒーローは他セクションページと共通の PageHero を使用する。
@@ -86,33 +105,39 @@ export default async function PrivacyPolicyPage({
     ...pageHeroes.privacy,
     title: t("title"),
     description: t("subtitle"),
+    imageAlt: tHeroAlt("privacy"),
   };
 
-  const { info, thirdParty, cookies, contact, copyright } = privacyPolicyConfig;
+  const policy = resolvePrivacyPolicy(locale as Locale);
+  const { thirdParty, cookies } = policy;
 
   return (
     <PageSheetLayout hero={hero}>
       <div className="mx-auto max-w-3xl space-y-14 sm:space-y-16">
         <PolicySection title={t("sections.basicInfo")}>
-          <p>
-            {info.organizationName}
-            （以下「当委員会」）は、お客様の個人情報保護の重要性について認識し、個人情報の保護に関する法律（個人情報保護法）を遵守すると共に、以下のプライバシーポリシーに従って、個人情報を適切に取り扱います。
-          </p>
-          <FactList items={[{ label: t("lastUpdated"), value: info.updateDate }]} />
+          <p>{policy.intro.replace("{organization}", policy.organizationName)}</p>
+          <FactList
+            items={[
+              {
+                label: t("lastUpdated"),
+                value: formatPolicyDate(privacyPolicyShared.updateDate, locale as Locale),
+              },
+            ]}
+          />
         </PolicySection>
 
         <PolicySection title={t("sections.purposes")}>
-          <p>当委員会は、お客様からお預かりした個人情報を以下の目的で利用いたします。</p>
-          <PolicyList items={privacyPolicyConfig.purposes} />
+          <p>{policy.purposesLead}</p>
+          <PolicyList items={policy.purposes} />
         </PolicySection>
 
         <PolicySection title={t("sections.collectedInfo")}>
-          <p>当サイトでは、以下の情報を収集する場合があります。</p>
-          <PolicyList items={privacyPolicyConfig.collectedInfo} />
+          <p>{policy.collectedInfoLead}</p>
+          <PolicyList items={policy.collectedInfo} />
         </PolicySection>
 
         <PolicySection title={t("sections.security")}>
-          <p>{privacyPolicyConfig.security.description}</p>
+          <p>{policy.securityDescription}</p>
         </PolicySection>
 
         <PolicySection title={t("sections.thirdParty")}>
@@ -125,7 +150,7 @@ export default async function PrivacyPolicyPage({
           {/*
             外部サービスへ実際に送信しているもの。
             「原則として提供しない」の例外を具体的に書く欄で、送信先が増えたら
-            src/data/privacy.ts の externalServices へ足す
+            src/data/privacy.ts の externalServices へ足す（4言語すべて）
           */}
           {thirdParty.externalServices.map((service) => (
             <div key={service.provider} className="border-l-[3px] border-primary-600 pl-5 sm:pl-8">
@@ -142,7 +167,7 @@ export default async function PrivacyPolicyPage({
           <div>
             <p>{cookies.optOut}</p>
             <a
-              href={cookies.optOutUrl}
+              href={privacyPolicyShared.optOutUrl}
               target="_blank"
               rel="noopener noreferrer"
               className={textLinkClassName}
@@ -155,21 +180,22 @@ export default async function PrivacyPolicyPage({
 
         <PolicySection title={t("sections.contactWindow")}>
           <div>
-            <p>{contact.description}</p>
-            <Link href={contact.url} className={textLinkClassName}>
+            <p>{policy.contactDescription}</p>
+            <Link href={privacyPolicyShared.contactUrl} className={textLinkClassName}>
               {t("toContactForm")}
             </Link>
           </div>
         </PolicySection>
 
         <PolicySection title={t("sections.disclaimer")}>
-          <PolicyList items={privacyPolicyConfig.disclaimer} />
+          <PolicyList items={policy.disclaimer} />
         </PolicySection>
 
         <PolicySection title={t("sections.copyright")}>
-          <p>{copyright.description}</p>
+          <p>{policy.copyrightDescription}</p>
           <p className="text-sm text-gray-600">
-            Copyright © {copyright.year} {copyright.holder}. All Rights Reserved.
+            Copyright © {privacyPolicyShared.copyrightYear} {policy.copyrightHolder}. All Rights
+            Reserved.
           </p>
         </PolicySection>
       </div>

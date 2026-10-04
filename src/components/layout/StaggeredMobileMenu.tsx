@@ -47,6 +47,8 @@ interface StaggeredMobileMenuProps {
   /** ロケール解決済みのナビ項目。Header の useChromeNav() から受け取る */
   items: readonly ChromeNavItem[];
   closeLabel: string;
+  /** SNSリンク群の aria-label。ロケール別 */
+  socialLabel: string;
   pathname: string;
 }
 
@@ -55,6 +57,7 @@ export function StaggeredMobileMenu({
   onClose,
   items,
   closeLabel,
+  socialLabel,
   pathname,
 }: StaggeredMobileMenuProps) {
   const prevOpenRef = useRef(false);
@@ -395,7 +398,7 @@ export function StaggeredMobileMenu({
             <LanguageSwitcherInline className="pt-2" onNavigate={onClose} />
 
             {/* SNSリンク */}
-            <div className="sm-socials mt-auto flex flex-col gap-3 pt-8" aria-label="SNSリンク">
+            <div className="sm-socials mt-auto flex flex-col gap-3 pt-8" aria-label={socialLabel}>
               <h3
                 className="sm-socials-title m-0 text-base font-medium"
                 style={{ color: ACCENT_COLOR }}

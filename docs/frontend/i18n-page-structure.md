@@ -133,7 +133,19 @@ const { href, hrefLang } = localizeNavHref("/access", locale);
 
 `src/app/[locale]/info/faq/FAQContent.tsx` の `FAQ_FILTERS[].keywords`（`"入場"` `"アクセス"` 等）は、microCMS の日本語コンテンツをカテゴリ分類するための照合キーワードです。UI文言ではないため、翻訳すると en/zh/ko で全FAQが「その他」に倒れます。**表示ロケールに関わらず日本語のまま維持してください。**
 
-同様に、CMS 由来のコンテンツ（`news` / `events` / `informations`）と `src/data/` 配下の本文は日本語専用です。`[locale]` 配下のページでも本文は日本語のまま表示されます。
+同様に、CMS 由来のコンテンツ（`news` / `events` / `informations`）は日本語専用です。`[locale]` 配下のページでも CMS 由来の本文は日本語のまま表示されます。
+
+**`src/data/` 配下の本文は、`[locale]` 配下の6ページが読むものに限り4言語で持ちます**（`about.ts` / `access.ts` / `guide.ts` / `privacy.ts`）。形は `Record<Locale, Content>` ＋ `resolveXxx(locale)` で、ロケールによらない値（真偽値・URL・ISO日付）は別の定数（`guideFlags` / `privacyPolicyShared`）へ分けます。`privacy.ts` は法的文書なので4言語を**同じコミットで**直すこと。
+
+### お問い合わせフォームの文言
+
+- 入力欄・検証メッセージは `contact.form.*` / `contact.validation.*`。`createContactFormSchema(messages)`（`src/types/contact.ts`）へ渡す。サーバー（`/api/contact`）は既定の日本語メッセージのまま使う。
+- **サーバーの失敗応答は `code` を返し、来場者へ見せる文言はクライアントが `contact.errors.*` から引く**（`ContactErrorCode`）。応答の `error`（日本語）は診断用。失敗の経路を足したら `code` と4言語の `contact.errors` を足す。
+- 運営宛メールの本文と `contactTypeLabels` は日本語のまま（受け取るのは運営）。
+
+### サイト名・ロゴ alt・コピーライト
+
+Header / Footer / メタデータのサイト名は `src/messages/chrome/*.json` の `brand.*` が出典。`createPageMetadata` と `createAboutStructuredData` もこれを引く。`footer.copyright` は `{year}` を含み、年は Footer（サーバー）が渡す。
 
 ---
 

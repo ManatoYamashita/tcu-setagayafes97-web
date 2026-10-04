@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { AppImage } from "@/components/ui/AppImage";
+import { useChromeNav } from "@/components/layout/useChromeNav";
 import { LogoLoop, type LogoItem } from "@/components/ui/LogoLoop";
 import { SponsorModal } from "./SponsorModal";
 import { SponsorWordmark } from "./SponsorWordmark";
@@ -18,6 +19,7 @@ interface SponsorLogoLoopProps {
  * ロゴクリックでスポンサー詳細モーダルを表示
  */
 export function SponsorLogoLoop({ sponsors, onReady }: SponsorLogoLoopProps) {
+  const { messages } = useChromeNav();
   const [selectedSponsor, setSelectedSponsor] = useState<Information | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -122,7 +124,7 @@ export function SponsorLogoLoop({ sponsors, onReady }: SponsorLogoLoopProps) {
         pauseOnHover
         logoHeight={40}
         gap={48}
-        ariaLabel="協賛企業ロゴ"
+        ariaLabel={messages.sponsors.logosLabel}
         renderItem={renderItem}
       />
       <SponsorModal sponsor={selectedSponsor} isOpen={isModalOpen} onClose={handleCloseModal} />

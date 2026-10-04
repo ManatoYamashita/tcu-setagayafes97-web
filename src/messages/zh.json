@@ -1,21 +1,4 @@
 {
-  "common": {
-    "loading": "加载中...",
-    "error": "发生错误",
-    "notFound": "页面未找到",
-    "backToTop": "返回顶部",
-    "moreInfo": "了解更多",
-    "seeAll": "查看全部",
-    "share": "分享",
-    "language": "语言"
-  },
-  "languageSwitcher": {
-    "label": "选择语言",
-    "ja": "日语",
-    "en": "英语",
-    "zh": "简体中文",
-    "ko": "韩语"
-  },
   "about": {
     "title": "关于我们",
     "subtitle": "世田谷祭执行委员会的理念与愿景",
@@ -71,22 +54,59 @@
     "form": {
       "title": "咨询表格",
       "type": "咨询类型",
+      "typeLegend": "请问您咨询哪方面的事项？",
+      "optionalNote": "仅电话号码为选填项。",
       "name": "姓名",
       "email": "电子邮箱",
+      "phone": "电话号码",
       "subject": "主题",
       "message": "咨询内容",
+      "optional": "选填",
+      "messageHint": "如能具体写明日期、时间或企划名称等，我们能更快回复（10个字符以上）。",
+      "placeholders": {
+        "name": "山田 太郎",
+        "email": "example@example.com",
+        "phone": "090-1234-5678",
+        "subject": "关于企划的举办时间"
+      },
+      "botLabel": "请勿填写此栏",
+      "agree": "我同意<link>隐私政策</link>",
       "submit": "提交",
-      "sending": "发送中...",
-      "required": "必填",
-      "selectType": "请选择咨询类型",
-      "success": "您的咨询已成功提交。",
-      "error": "发送失败。请稍后重试。"
+      "sending": "发送中",
+      "submitNote": "根据内容不同，回复可能需要一些时间。"
     },
     "beforeContact": {
       "title": "咨询前请注意",
       "prefix": "请先查阅",
       "faqLink": "常见问题页面",
       "suffix": "了解常见问题。"
+    },
+    "status": {
+      "successTitle": "已提交",
+      "successBody": "我们将在3个工作日内回复。不会发送确认邮件，如需留存记录，请保存此页面。",
+      "errorTitle": "无法提交",
+      "errorFallback": "发送过程中发生错误。请稍后重试。"
+    },
+    "validation": {
+      "type": "请选择咨询类型",
+      "nameRequired": "请输入姓名",
+      "nameMax": "姓名请在100个字符以内",
+      "emailRequired": "请输入电子邮箱",
+      "emailInvalid": "请输入有效的电子邮箱",
+      "phoneFormat": "电话号码只能输入数字和连字符",
+      "phoneMax": "电话号码请在15个字符以内",
+      "subjectRequired": "请输入主题",
+      "subjectMax": "主题请在200个字符以内",
+      "messageMin": "咨询内容请至少输入10个字符",
+      "messageMax": "咨询内容请在2000个字符以内",
+      "agreeToPrivacyPolicy": "请同意隐私政策"
+    },
+    "errors": {
+      "rate_limited": "提交次数已超出限制。请稍后再试。",
+      "invalid": "输入内容有误。",
+      "rejected": "无法确认提交内容。很抱歉，请重新加载页面，再次填写并提交。",
+      "unavailable": "目前无法通过联系表单提交。如有急事，请通过 X（原 Twitter）@setagayafes_tcu 的私信联系我们。",
+      "server_error": "发送过程中发生错误。请稍后重试。"
     }
   },
   "privacy": {
@@ -228,5 +248,11 @@
       "inquiry": "如有疑问，请前往正门信息台咨询。",
       "trainNote": "行程时间可能因拥堵情况而有所不同。"
     }
+  },
+  "pageHeroAlt": {
+    "contact": "联系我们",
+    "privacy": "隐私政策",
+    "guide": "来场指南",
+    "faq": "常见问题"
   }
 }

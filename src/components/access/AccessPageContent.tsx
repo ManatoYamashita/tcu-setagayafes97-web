@@ -40,6 +40,7 @@ export function AccessPageView({ content, locale }: AccessPageContentProps) {
     ...pageHeroes.access,
     title: content.introduction.title,
     description: content.introduction.description,
+    imageAlt: content.introduction.imageAlt,
   };
 
   return (
@@ -69,7 +70,13 @@ export function AccessPageView({ content, locale }: AccessPageContentProps) {
               {content.location.venue}
             </p>
             <address className="mt-2 not-italic leading-7 text-gray-700">
-              {accessConfig.address}
+              {content.location.address}
+              {/* 日本語以外では、タクシーや問い合わせで使える日本語の原文を併記する */}
+              {locale !== "ja" && (
+                <span lang="ja" className="block text-sm text-gray-600">
+                  {accessConfig.address}
+                </span>
+              )}
             </address>
             <a
               href={`tel:${accessConfig.phone.replaceAll("-", "")}`}

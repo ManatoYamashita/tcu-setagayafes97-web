@@ -1,11 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle, AlertCircle } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { contactFormSchema, type ContactFormData, type ContactType } from "@/types/contact";
+import {
+  contactErrorCodes,
+  createContactFormSchema,
+  type ContactErrorCode,
+  type ContactFormData,
+  type ContactType,
+  type ContactValidationMessages,
+} from "@/types/contact";
 
 /**
  * 種別カード1枚分の内容
@@ -55,14 +63,15 @@ const ROW_CLASS = "md:grid md:grid-cols-[8rem_minmax(0,1fr)] md:gap-x-6";
 function Field({
   name,
   label,
-  optional,
+  optionalLabel,
   hint,
   error,
   children,
 }: {
   name: string;
   label: string;
-  optional?: boolean;
+  /** 任意欄に付ける印の文言。指定した欄だけに出る */
+  optionalLabel?: string;
   hint?: string;
   error?: string;
   children: React.ReactNode;
@@ -74,7 +83,7 @@ function Field({
         className={`mb-2 block text-sm font-semibold text-gray-900 md:mb-0 ${hint ? "" : "md:pt-3.5"}`}
       >
         {label}
-        {optional && <span className="ml-2 font-normal text-gray-600">任意</span>}
+        {optionalLabel && <span className="ml-2 font-normal text-gray-600">{optionalLabel}</span>}
       </label>
       <div className="min-w-0">
         {hint && (
@@ -106,17 +115,45 @@ function describedBy(
  * お問い合わせフォームコンポーネント
  */
 export function ContactForm({ typeOptions }: { typeOptions: ContactTypeOption[] }) {
+  const t = useTranslations("contact");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
 
   /**
-   * サーバーが返した案内文
+   * サーバーが返した失敗の種類（`code`）
    *
    * **固定文言だけを出してはいけません。** 送信設定が未完了のとき（#261）や自動投稿よけに
    * 掛かったときは「時間をおいて再度お試しください」では直らず、来場者が何をすべきか分かりません。
-   * サーバーが具体的な案内を返したらそれを出し、無ければ従来の文言へ落とします。
+   * サーバーが `code` を返したらそれに対応する具体的な案内を出し、無ければ汎用の文言へ落とします。
+   * 文言そのものはロケール別なので、サーバーの日本語の `error` は使わず `code` から引きます。
    */
-  const [serverError, setServerError] = useState<string | null>(null);
+  const [serverErrorCode, setServerErrorCode] = useState<ContactErrorCode | null>(null);
+
+  /** `code` ごとの案内文。キーはリテラルで書く（動的に組み立てると未使用キーの検出から漏れる） */
+  const serverErrorMessages: Record<ContactErrorCode, string> = {
+    rate_limited: t("errors.rate_limited"),
+    invalid: t("errors.invalid"),
+    rejected: t("errors.rejected"),
+    unavailable: t("errors.unavailable"),
+    server_error: t("errors.server_error"),
+  };
+
+  /** 検証メッセージ。スキーマはロケール別の文言で作る（制約そのものは `createContactFormSchema` が持つ） */
+  const validationMessages: ContactValidationMessages = {
+    type: t("validation.type"),
+    nameRequired: t("validation.nameRequired"),
+    nameMax: t("validation.nameMax"),
+    emailRequired: t("validation.emailRequired"),
+    emailInvalid: t("validation.emailInvalid"),
+    phoneFormat: t("validation.phoneFormat"),
+    phoneMax: t("validation.phoneMax"),
+    subjectRequired: t("validation.subjectRequired"),
+    subjectMax: t("validation.subjectMax"),
+    messageMin: t("validation.messageMin"),
+    messageMax: t("validation.messageMax"),
+    agreeToPrivacyPolicy: t("validation.agreeToPrivacyPolicy"),
+  };
+  const contactFormSchema = createContactFormSchema(validationMessages);
 
   /**
    * ハニーポット
@@ -178,7 +215,7 @@ export function ContactForm({ typeOptions }: { typeOptions: ContactTypeOption[] 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
     setSubmitStatus(null);
-    setServerError(null);
+    setServerErrorCode(null);
 
     const mountedAt = mountedAtRef.current;
 
@@ -199,7 +236,11 @@ export function ContactForm({ typeOptions }: { typeOptions: ContactTypeOption[] 
       const result = await response.json();
 
       if (!response.ok || !result.success) {
-        throw new Error(result.error || "送信に失敗しました");
+        setServerErrorCode(
+          (contactErrorCodes as readonly string[]).includes(result.code) ? result.code : null
+        );
+        setSubmitStatus("error");
+        return;
       }
 
       setSubmitStatus("success");
@@ -209,7 +250,7 @@ export function ContactForm({ typeOptions }: { typeOptions: ContactTypeOption[] 
       mountedAtRef.current = Date.now();
     } catch (error) {
       console.error("Form submission error:", error);
-      setServerError(error instanceof Error ? error.message : null);
+      setServerErrorCode(null);
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
@@ -228,10 +269,8 @@ export function ContactForm({ typeOptions }: { typeOptions: ContactTypeOption[] 
         >
           <CheckCircle aria-hidden="true" className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-700" />
           <div>
-            <p className="font-semibold text-green-900">送信しました</p>
-            <p className="mt-1 text-sm text-green-900">
-              3営業日以内にご返信します。確認メールは届かないため、控えが必要な場合はこの画面を保存してください。
-            </p>
+            <p className="font-semibold text-green-900">{t("status.successTitle")}</p>
+            <p className="mt-1 text-sm text-green-900">{t("status.successBody")}</p>
           </div>
         </div>
       )}
@@ -246,9 +285,9 @@ export function ContactForm({ typeOptions }: { typeOptions: ContactTypeOption[] 
         >
           <AlertCircle aria-hidden="true" className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-700" />
           <div>
-            <p className="font-semibold text-red-900">送信できませんでした</p>
+            <p className="font-semibold text-red-900">{t("status.errorTitle")}</p>
             <p className="mt-1 text-sm text-red-900">
-              {serverError ?? "送信中にエラーが発生しました。時間をおいて再度お試しください。"}
+              {serverErrorCode ? serverErrorMessages[serverErrorCode] : t("status.errorFallback")}
             </p>
           </div>
         </div>
@@ -270,7 +309,7 @@ export function ContactForm({ typeOptions }: { typeOptions: ContactTypeOption[] 
           （`src/lib/contact-guard.ts` の `RETRY_HINT`）。
         */}
         <div aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
-          <label htmlFor="contact-bot-field">この欄は入力しないでください</label>
+          <label htmlFor="contact-bot-field">{t("form.botLabel")}</label>
           <input
             id="contact-bot-field"
             type="text"
@@ -291,7 +330,9 @@ export function ContactForm({ typeOptions }: { typeOptions: ContactTypeOption[] 
           `peer-focus-visible:` を使う。
         */}
         <fieldset className="min-w-0">
-          <legend className="mb-4 text-base font-semibold text-gray-900">どのご用件ですか</legend>
+          <legend className="mb-4 text-base font-semibold text-gray-900">
+            {t("form.typeLegend")}
+          </legend>
           <div className="grid gap-4 md:grid-cols-3">
             {typeOptions.map((option) => {
               const isSelected = selectedType === option.value;
@@ -347,9 +388,9 @@ export function ContactForm({ typeOptions }: { typeOptions: ContactTypeOption[] 
             例外のほうへ印を付けたほうが読む量が減る。
             機械向けには各欄の `aria-required` が伝える。
           */}
-          <p className="text-sm text-gray-600">電話番号のみ任意です。</p>
+          <p className="text-sm text-gray-600">{t("form.optionalNote")}</p>
 
-          <Field name="name" label="お名前" error={errors.name?.message}>
+          <Field name="name" label={t("form.name")} error={errors.name?.message}>
             <input
               id="name"
               type="text"
@@ -358,12 +399,12 @@ export function ContactForm({ typeOptions }: { typeOptions: ContactTypeOption[] 
               aria-required="true"
               aria-invalid={errors.name ? "true" : undefined}
               aria-describedby={describedBy("name", { hasError: !!errors.name })}
-              placeholder="山田 太郎"
+              placeholder={t("form.placeholders.name")}
               className={`${FIELD_CLASS} max-w-sm`}
             />
           </Field>
 
-          <Field name="email" label="メールアドレス" error={errors.email?.message}>
+          <Field name="email" label={t("form.email")} error={errors.email?.message}>
             <input
               id="email"
               type="email"
@@ -372,12 +413,17 @@ export function ContactForm({ typeOptions }: { typeOptions: ContactTypeOption[] 
               aria-required="true"
               aria-invalid={errors.email ? "true" : undefined}
               aria-describedby={describedBy("email", { hasError: !!errors.email })}
-              placeholder="example@example.com"
+              placeholder={t("form.placeholders.email")}
               className={FIELD_CLASS}
             />
           </Field>
 
-          <Field name="phone" label="電話番号" optional error={errors.phone?.message}>
+          <Field
+            name="phone"
+            label={t("form.phone")}
+            optionalLabel={t("form.optional")}
+            error={errors.phone?.message}
+          >
             <input
               id="phone"
               type="tel"
@@ -385,12 +431,12 @@ export function ContactForm({ typeOptions }: { typeOptions: ContactTypeOption[] 
               autoComplete="tel"
               aria-invalid={errors.phone ? "true" : undefined}
               aria-describedby={describedBy("phone", { hasError: !!errors.phone })}
-              placeholder="090-1234-5678"
+              placeholder={t("form.placeholders.phone")}
               className={`${FIELD_CLASS} max-w-[14rem]`}
             />
           </Field>
 
-          <Field name="subject" label="件名" error={errors.subject?.message}>
+          <Field name="subject" label={t("form.subject")} error={errors.subject?.message}>
             <input
               id="subject"
               type="text"
@@ -398,7 +444,7 @@ export function ContactForm({ typeOptions }: { typeOptions: ContactTypeOption[] 
               aria-required="true"
               aria-invalid={errors.subject ? "true" : undefined}
               aria-describedby={describedBy("subject", { hasError: !!errors.subject })}
-              placeholder="企画の開催時間について"
+              placeholder={t("form.placeholders.subject")}
               className={FIELD_CLASS}
             />
           </Field>
@@ -410,8 +456,8 @@ export function ContactForm({ typeOptions }: { typeOptions: ContactTypeOption[] 
           */}
           <Field
             name="message"
-            label="お問い合わせ内容"
-            hint="日時や企画名など、具体的に書いていただけると回答が早くなります（10文字以上）。"
+            label={t("form.message")}
+            hint={t("form.messageHint")}
             error={errors.message?.message}
           >
             <textarea
@@ -444,13 +490,16 @@ export function ContactForm({ typeOptions }: { typeOptions: ContactTypeOption[] 
                   className="mt-0.5 h-5 w-5 flex-shrink-0 accent-primary-600 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
                 />
                 <span>
-                  <Link
-                    href="/about/privacy"
-                    className="font-semibold text-primary-600 underline underline-offset-4 hoverable:hover:no-underline"
-                  >
-                    プライバシーポリシー
-                  </Link>
-                  に同意します
+                  {t.rich("form.agree", {
+                    link: (chunks) => (
+                      <Link
+                        href="/about/privacy"
+                        className="font-semibold text-primary-600 underline underline-offset-4 hoverable:hover:no-underline"
+                      >
+                        {chunks}
+                      </Link>
+                    ),
+                  })}
                 </span>
               </label>
               {errors.agreeToPrivacyPolicy && (
@@ -475,15 +524,13 @@ export function ContactForm({ typeOptions }: { typeOptions: ContactTypeOption[] 
                       aria-hidden="true"
                       className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white"
                     />
-                    <span>送信中</span>
+                    <span>{t("form.sending")}</span>
                   </>
                 ) : (
-                  <span>送信する</span>
+                  <span>{t("form.submit")}</span>
                 )}
               </button>
-              <p className="text-sm text-gray-600">
-                内容によっては、回答までお時間をいただく場合があります。
-              </p>
+              <p className="text-sm text-gray-600">{t("form.submitNote")}</p>
             </div>
           </div>
         </div>

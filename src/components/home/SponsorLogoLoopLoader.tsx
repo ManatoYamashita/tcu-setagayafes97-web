@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { AppImage } from "@/components/ui/AppImage";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useChromeNav } from "@/components/layout/useChromeNav";
 import { SPONSOR_LOGO_HEIGHT, toSponsorLogos } from "@/lib/sponsor-logos";
 import type { Information } from "@/types/informations";
 import { SponsorWordmark } from "./SponsorWordmark";
@@ -17,12 +18,16 @@ const SponsorLogoLoop = dynamic(
 );
 
 function StaticSponsorLogos({ sponsors }: { sponsors: Information[] }) {
+  const { messages } = useChromeNav();
   const logos = toSponsorLogos(sponsors);
 
   if (logos.length === 0) return null;
 
   return (
-    <ul className="flex h-10 items-center gap-12 overflow-hidden" aria-label="協賛企業ロゴ">
+    <ul
+      className="flex h-10 items-center gap-12 overflow-hidden"
+      aria-label={messages.sponsors.logosLabel}
+    >
       {logos.map((logo) => (
         <li key={logo.sponsor.id} className="flex h-10 shrink-0 items-center">
           {logo.kind === "image" ? (

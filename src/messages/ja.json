@@ -1,21 +1,4 @@
 {
-  "common": {
-    "loading": "読み込み中...",
-    "error": "エラーが発生しました",
-    "notFound": "ページが見つかりません",
-    "backToTop": "トップに戻る",
-    "moreInfo": "詳細を見る",
-    "seeAll": "すべて見る",
-    "share": "シェア",
-    "language": "言語"
-  },
-  "languageSwitcher": {
-    "label": "言語を選択",
-    "ja": "日本語",
-    "en": "English",
-    "zh": "简体中文",
-    "ko": "한국어"
-  },
   "about": {
     "title": "委員会について",
     "subtitle": "世田谷祭実行委員会の理念とビジョン",
@@ -71,22 +54,59 @@
     "form": {
       "title": "お問い合わせフォーム",
       "type": "お問い合わせ種別",
+      "typeLegend": "どのご用件ですか",
+      "optionalNote": "電話番号のみ任意です。",
       "name": "お名前",
       "email": "メールアドレス",
+      "phone": "電話番号",
       "subject": "件名",
       "message": "お問い合わせ内容",
+      "optional": "任意",
+      "messageHint": "日時や企画名など、具体的に書いていただけると回答が早くなります（10文字以上）。",
+      "placeholders": {
+        "name": "山田 太郎",
+        "email": "example@example.com",
+        "phone": "090-1234-5678",
+        "subject": "企画の開催時間について"
+      },
+      "botLabel": "この欄は入力しないでください",
+      "agree": "<link>プライバシーポリシー</link>に同意します",
       "submit": "送信する",
-      "sending": "送信中...",
-      "required": "必須",
-      "selectType": "お問い合わせ種別を選択してください",
-      "success": "お問い合わせを受け付けました。",
-      "error": "送信に失敗しました。時間をおいて再度お試しください。"
+      "sending": "送信中",
+      "submitNote": "内容によっては、回答までお時間をいただく場合があります。"
     },
     "beforeContact": {
       "title": "お問い合わせの前に",
       "prefix": "よくいただくご質問は",
       "faqLink": "FAQページ",
       "suffix": "にまとめております。まずはそちらをご確認ください。"
+    },
+    "status": {
+      "successTitle": "送信しました",
+      "successBody": "3営業日以内にご返信します。確認メールは届かないため、控えが必要な場合はこの画面を保存してください。",
+      "errorTitle": "送信できませんでした",
+      "errorFallback": "送信中にエラーが発生しました。時間をおいて再度お試しください。"
+    },
+    "validation": {
+      "type": "お問い合わせ種別を選択してください",
+      "nameRequired": "お名前を入力してください",
+      "nameMax": "お名前は100文字以内で入力してください",
+      "emailRequired": "メールアドレスを入力してください",
+      "emailInvalid": "有効なメールアドレスを入力してください",
+      "phoneFormat": "電話番号は数字とハイフンのみ入力可能です",
+      "phoneMax": "電話番号は15文字以内で入力してください",
+      "subjectRequired": "件名を入力してください",
+      "subjectMax": "件名は200文字以内で入力してください",
+      "messageMin": "お問い合わせ内容は10文字以上で入力してください",
+      "messageMax": "お問い合わせ内容は2000文字以内で入力してください",
+      "agreeToPrivacyPolicy": "プライバシーポリシーに同意してください"
+    },
+    "errors": {
+      "rate_limited": "送信回数の制限を超えました。しばらく時間をおいてから再度お試しください。",
+      "invalid": "入力内容に誤りがあります。",
+      "rejected": "送信内容を確認できませんでした。お手数ですが、ページを再読み込みしてから、もう一度入力して送信してください。",
+      "unavailable": "ただいまお問い合わせフォームからの送信ができません。お急ぎの場合は、X（旧Twitter）@setagayafes_tcu のダイレクトメッセージからご連絡ください。",
+      "server_error": "送信中にエラーが発生しました。時間をおいて再度お試しください。"
     }
   },
   "privacy": {
@@ -228,5 +248,11 @@
       "inquiry": "ご不明な点がございましたら、正門の総合案内所までお問い合わせください。",
       "trainNote": "混雑状況により、所要時間が異なる場合があります。"
     }
+  },
+  "pageHeroAlt": {
+    "contact": "お問い合わせ",
+    "privacy": "プライバシーポリシー",
+    "guide": "来場ガイド",
+    "faq": "よくある質問"
   }
 }

@@ -1,4 +1,7 @@
+"use client";
+
 import { Instagram, Youtube } from "lucide-react";
+import { useChromeNav } from "@/components/layout/useChromeNav";
 import { siteConfig } from "@/data/site";
 
 export interface SocialIconsProps {
@@ -16,6 +19,8 @@ export function SocialIcons({
   variant = "minimal",
   className = "",
 }: SocialIconsProps) {
+  // Footer（サーバー）から呼ばれ Provider の外にあるため、chrome 辞書をパスから引く
+  const { messages } = useChromeNav();
   const iconSizes = {
     sm: "h-4 w-4",
     md: "h-5 w-5",
@@ -81,7 +86,7 @@ export function SocialIcons({
             target="_blank"
             rel="noopener noreferrer"
             className={`${linkBase} ${variant === "minimal" ? "hover:text-gray-900 hover:scale-110" : "group flex items-center gap-2"} ${variant !== "minimal" ? "shrink-0" : ""}`}
-            aria-label={`${social.name}で世田谷祭をフォロー`}
+            aria-label={messages.brand.followOn.replace("{platform}", social.name)}
           >
             {iconEl}
             {showLabel && layout === "vertical" && <span className="text-sm">{social.name}</span>}

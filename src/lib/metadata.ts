@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getChromeMessages } from "@/i18n/chrome-messages";
 import { routing, type Locale } from "@/i18n/routing";
 import { siteConfig } from "@/data/site";
 
@@ -142,7 +143,8 @@ export function createPageMetadata({
   image,
   noindex = false,
 }: PageMetadataOptions): Metadata {
-  const siteName = siteConfig.metadata.siteName;
+  // サイト名はロケール別。ja では siteConfig.metadata の値と一致する（chrome JSON が出典）
+  const { name: siteName, shortName: ogSiteName } = getChromeMessages(locale).brand;
   const fullTitle = title === siteName ? siteName : `${title} | ${siteName}`;
   const canonicalPath = buildLocalePath(pathname, locale);
   const canonicalUrl = absoluteUrl(canonicalPath);
@@ -175,7 +177,7 @@ export function createPageMetadata({
       title: fullTitle,
       description,
       url: canonicalUrl,
-      siteName: siteConfig.metadata.searchSiteName,
+      siteName: ogSiteName,
       images,
       locale: localeOpenGraph[locale],
       type,

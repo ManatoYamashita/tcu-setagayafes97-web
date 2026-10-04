@@ -20,8 +20,10 @@ export const sponsorsPageContent = {
   closeLabel: "協賛の詳細を閉じる",
 } as const;
 
-/** トップ・委員会ページの協賛バーから一覧ページへ誘導する CTA */
+/** トップ・委員会ページの協賛バーから一覧ページへ誘導する CTA のリンク先 */
+/**
+ * 文言（見出し・ボタン）は src/messages/chrome/*.json の `sponsors.*`（ロケール別）。
+ */
 export const sponsorBannerCta = {
-  label: "協賛・協力の一覧を見る",
   href: "/about/sponsors",
 } as const;

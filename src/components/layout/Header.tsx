@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { AppImage } from "@/components/ui/AppImage";
 import { Menu } from "lucide-react";
-import { siteConfig } from "@/data/site";
 import { DesktopNav } from "@/components/layout/DesktopNav";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { useChromeNav } from "@/components/layout/useChromeNav";
@@ -111,11 +110,11 @@ export function Header() {
             className={`relative block shrink-0 hover:opacity-80 ${
               isAtTop ? "h-[83px] w-52" : "h-[45px] w-28"
             }`}
-            aria-label={siteConfig.shortName}
+            aria-label={messages.brand.shortName}
           >
             <AppImage
               src="/images/brand/logo.avif"
-              alt="世田谷祭ロゴ"
+              alt={messages.brand.logoAlt}
               width={208}
               height={83}
               sizes="208px"
@@ -155,6 +154,7 @@ export function Header() {
           onClose={handleCloseMobileMenu}
           items={headerItems}
           closeLabel={messages.header.closeMenu}
+          socialLabel={messages.brand.socialLinks}
           pathname={pathname}
         />
       )}

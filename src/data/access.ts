@@ -254,6 +254,8 @@ export const accessConfig = {
 export interface AccessPageContent {
   introduction: {
     label: string;
+    /** ヒーロー画像の alt */
+    imageAlt: string;
     title: string;
     description: string;
     mapLinkLabel: string;
@@ -262,6 +264,8 @@ export interface AccessPageContent {
   location: {
     title: string;
     venue: string;
+    /** ロケール別の住所表記。日本語の原文は `accessConfig.address` が持つ */
+    address: string;
     phoneLabel: string;
     mapTitle: string;
     mapCaption: string;
@@ -298,6 +302,7 @@ export interface AccessPageContent {
 export const accessPageContent = {
   introduction: {
     label: "Setagaya Campus",
+    imageAlt: "世田谷キャンパスの風景",
     title: "世田谷祭への 行き方",
     description:
       "会場は東京都市大学 世田谷キャンパスです。最寄りの尾山台駅からは徒歩約12分。時間に余裕を持ってお越しください。",
@@ -307,6 +312,7 @@ export const accessPageContent = {
   location: {
     title: "会場所在地",
     venue: "東京都市大学 世田谷キャンパス",
+    address: "〒158-8557 東京都世田谷区玉堤1-28-1",
     phoneLabel: "大学代表",
     mapTitle: "東京都市大学 世田谷キャンパス周辺地図",
     mapCaption: "地図を拡大したい場合は「Google マップで開く」をご利用ください。",
@@ -359,6 +365,7 @@ export const accessPageContents = {
   en: {
     introduction: {
       label: "Setagaya Campus",
+      imageAlt: "View of the Setagaya Campus",
       title: "Your way to Setagaya Festival.",
       description:
         "The venue is Tokyo City University Setagaya Campus. It is about a 12-minute walk from the nearest station, Oyamadai. Please allow extra travel time.",
@@ -368,6 +375,7 @@ export const accessPageContents = {
     location: {
       title: "Venue location",
       venue: "Tokyo City University Setagaya Campus",
+      address: "1-28-1 Tamazutsumi, Setagaya-ku, Tokyo 158-8557, Japan",
       phoneLabel: "University main line",
       mapTitle: "Map around Tokyo City University Setagaya Campus",
       mapCaption: "Use “Open in Google Maps” to enlarge the map or start navigation.",
@@ -418,6 +426,7 @@ export const accessPageContents = {
   zh: {
     introduction: {
       label: "Setagaya Campus",
+      imageAlt: "世田谷校区风景",
       title: "轻松抵达世田谷祭。",
       description:
         "会场位于东京都市大学世田谷校区。从最近的尾山台站步行约12分钟，请预留充足的出行时间。",
@@ -427,6 +436,7 @@ export const accessPageContents = {
     location: {
       title: "会场地址",
       venue: "东京都市大学 世田谷校区",
+      address: "日本东京都世田谷区玉堤1-28-1（邮编 158-8557）",
       phoneLabel: "大学总机",
       mapTitle: "东京都市大学世田谷校区周边地图",
       mapCaption: "如需放大地图或开始导航，请使用“在 Google 地图中打开”。",
@@ -475,6 +485,7 @@ export const accessPageContents = {
   ko: {
     introduction: {
       label: "Setagaya Campus",
+      imageAlt: "세타가야 캠퍼스 풍경",
       title: "헤매지 않고 세타가야사이로.",
       description:
         "행사장은 도쿄도시대학 세타가야 캠퍼스입니다. 가장 가까운 오야마다이역에서 도보 약 12분이므로 여유 있게 방문해 주세요.",
@@ -484,6 +495,7 @@ export const accessPageContents = {
     location: {
       title: "행사장 위치",
       venue: "도쿄도시대학 세타가야 캠퍼스",
+      address: "일본 도쿄도 세타가야구 다마즈쓰미 1-28-1 (우편번호 158-8557)",
       phoneLabel: "대학 대표번호",
       mapTitle: "도쿄도시대학 세타가야 캠퍼스 주변 지도",
       mapCaption: "지도를 확대하거나 길 안내를 시작하려면 ‘Google 지도에서 열기’를 이용해 주세요.",

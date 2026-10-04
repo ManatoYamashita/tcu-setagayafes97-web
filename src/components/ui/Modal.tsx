@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback, type ReactNode } from "react";
+import { useChromeNav } from "@/components/layout/useChromeNav";
 
 interface ModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ interface ModalProps {
  * フォーカストラップ・Escキー閉じ・backdrop クリック閉じを標準サポート
  */
 export function Modal({ isOpen, onClose, children, ariaLabel }: ModalProps) {
+  const { messages } = useChromeNav();
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -67,7 +69,7 @@ export function Modal({ isOpen, onClose, children, ariaLabel }: ModalProps) {
           type="button"
           onClick={onClose}
           className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
-          aria-label="閉じる"
+          aria-label={messages.sponsors.close}
         >
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
