@@ -15,6 +15,9 @@ import { defineConfig, devices } from "@playwright/test";
  * - e2e/not-found/ — #249。モバイルの読み順・見出し間隔・画像幅。
  *   実際の上下関係と表示幅はブラウザのレイアウト結果を測らないと保証できない。
  *   企画詳細の404に歯車の画像が読み込まれていることもここで見る
+ * - e2e/opener/ — #402。サイト内からのフルロードでオープナーが再生される。
+ *   判定が遷移種別と referrer に依存し、どちらも実ブラウザの遷移でしか値が決まらない。
+ *   このファイルだけ reducedMotion を戻してオープナーを走らせる
  *
  * 設計判断は docs/frontend/layout-e2e.md を参照。
  */

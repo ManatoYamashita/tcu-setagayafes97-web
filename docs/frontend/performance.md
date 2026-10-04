@@ -280,7 +280,7 @@ const shouldWaitForOpener = willRunOpener() && !hasOpenerFinished();
 
 - ヘッダーの常設ロゴに動画を自動読み込みしない。ブランド演出はオープナーへ集約する。
 - スクロール連動の補間は `transform` / `opacity` を使い、`width` をアニメーションしない。
-- オープナーは `window.load` を待たず、ハイドレーション後に開始する。
+- オープナーは `window.load` を待たず、ハイドレーション後に開始する。サイト内の遷移から落ちたフルロードでは走らせない（[opener-entry-only.md](./opener-entry-only.md)）。
 - 初期表示モーションの尺は `src/lib/motion.ts` に集約する。オープナーの合計は
   LCP を覆う時間の上限なので、コンポーネント内に散らさない。
 - タイムライン内の位置は `tl.duration()` からの逆算ではなく `addLabel` で表す。

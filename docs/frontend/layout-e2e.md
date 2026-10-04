@@ -1,13 +1,14 @@
 # レイアウトの実測アサーション（Playwright）
 
 実ブラウザでしか捕まえられない事故に対する、**再発防止装置の置き場**です。
-**「E2E を増やしていく基盤」ではありません。** 現在3つの装置が載っています。
+**「E2E を増やしていく基盤」ではありません。** 載っている装置の一部を次に示します。
 
-| 装置             | 対象              | 防いでいる事故                                          |
-| ---------------- | ----------------- | ------------------------------------------------------- |
-| `e2e/timetable/` | `/timetable`      | #148 — 盤面が `height: 100%` の解決失敗で 0px に潰れる  |
-| `e2e/landmarks/` | 全ルート＋404画面 | #177 A — `<main id="content">` の付け忘れ・二重・空振り |
-| `e2e/not-found/` | グローバル404画面 | #249 — モバイルの読み順とイラスト寸法の退行             |
+| 装置             | 対象                 | 防いでいる事故                                                                                            |
+| ---------------- | -------------------- | --------------------------------------------------------------------------------------------------------- |
+| `e2e/timetable/` | `/timetable`         | #148 — 盤面が `height: 100%` の解決失敗で 0px に潰れる                                                    |
+| `e2e/landmarks/` | 全ルート＋404画面    | #177 A — `<main id="content">` の付け忘れ・二重・空振り                                                   |
+| `e2e/not-found/` | グローバル404画面    | #249 — モバイルの読み順とイラスト寸法の退行                                                               |
+| `e2e/opener/`    | `/access` → `/about` | #402 — サイト内からのフルロードでオープナーが再生される（[opener-entry-only.md](./opener-entry-only.md)） |
 
 関連: [timetable-gantt.md](./timetable-gantt.md)（盤面の設計） /
 [landmarks-and-skip-link.md](./landmarks-and-skip-link.md)（ランドマークの契約） /
@@ -122,6 +123,8 @@ e2e/
 ├── fixtures.ts                      # 測定系の生存確認・共通フィクスチャ
 ├── not-found/
 │   └── responsive-parity.spec.ts    # 読み順・見出し間隔・画像幅             [mobile]
+├── opener/
+│   └── in-site-reload.spec.ts       # 入口では再生・サイト内のフルロードでは非再生 [desktop]
 └── timetable/
     ├── board-geometry.spec.ts       # 盤面高さ・座標の写像・レーン分割・レンジ  [desktop]
     ├── card-density.spec.ts         # カード実寸 24px・内容の溢れ              [desktop]

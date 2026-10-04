@@ -157,6 +157,8 @@
 - **[i18n-page-structure.md](./frontend/i18n-page-structure.md)** - 多言語ページの構成パターン（next-intl・メッセージ分割・リンク・`lang`）
 - **[page-transition.md](./frontend/page-transition.md)** - ページ遷移アニメーションと View Transitions API
   - **popstate リスナはモジュール評価時に登録する**（`useEffect` だと2回目以降動かない）。`next` を上げたら履歴遷移を再検証する
+- **[opener-entry-only.md](./frontend/opener-entry-only.md)** - オープナーは入口でだけ再生する（#402）
+  - **デプロイ後の開いたままのタブは、次の遷移・検索でフルロードへ落ちる**（ビルドID不一致）。遷移種別と referrer でサイト内からの到着を判定する
 
 ## 更新手順（PDCA）
 

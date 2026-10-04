@@ -87,17 +87,57 @@ export const hasOpenerFinished = () =>
   (window as unknown as Record<string, boolean>)[OPENER_DONE_KEY] === true;
 
 /**
+ * このドキュメントが「サイト内の移動」によって読み込まれたか。
+ *
+ * サイト内の遷移は `<Link>` / `router.push()` でもフルロードへ落ちることがある。
+ * Next.js は RSC 応答のビルドIDがクライアントと違う（＝デプロイ後に開いたままのタブ）、
+ * 応答が 200 でない、fetch が失敗した、のいずれかでブラウザ遷移へ切り替える
+ * （next/dist/client/components/router-reducer/fetch-server-response.js）。
+ * このときの遷移種別は `navigate`、referrer は直前のページ（同一オリジン）になる。
+ *
+ * `reload` は利用者が明示的に読み込み直したものなので含めない。
+ *
+ * @param navigationType PerformanceNavigationTiming.type
+ * @param referrer document.referrer
+ * @param origin location.origin
+ */
+export const isInSiteArrival = (
+  navigationType: string | undefined,
+  referrer: string,
+  origin: string
+): boolean => {
+  if (navigationType !== "navigate" && navigationType !== "back_forward") return false;
+  if (!referrer) return false;
+  try {
+    return new URL(referrer).origin === origin;
+  } catch {
+    return false;
+  }
+};
+
+const isCurrentDocumentInSiteArrival = () => {
+  const [entry] = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
+  return isInSiteArrival(entry?.type, document.referrer, window.location.origin);
+};
+
+/**
  * この閲覧環境でオープナーが走るか。OpenerLoader のロード条件と同一の述語。
  *
  * DOM の [data-opener-active] を見る方式では判定できない。Opener は
  * dynamic(ssr:false) なので SSR HTML にマーカーが出ず、各ページの useEffect は
  * useSyncExternalStore の再レンダー → チャンク取得 → Opener の mount より
  * 必ず先に走るため、初回表示では常に「オープナーは居ない」と誤判定される。
+ *
+ * サイト内の移動から落ちてきたフルロード（isInSiteArrival）でも走らせない。
+ * オープナーは入口の演出であり、ページを移っただけで再生されるのは不具合に見える。
+ * 判定をここに置くのは、shouldWaitForOpener() と OpenerLoader が同じ答えを得るため。
+ * 片方だけで判定すると、オープナーが出ないのに入場が OPENER_FAILSAFE_MS まで待たされる。
  */
 export const willRunOpener = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(min-width: 768px)").matches &&
-  !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  !window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
+  !isCurrentDocumentInSiteArrival();
 
 /**
  * 入場アニメーションが `opener-done` を待つべきか。
