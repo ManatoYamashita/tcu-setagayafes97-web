@@ -253,7 +253,7 @@ export function EventFilters({
               // 確定キーでソフトウェアキーボードを閉じ、結果を見せる。IME の確定とは区別する
               if (e.key === "Enter" && !e.nativeEvent.isComposing) e.currentTarget.blur();
             }}
-            className="h-11 w-full rounded-lg border border-gray-400 bg-white pr-10 pl-9 text-base text-gray-900 placeholder-gray-600 focus:border-gray-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600 lg:h-auto lg:py-2 lg:pl-4 lg:text-sm"
+            className={`h-11 w-full rounded-lg border border-gray-400 bg-white pl-9 text-base ${isKeywordPending ? "pr-10" : "pr-3"} text-gray-900 placeholder-gray-600 focus:border-gray-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600 lg:h-auto lg:py-2 lg:pl-4 lg:text-sm`}
           />
           {isKeywordPending && (
             <Loader2
@@ -267,7 +267,11 @@ export function EventFilters({
         </p>
       </div>
 
-      {/* lg 未満: 開催日・種別・建物はシートで選ぶ */}
+      {/*
+        lg 未満: 開催日・種別・建物はシートで選ぶ。
+        アイコンだけにしているのは入力欄の幅を確保するため。「条件」の文字を添えると
+        102px を取り、390px 幅でもプレースホルダが途中で切れた（2026-10-04 実測）
+      */}
       <button
         type="button"
         onClick={() => setIsSheetOpen(true)}
@@ -275,13 +279,12 @@ export function EventFilters({
         aria-label={
           sheetFilterCount > 0 ? `絞り込み条件（${sheetFilterCount}件を選択中）` : "絞り込み条件"
         }
-        className="relative inline-flex h-11 shrink-0 items-center gap-1.5 rounded-lg border border-gray-400 bg-white px-3 text-sm font-semibold text-gray-900 transition-colors hoverable:hover:bg-gray-50 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600 lg:hidden"
+        className="relative inline-flex size-11 shrink-0 items-center justify-center rounded-lg border border-gray-400 bg-white text-gray-900 transition-colors hoverable:hover:bg-gray-50 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600 lg:hidden"
       >
-        <SlidersHorizontal className="size-4" aria-hidden="true" />
-        条件
+        <SlidersHorizontal className="size-5" aria-hidden="true" />
         {sheetFilterCount > 0 && (
           <span
-            className="inline-flex size-5 items-center justify-center rounded-full bg-primary-600 text-xs font-bold text-white tabular-nums"
+            className="absolute -top-1.5 -right-1.5 inline-flex size-5 items-center justify-center rounded-full bg-primary-600 text-xs font-bold text-white tabular-nums ring-2 ring-white"
             aria-hidden="true"
             data-filter-count
           >
