@@ -36,13 +36,15 @@ const KEYWORD_DEBOUNCE_MS = 300;
  *
  * ブレークポイントで形が変わります（#376）。
  *
- * - `lg` 以上: サイドバーに全項目を並べる（高さの上限 `max-h` は sticky とセットで要る）
+ * - `lg` 以上: サイドバーにキーワードのカードと絞り込みのカードを並べる（高さの上限 `max-h` は sticky とセットで要る）
  * - `lg` 未満: キーワード入力と「条件」ボタンだけの細いバーが追従し、開催日・種別・建物は
  *   ボトムシート（`EventFilterSheet`）で選ぶ。全項目を追従させると、開いた瞬間に画面の
  *   7割を占めてカードが見えなくなるため（390x844 で 612px。2026-10-04 実測）
  *
  * 2つの形は**DOM の並び順と表示切替だけ**で作り分けます。キーワード入力は1要素のままで、
  * 両方の形で同じものを使います（IME・デバウンスの状態を二重に持たないため）。
+ * `lg` 以上ではキーワード入力を絞り込みとは別のカードに置きます（入力が絞り込みの最下部に
+ * 埋もれて見つけにくかったため）。
  * 設計は docs/frontend/events-filter-sheet.md を参照。
  */
 export function EventFilters({
@@ -191,39 +193,20 @@ export function EventFilters({
   return (
     /*
       lg 未満: キーワード入力と「条件」ボタンを横に並べた細いバー（枠は入力欄とボタンが持つ）
-      lg 以上: 枠つきのカードに見出し・全項目・キーワードを縦に並べる
+      lg 以上: キーワード入力のカードと、開催日・種別・建物のカードを縦に2枚並べる
 
       lg の高さの上限は sticky 化（#239）とセットで要る。親の <aside> が画面上部へ貼り付くため、
       これが無いと項目が多いときにパネルが画面を縦いっぱいに占める。
       ヘッダー（--header-height）と上下の余白を引いた残りが上限。
+      キーワードのカードは縮めず（`shrink-0`）、残りの高さを絞り込みのカードが
+      `overflow-y-auto` で受ける。検索欄の高さを数値で引かずに済む。
     */
-    <div className="flex items-center gap-2 lg:block lg:max-h-[calc(100svh-var(--header-height)-2rem)] lg:overflow-y-auto lg:rounded-lg lg:border lg:border-gray-200 lg:bg-white lg:p-6">
-      <div className="mb-4 hidden items-center justify-between lg:flex">
-        <h2 className="text-lg font-bold text-gray-900">絞り込み</h2>
-        <button
-          type="button"
-          onClick={handleReset}
-          className="text-sm text-gray-900 underline hoverable:hover:text-gray-900/80 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
-          aria-label="フィルターをリセット"
-        >
-          リセット
-        </button>
-      </div>
-
-      {/* lg 以上のサイドバー。lg 未満では同じ項目をシートの中に描く */}
-      <div className="hidden lg:block">
-        <EventFilterFields
-          filters={filters}
-          buildingOptions={buildingOptions}
-          onChange={handleFilterChange}
-        />
-      </div>
-
+    <div className="flex items-center gap-2 lg:max-h-[calc(100svh-var(--header-height)-2rem)] lg:flex-col lg:items-stretch lg:gap-4">
       {/*
         キーワード検索。両方の形で同じ1要素を使う。
         `id="keyword-search"` は scripts/assert-events-static-html.mjs が静的HTMLの目印にしている
       */}
-      <div className="min-w-0 flex-1 lg:mt-6">
+      <div className="min-w-0 flex-1 lg:flex-none lg:shrink-0 lg:rounded-lg lg:border lg:border-gray-200 lg:bg-white lg:p-4">
         <label
           htmlFor="keyword-search"
           className="sr-only lg:not-sr-only lg:mb-2 lg:block lg:text-sm lg:font-semibold lg:text-gray-900/90"
@@ -232,7 +215,7 @@ export function EventFilters({
         </label>
         <div className="relative">
           <Search
-            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-600 lg:hidden"
+            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-600"
             aria-hidden="true"
           />
           <input
@@ -253,7 +236,7 @@ export function EventFilters({
               // 確定キーでソフトウェアキーボードを閉じ、結果を見せる。IME の確定とは区別する
               if (e.key === "Enter" && !e.nativeEvent.isComposing) e.currentTarget.blur();
             }}
-            className={`h-11 w-full rounded-lg border border-gray-400 bg-white pl-9 text-base ${isKeywordPending ? "pr-10" : "pr-3"} text-gray-900 placeholder-gray-600 focus:border-gray-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600 lg:h-auto lg:py-2 lg:pl-4 lg:text-sm`}
+            className={`h-11 w-full rounded-lg border border-gray-400 bg-white pl-9 text-base ${isKeywordPending ? "pr-10" : "pr-3"} text-gray-900 placeholder-gray-600 focus:border-gray-600 focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-primary-600 lg:text-sm`}
           />
           {isKeywordPending && (
             <Loader2
@@ -265,6 +248,29 @@ export function EventFilters({
         <p className="mt-2 hidden text-xs text-gray-700 lg:block">
           企画名・団体名・場所・紹介文から探します。文章のまま入力できます。
         </p>
+      </div>
+
+      {/*
+        lg 以上の絞り込みカード。lg 未満では同じ項目をシートの中に描くため出さない。
+        リセットはキーワードも含めて全部戻す（別カードだが、押す場所はここ1つに保つ）
+      */}
+      <div className="hidden min-h-0 lg:block lg:overflow-y-auto lg:rounded-lg lg:border lg:border-gray-200 lg:bg-white lg:p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-gray-900">絞り込み</h2>
+          <button
+            type="button"
+            onClick={handleReset}
+            className="text-sm text-gray-900 underline hoverable:hover:text-gray-900/80 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
+            aria-label="フィルターをリセット"
+          >
+            リセット
+          </button>
+        </div>
+        <EventFilterFields
+          filters={filters}
+          buildingOptions={buildingOptions}
+          onChange={handleFilterChange}
+        />
       </div>
 
       {/*
