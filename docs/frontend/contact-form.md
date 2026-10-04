@@ -40,7 +40,8 @@
 判定は `resolveMailConfig()`（`src/lib/contact-mail.ts`）が持ち、ユニットテストで縛ってある。
 
 - **届け先は環境変数ではなく [`src/data/contact.ts`](../../src/data/contact.ts) が持つ**
-  （現在は委員会の `sfa.koho@gmail.com`。2026-10-05 決定）。`CONTACT_TO_EMAIL` は**もう読まない。**
+  （現在は委員会の `sfa.koho@gmail.com`。2026-10-05 決定）。サイト担当者の
+  `mail@yamashitamana.to` が **Bcc** で控えを受け取る（To / Cc だと「全員に返信」で来場者に見える）。`CONTACT_TO_EMAIL` は**もう読まない。**
   以前は `contact@setagayafes.com`（存在しないドメイン）が既定値で、その後は環境変数が
   どこにも登録されず1通も届かなかった。**宛先は秘密情報ではなく、レビューを通して変える値である**
 - **差出人は `CONTACT_FROM_EMAIL || SMTP_USER`。** 別ドメインの既定値を書くと SPF / DMARC で弾かれる

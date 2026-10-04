@@ -12,4 +12,11 @@
 export const contactMailConfig = {
   /** 委員会の広報用受信箱。落とし物・取材の届け出もここへ届く */
   to: "sfa.koho@gmail.com",
+  /**
+   * 届いているかを確かめるための控え（サイト担当者）
+   *
+   * **To / Cc ではなく Bcc にする。** To / Cc に並べると、委員会が「全員に返信」したときに
+   * 来場者へ担当者のアドレスが見え、返信のスレッドにも担当者が入り続ける。
+   */
+  bcc: ["mail@yamashitamana.to"],
 } as const;

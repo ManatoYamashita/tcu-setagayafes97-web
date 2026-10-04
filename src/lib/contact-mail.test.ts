@@ -14,6 +14,10 @@ describe("contactMailConfig", () => {
   it("届け先は委員会の受信箱である（#261）", () => {
     expect(contactMailConfig.to).toBe("sfa.koho@gmail.com");
   });
+
+  it("確認用の控えを Bcc で受け取る（委員会の宛先・来場者への返信に出さない）", () => {
+    expect(contactMailConfig.bcc).toEqual(["mail@yamashitamana.to"]);
+  });
 });
 
 describe("resolveMailConfig", () => {
@@ -30,6 +34,7 @@ describe("resolveMailConfig", () => {
         pass: "app-password",
         from: "sender@example.com",
         to: "sfa.koho@gmail.com",
+        bcc: ["mail@yamashitamana.to"],
       },
     });
   });

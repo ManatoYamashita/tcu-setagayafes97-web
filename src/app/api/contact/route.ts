@@ -15,7 +15,7 @@ import { contactSubmissionSchema, contactTypeLabels } from "@/types/contact";
  * - SMTP_PASS: SMTPパスワード
  * - CONTACT_FROM_EMAIL: 送信元メールアドレス（任意。省略時は SMTP_USER）
  *
- * 届け先は環境変数ではなく `src/data/contact.ts` が持つ。
+ * 届け先（To と確認用の Bcc）は環境変数ではなく `src/data/contact.ts` が持つ。
  */
 
 /**
@@ -182,6 +182,7 @@ export async function POST(request: NextRequest) {
     await transporter.sendMail({
       from: config.from,
       to: config.to,
+      bcc: [...config.bcc],
       replyTo: data.email,
       subject: emailContent.subject,
       text: emailContent.text,

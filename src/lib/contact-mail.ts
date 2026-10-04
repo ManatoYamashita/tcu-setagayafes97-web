@@ -20,6 +20,8 @@ export interface MailConfig {
   pass: string;
   from: string;
   to: string;
+  /** 確認用の控え。ヘッダには出ない */
+  bcc: readonly string[];
 }
 
 export type MailConfigResult = { ok: true; config: MailConfig } | { ok: false; missing: string[] };
@@ -58,6 +60,7 @@ export function resolveMailConfig(env: Record<string, string | undefined>): Mail
       // 差出人は認証したアカウントへ落とす。別ドメインの既定値を書くと SPF/DMARC で弾かれる
       from: read("CONTACT_FROM_EMAIL") || user,
       to: contactMailConfig.to,
+      bcc: contactMailConfig.bcc,
     },
   };
 }
