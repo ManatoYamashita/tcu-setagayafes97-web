@@ -70,15 +70,15 @@ test.describe("/events の絞り込み（lg 未満）", () => {
 
   test("スクロールしてもバーが画面上部に貼り付く", async ({ page }) => {
     await gotoEvents(page);
-    // CI では一覧が0件で、ページが短く追従を観測できない。一覧の側へ高さを足す
-    await page.locator("aside + div").evaluate((el) => {
-      const spacer = document.createElement("div");
-      spacer.style.height = "4000px";
-      el.append(spacer);
-    });
-    await page.evaluate(() => window.scrollTo(0, 3000));
-
+    // CI では一覧が0件で、ページが短く追従を観測できない。一覧の側へ高さを足す。
+    // **子要素を足してはいけない。** ハイドレーション前に足すと、React がサーバーに無い
+    // ノードとして削除する（#392 の CI で spacer が scrollTo の直後に消えていた。trace で確認）。
+    // React が管理しない style の min-height なら残る。消えても次の試行で足し直す
     await expect(async () => {
+      await page.locator("aside + div").evaluate((el: HTMLElement) => {
+        el.style.minHeight = "4000px";
+        window.scrollTo(0, 3000);
+      });
       const top = await page
         .locator("aside")
         .evaluate((el) => Math.round(el.getBoundingClientRect().top));

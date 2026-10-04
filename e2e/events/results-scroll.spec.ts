@@ -23,15 +23,20 @@ async function gotoEvents(page: Page) {
   await expect(page.locator("#keyword-search")).toBeVisible();
 }
 
-/** 結果ブロックの後ろへ高さを足し、ページを下まで読み進めた状態を作る */
+/**
+ * 結果ブロックに高さを足し、ページを下まで読み進めた状態を作る
+ *
+ * **子要素を足してはいけない。** ハイドレーション前に足すと、React がサーバーに無いノードとして
+ * 削除する（CI で実測）。React が管理しない style の min-height なら残る
+ */
 async function scrollDeep(page: Page) {
-  await page.locator("aside + div").evaluate((el) => {
-    const spacer = document.createElement("div");
-    spacer.style.height = "4000px";
-    el.append(spacer);
-  });
-  await page.evaluate(() => window.scrollTo(0, 3000));
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(2000);
+  await expect(async () => {
+    await page.locator("aside + div").evaluate((el: HTMLElement) => {
+      el.style.minHeight = "4000px";
+      window.scrollTo(0, 3000);
+    });
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(2000);
+  }).toPass();
 }
 
 /** ハイドレーション前の入力は URL へ届かないため、届くまで入れ直す */
