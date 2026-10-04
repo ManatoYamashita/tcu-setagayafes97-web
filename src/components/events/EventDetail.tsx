@@ -38,7 +38,8 @@ const typeLabels: Record<Event["type"], string> = {
   other: "その他",
 };
 
-const SQUARE_IMAGE_TOLERANCE = 0.05;
+// 縦横比が近いイラストを横長写真として画面幅いっぱいに拡大しない。
+const SQUARE_IMAGE_TOLERANCE = 0.2;
 
 function EventFact({ label, value }: EventFactProps) {
   return (

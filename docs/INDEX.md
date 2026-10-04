@@ -121,6 +121,7 @@
   - **z-index が効くのは同じ積み重ね文脈の中だけ。** Header 内のドロップダウンの z-60 は、ページ全体では Header と同じ 40
 - **[layout-responsive.md](./frontend/layout-responsive.md)** - タブレット帯（640〜1023px）の取りこぼし、DOM 2枚持ち、部分幅ヒーロー画像の境界処理
   - **`lg:` の1段階だけで切り替えると 640〜1023px が全てモバイル扱いになる**
+  - **企画詳細のほぼ正方形の画像は小型表示にする。** 長辺との差20%以下を含め、390/1000/1280pxで確認する（#377）
 - **[layout-width-and-alignment.md](./frontend/layout-width-and-alignment.md)** - 幅の梯子、左端の揃え方、負のマージン、Tailwind v4 の出力順
   - **1ページに `max-w-*` を何種類も同居させない。** ハウス標準は `PageSheetLayout` の1本
   - **確認は `max-w-*` が効かない幅（1344px 未満）を含める。** 広い画面ではずれが消えて見える
