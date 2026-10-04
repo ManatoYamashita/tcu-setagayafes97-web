@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { X } from "lucide-react";
-import { useSheetDialog } from "@/components/ui/useSheetDialog";
+import { SlidePanel } from "@/components/ui/SlidePanel";
 import type { FilterParams } from "@/lib/filters";
 import type { BuildingFilterOption } from "@/data/filter-options";
 import { EventFilterFields } from "./EventFilterFields";
@@ -23,7 +23,7 @@ interface EventFilterSheetProps {
   isSearching: boolean;
 }
 
-/** lg（64rem）。`globals.css` の `.events-filter-sheet` が lg 以上で消える境界と揃える */
+/** lg（64rem）。`globals.css` の `.slide-panel` が右パネルへ切り替わる境界と揃える */
 const DESKTOP_QUERY = "(min-width: 64rem)";
 
 /**
@@ -33,7 +33,8 @@ const DESKTOP_QUERY = "(min-width: 64rem)";
  * 下書きを持たないのは、選んだ結果の件数をその場で見せて「0件になる組み合わせ」を
  * 閉じる前に気づけるようにするためです。
  *
- * 開閉の状態は URL に持ちません（`EventFilters` のローカル state）。
+ * 開閉の状態は URL に持ちません（`EventFilters` のローカル state）。開閉の機構
+ * （`<dialog>`・退場アニメーション・Esc・背景の押下）は `SlidePanel` が持ちます。
  *
  * 設計は docs/frontend/events-filter-sheet.md を参照。
  */
@@ -48,11 +49,10 @@ export function EventFilterSheet({
   resultCount,
   isSearching,
 }: EventFilterSheetProps) {
-  const { dialogRef, handleClick } = useSheetDialog({ isOpen, onClose });
-
   /*
-    開いたまま lg へ広げると、シートは CSS で消えるが showModal() の inert は残り、
-    サイドバーも一覧も操作できなくなる。境界を越えた時点で閉じる。
+    lg 以上ではサイドバーが同じ項目を出すため、シートは使わない。開いたまま lg へ広げると
+    右パネルへ変形して残り、showModal() の inert でサイドバーも一覧も操作できなくなる。
+    境界を越えた時点で閉じる。
   */
   useEffect(() => {
     if (!isOpen) return;
@@ -69,12 +69,7 @@ export function EventFilterSheet({
   }, [isOpen, onClose]);
 
   return (
-    <dialog
-      ref={dialogRef}
-      className="events-filter-sheet"
-      aria-labelledby="events-filter-sheet-title"
-      onClick={handleClick}
-    >
+    <SlidePanel open={isOpen} onClose={onClose} labelledBy="events-filter-sheet-title">
       <div className="flex min-h-0 flex-1 flex-col">
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-gray-200 px-4 py-2">
           <h2 id="events-filter-sheet-title" className="text-lg font-bold text-gray-900">
@@ -122,6 +117,6 @@ export function EventFilterSheet({
           </button>
         </div>
       </div>
-    </dialog>
+    </SlidePanel>
   );
 }

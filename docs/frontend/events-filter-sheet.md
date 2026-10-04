@@ -28,13 +28,12 @@ lg 未満の `/events` で、絞り込みが画面の大半を占めて企画カ
 変更後の実測（dev、実データ、390x844、`?type=stage`）: `<aside>` **60px**、
 「N 件の企画が見つかりました」が y=792（画面内）。シートは下端に接地し高さ 508px（上限 85dvh）。
 
-| ファイル                                        | 役割                                                                   |
-| ----------------------------------------------- | ---------------------------------------------------------------------- |
-| `src/components/events/EventFilters.tsx`        | 2つの形を DOM の並び順と表示切替で作り分ける                           |
-| `src/components/events/EventFilterFields.tsx`   | 開催日・種別・建物。サイドバーとシートの2箇所に描く                    |
-| `src/components/events/EventFilterSheet.tsx`    | `<dialog>` のボトムシート                                              |
-| `src/components/ui/useSheetDialog.ts`           | 開閉（showModal・退場アニメーション・Esc・背景）。タイムテーブルと共用 |
-| `src/app/globals.css` の `.events-filter-sheet` | シートの形と動き。keyframes は `.timetable-panel` と共用               |
+| ファイル                                      | 役割                                                                         |
+| --------------------------------------------- | ---------------------------------------------------------------------------- |
+| `src/components/events/EventFilters.tsx`      | 2つの形を DOM の並び順と表示切替で作り分ける                                 |
+| `src/components/events/EventFilterFields.tsx` | 開催日・種別・建物。サイドバーとシートの2箇所に描く                          |
+| `src/components/events/EventFilterSheet.tsx`  | シートの中身。外枠は共通部品の `SlidePanel`                                  |
+| `src/components/ui/SlidePanel.tsx`            | 開閉（showModal・退場アニメーション・Esc・背景）。タイムテーブル・協賛と共用 |
 
 ## 設計判断
 
@@ -76,8 +75,9 @@ lg 未満では見出しと項目を隠して `flex` の横並びにし、lg 以
 
 ### lg へ広げたら閉じる
 
-`showModal()` の inert は CSS でシートを消しても残る。開いたまま lg へ広げると、
-サイドバーも一覧も操作できなくなる。`matchMedia("(min-width: 64rem)")` の変化で閉じる。
+`SlidePanel` は lg 以上で右からのパネルに変形する。開いたまま lg へ広げると、
+サイドバーと同じ項目を出す右パネルが残り、`showModal()` の inert でサイドバーも一覧も
+操作できなくなる。`matchMedia("(min-width: 64rem)")` の変化で閉じる。
 
 ### 読み込み中の骨格も揃える
 

@@ -24,7 +24,7 @@ async function gotoEvents(page: Page, query = "") {
   await expect(page.locator("#keyword-search")).toBeVisible();
 }
 
-const sheet = (page: Page) => page.locator("dialog.events-filter-sheet");
+const sheet = (page: Page) => page.locator("aside dialog.slide-panel");
 const trigger = (page: Page) => page.getByRole("button", { name: /^絞り込み条件/ });
 
 /** ハイドレーション前の押下は何も起こさないため、開くまで押し直す */
