@@ -1,21 +1,4 @@
 {
-  "common": {
-    "loading": "読み込み中...",
-    "error": "エラーが発生しました",
-    "notFound": "ページが見つかりません",
-    "backToTop": "トップに戻る",
-    "moreInfo": "詳細を見る",
-    "seeAll": "すべて見る",
-    "share": "シェア",
-    "language": "言語"
-  },
-  "languageSwitcher": {
-    "label": "言語を選択",
-    "ja": "日本語",
-    "en": "English",
-    "zh": "简体中文",
-    "ko": "한국어"
-  },
   "about": {
     "title": "委員会について",
     "subtitle": "世田谷祭実行委員会の理念とビジョン",

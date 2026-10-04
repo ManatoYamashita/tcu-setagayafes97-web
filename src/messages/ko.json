@@ -1,21 +1,4 @@
 {
-  "common": {
-    "loading": "로딩 중...",
-    "error": "오류가 발생했습니다",
-    "notFound": "페이지를 찾을 수 없습니다",
-    "backToTop": "맨 위로",
-    "moreInfo": "자세히 보기",
-    "seeAll": "모두 보기",
-    "share": "공유",
-    "language": "언어"
-  },
-  "languageSwitcher": {
-    "label": "언어 선택",
-    "ja": "일본어",
-    "en": "영어",
-    "zh": "중국어",
-    "ko": "한국어"
-  },
   "about": {
     "title": "소개",
     "subtitle": "세타가야사이 실행위원회의 이념과 비전",
@@ -223,7 +206,7 @@
       "all": "전체",
       "visit": "방문",
       "event": "행사",
-      "facility": "회장・시설",
+      "facility": "회장·시설",
       "other": "기타"
     },
     "noResults": {

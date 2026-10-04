@@ -1,21 +1,4 @@
 {
-  "common": {
-    "loading": "加载中...",
-    "error": "发生错误",
-    "notFound": "页面未找到",
-    "backToTop": "返回顶部",
-    "moreInfo": "了解更多",
-    "seeAll": "查看全部",
-    "share": "分享",
-    "language": "语言"
-  },
-  "languageSwitcher": {
-    "label": "选择语言",
-    "ja": "日语",
-    "en": "英语",
-    "zh": "简体中文",
-    "ko": "韩语"
-  },
   "about": {
     "title": "关于我们",
     "subtitle": "世田谷祭执行委员会的理念与愿景",

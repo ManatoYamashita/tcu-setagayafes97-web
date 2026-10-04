@@ -1,21 +1,4 @@
 {
-  "common": {
-    "loading": "Loading...",
-    "error": "An error occurred",
-    "notFound": "Page not found",
-    "backToTop": "Back to top",
-    "moreInfo": "Learn more",
-    "seeAll": "See all",
-    "share": "Share",
-    "language": "Language"
-  },
-  "languageSwitcher": {
-    "label": "Select Language",
-    "ja": "Japanese",
-    "en": "English",
-    "zh": "Chinese",
-    "ko": "Korean"
-  },
   "about": {
     "title": "About Us",
     "subtitle": "Philosophy and Vision of Setagaya Festival Executive Committee",
