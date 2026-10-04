@@ -36,6 +36,15 @@
     "name": "The 97th Tokyo City University Setagaya Festival",
     "shortName": "Setagaya Festival",
     "logoAlt": "Setagaya Festival logo",
-    "socialLinks": "Social media links"
+    "socialLinks": "Social media links",
+    "followOn": "Follow Setagaya Festival on {platform}"
+  },
+  "sponsors": {
+    "heading": "Sponsors & Supporters",
+    "viewAll": "View all sponsors and supporters",
+    "logosLabel": "Sponsor logos",
+    "detailLabel": "Details of {name}",
+    "website": "Visit website",
+    "close": "Close"
   }
 }

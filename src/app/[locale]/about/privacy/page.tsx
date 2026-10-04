@@ -95,6 +95,7 @@ export default async function PrivacyPolicyPage({
   setRequestLocale(locale);
 
   const t = await getTranslations("privacy");
+  const tHeroAlt = await getTranslations("pageHeroAlt");
 
   /**
    * ヒーローは他セクションページと共通の PageHero を使用する。
@@ -104,6 +105,7 @@ export default async function PrivacyPolicyPage({
     ...pageHeroes.privacy,
     title: t("title"),
     description: t("subtitle"),
+    imageAlt: tHeroAlt("privacy"),
   };
 
   const policy = resolvePrivacyPolicy(locale as Locale);

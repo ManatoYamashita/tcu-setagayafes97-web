@@ -254,6 +254,8 @@ export const accessConfig = {
 export interface AccessPageContent {
   introduction: {
     label: string;
+    /** ヒーロー画像の alt */
+    imageAlt: string;
     title: string;
     description: string;
     mapLinkLabel: string;
@@ -298,6 +300,7 @@ export interface AccessPageContent {
 export const accessPageContent = {
   introduction: {
     label: "Setagaya Campus",
+    imageAlt: "世田谷キャンパスの風景",
     title: "世田谷祭への 行き方",
     description:
       "会場は東京都市大学 世田谷キャンパスです。最寄りの尾山台駅からは徒歩約12分。時間に余裕を持ってお越しください。",
@@ -359,6 +362,7 @@ export const accessPageContents = {
   en: {
     introduction: {
       label: "Setagaya Campus",
+      imageAlt: "View of the Setagaya Campus",
       title: "Your way to Setagaya Festival.",
       description:
         "The venue is Tokyo City University Setagaya Campus. It is about a 12-minute walk from the nearest station, Oyamadai. Please allow extra travel time.",
@@ -418,6 +422,7 @@ export const accessPageContents = {
   zh: {
     introduction: {
       label: "Setagaya Campus",
+      imageAlt: "世田谷校区风景",
       title: "轻松抵达世田谷祭。",
       description:
         "会场位于东京都市大学世田谷校区。从最近的尾山台站步行约12分钟，请预留充足的出行时间。",
@@ -475,6 +480,7 @@ export const accessPageContents = {
   ko: {
     introduction: {
       label: "Setagaya Campus",
+      imageAlt: "세타가야 캠퍼스 풍경",
       title: "헤매지 않고 세타가야사이로.",
       description:
         "행사장은 도쿄도시대학 세타가야 캠퍼스입니다. 가장 가까운 오야마다이역에서 도보 약 12분이므로 여유 있게 방문해 주세요.",

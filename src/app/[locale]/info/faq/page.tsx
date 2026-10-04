@@ -47,6 +47,7 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: st
   setRequestLocale(locale);
 
   const t = await getTranslations("faq");
+  const tHeroAlt = await getTranslations("pageHeroAlt");
 
   // FAQ一覧を取得
   const faqList = await getFAQList();
@@ -59,6 +60,7 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: st
     ...pageHeroes.faq,
     title: t("title"),
     description: t("subtitle"),
+    imageAlt: tHeroAlt("faq"),
   };
 
   return (

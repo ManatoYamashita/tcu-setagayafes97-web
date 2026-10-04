@@ -40,6 +40,7 @@ export function AccessPageView({ content, locale }: AccessPageContentProps) {
     ...pageHeroes.access,
     title: content.introduction.title,
     description: content.introduction.description,
+    imageAlt: content.introduction.imageAlt,
   };
 
   return (

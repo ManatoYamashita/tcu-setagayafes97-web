@@ -36,6 +36,15 @@
     "name": "第97回東京都市大学世田谷祭",
     "shortName": "世田谷祭",
     "logoAlt": "世田谷祭ロゴ",
-    "socialLinks": "SNSリンク"
+    "socialLinks": "SNSリンク",
+    "followOn": "{platform}で世田谷祭をフォロー"
+  },
+  "sponsors": {
+    "heading": "協賛・協力",
+    "viewAll": "協賛・協力の一覧を見る",
+    "logosLabel": "協賛企業ロゴ",
+    "detailLabel": "{name}の詳細",
+    "website": "Webサイトを見る",
+    "close": "閉じる"
   }
 }

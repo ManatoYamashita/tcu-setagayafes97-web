@@ -72,6 +72,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
   setRequestLocale(locale);
 
   const t = await getTranslations("guide");
+  const tHeroAlt = await getTranslations("pageHeroAlt");
   const tNav = await getTranslations("navigation");
 
   /**
@@ -82,6 +83,7 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
     ...pageHeroes.guide,
     title: t("title"),
     description: t("subtitle"),
+    imageAlt: tHeroAlt("guide"),
   };
 
   // id は各 <section> のアンカーと対応する。翻訳キーはリテラルで書き、動的生成しない。

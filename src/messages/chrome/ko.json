@@ -36,6 +36,15 @@
     "name": "제97회 도쿄도시대학 세타가야사이",
     "shortName": "세타가야사이",
     "logoAlt": "세타가야사이 로고",
-    "socialLinks": "SNS 링크"
+    "socialLinks": "SNS 링크",
+    "followOn": "{platform}에서 세타가야사이 팔로우"
+  },
+  "sponsors": {
+    "heading": "협찬·협력",
+    "viewAll": "협찬·협력 목록 보기",
+    "logosLabel": "협찬 기업 로고",
+    "detailLabel": "{name} 상세 정보",
+    "website": "웹사이트 보기",
+    "close": "닫기"
   }
 }

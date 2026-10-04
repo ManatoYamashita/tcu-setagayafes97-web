@@ -36,6 +36,15 @@
     "name": "第97届东京都市大学世田谷祭",
     "shortName": "世田谷祭",
     "logoAlt": "世田谷祭标志",
-    "socialLinks": "社交媒体链接"
+    "socialLinks": "社交媒体链接",
+    "followOn": "在 {platform} 上关注世田谷祭"
+  },
+  "sponsors": {
+    "heading": "赞助与协作",
+    "viewAll": "查看赞助与协作名单",
+    "logosLabel": "赞助企业标志",
+    "detailLabel": "{name}的详情",
+    "website": "访问网站",
+    "close": "关闭"
   }
 }

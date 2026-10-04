@@ -248,5 +248,11 @@
       "inquiry": "For any questions, please visit the Information Desk at the main gate.",
       "trainNote": "Travel times may vary depending on congestion."
     }
+  },
+  "pageHeroAlt": {
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "guide": "Visitor guide",
+    "faq": "Frequently asked questions"
   }
 }

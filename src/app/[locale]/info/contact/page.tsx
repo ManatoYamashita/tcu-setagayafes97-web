@@ -42,6 +42,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
   setRequestLocale(locale);
 
   const t = await getTranslations("contact");
+  const tHeroAlt = await getTranslations("pageHeroAlt");
 
   /**
    * ヒーローは他セクションページと共通の PageHero を使用する。
@@ -51,6 +52,7 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
     ...pageHeroes.contact,
     title: t("title"),
     description: t("subtitle"),
+    imageAlt: tHeroAlt("contact"),
   };
 
   /**
