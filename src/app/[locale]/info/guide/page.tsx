@@ -3,10 +3,10 @@ import type { ReactNode } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
 import { FactList } from "@/components/ui/FactList";
-import { guideConfig } from "@/data/guide";
+import { guideFlags, resolveGuide } from "@/data/guide";
 import { pageHeroes, type PageHeroData } from "@/data/page-heroes";
 import { Link } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
+import { routing, type Locale } from "@/i18n/routing";
 import { createPageMetadata } from "@/lib/metadata";
 
 /**
@@ -95,7 +95,8 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
     { id: "emergency", label: t("nav.emergency") },
   ];
 
-  const { accessibility, forFamilies } = guideConfig;
+  const guide = resolveGuide(locale as Locale);
+  const { accessibility, forFamilies } = guideFlags;
   const existence = (value: boolean) => (value ? t("labels.exists") : t("labels.notExists"));
 
   const relatedPages = [
@@ -130,16 +131,16 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
         <GuideSection id="admission" title={t("sections.admission")}>
           <FactList
             items={[
-              { label: t("labels.admissionFee"), value: guideConfig.admission.fee },
-              { label: t("labels.openingHours"), value: guideConfig.admission.time },
+              { label: t("labels.admissionFee"), value: guide.admission.fee },
+              { label: t("labels.openingHours"), value: guide.admission.time },
             ]}
           />
-          <GuideNotes notes={guideConfig.admission.notes} />
+          <GuideNotes notes={guide.admission.notes} />
         </GuideSection>
 
         <GuideSection id="precautions" title={t("sections.precautions")}>
           <FactList
-            items={guideConfig.precautions.map((item) => ({
+            items={guide.precautions.map((item) => ({
               label: item.category,
               value: item.content,
             }))}
@@ -160,25 +161,25 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
                 value: existence(accessibility.multipurposeRestrooms),
               },
               { label: t("labels.nursingRoom"), value: existence(accessibility.nursingRoom) },
-              { label: t("labels.elevatorsIn"), value: accessibility.elevators.join("、") },
+              { label: t("labels.elevatorsIn"), value: guide.accessibility.elevators },
             ]}
           />
-          <GuideNotes notes={accessibility.notes} />
+          <GuideNotes notes={guide.accessibility.notes} />
         </GuideSection>
 
         <GuideSection id="weather" title={t("sections.weather")}>
-          <p className="text-lg font-bold text-gray-900">{guideConfig.weatherInfo.rainPolicy}</p>
-          <GuideNotes notes={guideConfig.weatherInfo.notes} />
+          <p className="text-lg font-bold text-gray-900">{guide.weatherInfo.rainPolicy}</p>
+          <GuideNotes notes={guide.weatherInfo.notes} />
         </GuideSection>
 
         <GuideSection id="lost-and-found" title={t("sections.lostFound")}>
           <FactList
             items={[
-              { label: t("labels.lostFoundLocation"), value: guideConfig.lostAndFound.location },
-              { label: t("labels.lostFoundHours"), value: guideConfig.lostAndFound.hours },
+              { label: t("labels.lostFoundLocation"), value: guide.lostAndFound.location },
+              { label: t("labels.lostFoundHours"), value: guide.lostAndFound.hours },
             ]}
           />
-          <GuideNotes notes={guideConfig.lostAndFound.notes} />
+          <GuideNotes notes={guide.lostAndFound.notes} />
         </GuideSection>
 
         <GuideSection id="families" title={t("sections.families")}>
@@ -191,21 +192,21 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
               },
             ]}
           />
-          <GuideNotes notes={forFamilies.notes} />
+          <GuideNotes notes={guide.forFamilies.notes} />
         </GuideSection>
 
         <GuideSection id="emergency" title={t("sections.emergency")}>
           <FactList
             tone="alert"
             items={[
-              { label: t("labels.medicalRoom"), value: guideConfig.emergency.medicalRoom },
+              { label: t("labels.medicalRoom"), value: guide.emergency.medicalRoom },
               {
                 label: t("labels.emergencyContact"),
-                value: guideConfig.emergency.emergencyContact,
+                value: guide.emergency.emergencyContact,
               },
             ]}
           />
-          <GuideNotes notes={guideConfig.emergency.notes} />
+          <GuideNotes notes={guide.emergency.notes} />
         </GuideSection>
 
         {/* 関連ページリンク */}
