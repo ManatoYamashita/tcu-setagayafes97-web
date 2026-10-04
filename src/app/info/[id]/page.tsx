@@ -147,7 +147,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
   };
   const newsCtaTarget = resolveNewsCtaTarget(news.cta);
   const newsCtaClassName =
-    "inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary-600 px-6 py-3 font-semibold text-white shadow-md transition-[background-color,box-shadow,scale] duration-150 ease-out hoverable:hover:bg-primary-700 hoverable:hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100";
+    "inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary-600 px-6 py-3 font-semibold text-white shadow-md transition-[background-color,box-shadow,scale] duration-150 ease-out hoverable:hover:bg-primary-700 hoverable:hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 active:scale-[0.96] motion-reduce:transition-none motion-reduce:active:scale-100";
 
   return (
     <>
@@ -192,8 +192,9 @@ export default async function NewsPage({ params }: NewsPageProps) {
       >
         {/* パンくずリスト */}
         <nav className="border-b border-gray-200/20 bg-secondary py-4" aria-label="パンくずリスト">
+          {/* 記事（max-w-4xl）と左端を揃える。揃えないと広い画面で左端が2本になる */}
           <div className="container mx-auto px-4">
-            <ol className="flex flex-wrap items-center gap-2 text-sm text-gray-900/80">
+            <ol className="mx-auto flex max-w-4xl flex-wrap items-center gap-2 text-sm text-gray-900/80">
               <li>
                 <Link href="/" className="text-primary-700 hover:underline">
                   トップ
@@ -245,7 +246,9 @@ export default async function NewsPage({ params }: NewsPageProps) {
               </div>
 
               {/* タイトル */}
-              <h1 className="mb-6 text-3xl font-bold text-gray-900 md:text-4xl">{news.title}</h1>
+              <h1 className="mb-6 text-3xl font-bold text-balance [word-break:auto-phrase] text-gray-900 md:text-4xl">
+                {news.title}
+              </h1>
 
               {/* サムネイル */}
               {news.thumbnail && (
