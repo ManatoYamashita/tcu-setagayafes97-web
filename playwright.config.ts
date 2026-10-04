@@ -71,14 +71,14 @@ export default defineConfig({
       // 実際に検証できる幅だからです。
       name: "desktop",
       use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 900 } },
-      // responsive-parity はモバイル幅でしか成立しない
-      testIgnore: /responsive-parity\.spec\.ts/,
+      // responsive-parity と results-scroll はモバイル幅を基準にする（lg のケースは各 spec が幅を指定する）
+      testIgnore: /(responsive-parity|results-scroll)\.spec\.ts/,
     },
     {
       // 対応下限の320px。lg 未満なので盤面ではなく縦スタックが出て、404もモバイル配置になります。
       name: "mobile",
       use: { ...devices["Desktop Chrome"], viewport: { width: 320, height: 640 } },
-      testMatch: /responsive-parity\.spec\.ts/,
+      testMatch: /(responsive-parity|results-scroll)\.spec\.ts/,
     },
   ],
 
