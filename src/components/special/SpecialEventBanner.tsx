@@ -8,53 +8,39 @@ export function SpecialEventBanner() {
   return (
     <Link
       href={`/special/${specialBanner.eventId}`}
-      className="group relative mb-8 block min-h-[236px] isolate overflow-hidden rounded-3xl bg-primary-900 text-white focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-primary-600 sm:min-h-[280px] lg:min-h-[320px]"
+      className="mb-8 grid grid-cols-[minmax(0,1fr)_40%] overflow-hidden border-y border-primary-700 bg-primary-50 text-primary-900 hover:bg-primary-100 focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-primary-600 sm:grid-cols-[minmax(0,1fr)_38%]"
     >
-      <span className="absolute inset-y-0 right-0 w-[53%] sm:w-1/2" aria-hidden="true">
+      <div className="flex min-h-[172px] min-w-0 flex-col justify-center px-4 py-4 sm:min-h-[198px] sm:px-8 lg:min-h-[208px] lg:px-10">
+        <p className="text-[11px] font-semibold text-primary-700 sm:text-xs">著名人企画</p>
+
+        <h2 className="mt-3 font-sans sm:mt-4">
+          <AppImage
+            src={specialBanner.nameLogo.src}
+            alt={specialBanner.name}
+            width={specialBanner.nameLogo.width}
+            height={specialBanner.nameLogo.height}
+            sizes="(min-width: 1024px) 280px, (min-width: 640px) 220px, 128px"
+            className="h-auto w-full max-w-32 sm:max-w-56 lg:max-w-70"
+          />
+          <span className="mt-2 block text-[13px] font-semibold leading-snug sm:mt-3 sm:text-lg">
+            スペシャルパフォーマンス
+          </span>
+        </h2>
+
+        <span className="mt-3 self-start border-b border-primary-700 pb-0.5 text-[11px] font-medium sm:mt-4 sm:text-xs">
+          公演情報を見る
+        </span>
+      </div>
+
+      <span className="relative block min-h-[172px] border-l border-primary-700 sm:min-h-[198px] lg:min-h-[208px]">
         <AppImage
           src={specialBanner.image.src}
           alt=""
           fill
-          sizes="(min-width: 1024px) 600px, (min-width: 640px) 50vw, 53vw"
-          className="object-cover object-[49%_38%] transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transition-none"
+          sizes="(min-width: 640px) 38vw, 40vw"
+          className="object-cover object-[49%_38%]"
         />
       </span>
-      <span
-        className="pointer-events-none absolute inset-0 bg-gradient-to-r from-primary-900 from-[38%] via-primary-900/85 via-[52%] to-transparent to-[78%]"
-        aria-hidden="true"
-      />
-
-      <div className="relative z-10 flex min-h-[236px] max-w-[69%] flex-col items-start justify-between gap-5 p-5 sm:min-h-[280px] sm:max-w-[66%] sm:p-8 lg:min-h-[320px] lg:max-w-[62%] lg:p-10">
-        <p className="border-l-2 border-primary-300 pl-3 text-xs font-bold tracking-[0.08em] text-primary-100 sm:text-sm">
-          著名人企画
-        </p>
-
-        <h2 className="font-sans">
-          <span className="block text-[clamp(2.25rem,8vw,5.5rem)] font-black leading-none tracking-[-0.06em]">
-            {specialBanner.name}
-          </span>
-          <span className="mt-3 block text-base font-bold leading-[1.35] tracking-[0.04em] sm:text-xl lg:text-2xl">
-            <span className="block lg:inline">スペシャル</span>
-            <span className="block lg:inline">パフォーマンス</span>
-          </span>
-        </h2>
-
-        <span className="inline-flex items-center gap-2 border-b border-primary-200 pb-1 text-xs font-semibold sm:text-sm">
-          公演情報を見る
-          <svg
-            className="size-4 transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M5 12h14m-6-6 6 6-6 6" />
-          </svg>
-        </span>
-      </div>
     </Link>
   );
 }
