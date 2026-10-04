@@ -71,22 +71,59 @@
     "form": {
       "title": "Contact Form",
       "type": "Inquiry Type",
+      "typeLegend": "What is your inquiry about?",
+      "optionalNote": "Only the phone number is optional.",
       "name": "Name",
       "email": "Email",
+      "phone": "Phone number",
       "subject": "Subject",
       "message": "Message",
+      "optional": "Optional",
+      "messageHint": "Specific details such as the date, time, or event name help us reply faster (at least 10 characters).",
+      "placeholders": {
+        "name": "Taro Yamada",
+        "email": "example@example.com",
+        "phone": "090-1234-5678",
+        "subject": "About the event's opening hours"
+      },
+      "botLabel": "Please leave this field empty",
+      "agree": "I agree to the <link>Privacy Policy</link>",
       "submit": "Submit",
-      "sending": "Sending...",
-      "required": "Required",
-      "selectType": "Please select an inquiry type",
-      "success": "Your inquiry has been submitted successfully.",
-      "error": "Failed to send. Please try again later."
+      "sending": "Sending",
+      "submitNote": "Depending on the content, it may take some time for us to reply."
     },
     "beforeContact": {
       "title": "Before Contacting",
       "prefix": "Please check our",
       "faqLink": "FAQ page",
       "suffix": "for frequently asked questions first."
+    },
+    "status": {
+      "successTitle": "Your message has been sent",
+      "successBody": "We will reply within 3 business days. No confirmation email is sent, so please save this screen if you need a record.",
+      "errorTitle": "Your message could not be sent",
+      "errorFallback": "An error occurred while sending. Please try again later."
+    },
+    "validation": {
+      "type": "Please select an inquiry type",
+      "nameRequired": "Please enter your name",
+      "nameMax": "Name must be 100 characters or fewer",
+      "emailRequired": "Please enter your email address",
+      "emailInvalid": "Please enter a valid email address",
+      "phoneFormat": "Phone number may contain only digits and hyphens",
+      "phoneMax": "Phone number must be 15 characters or fewer",
+      "subjectRequired": "Please enter a subject",
+      "subjectMax": "Subject must be 200 characters or fewer",
+      "messageMin": "Message must be at least 10 characters",
+      "messageMax": "Message must be 2000 characters or fewer",
+      "agreeToPrivacyPolicy": "Please agree to the Privacy Policy"
+    },
+    "errors": {
+      "rate_limited": "You have exceeded the sending limit. Please wait a while and try again.",
+      "invalid": "There is an error in your input.",
+      "rejected": "We could not verify your submission. Please reload the page, fill in the form again, and resubmit.",
+      "unavailable": "The contact form is currently unavailable. If it is urgent, please contact us by direct message on X (formerly Twitter) at @setagayafes_tcu.",
+      "server_error": "An error occurred while sending. Please try again later."
     }
   },
   "privacy": {

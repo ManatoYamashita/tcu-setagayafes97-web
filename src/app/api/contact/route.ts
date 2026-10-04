@@ -179,6 +179,10 @@ ${data.message}
 /**
  * POST: お問い合わせ送信
  *
+ * 失敗の応答には `code`（`ContactErrorCode`）を付ける。`error` は日本語の文面で、
+ * 来場者へ見せる文言はクライアントが `code` からロケール別に引く（`contact.errors.*`）。
+ * 新しい失敗の経路を足したら `code` も足し、4言語の `contact.errors` へ対応するキーを足すこと。
+ *
  * **検証の順序に意味がある。** レート制限を本文のパースより前に置いてあるのは、
  * 安い検査を先に終えるためと、**空ボディ `{}` で副作用なしにレート制限を試せる**ようにするためである
  * （空ボディは下の zod 検証で 400 になり、メールは出ない。#260 の実測で使った手）。
@@ -194,6 +198,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
+          code: "rate_limited",
           error: "送信回数の制限を超えました。しばらく時間をおいてから再度お試しください。",
         },
         { status: 429 }
@@ -207,7 +212,7 @@ export async function POST(request: NextRequest) {
       body = await request.json();
     } catch {
       return NextResponse.json(
-        { success: false, error: "入力内容に誤りがあります。" },
+        { success: false, code: "invalid", error: "入力内容に誤りがあります。" },
         { status: 400 }
       );
     }
@@ -219,6 +224,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
+          code: "invalid",
           error: "入力内容に誤りがあります。",
           details: parsed.error.flatten().fieldErrors,
         },
@@ -235,7 +241,10 @@ export async function POST(request: NextRequest) {
       // **来場者の入力内容は出さない。** どの経路で落ちたかだけ残す
       console.error(`[contact] 自動投稿として拒否しました verdict=${verdict} ip=${ip}`);
 
-      return NextResponse.json({ success: false, error: RETRY_HINT }, { status: 400 });
+      return NextResponse.json(
+        { success: false, code: "rejected", error: RETRY_HINT },
+        { status: 400 }
+      );
     }
 
     // 5. 送信設定。**欠けていたら受け付けない**
@@ -259,6 +268,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             success: false,
+            code: "unavailable",
             error:
               "ただいまお問い合わせフォームからの送信ができません。お急ぎの場合は、X（旧Twitter）@setagayafes_tcu のダイレクトメッセージからご連絡ください。",
           },
@@ -326,6 +336,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
+        code: "server_error",
         error: "送信中にエラーが発生しました。時間をおいて再度お試しください。",
       },
       { status: 500 }

@@ -71,22 +71,59 @@
     "form": {
       "title": "문의 양식",
       "type": "문의 유형",
+      "typeLegend": "어떤 용건이신가요?",
+      "optionalNote": "전화번호만 선택 입력입니다.",
       "name": "이름",
       "email": "이메일",
+      "phone": "전화번호",
       "subject": "제목",
       "message": "문의 내용",
+      "optional": "선택",
+      "messageHint": "일시나 기획명 등을 구체적으로 적어 주시면 더 빨리 답변드릴 수 있습니다(10자 이상).",
+      "placeholders": {
+        "name": "야마다 타로",
+        "email": "example@example.com",
+        "phone": "090-1234-5678",
+        "subject": "기획 개최 시간에 대해"
+      },
+      "botLabel": "이 칸은 입력하지 마세요",
+      "agree": "<link>개인정보 처리방침</link>에 동의합니다",
       "submit": "제출",
-      "sending": "전송 중...",
-      "required": "필수",
-      "selectType": "문의 유형을 선택해 주세요",
-      "success": "문의가 성공적으로 접수되었습니다.",
-      "error": "전송에 실패했습니다. 나중에 다시 시도해 주세요."
+      "sending": "전송 중",
+      "submitNote": "내용에 따라 답변까지 시간이 걸릴 수 있습니다."
     },
     "beforeContact": {
       "title": "문의 전 확인사항",
       "prefix": "자주 묻는 질문은",
       "faqLink": "FAQ 페이지",
       "suffix": "에서 먼저 확인해 주세요."
+    },
+    "status": {
+      "successTitle": "전송했습니다",
+      "successBody": "영업일 기준 3일 이내에 답변드립니다. 확인 메일은 발송되지 않으므로, 기록이 필요하시면 이 화면을 저장해 주세요.",
+      "errorTitle": "전송하지 못했습니다",
+      "errorFallback": "전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
+    },
+    "validation": {
+      "type": "문의 유형을 선택해 주세요",
+      "nameRequired": "이름을 입력해 주세요",
+      "nameMax": "이름은 100자 이내로 입력해 주세요",
+      "emailRequired": "이메일 주소를 입력해 주세요",
+      "emailInvalid": "올바른 이메일 주소를 입력해 주세요",
+      "phoneFormat": "전화번호는 숫자와 하이픈만 입력할 수 있습니다",
+      "phoneMax": "전화번호는 15자 이내로 입력해 주세요",
+      "subjectRequired": "제목을 입력해 주세요",
+      "subjectMax": "제목은 200자 이내로 입력해 주세요",
+      "messageMin": "문의 내용은 10자 이상 입력해 주세요",
+      "messageMax": "문의 내용은 2000자 이내로 입력해 주세요",
+      "agreeToPrivacyPolicy": "개인정보 처리방침에 동의해 주세요"
+    },
+    "errors": {
+      "rate_limited": "전송 횟수 제한을 초과했습니다. 잠시 후 다시 시도해 주세요.",
+      "invalid": "입력 내용에 오류가 있습니다.",
+      "rejected": "전송 내용을 확인할 수 없었습니다. 번거로우시겠지만 페이지를 새로 고침한 뒤 다시 입력하여 전송해 주세요.",
+      "unavailable": "현재 문의 양식으로 전송할 수 없습니다. 급하신 경우 X(구 Twitter) @setagayafes_tcu 의 다이렉트 메시지로 연락해 주세요.",
+      "server_error": "전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
     }
   },
   "privacy": {
