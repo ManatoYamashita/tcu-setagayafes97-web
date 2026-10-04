@@ -1,7 +1,7 @@
 # タイムテーブルの企画詳細パネル
 
 `/timetable` のカードを押したとき、企画詳細ページへ遷移せずに開くパネルの設計です（#338）。
-実装は `src/components/timetable/TimetableEventPanel.tsx`。盤面との関係は
+実装は `src/components/timetable/TimetableEventPanel.tsx`（中身と前後移動）と、開閉の機構を持つ共通部品 `src/components/ui/SlidePanel.tsx`。協賛・協力ページの詳細パネル（`SponsorList`）も同じ `SlidePanel` を使う（#371）。盤面との関係は
 [timetable-gantt.md](./timetable-gantt.md) を参照してください。
 
 - lg（1024px）以上: 右からスライドインするパネル（幅 `min(28rem, 100vw)`）
@@ -55,7 +55,7 @@ JS 無効、中クリック、新規タブで開く、クローラの巡回が�
 
 ## 動き
 
-入場・退場とも **CSS keyframes**（`globals.css` の `.timetable-panel`）。
+入場・退場とも **CSS keyframes**（`globals.css` の `.slide-panel`）。
 
 `@starting-style` + `overlay` の方式は退場が Firefox / Safari で効かない（`overlay` が未対応）ため採らない。
 退場は JS が `data-closing` を付け、`animationend` を待ってから `dialog.close()` する。
