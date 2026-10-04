@@ -77,7 +77,7 @@ export function EventsView({
   const isSearching = semantic?.outcome === "loading";
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 pt-6 pb-12">
       <div className="lg:grid lg:grid-cols-[300px_1fr] lg:gap-8">
         {/*
           サイドバー: フィルター

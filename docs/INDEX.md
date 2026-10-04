@@ -132,6 +132,7 @@
   - **絞り込みとグループ化は必ず同じ `resolveStageId()` を通す**
 - **[events-search.md](./frontend/events-search.md)** - `/events` の検索と絞り込み（正規化・建物導出・3段カスケード）
   - **正規化は `normalizeText()` の1本に集約する。** 別々に正規化すると「検索では出るのにフィルタでは落ちる」
+- **[events-special-banner.md](./frontend/events-special-banner.md)** - `/events` 冒頭の音楽ポスター風著名人企画バナー（文字のグルーピング・画像・上角・小画面の配置）
 - **[events-semantic-search.md](./frontend/events-semantic-search.md)** - `/events` の意味検索（第4段・TypeSafe Jev。#253）
   - **足切りは `has_match`。`confidence` を使ってはいけない**
   - **来場者の検索語は米国の TypeSafe へ送られる。** 費用の歯止めはプリペイド $5（カード登録で外れる）
