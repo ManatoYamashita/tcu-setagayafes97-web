@@ -27,7 +27,7 @@ async function gotoEvents(page: Page) {
  * 結果ブロックに高さを足し、ページを下まで読み進めた状態を作る
  *
  * **子要素を足してはいけない。** ハイドレーション前に足すと、React がサーバーに無いノードとして
- * 削除する（CI で実測）。React が管理しない style の min-height なら残る
+ * 削除する（#391）。React が管理しない style の min-height は不整合を起こさず残る
  */
 async function scrollDeep(page: Page) {
   await expect(async () => {
