@@ -17,7 +17,15 @@ export default function EventsLoading() {
         <div className="lg:grid lg:grid-cols-[300px_1fr] lg:gap-8">
           {/* サイドバー: フィルタースケルトン */}
           <aside className="mb-8 lg:mb-0">
-            <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            {/*
+              lg 未満: 本体と同じ細いバー（キーワード入力＋「条件」ボタン）。
+              全項目の骨格を出すと、読み込みの間だけ 600px 超の塊が画面を占める（#376）
+            */}
+            <div className="flex items-center gap-2 py-2 lg:hidden">
+              <div className="h-11 flex-1 animate-pulse rounded-lg bg-gray-200" />
+              <div className="h-11 w-20 animate-pulse rounded-lg bg-gray-200" />
+            </div>
+            <div className="hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm lg:block">
               <div className="mb-4 flex items-center justify-between">
                 <div className="h-6 w-24 animate-pulse rounded bg-gray-200" />
                 <div className="h-4 w-16 animate-pulse rounded bg-gray-200" />

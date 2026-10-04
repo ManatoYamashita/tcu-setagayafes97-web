@@ -136,6 +136,8 @@
   - **来場者の検索語は米国の TypeSafe へ送られる。** 費用の歯止めはプリペイド $5（カード登録で外れる）
 - **[events-infinite-scroll.md](./frontend/events-infinite-scroll.md)** - `/events` の無限スクロールと絞り込みの追従（#239）
   - **`<aside>` の `self-start` を外すと sticky が一度も貼り付かない。** lint / 型 / テスト / build はすべて通る
+- **[events-filter-sheet.md](./frontend/events-filter-sheet.md)** - `/events` のモバイル絞り込み（検索バー＋ボトムシート。#376）
+  - **lg 未満で追従させるのは60pxのバーだけ。** 全項目を追従させると開いた瞬間に画面の7割を占める
 - **[static-html-and-search-params.md](./frontend/static-html-and-search-params.md)** - `useSearchParams()` と静的 HTML（#156）
   - **境界を書かないとエラーにならず、いちばん近い `loading.tsx` が代役になって本体が静的 HTML から消える**
 - **[contact-form.md](./frontend/contact-form.md)** - お問い合わせフォームの送信可否と防御（#260 / #261）

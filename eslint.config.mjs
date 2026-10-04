@@ -6,13 +6,15 @@ import { RESTRICTED_COLOR_TOKENS } from "./scripts/restricted-color-tokens.mjs";
 /**
  * `<Suspense>` の fallback として描かれるツリー
  *
- * `src/app/events/(list)/page.tsx` の fallback は `EventsView` を起点に、この6ファイルだけを描く。
+ * `src/app/events/(list)/page.tsx` の fallback は `EventsView` を起点に、このリストのファイルだけを描く。
  * クエリを読んでよいのは境界の内側にいる `EventsContent` だけなので、ここには含めない。
  * 意味検索を叩く `useSemanticSearch.ts` も `EventsContent` からだけ呼ばれるため含めない。
  */
 const EVENTS_FALLBACK_TREE = [
   "src/components/events/EventsView.tsx",
   "src/components/events/EventFilters.tsx",
+  "src/components/events/EventFilterFields.tsx",
+  "src/components/events/EventFilterSheet.tsx",
   "src/components/events/EventInfiniteList.tsx",
   "src/components/events/EventGrid.tsx",
   "src/components/events/EventGridSkeleton.tsx",

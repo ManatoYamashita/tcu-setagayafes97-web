@@ -89,7 +89,9 @@ export function EventsView({
           高さが行全体（= カード群の高さ）まで伸びるため、**sticky が一度も貼り付きません。**
           見た目は変わらないので、外すと静かに追従だけが失われます。
 
-          `lg` 未満では通常フローの中で貼り付きます。背景を白で敷き、左右は `-mx-4 px-4` で
+          `lg` 未満では通常フローの中で貼り付きます。追従するのはキーワード入力と「条件」ボタンの
+          細いバー（44px + 上下 8px）だけで、開催日・種別・建物はボトムシートへ逃がしています（#376）。
+          背景を白で敷き、左右は `-mx-4 px-4` で
           シートの端まで伸ばしています。敷かないと、背後を流れるカードが透けて重なります。
           `z-20` はカードより上・ヘッダー（`z-40`）より下という意味です。
 
@@ -104,7 +106,12 @@ export function EventsView({
           通らないため、隙間が見た目の問題になりません。
         */}
         <aside className="sticky top-[calc(var(--header-height)-1rem)] z-20 -mx-4 mb-8 self-start bg-white px-4 py-2 lg:top-[calc(var(--header-height)+1rem)] lg:mx-0 lg:mb-0 lg:bg-transparent lg:px-0 lg:py-0">
-          <EventFilters filters={filters} buildingOptions={buildingOptions} />
+          <EventFilters
+            filters={filters}
+            buildingOptions={buildingOptions}
+            resultCount={events.length}
+            isSearching={isSearching}
+          />
         </aside>
 
         {/*
