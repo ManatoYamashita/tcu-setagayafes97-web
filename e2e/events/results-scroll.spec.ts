@@ -65,7 +65,7 @@ test.describe("絞り込み後のスクロール位置（lg 未満）", () => {
     await scrollDeep(page);
     await typeKeyword(page);
 
-    // スムーズスクロールが終わるまで待つ
+    // 再描画とスクロールが終わるまで待つ
     await expect(async () => {
       const bar = await rect(page, "aside");
       const results = await rect(page, "aside + div");
@@ -73,6 +73,38 @@ test.describe("絞り込み後のスクロール位置（lg 未満）", () => {
         Math.abs(results.top - bar.bottom),
         `結果の先頭（${results.top}px）が追従バーの下端（${bar.bottom}px）に揃っている`
       ).toBeLessThanOrEqual(1);
+    }).toPass();
+  });
+
+  test("寄せた直後に ScrollTrigger.refresh が割り込んでも、結果の先頭に留まる", async ({
+    page,
+  }) => {
+    // 本番では一覧が縮むと最下部の著名人企画セクションが useScrollReveal の先読み範囲に入り、
+    // ScrollTrigger.refresh() が scrollTo(0, 0) → scrollTo(0, 元の位置) を呼ぶ（#395）。
+    // CI は0件でこのセクションが発火しないため、同じ割り込みを寄せた 50ms 後に起こす。
+    // スムーズスクロールだとここで打ち切られ、途中で止まる
+    await page.addInitScript(() => {
+      const original = Element.prototype.scrollIntoView;
+      Element.prototype.scrollIntoView = function (
+        this: Element,
+        arg?: boolean | ScrollIntoViewOptions
+      ) {
+        original.call(this, arg);
+        setTimeout(() => {
+          const y = window.scrollY;
+          window.scrollTo(0, 0);
+          window.scrollTo(0, y);
+        }, 50);
+      };
+    });
+    await gotoEvents(page);
+    await scrollDeep(page);
+    await typeKeyword(page);
+
+    await expect(async () => {
+      const bar = await rect(page, "aside");
+      const results = await rect(page, "aside + div");
+      expect(Math.abs(results.top - bar.bottom)).toBeLessThanOrEqual(1);
     }).toPass();
   });
 

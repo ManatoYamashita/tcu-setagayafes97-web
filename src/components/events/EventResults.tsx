@@ -47,8 +47,12 @@ export function EventResults({ filterKey, children }: EventResultsProps) {
     const offset = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
     if (el.getBoundingClientRect().top >= offset) return;
 
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    el.scrollIntoView({ block: "start", behavior: reduceMotion ? "auto" : "smooth" });
+    // **smooth にしてはいけない**（#395）。一覧が縮むと最下部の著名人企画セクションが
+    // useScrollReveal の先読み範囲に入り、ScrollTrigger.refresh() が走る。refresh は
+    // scrollTo(0, 0) → scrollTo(0, 元の位置) で測り直すため、進行中のスムーズスクロールを
+    // その場で打ち切る（本番 390x844 で y=1414 に止まった）。瞬時に移しておけば、
+    // refresh は移動後の位置を保存して戻すので結果が保たれる
+    el.scrollIntoView({ block: "start", behavior: "instant" });
   }, [filterKey]);
 
   return (
