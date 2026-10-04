@@ -30,6 +30,12 @@
     "venueInfo": "场馆信息",
     "information": "信息中心",
     "aboutCommittee": "关于委员会",
-    "copyright": "© 2026 第97届东京都市大学世田谷祭执行委员会"
+    "copyright": "© {year} 东京都市大学 世田谷祭执行委员会 版权所有"
+  },
+  "brand": {
+    "name": "第97届东京都市大学世田谷祭",
+    "shortName": "世田谷祭",
+    "logoAlt": "世田谷祭标志",
+    "socialLinks": "社交媒体链接"
   }
 }

@@ -1,6 +1,5 @@
-import { AppImage } from "@/components/ui/AppImage";
-import { siteConfig } from "@/data/site";
 import { FooterNav } from "@/components/layout/FooterNav";
+import { FooterCopyright, FooterLogo } from "@/components/layout/FooterBrand";
 import { SocialIcons } from "@/components/ui/SocialIcons";
 import { SponsorBanner } from "@/components/layout/SponsorBanner";
 
@@ -21,14 +20,7 @@ export function Footer() {
         <div className="container mx-auto px-4 py-8">
           {/* ロゴ: 左上 */}
           <div className="mb-6">
-            <AppImage
-              src="/images/brand/logo-white.avif"
-              alt={siteConfig.shortName}
-              width={192}
-              height={77}
-              sizes="192px"
-              className="h-auto w-48"
-            />
+            <FooterLogo width={192} height={77} className="h-auto w-48" />
           </div>
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
@@ -48,18 +40,8 @@ export function Footer() {
           </div>
 
           <div className="mt-8 flex flex-col items-center border-t border-white/20 pt-8 text-white/85">
-            <AppImage
-              src="/images/brand/logo-white.avif"
-              alt={siteConfig.shortName}
-              width={48}
-              height={19}
-              sizes="48px"
-              className="mb-3 h-auto w-12"
-            />
-            <p className="mb-2">{siteConfig.name}</p>
-            <p className="text-sm">
-              © {currentYear} 東京都市大学 世田谷祭実行委員会. All rights reserved.
-            </p>
+            <FooterLogo width={48} height={19} className="mb-3 h-auto w-12" />
+            <FooterCopyright year={currentYear} />
           </div>
         </div>
       </footer>
