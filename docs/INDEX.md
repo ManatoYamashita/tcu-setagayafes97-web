@@ -148,6 +148,7 @@
   - **lg 未満で追従させるのは60pxのバーだけ。** 全項目を追従させると開いた瞬間に画面の7割を占める
 - **[static-html-and-search-params.md](./frontend/static-html-and-search-params.md)** - `useSearchParams()` と静的 HTML（#156）
   - **境界を書かないとエラーにならず、いちばん近い `loading.tsx` が代役になって本体が静的 HTML から消える**
+  - **本描画は来場者ごとにシャッフルするので、fallback と並び順は一致しない（#409）。** サーバーでは並べ替えない（ISR で同じ順番が全員に配られるため）
 - **[contact-form.md](./frontend/contact-form.md)** - お問い合わせフォームの送信可否と防御（#260 / #261）
   - **設定が欠けていたら成功を返さない。** 2026-09-21 まで本番は1通も送らず「送信完了」と表示していた
 - **[layout-e2e.md](./frontend/layout-e2e.md)** - 実ブラウザの再発防止装置（Playwright。盤面 / ランドマーク / 404 / `/events` / オープナー）。一覧のずれは `check:e2e-guards` が落とす
