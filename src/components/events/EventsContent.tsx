@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import type { Event } from "@/types/events";
 import {
@@ -15,8 +16,10 @@ import {
   selectSemanticEvents,
   shouldAskSemanticSearch,
 } from "@/lib/semantic-search";
+import { seededShuffle } from "@/lib/shuffle";
 import { EventsView } from "./EventsView";
 import { useSemanticSearch } from "./useSemanticSearch";
+import { useShuffleSeed } from "./useShuffleSeed";
 
 interface EventsContentProps {
   initialEvents: Event[];
@@ -47,8 +50,26 @@ export function EventsContent({ initialEvents }: EventsContentProps) {
   // 効いていないように見える。
   const buildingOptions = listBuildingOptions(initialEvents, filters.building);
 
+  /*
+   * 表示順のランダム化（#409）
+   *
+   * microCMS は公開日の新しい順に返すため、そのままだと同じ企画が先頭に出続ける。
+   * 来場者ごとに並びを変えて、団体の間で露出の差が出ないようにする。
+   *
+   * **絞り込みの前にシャッフルする。** 日程・種別・建物の絞り込みは順番を保つので、
+   * 条件を変えても企画同士の前後関係は変わらない。キーワード検索は関連度で並べ替え、
+   * 同点の企画だけがこの順に並ぶ。意味検索は `ranking` の順で組み直すので影響を受けない。
+   *
+   * シードの寿命とサーバーで並べ替えない理由は `useShuffleSeed` を参照。
+   */
+  const seed = useShuffleSeed();
+  const orderedEvents = useMemo(
+    () => (seed === null ? initialEvents : seededShuffle(initialEvents, seed)),
+    [initialEvents, seed]
+  );
+
   // フィルタリング（段1〜3のリテラル検索まで）
-  const literalEvents = filterEvents(initialEvents, filters);
+  const literalEvents = filterEvents(orderedEvents, filters);
 
   /*
    * 第4段（意味検索）のゲート

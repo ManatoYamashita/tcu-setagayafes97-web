@@ -190,7 +190,7 @@ function toSearchFields(event: Event): SearchField[] {
 /** 並べ替えのために保持する1件分 */
 interface ScoredRow {
   event: Event;
-  /** 元の並び順。同点のときに `-publishedAt` 順を保つために使う */
+  /** 元の並び順。同点のときに入力順（`/events` ではシャッフル後の順。#409）を保つために使う */
   index: number;
   fields: SearchField[];
 }
