@@ -11,7 +11,7 @@ interface GearParams {
 }
 
 export const GEAR_DEFAULTS = {
-  // 歯形（歯数・外径・内径）は写真の切り抜きと共有する（src/lib/gear-profile.ts）
+  // 歯形（歯数・外径・内径）の定義は src/lib/gear-profile.ts にある
   teeth: GEAR_PROFILE.teeth,
   outerRadius: GEAR_PROFILE.outerRadius,
   innerRadius: GEAR_PROFILE.innerRadius,
