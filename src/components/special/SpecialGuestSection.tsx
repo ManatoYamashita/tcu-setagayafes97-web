@@ -3,7 +3,6 @@ import Link from "next/link";
 
 import { specialBanner } from "@/data/special-banner";
 import { getSpecialEventById } from "@/lib/events";
-import { gearClipPath } from "@/lib/gear-profile";
 import { cn } from "@/lib/utils";
 
 import { SpecialGuestMotion } from "./SpecialGuestMotion";
@@ -11,7 +10,7 @@ import { SpecialGuestMotion } from "./SpecialGuestMotion";
 /**
  * 著名人企画（スペシャル企画）の告知セクション
  *
- * 出演者ロゴ・歯車の形に切り抜いた写真・日時と会場・チケットの要点・入場の条件を見せ、
+ * 出演者ロゴ・写真・日時と会場・チケットの要点・入場の条件を見せ、
  * 著名人企画LPへ誘導します。トップページ（Hero の直下）と企画一覧ページ（/events の最下部）の
  * 2箇所で使います。チケットは券種を必ず両方載せます（理由は src/data/special-banner.ts）。
  *
@@ -25,9 +24,9 @@ import { SpecialGuestMotion } from "./SpecialGuestMotion";
  * - 768px〜: 12列グリッドで写真が左 6列、テキストが右 6列。
  *   見出し（ロゴ＋横罫）だけを左へ引き出して写真の右端に重ねる
  *
- * 写真はサイトの歯車モチーフと同じ歯形（src/lib/gear-profile.ts）で切り抜きます。
- * SSR では完成形の clip-path を持ち、入場モーション（SpecialGuestMotion）が
- * 中心から回しながら広げます。モーション軽減時や JS が無いときは完成形のままです。
+ * 写真は切り抜かない四角形です。トップページ（`hero`）では画面の左端まで広げます
+ * （下の「写真を画面の左端へ広げる」）。入場モーション（SpecialGuestMotion）は窓を左端から
+ * 右へ開きます。モーション軽減時や JS が無いときは最初から全体が見えます。
  *
  * DOM 順は「見出し → 本文 → チケット → 注記 → CTA → 写真」で固定し、見た目の入れ替えは写真側の
  * `order-first` だけで行います。DOM を並べ替えると h2 より先に写真が読み上げられ、
@@ -67,15 +66,14 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
   const isSheet = variant === "sheet";
 
   /*
-   * 写真の実描画幅は variant で変わる。/events は PageSheetLayout の `mx-*` `px-*` と
-   * 呼び出し側の container の `px-4` が重なり、横方向の余白がトップページより
-   * 片側 32px（lg では 48px）多い。同じ sizes を使うと srcset の過大な候補を掴むので分ける。
-   * 写真の列幅は md 以上で 6/12（= 0.5）、max-w-6xl で 576px に頭打ち。
-   * 縦積みのときは max-w-sm（384px）で頭打ち。
+   * 写真の実描画幅は variant で変わる。
+   * - hero: 画面の左端から広げるので、md 以上は画面の半分、縦積みでは画面幅から右の余白を引いた幅。
+   * - sheet: /events は PageSheetLayout の `mx-*` `px-*` と呼び出し側の container の `px-4` が重なる。
+   *   写真の列幅は md 以上で 6/12（= 0.5）、max-w-6xl で 576px に頭打ち。縦積みは max-w-sm（384px）。
    */
   const imageSizes = isSheet
     ? "(min-width: 1024px) min(576px, calc((100vw - 10rem) * 0.5)), (min-width: 768px) calc((100vw - 8rem) * 0.5), min(384px, calc(100vw - 6rem))"
-    : "(min-width: 1024px) min(576px, calc((100vw - 2rem) * 0.5)), (min-width: 768px) calc((100vw - 2rem) * 0.5), min(384px, calc(100vw - 2rem))";
+    : "(min-width: 768px) 50vw, 100vw";
 
   return (
     <section
@@ -89,7 +87,9 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
           : // z-10 は必須。直後の ABOUT が `-mt-48` でこのセクションへ 192px 潜り込み、
             // その中の装飾blob（`absolute inset-0`）が上に乗るため、Hero と同じ層へ上げる。
             // content-visibility はフォールド直下では効果が無く CLS だけ残るので付けない
-            "relative z-10 py-20 lg:py-28"
+            // overflow-x-clip は、写真を左へ広げる `50vw` がクラシックなスクロールバーの幅だけ
+            // 画面からはみ出して横スクロールを生むのを防ぐため（y 方向は切らない）
+            "relative z-10 overflow-x-clip py-20 lg:py-28"
       )}
     >
       {/* 入場モーション。DOM は出さず、下の data 属性を探して animate する */}
@@ -196,19 +196,33 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
           </div>
 
           {/* 写真側。縦積みのときだけ order で先頭へ出す。
-              clip-path は SSR で完成形を持たせ、入場モーションが data-special-guest-gear を
-              目印に書き換える。正方形の原画をそのまま正方形の箱へ入れる */}
+              入場モーションが data-special-guest-wipe を目印に clip-path を書き換える（SSR では持たない）。
+
+              写真を画面の左端へ広げる（hero のみ）:
+              グリッドは中央寄せなので、グリッドの左端から画面の左端までは (100vw - グリッド幅) / 2。
+              グリッドアイテムの % マージンはそのグリッド領域の幅が基準になるため、
+              - 縦積み（1列 = グリッド幅 G）: ml = 50% - 50vw、幅 = G + 余白 = 50% + 50vw
+              - md 以上（6/12 列 = G/2）: ml = 100% - 50vw。幅は auto（stretch）で画面のちょうど半分
+              右端は列の境界のまま動かさない。
+              md 以上の高さはテキスト側の行の高さに合わせ、正方形の原画を横長に切り抜く。
+              顔が上寄りにあるので object-position は上から 30%。
+
+              sheet（/events）は白いシートの内側なので広げない */}
           <div
-            className="relative order-first mx-auto aspect-square w-full max-w-sm md:order-none md:col-start-1 md:col-end-7 md:row-start-1 md:max-w-none"
-            style={{ clipPath: gearClipPath() }}
-            data-special-guest-gear
+            className={cn(
+              "relative order-first aspect-square md:order-none md:col-start-1 md:col-end-7 md:row-start-1",
+              isSheet
+                ? "mx-auto w-full max-w-sm md:max-w-none"
+                : "ml-[calc(50%-50vw)] w-[calc(50%+50vw)] md:ml-[calc(100%-50vw)] md:aspect-auto md:min-h-[28rem] md:w-auto"
+            )}
+            data-special-guest-wipe
           >
             <AppImage
               src={image.src}
               alt={image.alt}
               fill
               sizes={imageSizes}
-              className="object-cover"
+              className="object-cover object-[50%_30%]"
             />
           </div>
         </div>

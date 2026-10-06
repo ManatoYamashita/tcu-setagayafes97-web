@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 
-import { gearClipPath } from "@/lib/gear-profile";
 import { useScrollReveal, type UseScrollRevealOptions } from "@/lib/use-scroll-reveal";
 
 /**
@@ -12,34 +11,31 @@ import { useScrollReveal, type UseScrollRevealOptions } from "@/lib/use-scroll-r
  * 2つの演出を持つ。
  *
  * - テキスト側の stagger: 実装は `@/lib/use-scroll-reveal`。ここは属性名を宣言するだけ
- * - 写真の歯車リビール: 歯車形の窓が中心から回転しながら広がり、写真が現れる。
- *   回すのは窓（clip-path）だけで、写真そのものは回さない
+ * - 写真のワイプ: 写真は画面の左端に付いているので、窓（clip-path）が左端から右へ開いて現れる。
+ *   動かすのは窓だけで、写真そのものは動かさない
  *
  * マーカーは `<section>` の直下の先頭に置く前提。どちらの演出も `parentElement` を
  * スコープに取るため、トップページ（variant="hero"）でも /events（variant="sheet"）でも
  * 同じ構造で動く。
  *
- * 歯車リビールは CSS の `clip-path: polygon()` を毎フレーム書き換える。点の数は
- * scale や回転によらず一定（gearClipPath）なので形が飛ばない。SVG の clipPath を
- * transform で動かす方式は、Safari で再描画が追従しないことがあるため使わない。
+ * ワイプは CSS の `clip-path: inset()` の右端だけを毎フレーム書き換える。
+ * SSR の写真は clip-path を持たない（完成形）。窓を閉じるのは effect の中だけ。
  */
 const SPECIAL_GUEST_MOTION: UseScrollRevealOptions = {
-  // 写真は下の歯車リビールが受け持つため、この属性を持つ要素は現在ない
+  // 写真は下のワイプが受け持つため、この属性を持つ要素は現在ない
   revealAttribute: "data-special-guest-reveal",
   staggerAttribute: "data-special-guest-stagger",
 };
 
-const GEAR_ATTRIBUTE = "data-special-guest-gear";
+const WIPE_ATTRIBUTE = "data-special-guest-wipe";
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
-/** 窓が広がりきるまでに回す角度（度）。負の値は反時計回りから戻る向き */
-const GEAR_REVEAL_ROTATION_DEG = -90;
 
-function useGearReveal() {
+function useWipeReveal() {
   const markerRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const target = markerRef.current?.parentElement?.querySelector<HTMLElement>(
-      `[${GEAR_ATTRIBUTE}]`
+      `[${WIPE_ATTRIBUTE}]`
     );
 
     if (!target) return;
@@ -47,12 +43,10 @@ function useGearReveal() {
     // IMPORTANT: この判定より前で gsap に触れないこと。return すれば SSR の完成形が残る
     if (window.matchMedia(REDUCED_MOTION_QUERY).matches) return;
 
-    const finalClipPath = gearClipPath();
+    // 完成形は clip-path なし（SSR と同じ状態）へ戻す
+    const finalClipPath = "";
     const setProgress = (progress: number) => {
-      target.style.clipPath = gearClipPath({
-        scale: progress,
-        rotationDeg: GEAR_REVEAL_ROTATION_DEG * (1 - progress),
-      });
+      target.style.clipPath = `inset(0 ${(1 - progress) * 100}% 0 0)`;
     };
 
     let disposed = false;
@@ -103,12 +97,12 @@ function useGearReveal() {
 
 export function SpecialGuestMotion() {
   const staggerMarkerRef = useScrollReveal(SPECIAL_GUEST_MOTION);
-  const gearMarkerRef = useGearReveal();
+  const wipeMarkerRef = useWipeReveal();
 
   return (
     <>
       <span ref={staggerMarkerRef} hidden aria-hidden="true" />
-      <span ref={gearMarkerRef} hidden aria-hidden="true" />
+      <span ref={wipeMarkerRef} hidden aria-hidden="true" />
     </>
   );
 }

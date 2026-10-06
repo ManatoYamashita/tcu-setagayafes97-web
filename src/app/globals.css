@@ -355,7 +355,7 @@ body {
    */
   /* 実測（2026-10-06、/events、#419）: 375px 53.6rem / 768px 35.1rem / 1024px 36.6rem /
      1280px 39.1rem / 1440px 40.1rem。md〜lg はテキスト側（チケット・注記）の高さが決め、
-     xl 以上は歯車の写真（正方形）が列幅とともに伸びて max-w-6xl で頭打ちになる */
+     xl 以上は写真（正方形）が列幅とともに伸びて max-w-6xl で頭打ちになる */
   .deferred-section--special {
     contain-intrinsic-size: auto 54rem;
   }
