@@ -452,7 +452,7 @@ Line Height:  1.5 (既定) / 読み物の本文は 1.625〜2.0 (leading-*)
 | HeroSection         | `duration(0.5s)` / `stagger(0.08s)` | 3要素の順次フェードイン + スライドアップ（ロゴはLCPのため対象外） |
 | Opener              | 2フェーズ / 合計1.6s                | 濃紫 + 白ロゴを見せる → スライドアウト                            |
 | AboutSection        | ScrollTrigger                       | スクロール時の画像スケール + テキスト stagger                     |
-| useScrollReveal     | ScrollTrigger                       | `data-*` 属性のリビール + stagger。下の3コンポーネントが共有      |
+| useScrollReveal     | ScrollTrigger                       | `data-*` 属性のリビール + stagger。下の4コンポーネントが共有      |
 | ChairpersonSection  | ScrollTrigger + SplitText           | 行単位リヴィール + 画像二層ズーム + 段落 stagger                  |
 | StaggeredMobileMenu | タイムライン                        | 背景スライドイン + メニュー項目 stagger                           |
 
@@ -476,7 +476,7 @@ GSAP が入場を始めたらそのクラスを外し、CSS 側と競合させ�
 Server Component へ演出だけ足す場合は、非表示マーカーを1つ置いて `data-*` 属性を
 フックにする。`"use client"` を本文側へ広げずに済む。実装は
 **`src/lib/use-scroll-reveal.ts` の `useScrollReveal` に集約されており**、
-`SpecialPageMotion` / `AccessPageMotion` / `SpecialGuestMotion` はそれぞれ属性名と
+`SpecialPageMotion` / `AccessPageMotion` / `SpecialGuestMotion` / `CommitteeCollageMotion` は属性名と
 発火位置、ヒーロー入場だけを宣言する。**reveal / stagger の tween を各所で
 書き直さないこと。** 値を変えるならフック側を1箇所直す。
 

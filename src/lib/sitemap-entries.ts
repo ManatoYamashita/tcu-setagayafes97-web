@@ -36,7 +36,7 @@ export interface StaticPageEntry {
  * 呼び出し側が一覧の `updatedAt` の最大値を渡す。
  */
 export const STATIC_PAGE_LAST_MODIFIED: Readonly<Record<string, string>> = {
-  "/about": "2026-09-04",
+  "/about": "2026-10-06",
   "/about/privacy": "2026-02-01",
   "/access": "2026-08-09",
   "/info/guide": "2026-08-15",
