@@ -5,6 +5,8 @@ import { siteConfig } from "@/data/site";
 import { localizeNavHref } from "@/i18n/localized-pathnames";
 import { routing, type Locale } from "@/i18n/routing";
 
+import { CommitteePhotoCollage } from "./CommitteePhotoCollage";
+
 /**
  * 「世田谷祭とは」セクション — Aboutページの AboutHero と ChairpersonSection の間
  *
@@ -16,6 +18,8 @@ import { routing, type Locale } from "@/i18n/routing";
  * GSAP のクライアントコンポーネントだが、ここへ演出を足すと SplitText の行分割と
  * white-space の相互作用（ChairpersonSection の冒頭コメント）を再現することになり、
  * 本文をHTMLへ確実に出すという目的に対して割に合わない。
+ * 例外は「組織構成」の後に挟む写真コラージュ（CommitteePhotoCollage）で、文字を持たないため
+ * 非表示マーカー方式の入場モーション（useScrollReveal）だけを持たせている。
  *
  * 背景を bg-gray-50 にしているのは継ぎ目を消すため。AboutHero の上下マスクが
  * bg-gray-50、ChairpersonSection のルートが from-gray-50 の縦グラデーションなので、
@@ -109,8 +113,15 @@ export function FestivalIntroSection({ locale }: { locale: Locale }) {
             </li>
           ))}
         </ul>
+      </div>
 
-        <nav className="mt-12" aria-label={content.linksHeading}>
+      {/* 写真は本文より広い幅で見せるため、本文の max-w-3xl をいったん閉じる */}
+      <div className="mx-auto mt-14 max-w-4xl px-6 sm:px-8 lg:mt-20 lg:px-12">
+        <CommitteePhotoCollage label={content.collageLabel} alts={content.collageAlts} />
+      </div>
+
+      <div className="mx-auto max-w-3xl px-6 sm:px-8 lg:px-12">
+        <nav className="mt-14 lg:mt-20" aria-label={content.linksHeading}>
           <p className="text-sm font-bold text-primary-700 sm:text-base">{content.linksHeading}</p>
           <ul className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
             {content.links.map((link) => {

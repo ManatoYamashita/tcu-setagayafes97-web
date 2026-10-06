@@ -94,6 +94,16 @@ export const aboutConfig = {
     departments: ["広報部", "管理部", "企画部"],
   },
 
+  // 委員会の写真コラージュ（CommitteePhotoCollage）。左・中央・右の3列×2枚。
+  // alt は言語ごとに `festivalIntroContents[*].collageAlts` が同じ並びで持つ
+  committeeCollage: {
+    columns: [
+      ["/images/committee/committee-01.avif", "/images/committee/committee-02.avif"],
+      ["/images/committee/committee-03.avif", "/images/committee/committee-04.avif"],
+      ["/images/committee/committee-05.avif", "/images/committee/committee-06.avif"],
+    ],
+  },
+
   // SNSリンク
   social: [
     {
@@ -190,6 +200,10 @@ export interface FestivalIntroContent {
   committeeParagraphs: readonly string[];
   departmentsLabel: string;
   departments: readonly string[];
+  /** 写真コラージュの名前（画面には出さず aria-label に使う） */
+  collageLabel: string;
+  /** 写真コラージュの alt。`aboutConfig.committeeCollage` の左列の上から順に6枚分 */
+  collageAlts: readonly string[];
   linksHeading: string;
   links: readonly { label: string; href: string }[];
 }
@@ -220,6 +234,16 @@ export const festivalIntroContent = {
   ],
   departmentsLabel: "組織構成",
   departments: aboutConfig.committee.departments,
+  collageLabel: "実行委員会の活動風景",
+  // TODO: 写真の受領後に1枚ずつの内容に合わせて書き直す
+  collageAlts: [
+    "実行委員会の活動の様子",
+    "実行委員会の活動の様子",
+    "実行委員会の活動の様子",
+    "実行委員会の活動の様子",
+    "実行委員会の活動の様子",
+    "実行委員会の活動の様子",
+  ],
   linksHeading: "関連ページ",
   links: [
     { label: "会場とアクセス", href: "/access" },
@@ -257,6 +281,16 @@ export const festivalIntroContents = {
     ],
     departmentsLabel: "Departments",
     departments: ["Public Relations", "Administration", "Planning"],
+    collageLabel: "The organizing committee at work",
+    // TODO: 写真の受領後に1枚ずつの内容に合わせて書き直す
+    collageAlts: [
+      "Organizing committee members at work",
+      "Organizing committee members at work",
+      "Organizing committee members at work",
+      "Organizing committee members at work",
+      "Organizing committee members at work",
+      "Organizing committee members at work",
+    ],
     linksHeading: "Related pages",
     links: [
       { label: "Venue and access", href: "/access" },
@@ -291,6 +325,16 @@ export const festivalIntroContents = {
     ],
     departmentsLabel: "组织构成",
     departments: ["宣传部", "管理部", "企划部"],
+    collageLabel: "执行委员会的活动风景",
+    // TODO: 写真の受領後に1枚ずつの内容に合わせて書き直す
+    collageAlts: [
+      "执行委员会成员活动的情景",
+      "执行委员会成员活动的情景",
+      "执行委员会成员活动的情景",
+      "执行委员会成员活动的情景",
+      "执行委员会成员活动的情景",
+      "执行委员会成员活动的情景",
+    ],
     linksHeading: "相关页面",
     links: [
       { label: "会场与交通", href: "/access" },
@@ -325,6 +369,16 @@ export const festivalIntroContents = {
     ],
     departmentsLabel: "조직 구성",
     departments: ["홍보부", "관리부", "기획부"],
+    collageLabel: "실행위원회의 활동 풍경",
+    // TODO: 写真の受領後に1枚ずつの内容に合わせて書き直す
+    collageAlts: [
+      "실행위원회 위원들이 활동하는 모습",
+      "실행위원회 위원들이 활동하는 모습",
+      "실행위원회 위원들이 활동하는 모습",
+      "실행위원회 위원들이 활동하는 모습",
+      "실행위원회 위원들이 활동하는 모습",
+      "실행위원회 위원들이 활동하는 모습",
+    ],
     linksHeading: "관련 페이지",
     links: [
       { label: "장소와 오시는 길", href: "/access" },
