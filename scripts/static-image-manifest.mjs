@@ -44,6 +44,54 @@
  * 手で二重に書かず `source` フィールドで明示する。
  */
 
+/**
+ * 過去の世田谷祭（/about の PastFestivalsSection）のサムネイル。
+ *
+ * 原画像は archive.setagayafes.org/img/<序数>.png を幅 960px の WebP へ縮めたもの。
+ * 第94回・第95回はアーカイブ側の画像が 404 だったため、各回のサイトを
+ * 1000x678 で撮影して補った（docs/frontend/about-past-festivals.md）。
+ *
+ * 原画の縦横比は回ごとに違う（836x883 〜 1448x1086）。グリッドで揃えるため 4:3 へ
+ * 切り抜く。回数やロゴはヘッダーにあるので、切り抜きの基準は上端（`position: "top"`）。
+ *
+ * 表示幅が最も広くなるのは 2列の上限 viewport 639px で、1枚 約272px。
+ * その x 2 を切り上げて 560x420 を box とする。
+ */
+const PAST_FESTIVAL_THUMBNAILS = [
+  "96th",
+  "95th",
+  "94th",
+  "93rd",
+  "92nd",
+  "91st",
+  "90th",
+  "89th",
+  "88th",
+  "86th",
+  "85th",
+  "84th",
+  "83rd",
+  "82nd",
+  "81st",
+  "80th",
+  "79th",
+  "78th",
+  "77th",
+  "76th",
+].map((ordinal) => ({
+  path: `public/images/past-festivals/${ordinal}.avif`,
+  source: `assets/source/images/past-festivals/${ordinal}.webp`,
+  box: { width: 560, height: 420 },
+  fit: "cover",
+  position: "top",
+  // スクリーンショットは文字を含むので、輪郭が滲まない 4:4:4 で焼く
+  kind: "art",
+  quality: 50,
+  // 実測の最大は 84th の 29,534 B（2026-10-07）。全回に同じ上限を掛ける
+  maxBytes: 32000,
+  note: `PastFestivalsSection（/about）の ${ordinal} のサムネイル`,
+}));
+
 /** `role: "app"`。`AppImage` からのみ描かれる画像。AVIF へ焼いて原寸のまま配る */
 const APP_IMAGES = [
   {
@@ -290,6 +338,7 @@ const APP_IMAGES = [
     maxBytes: 15000,
     note: "CommitteePhotoCollage の右列の下",
   },
+  ...PAST_FESTIVAL_THUMBNAILS,
 ];
 
 /**
