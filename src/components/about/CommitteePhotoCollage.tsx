@@ -6,7 +6,8 @@ import { CommitteeCollageMotion } from "./CommitteeCollageMotion";
 /**
  * 委員会の写真コラージュ — FestivalIntroSection の「組織構成」と「関連ページ」の間
  *
- * 3列（左・中央・右）に縦長の写真を2枚ずつ置き、列ごとに縦位置をずらす。
+ * 3列（左・中央・右）に写真を2枚ずつ置き、列ごとに縦位置をずらす。
+ * 写真は切り抜かず、それぞれの縦横比のまま見せる（集合写真を縦長に切ると人が切れる）。
  * 画面に出すテキストは持たず、写真だけで委員会の雰囲気を伝える。
  *
  * - 列幅の比は 1 : 1.5 : 1。中央列だけ大きくして視線の中心を作る。
@@ -21,7 +22,7 @@ import { CommitteeCollageMotion } from "./CommitteeCollageMotion";
 const COLUMN_OFFSETS = ["mt-[40%]", "mt-0", "mt-[110%]"] as const;
 
 /**
- * 表示幅は、コンテナ（max-w-4xl から左右余白を引いた最大 800px）を 1 : 1.5 : 1 と
+ * 表示幅は、コンテナ（max-w-4xl から左右余白を引いた幅。lg 以上で 800px）を 1 : 1.5 : 1 と
  * 列間の余白で割って出している。public/ の画像は unoptimized で1種類しか無いため、
  * ここはブラウザの先読みの優先度にしか効かない。
  */
@@ -49,20 +50,20 @@ export function CommitteePhotoCollage({ label, alts }: { label: string; alts: re
       >
         {columns.map((column, columnIndex) => (
           <div
-            key={column[0]}
+            key={column[0].src}
             className={`${COLUMN_OFFSETS[columnIndex]} flex flex-col gap-3 sm:gap-5`}
             data-committee-collage-stagger
           >
-            {column.map((src, rowIndex) => (
-              <div key={src} className="relative aspect-[3/4] overflow-hidden bg-gray-100">
-                <AppImage
-                  src={src}
-                  alt={alts[columnStarts[columnIndex] + rowIndex] ?? ""}
-                  fill
-                  sizes={COLUMN_SIZES[columnIndex]}
-                  className="object-cover"
-                />
-              </div>
+            {column.map((photo, rowIndex) => (
+              <AppImage
+                key={photo.src}
+                src={photo.src}
+                alt={alts[columnStarts[columnIndex] + rowIndex] ?? ""}
+                width={photo.width}
+                height={photo.height}
+                sizes={COLUMN_SIZES[columnIndex]}
+                className="h-auto w-full bg-gray-100"
+              />
             ))}
           </div>
         ))}

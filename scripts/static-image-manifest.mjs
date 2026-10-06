@@ -207,6 +207,75 @@ const APP_IMAGES = [
     maxBytes: 12500,
     note: "歯車の装飾（NewsSectionInteractive）",
   },
+  {
+    path: "public/images/committee/committee-kids-event.avif",
+    source: "assets/source/images/committee/committee-kids-event.webp",
+    // CommitteePhotoCollage（/about）。列幅の比は 1 : 1.5 : 1。最も広くなるのは viewport 960〜1023px
+    // （max-w-4xl に sm の余白で中身 832px）で、左右の列が 226px、中央列が 339px（2026-10-06 実測）。
+    // その x 2 を切り上げて左右 460 / 中央 680 を box の幅とし、高さは縦横比から出す。
+    // 原画 1108x1477（3:4）。
+    box: { width: 460, height: 614 },
+    fit: "inside",
+    kind: "photo",
+    quality: 50,
+    maxBytes: 52500,
+    note: "CommitteePhotoCollage の左列の上",
+  },
+  {
+    path: "public/images/committee/committee-sparklers.avif",
+    source: "assets/source/images/committee/committee-sparklers.webp",
+    // 原画 1200x800（3:2）。
+    box: { width: 460, height: 307 },
+    fit: "inside",
+    kind: "photo",
+    quality: 50,
+    maxBytes: 13000,
+    note: "CommitteePhotoCollage の左列の下",
+  },
+  {
+    path: "public/images/committee/committee-beach.avif",
+    source: "assets/source/images/committee/committee-beach.webp",
+    // 原画 1800x1200（3:2）。
+    box: { width: 680, height: 454 },
+    fit: "inside",
+    kind: "photo",
+    quality: 50,
+    maxBytes: 45500,
+    note: "CommitteePhotoCollage の中央列の上",
+  },
+  {
+    path: "public/images/committee/committee-yakisoba.avif",
+    source: "assets/source/images/committee/committee-yakisoba.webp",
+    // 原画 858x1144（3:4。Instagram の画面の矢印とドットを切り落とした）。
+    box: { width: 680, height: 907 },
+    fit: "inside",
+    kind: "photo",
+    quality: 50,
+    maxBytes: 34000,
+    note: "CommitteePhotoCollage の中央列の下",
+  },
+  {
+    path: "public/images/committee/committee-school-event.avif",
+    source: "assets/source/images/committee/committee-school-event.webp",
+    // 原画 1477x1108（4:3）。
+    box: { width: 460, height: 345 },
+    fit: "inside",
+    kind: "photo",
+    quality: 50,
+    maxBytes: 32500,
+    note: "CommitteePhotoCollage の右列の上",
+  },
+  {
+    path: "public/images/committee/committee-meeting.avif",
+    source: "assets/source/images/committee/committee-meeting.webp",
+    // 原画 1200x900（4:3）。
+    box: { width: 460, height: 345 },
+    fit: "inside",
+    kind: "photo",
+    quality: 50,
+    maxBytes: 15000,
+    note: "CommitteePhotoCollage の右列の下",
+  },
 ];
 
 /**

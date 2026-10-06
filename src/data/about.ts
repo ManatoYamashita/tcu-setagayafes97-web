@@ -95,12 +95,23 @@ export const aboutConfig = {
   },
 
   // 委員会の写真コラージュ（CommitteePhotoCollage）。左・中央・右の3列×2枚。
+  // 写真ごとの縦横比はそのまま見せる（集合写真を縦長に切ると人が切れるため）。
+  // width / height は public/ の AVIF の実寸で、縦横比を決めるためだけに使う。
   // alt は言語ごとに `festivalIntroContents[*].collageAlts` が同じ並びで持つ
   committeeCollage: {
     columns: [
-      ["/images/committee/committee-01.avif", "/images/committee/committee-02.avif"],
-      ["/images/committee/committee-03.avif", "/images/committee/committee-04.avif"],
-      ["/images/committee/committee-05.avif", "/images/committee/committee-06.avif"],
+      [
+        { src: "/images/committee/committee-kids-event.avif", width: 460, height: 613 },
+        { src: "/images/committee/committee-sparklers.avif", width: 460, height: 307 },
+      ],
+      [
+        { src: "/images/committee/committee-beach.avif", width: 680, height: 453 },
+        { src: "/images/committee/committee-yakisoba.avif", width: 680, height: 907 },
+      ],
+      [
+        { src: "/images/committee/committee-school-event.avif", width: 460, height: 345 },
+        { src: "/images/committee/committee-meeting.avif", width: 460, height: 345 },
+      ],
     ],
   },
 
@@ -235,14 +246,13 @@ export const festivalIntroContent = {
   departmentsLabel: "組織構成",
   departments: aboutConfig.committee.departments,
   collageLabel: "実行委員会の活動風景",
-  // TODO: 写真の受領後に1枚ずつの内容に合わせて書き直す
   collageAlts: [
-    "実行委員会の活動の様子",
-    "実行委員会の活動の様子",
-    "実行委員会の活動の様子",
-    "実行委員会の活動の様子",
-    "実行委員会の活動の様子",
-    "実行委員会の活動の様子",
+    "地域のイベントで子どもたちにメダルを手渡す実行委員",
+    "花火で「97」の文字を描く実行委員",
+    "海辺で撮影した実行委員の集合写真",
+    "湯気の立つ鉄板で焼きそばを焼く実行委員",
+    "小学校の校庭で撮影した実行委員の集合写真",
+    "教室に集まって会議をする実行委員",
   ],
   linksHeading: "関連ページ",
   links: [
@@ -282,14 +292,13 @@ export const festivalIntroContents = {
     departmentsLabel: "Departments",
     departments: ["Public Relations", "Administration", "Planning"],
     collageLabel: "The organizing committee at work",
-    // TODO: 写真の受領後に1枚ずつの内容に合わせて書き直す
     collageAlts: [
-      "Organizing committee members at work",
-      "Organizing committee members at work",
-      "Organizing committee members at work",
-      "Organizing committee members at work",
-      "Organizing committee members at work",
-      "Organizing committee members at work",
+      "Committee members handing out medals to children at a local event",
+      "Committee members drawing the number 97 with sparklers",
+      "Group photo of the organizing committee on a beach",
+      "Committee members cooking yakisoba on a steaming griddle",
+      "Group photo of committee members in an elementary school playground",
+      "Committee members gathered in a classroom for a meeting",
     ],
     linksHeading: "Related pages",
     links: [
@@ -326,14 +335,13 @@ export const festivalIntroContents = {
     departmentsLabel: "组织构成",
     departments: ["宣传部", "管理部", "企划部"],
     collageLabel: "执行委员会的活动风景",
-    // TODO: 写真の受領後に1枚ずつの内容に合わせて書き直す
     collageAlts: [
-      "执行委员会成员活动的情景",
-      "执行委员会成员活动的情景",
-      "执行委员会成员活动的情景",
-      "执行委员会成员活动的情景",
-      "执行委员会成员活动的情景",
-      "执行委员会成员活动的情景",
+      "在社区活动中为孩子们颁发奖牌的执行委员",
+      "用烟花写出“97”字样的执行委员",
+      "在海边拍摄的执行委员会合影",
+      "在冒着热气的铁板上炒面的执行委员",
+      "在小学操场拍摄的执行委员合影",
+      "聚集在教室里开会的执行委员",
     ],
     linksHeading: "相关页面",
     links: [
@@ -370,14 +378,13 @@ export const festivalIntroContents = {
     departmentsLabel: "조직 구성",
     departments: ["홍보부", "관리부", "기획부"],
     collageLabel: "실행위원회의 활동 풍경",
-    // TODO: 写真の受領後に1枚ずつの内容に合わせて書き直す
     collageAlts: [
-      "실행위원회 위원들이 활동하는 모습",
-      "실행위원회 위원들이 활동하는 모습",
-      "실행위원회 위원들이 활동하는 모습",
-      "실행위원회 위원들이 활동하는 모습",
-      "실행위원회 위원들이 활동하는 모습",
-      "실행위원회 위원들이 활동하는 모습",
+      "지역 행사에서 아이들에게 메달을 건네는 실행위원",
+      "불꽃으로 숫자 97을 그리는 실행위원",
+      "바닷가에서 찍은 실행위원회 단체 사진",
+      "김이 오르는 철판에서 야키소바를 굽는 실행위원",
+      "초등학교 운동장에서 찍은 실행위원 단체 사진",
+      "교실에 모여 회의하는 실행위원",
     ],
     linksHeading: "관련 페이지",
     links: [
