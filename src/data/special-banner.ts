@@ -7,32 +7,24 @@
  * - /events 最下部の告知セクション（同 variant="sheet"）
  * - next.config.ts の `/special` 転送（`eventId` から転送先を組み立てる）
  *
- * 文言と画像は microCMS ではなくここで管理します。LP（/special/[id]）の
- * チケット表（microCMS の `special.tickets`）と同じ内容を、トップで読める粒度へ要約します。
+ * 文言と画像は microCMS ではなくここで管理します。告知セクションは日時・会場だけを見せ、
+ * 券種や販売方法は LP（/special/[id]）のチケット表（microCMS の `special.tickets`）へ任せます。
  *
- * IMPORTANT: 券種を片方だけ載せてはいけません。学内生券（¥1,000・東京都市大生のみ・
- * 学生証必須・学内手売り・現金のみ）と一般券（¥2,300・イープラス）は、価格も販売経路も
- * 購入資格も異なります。片方だけを「チケット販売日時」のような一般的な見出しで出すと、
- * 一般来場者が「学内で手売りしている」と誤読して来校する事故につながります。
- * LP の TicketTable を変更したら、ここも必ず追随させてください。
+ * IMPORTANT: 告知セクションへチケット情報を戻す場合は、券種を必ず両方載せてください。
+ * 学内生券（¥1,000・東京都市大生のみ・学生証必須・学内手売り・現金のみ）と一般券
+ * （¥2,300・イープラス）は、価格も販売経路も購入資格も異なります。片方だけを
+ * 「チケット販売日時」のような一般的な見出しで出すと、一般来場者が「学内で手売りしている」と
+ * 誤読して来校する事故につながります。
  *
  * リンク先の URL は eventId から組み立てます。LP が公開されているかどうかは
  * 表示側（各セクション）が `getSpecialEventById()` を使って確認します。
  */
 
-/** 定義リストで表示する明細の 1 ブロック */
-export interface SpecialBannerDetail {
-  /** 項目名（`<dt>`） */
-  term: string;
-  /** 内容（`<dd>`）。配列の 1 要素が 1 行になります */
-  lines: string[];
-}
-
 export interface SpecialBannerData {
   /** microCMS 上の企画 ID。リンク先の組み立てと実在確認に使います */
   eventId: string;
-  /** 出演者名の上に置く小ラベル */
-  label: string;
+  /** 見出しの下、本文の左に縦書きで置く分類ラベル */
+  category: string;
   /**
    * 出演者名。見出しは `nameLogo` の画像で表示するため、この文字列は
    * 画像の代替テキスト（= 見出しのアクセシブル名）として使われます。
@@ -62,15 +54,15 @@ export interface SpecialBannerData {
     width: number;
     height: number;
   };
-  /** チケット販売情報などの明細 */
-  details: SpecialBannerDetail[];
+  /** 本文（日時・会場）。配列の 1 要素が 1 行になります */
+  headline: string[];
   /** LP へ誘導する CTA のラベル */
   ctaLabel: string;
 }
 
 export const specialBanner: SpecialBannerData = {
   eventId: "special-event-mon7a",
-  label: "著名人スペシャル企画決定！",
+  category: "著名人企画",
   name: "MON7A",
   nameLogo: {
     src: "/images/special/mon7a-logo.avif",
@@ -83,23 +75,6 @@ export const specialBanner: SpecialBannerData = {
     width: 920,
     height: 920,
   },
-  // 販売開始が早い順。一般券（9/3）→ 学内生券（9/28）
-  details: [
-    {
-      term: "一般チケット",
-      lines: ["¥2,300", "9/3（木）10:00 〜 発売", "プレイガイド【イープラス】にて販売"],
-    },
-    {
-      term: "学内生チケット",
-      lines: [
-        "¥1,000（東京都市大生のみ・学生証必須）",
-        "世田谷キャンパス: 9/28（月）〜10/2（金）（予定）",
-        "横浜キャンパス: 10/5（月）〜10/9（金）（予定）",
-        "時間: 13:00〜13:30",
-        "学内にて手売り／現金のみ",
-        "世田谷: 3号館前ベンチ／横浜: 食堂前",
-      ],
-    },
-  ],
-  ctaLabel: "企画の詳細を見る",
+  headline: ["11月1日 16:00~", "世田谷キャンパス第1アリーナ"],
+  ctaLabel: "詳しくはこちら",
 };

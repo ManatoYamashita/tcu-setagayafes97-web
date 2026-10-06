@@ -10,22 +10,25 @@ import { SpecialGuestMotion } from "./SpecialGuestMotion";
 /**
  * 著名人企画（スペシャル企画）の告知セクション
  *
- * 出演者ロゴ・バナー画像・チケット販売情報を見せ、著名人企画LPへ誘導します。
+ * 出演者ロゴ・横長に切った写真・日時と会場を見せ、著名人企画LPへ誘導します。
  * トップページ（Hero の直下）と企画一覧ページ（/events の最下部）の2箇所で使います。
+ * 券種や販売方法は載せず、LP のチケット表へ任せます（理由は src/data/special-banner.ts）。
  *
  * 文言は microCMS ではなく src/data/special-banner.ts が持ちますが、リンク先が実在するか
  * どうかだけは getSpecialEventById() で確認します。ID が変わって LP に到達できない場合は、
  * リンク切れを見せずにセクションごと引っ込めます。
  *
- * レイアウトは画面幅で3段階に変わります。
+ * レイアウトは画面幅で2段階に変わります。
  *
- * - 〜767px: 縦積み。画像が上、テキストが下
- * - 768〜1023px: 横並びで画像が右
- * - 1024px〜: 横並びで画像が左
+ * - 〜767px: 縦積み。写真が上、テキストが下
+ * - 768px〜: 12列グリッドで写真が左（md 7列 / lg 8列）、テキストが右。
+ *   見出し（ロゴ＋横罫）だけを左へ引き出して写真の右端に重ねる
  *
- * DOM 順は「見出し → 明細 → CTA → 画像」で固定し、見た目の入れ替えは
- * `lg:flex-row-reverse` と画像側の `order-first` だけで行います。DOM を並べ替えると
- * h2 より先に画像が読み上げられ、セクションの主題が伝わらなくなるためです。
+ * 写真の右上は `.special-guest-notch`（globals.css）の mask で四分円に欠きます。
+ *
+ * DOM 順は「見出し → 本文 → CTA → 写真」で固定し、見た目の入れ替えは写真側の
+ * `order-first` だけで行います。DOM を並べ替えると h2 より先に写真が読み上げられ、
+ * セクションの主題が伝わらなくなるためです。
  */
 
 /**
@@ -56,18 +59,18 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
     return null;
   }
 
-  const { label, name, nameLogo, image, details, ctaLabel } = specialBanner;
+  const { category, name, nameLogo, image, headline, ctaLabel } = specialBanner;
   const isSheet = variant === "sheet";
 
   /*
-   * バナー画像の実描画幅は variant で変わる。/events は PageSheetLayout の
-   * `mx-*` と `px-*` が内側に二重で効くため、横方向の余白がトップページより
-   * 片側 32px（lg では 48px）多い。同じ sizes を使うと srcset の過大な候補を
-   * 掴むので分ける。lg は inner の max-w-5xl が効いて両者とも 460px に収束する。
+   * 写真の実描画幅は variant で変わる。/events は PageSheetLayout の `mx-*` `px-*` と
+   * 呼び出し側の container の `px-4` が重なり、横方向の余白がトップページより
+   * 片側 32px（lg では 48px）多い。同じ sizes を使うと srcset の過大な候補を掴むので分ける。
+   * 写真の列幅は md で 7/12（≒ 0.584）、lg で 8/12（≒ 0.667）、max-w-6xl で 768px に頭打ち。
    */
   const imageSizes = isSheet
-    ? "(min-width: 1024px) 460px, (min-width: 768px) 36vw, min(384px, calc(100vw - 6rem))"
-    : "(min-width: 1024px) 460px, (min-width: 768px) 42vw, min(384px, calc(100vw - 2rem))";
+    ? "(min-width: 1024px) min(768px, calc((100vw - 10rem) * 0.667)), (min-width: 768px) calc((100vw - 8rem) * 0.584), calc(100vw - 6rem)"
+    : "(min-width: 1024px) min(768px, calc((100vw - 2rem) * 0.667)), (min-width: 768px) calc((100vw - 2rem) * 0.584), calc(100vw - 2rem)";
 
   return (
     <section
@@ -88,83 +91,81 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
       <SpecialGuestMotion />
 
       <div className={isSheet ? undefined : "container mx-auto px-4"}>
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-10 md:flex-row md:items-center md:gap-12 lg:flex-row-reverse lg:gap-16">
-          {/* テキスト側。直下の子（見出し → 明細 → CTA）が入場の stagger 単位になる */}
-          <div className="w-full md:flex-1" data-special-guest-stagger>
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-y-8 md:grid-cols-12 md:gap-y-0">
+          {/* テキスト側。直下の子（見出し → 本文 → CTA）が入場の stagger 単位になる。
+              写真より前面に置くため relative z-10。見出しだけが写真へ重なる */}
+          <div
+            className="relative z-10 md:col-start-8 md:col-end-13 md:row-start-1 md:self-end md:pl-6 lg:col-start-9 lg:pl-8"
+            data-special-guest-stagger
+          >
             {/* 見出し（トップページは Kaisei Opti を読み込まないため font-sans を明示する）。
-                出演者名はロゴ画像で、alt が見出しのアクセシブル名を担う */}
-            <h2 className="font-sans">
-              <span className="block text-xs font-bold tracking-[0.2em] text-primary-700 sm:text-sm">
-                {label}
-              </span>
-              <span className="mt-4 block">
-                <AppImage
-                  src={nameLogo.src}
-                  alt={name}
-                  width={nameLogo.width}
-                  height={nameLogo.height}
-                  sizes="(min-width: 1024px) 360px, (min-width: 640px) 300px, 240px"
-                  className="h-auto w-full max-w-[240px] sm:max-w-[300px] lg:max-w-[360px]"
-                />
-              </span>
+                出演者名はロゴ画像で、alt が見出しのアクセシブル名を担う。
+                md 以上では左の余白（pl）より大きく引き出し、ロゴの頭を写真の右端へ重ねる。
+                重なった部分は暗い衣装の上に乗るため、md 以上だけ白い光彩で輪郭を保つ */}
+            <h2 className="flex items-center gap-4 font-sans md:-ml-12 lg:-ml-16">
+              <AppImage
+                src={nameLogo.src}
+                alt={name}
+                width={nameLogo.width}
+                height={nameLogo.height}
+                sizes="(min-width: 1024px) 260px, (min-width: 768px) 200px, 220px"
+                className="h-auto w-[220px] shrink-0 md:w-[200px] md:drop-shadow-[0_0_6px_rgba(255,255,255,0.9)] lg:w-[260px]"
+              />
+              <span aria-hidden="true" className="h-px min-w-8 flex-1 bg-gray-900" />
             </h2>
 
-            <dl className="mt-8 border-y border-dotted border-primary-700/30">
-              {details.map((detail, index) => (
-                <div
-                  key={detail.term}
-                  className={
-                    index > 0 ? "border-t border-dotted border-primary-700/30 py-4" : "py-4"
-                  }
-                >
-                  <dt className="font-sans text-xs font-bold tracking-[0.1em] text-primary-700 sm:text-sm">
-                    {detail.term}
-                  </dt>
-                  <dd className="mt-2 font-sans text-sm leading-[1.75] text-gray-700 sm:text-base">
-                    {detail.lines.map((line) => (
-                      <span key={line} className="block">
-                        {line}
-                      </span>
-                    ))}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+            {/* 本文。左に縦書きの分類ラベル、右に日時と会場。
+                会場名（14字）が1行に収まるよう列幅に合わせて文字を詰める。
+                収まらないと「アリー｜ナ」のように語の途中で折り返す（768px / 1024px で実測） */}
+            <div className="mt-6 flex gap-4 lg:mt-8 lg:gap-5">
+              <p className="font-sans text-xs font-bold tracking-[0.2em] text-primary-700 [writing-mode:vertical-rl] sm:text-sm">
+                {category}
+              </p>
+              <p className="font-sans text-lg leading-[1.6] font-bold text-gray-900 md:text-base lg:text-lg xl:text-xl">
+                {headline.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </p>
+            </div>
 
-            <Link
-              href={`/special/${event.id}`}
-              className="group mt-8 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition-colors hover:bg-primary-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
-            >
-              {ctaLabel}
-              <svg
-                className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
+            <div className="mt-4 flex justify-end lg:mt-6">
+              <Link
+                href={`/special/${event.id}`}
+                className="group inline-flex min-h-12 items-center gap-2 font-sans text-sm font-semibold text-gray-900 hover:text-primary-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </Link>
+                <span className="border-b border-current pb-0.5">{ctaLabel}</span>
+                <svg
+                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 12h14M13 6l6 6-6 6"
+                  />
+                </svg>
+              </Link>
+            </div>
           </div>
 
-          {/* 画像側。縦積みのときだけ order で先頭へ出す */}
+          {/* 写真側。縦積みのときだけ order で先頭へ出す。正方形の原画を横長に切るため、
+              顔が入るよう切り抜き位置を上寄せにする */}
           <div
-            className="order-first w-full max-w-sm shrink-0 overflow-hidden rounded-3xl md:order-none md:w-[42%] md:max-w-none lg:w-[45%]"
+            className="special-guest-notch relative order-first aspect-[4/3] w-full overflow-hidden md:order-none md:col-start-1 md:col-end-8 md:row-start-1 md:aspect-[3/2] lg:col-end-9"
             data-special-guest-reveal
           >
             <AppImage
               src={image.src}
               alt={image.alt}
-              width={image.width}
-              height={image.height}
+              fill
               sizes={imageSizes}
-              className="h-auto w-full"
+              className="object-cover object-[50%_30%]"
             />
           </div>
         </div>
