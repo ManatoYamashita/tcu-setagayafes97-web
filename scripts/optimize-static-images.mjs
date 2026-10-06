@@ -90,9 +90,17 @@ async function bake(entry) {
    * box より小さいものがある（`favicon-outline` は 500x500 で、広い画面の表示寸法に
    * 届かない）。付けないと水増しした画像を余計な転送量で配ることになる
    * （imgix 側の `fit=max` と同じ理屈）。
+   *
+   * `position` は `fit: "cover"` で切り抜くときの基準。省略すると sharp の既定（中央）になる。
+   * 過去回サイトのスクリーンショットは回数やロゴが上端にあるため `"top"` を指定している。
    */
   await sharp(source)
-    .resize({ ...entry.box, fit: entry.fit, withoutEnlargement: true })
+    .resize({
+      ...entry.box,
+      fit: entry.fit,
+      position: entry.position ?? "centre",
+      withoutEnlargement: true,
+    })
     .avif(avifOptions(entry))
     .toFile(output);
 

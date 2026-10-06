@@ -5,8 +5,10 @@ import { AboutHero } from "@/components/about/AboutHero";
 import { FestivalIntroSection } from "@/components/about/FestivalIntroSection";
 import { ChairpersonSection } from "@/components/about/ChairpersonSection";
 import { EventOverviewTable } from "@/components/about/EventOverviewTable";
+import { PastFestivalsSection } from "@/components/about/PastFestivalsSection";
 import { type Locale } from "@/i18n/routing";
 import { aboutPageContents } from "@/data/about";
+import { pastFestivalsContents } from "@/data/past-festivals";
 import { createPageMetadata } from "@/lib/metadata";
 import { createAboutStructuredData, serializeJsonLd } from "@/lib/structured-data";
 
@@ -106,14 +108,17 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         message={content.message}
       />
 
-      {/* 開催概要 */}
+      {/* 開催概要 + 過去の世田谷祭 */}
       {/*
         他セクションページの PageSheetLayout と同じ白シート表現。
         AboutHero は PageHero ではなく独自のヒーローのため、シート部分のみを
         インラインで再現している。
+        過去の世田谷祭はシートの内側の最後に置く。直後に共通 Footer の協賛バー
+        （白地）が続くので、シートの白がそのままつながる。
       */}
       <div className="relative z-10 -mt-6 mx-4 rounded-t-3xl bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] sm:mx-6 lg:mx-8">
         <EventOverviewTable content={content.overview} />
+        <PastFestivalsSection content={pastFestivalsContents[locale as Locale]} />
       </div>
     </main>
   );

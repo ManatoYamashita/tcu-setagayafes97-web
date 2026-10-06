@@ -139,6 +139,7 @@
 - **[events-search.md](./frontend/events-search.md)** - `/events` の検索と絞り込み（正規化・建物導出・3段カスケード）
   - **正規化は `normalizeText()` の1本に集約する。** 別々に正規化すると「検索では出るのにフィルタでは落ちる」
 - **[events-special-banner.md](./frontend/events-special-banner.md)** - `/events` 冒頭の音楽ポスター風著名人企画バナー（文字のグルーピング・画像・上角・小画面の配置）
+- **[about-past-festivals.md](./frontend/about-past-festivals.md)** - `/about` 最下部の「過去の世田谷祭」（歴代サイトのサムネイル一覧。出典・欠番・上端基準の切り抜き。#422）
 - **[special-guest-section.md](./frontend/special-guest-section.md)** - トップと `/events` 最下部の著名人企画告知セクション（歯車の切り抜きとリビール・白塗りロゴ・チケットの要約。#414 / #419）
   - **チケットは券種を必ず両方載せる**
   - **白塗りロゴを `SpecialEventBanner` に渡さない**（白抜きにすると文字が塊になる）
