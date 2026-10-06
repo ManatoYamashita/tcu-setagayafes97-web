@@ -150,8 +150,9 @@ const APP_IMAGES = [
   {
     path: "public/images/special/mon7a.avif",
     source: "assets/source/images/special/mon7a.webp",
-    // 原画 1280x1280。`imageSizes` は lg で 460px に収束する（SpecialGuestSection の
-    // コメント参照）。460 x 2 = 920。
+    // 原画 1280x1280。歯車形の写真は md 以上で 6/12 列、max-w-6xl で 576px に頭打ち
+    // （SpecialGuestSection の `imageSizes`）。576 x 2 = 1152 に対し 920 なので、
+    // lg の DPR2 では 1.25 倍に引き伸ばされる。ファーストビュー予算との兼ね合いで据え置き。
     box: { width: 920, height: 920 },
     fit: "inside",
     kind: "photo",
@@ -168,6 +169,19 @@ const APP_IMAGES = [
     fit: "inside",
     kind: "art",
     // 旧 `quality={75}`。見出しの代替なので輪郭が痩せると読めない。
+    quality: 60,
+    maxBytes: 3200,
+    note: "SpecialEventBanner の出演者名ロゴ（brightness-0 invert で白抜きにして使う）",
+  },
+  {
+    path: "public/images/special/mon7a-logo-filled.avif",
+    // 上の mon7a-logo.webp の、黒縁に囲まれた透明部分を白で塗った版（#419）。
+    // 写真や紫の背景に重ねても文字の中身が抜けないようにするため。
+    source: "assets/source/images/special/mon7a-logo-filled.webp",
+    // 原画 1524x405。`lg:w-[260px]` x 2 = 520 だが、旧ロゴと同じ箱に揃えて輪郭を保つ。
+    box: { width: 720, height: 191 },
+    fit: "inside",
+    kind: "art",
     quality: 60,
     maxBytes: 3200,
     note: "SpecialGuestSection の出演者名ロゴ（h2 のアクセシブル名を alt が担う）",
@@ -353,7 +367,7 @@ export const FIRST_VIEW_IMAGES = [
   "public/images/brand/favicon-outline.avif",
   "public/images/photos/tcu-7.avif",
   "public/images/special/mon7a.avif",
-  "public/images/special/mon7a-logo.avif",
+  "public/images/special/mon7a-logo-filled.avif",
   "public/images/photos/setagayafe97-image.avif",
   "public/materials/geer1.avif",
   "public/materials/geers.avif",
