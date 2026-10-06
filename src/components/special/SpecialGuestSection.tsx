@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { specialBanner } from "@/data/special-banner";
 import { getSpecialEventById } from "@/lib/events";
+import { gearClipPath } from "@/lib/gear-profile";
 import { cn } from "@/lib/utils";
 
 import { SpecialGuestMotion } from "./SpecialGuestMotion";
@@ -10,9 +11,9 @@ import { SpecialGuestMotion } from "./SpecialGuestMotion";
 /**
  * 著名人企画（スペシャル企画）の告知セクション
  *
- * 出演者ロゴ・横長に切った写真・日時と会場を見せ、著名人企画LPへ誘導します。
- * トップページ（Hero の直下）と企画一覧ページ（/events の最下部）の2箇所で使います。
- * 券種や販売方法は載せず、LP のチケット表へ任せます（理由は src/data/special-banner.ts）。
+ * 出演者ロゴ・歯車の形に切り抜いた写真・日時と会場・チケットの要点・入場の条件を見せ、
+ * 著名人企画LPへ誘導します。トップページ（Hero の直下）と企画一覧ページ（/events の最下部）の
+ * 2箇所で使います。チケットは券種を必ず両方載せます（理由は src/data/special-banner.ts）。
  *
  * 文言は microCMS ではなく src/data/special-banner.ts が持ちますが、リンク先が実在するか
  * どうかだけは getSpecialEventById() で確認します。ID が変わって LP に到達できない場合は、
@@ -21,12 +22,14 @@ import { SpecialGuestMotion } from "./SpecialGuestMotion";
  * レイアウトは画面幅で2段階に変わります。
  *
  * - 〜767px: 縦積み。写真が上、テキストが下
- * - 768px〜: 12列グリッドで写真が左（md 7列 / lg 8列）、テキストが右。
+ * - 768px〜: 12列グリッドで写真が左 6列、テキストが右 6列。
  *   見出し（ロゴ＋横罫）だけを左へ引き出して写真の右端に重ねる
  *
- * 写真の右上は `.special-guest-notch`（globals.css）の mask で四分円に欠きます。
+ * 写真はサイトの歯車モチーフと同じ歯形（src/lib/gear-profile.ts）で切り抜きます。
+ * SSR では完成形の clip-path を持ち、入場モーション（SpecialGuestMotion）が
+ * 中心から回しながら広げます。モーション軽減時や JS が無いときは完成形のままです。
  *
- * DOM 順は「見出し → 本文 → CTA → 写真」で固定し、見た目の入れ替えは写真側の
+ * DOM 順は「見出し → 本文 → チケット → 注記 → CTA → 写真」で固定し、見た目の入れ替えは写真側の
  * `order-first` だけで行います。DOM を並べ替えると h2 より先に写真が読み上げられ、
  * セクションの主題が伝わらなくなるためです。
  */
@@ -59,18 +62,20 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
     return null;
   }
 
-  const { category, name, nameLogo, image, headline, ctaLabel } = specialBanner;
+  const { category, name, nameLogoFilled, image, headline, tickets, notes, ctaLabel } =
+    specialBanner;
   const isSheet = variant === "sheet";
 
   /*
    * 写真の実描画幅は variant で変わる。/events は PageSheetLayout の `mx-*` `px-*` と
    * 呼び出し側の container の `px-4` が重なり、横方向の余白がトップページより
    * 片側 32px（lg では 48px）多い。同じ sizes を使うと srcset の過大な候補を掴むので分ける。
-   * 写真の列幅は md で 7/12（≒ 0.584）、lg で 8/12（≒ 0.667）、max-w-6xl で 768px に頭打ち。
+   * 写真の列幅は md 以上で 6/12（= 0.5）、max-w-6xl で 576px に頭打ち。
+   * 縦積みのときは max-w-sm（384px）で頭打ち。
    */
   const imageSizes = isSheet
-    ? "(min-width: 1024px) min(768px, calc((100vw - 10rem) * 0.667)), (min-width: 768px) calc((100vw - 8rem) * 0.584), calc(100vw - 6rem)"
-    : "(min-width: 1024px) min(768px, calc((100vw - 2rem) * 0.667)), (min-width: 768px) calc((100vw - 2rem) * 0.584), calc(100vw - 2rem)";
+    ? "(min-width: 1024px) min(576px, calc((100vw - 10rem) * 0.5)), (min-width: 768px) calc((100vw - 8rem) * 0.5), min(384px, calc(100vw - 6rem))"
+    : "(min-width: 1024px) min(576px, calc((100vw - 2rem) * 0.5)), (min-width: 768px) calc((100vw - 2rem) * 0.5), min(384px, calc(100vw - 2rem))";
 
   return (
     <section
@@ -92,24 +97,24 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
 
       <div className={isSheet ? undefined : "container mx-auto px-4"}>
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-y-8 md:grid-cols-12 md:gap-y-0">
-          {/* テキスト側。直下の子（見出し → 本文 → CTA）が入場の stagger 単位になる。
+          {/* テキスト側。直下の子（見出し → 本文 → チケット → 注記 → CTA）が入場の stagger 単位になる。
               写真より前面に置くため relative z-10。見出しだけが写真へ重なる */}
           <div
-            className="relative z-10 md:col-start-8 md:col-end-13 md:row-start-1 md:self-end md:pl-6 lg:col-start-9 lg:pl-8"
+            className="relative z-10 md:col-start-7 md:col-end-13 md:row-start-1 md:self-center md:pl-6 lg:pl-8"
             data-special-guest-stagger
           >
             {/* 見出し（トップページは Kaisei Opti を読み込まないため font-sans を明示する）。
                 出演者名はロゴ画像で、alt が見出しのアクセシブル名を担う。
                 md 以上では左の余白（pl）より大きく引き出し、ロゴの頭を写真の右端へ重ねる。
-                重なった部分は暗い衣装の上に乗るため、md 以上だけ白い光彩で輪郭を保つ */}
+                ロゴは内側を白で塗った版なので、暗い写真の上でも文字の中身が抜けない */}
             <h2 className="flex items-center gap-4 font-sans md:-ml-12 lg:-ml-16">
               <AppImage
-                src={nameLogo.src}
+                src={nameLogoFilled.src}
                 alt={name}
-                width={nameLogo.width}
-                height={nameLogo.height}
+                width={nameLogoFilled.width}
+                height={nameLogoFilled.height}
                 sizes="(min-width: 1024px) 260px, (min-width: 768px) 200px, 220px"
-                className="h-auto w-[220px] shrink-0 md:w-[200px] md:drop-shadow-[0_0_6px_rgba(255,255,255,0.9)] lg:w-[260px]"
+                className="h-auto w-[220px] shrink-0 md:w-[200px] lg:w-[260px]"
               />
               <span aria-hidden="true" className="h-px min-w-8 flex-1 bg-gray-900" />
             </h2>
@@ -130,7 +135,43 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
               </p>
             </div>
 
-            <div className="mt-4 flex justify-end lg:mt-6">
+            {/* チケットの要点。券種は必ず両方並べる（片方だけだと購入資格を誤読される） */}
+            <dl className="mt-5 border-y border-dotted border-primary-700/30 lg:mt-6">
+              {tickets.map((ticket, index) => (
+                <div
+                  key={ticket.term}
+                  className={cn(
+                    "grid grid-cols-[3.5rem_1fr] gap-x-3 py-3 sm:grid-cols-[4.5rem_1fr]",
+                    index > 0 && "border-t border-dotted border-primary-700/30"
+                  )}
+                >
+                  <dt className="font-sans text-xs font-bold tracking-[0.1em] text-primary-700 sm:text-sm">
+                    {ticket.term}
+                  </dt>
+                  <dd className="font-sans text-sm leading-[1.7] text-gray-700">
+                    {ticket.lines.map((line, lineIndex) => (
+                      <span
+                        key={line}
+                        className={cn("block", lineIndex === 0 && "font-bold text-gray-900")}
+                      >
+                        {line}
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+
+            {/* 入場の条件 */}
+            <ul className="mt-3 space-y-0.5 font-sans text-xs leading-[1.7] text-gray-600">
+              {notes.map((note) => (
+                <li key={note} className="text-pretty">
+                  ※{note}
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-2 flex justify-end lg:mt-4">
               <Link
                 href={`/special/${event.id}`}
                 className="group inline-flex min-h-12 items-center gap-2 font-sans text-sm font-semibold text-gray-900 hover:text-primary-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
@@ -154,18 +195,20 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
             </div>
           </div>
 
-          {/* 写真側。縦積みのときだけ order で先頭へ出す。正方形の原画を横長に切るため、
-              顔が入るよう切り抜き位置を上寄せにする */}
+          {/* 写真側。縦積みのときだけ order で先頭へ出す。
+              clip-path は SSR で完成形を持たせ、入場モーションが data-special-guest-gear を
+              目印に書き換える。正方形の原画をそのまま正方形の箱へ入れる */}
           <div
-            className="special-guest-notch relative order-first aspect-[4/3] w-full overflow-hidden md:order-none md:col-start-1 md:col-end-8 md:row-start-1 md:aspect-[3/2] lg:col-end-9"
-            data-special-guest-reveal
+            className="relative order-first mx-auto aspect-square w-full max-w-sm md:order-none md:col-start-1 md:col-end-7 md:row-start-1 md:max-w-none"
+            style={{ clipPath: gearClipPath() }}
+            data-special-guest-gear
           >
             <AppImage
               src={image.src}
               alt={image.alt}
               fill
               sizes={imageSizes}
-              className="object-cover object-[50%_30%]"
+              className="object-cover"
             />
           </div>
         </div>

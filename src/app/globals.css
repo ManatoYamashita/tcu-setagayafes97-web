@@ -353,11 +353,11 @@ body {
    * ScrollTrigger が画面外の推定値でトリガー位置を測ってしまう。値を変えたときは
    * /events で実測し直すこと。
    */
-  /* 実測（2026-10-06、/events）: 375px 31.8rem / 768px 19.1rem / 1024px 28.1rem /
-     1280px 35.2rem / 1440px・1920px 36.1rem。写真が 3:2 で列幅に比例するため、
-     md 以上は画面幅とともに伸びて max-w-6xl で頭打ちになる */
+  /* 実測（2026-10-06、/events、#419）: 375px 53.6rem / 768px 35.1rem / 1024px 36.6rem /
+     1280px 39.1rem / 1440px 40.1rem。md〜lg はテキスト側（チケット・注記）の高さが決め、
+     xl 以上は歯車の写真（正方形）が列幅とともに伸びて max-w-6xl で頭打ちになる */
   .deferred-section--special {
-    contain-intrinsic-size: auto 32rem;
+    contain-intrinsic-size: auto 54rem;
   }
 
   .deferred-section--events {
@@ -370,19 +370,13 @@ body {
    */
   @media (min-width: 48rem) {
     .deferred-section--special {
-      contain-intrinsic-size: auto 19rem;
-    }
-  }
-
-  @media (min-width: 64rem) {
-    .deferred-section--special {
-      contain-intrinsic-size: auto 28rem;
+      contain-intrinsic-size: auto 36rem;
     }
   }
 
   @media (min-width: 80rem) {
     .deferred-section--special {
-      contain-intrinsic-size: auto 36rem;
+      contain-intrinsic-size: auto 40rem;
     }
   }
 
@@ -468,35 +462,6 @@ body {
         var(--color-primary-100) min(109svh, 55%),
         var(--color-secondary) min(169svh, 85%)
       );
-    }
-  }
-
-  /* 著名人企画の告知セクション（SpecialGuestSection）: 写真の右上を四分円で欠く。
-     背景色で円を塗るのではなく mask で透かすため、トップのグラデーションの上でも
-     /events の白いシートの上でも同じ形になる。0.5px のずらしは縁のジャギー対策 */
-  .special-guest-notch {
-    --special-guest-notch: 3.5rem;
-    -webkit-mask-image: radial-gradient(
-      circle at 100% 0,
-      transparent var(--special-guest-notch),
-      #000 calc(var(--special-guest-notch) + 0.5px)
-    );
-    mask-image: radial-gradient(
-      circle at 100% 0,
-      transparent var(--special-guest-notch),
-      #000 calc(var(--special-guest-notch) + 0.5px)
-    );
-  }
-
-  @media (min-width: 48rem) {
-    .special-guest-notch {
-      --special-guest-notch: 5rem;
-    }
-  }
-
-  @media (min-width: 64rem) {
-    .special-guest-notch {
-      --special-guest-notch: 7rem;
     }
   }
 
