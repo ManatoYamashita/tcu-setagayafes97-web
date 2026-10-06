@@ -1,9 +1,9 @@
 /**
  * サイトの歯車モチーフの輪郭（2D）
  *
- * 3D 歯車（src/components/three/gear-geometry.ts）と、著名人企画の写真の切り抜き
- * （SpecialGuestSection の clip-path）が同じ歯形を使うために、three に依存しない形で
- * ここへ置いています。歯の数や比率を変えると両方の見た目が変わります。
+ * 3D 歯車（src/components/three/gear-geometry.ts）の歯形を、three に依存しない形で
+ * ここへ置いています（単体テストを three なしで回すため）。
+ * 著名人企画の写真の切り抜きにも使っていましたが、四角い写真へ戻したため現在は 3D 専用です。
  */
 
 /** 歯形の既定値。半径の単位は 3D 側のワールド座標 */
@@ -53,45 +53,4 @@ export function gearCornerPoints({
     points.push(at(innerRadius, base + toothGap + toothTop + toothGap));
   }
   return points;
-}
-
-interface GearClipPathParams {
-  /** 外径に対する倍率。0 で中心の1点に潰れ、1 で外径が箱の辺に接する */
-  scale?: number;
-  /** 回転角（度、時計回り）。0 で歯が真上・真下・真横を向く */
-  rotationDeg?: number;
-}
-
-/** 歯形の点は固定なので一度だけ求め、外径 1 に正規化しておく */
-const UNIT_GEAR_POINTS = gearCornerPoints().map(
-  ([x, y]): GearPoint => [x / GEAR_PROFILE.outerRadius, y / GEAR_PROFILE.outerRadius]
-);
-
-/**
- * 1つ目の歯の中心の角度（度）。`gearCornerPoints` は歯底を 0° から始めるため、
- * そのままだと歯が軸から 13° ほど傾いて見える。これを打ち消して歯を真上・真横へ向ける
- */
-const FIRST_TOOTH_CENTER_DEG =
-  ((GEAR_PROFILE.toothGapRatio + GEAR_PROFILE.toothTopRatio / 2) * 360) / GEAR_PROFILE.teeth;
-
-/**
- * 正方形の箱を歯車の形に切り抜く CSS `clip-path` の値を返します。
- *
- * 中心穴は付けません。写真の切り抜きに使うため、穴を開けると被写体の顔が抜けます。
- * 点の数は scale や回転によらず一定なので、アニメーション中に毎フレーム
- * 値を差し替えても形が飛びません。
- */
-export function gearClipPath({ scale = 1, rotationDeg = 0 }: GearClipPathParams = {}): string {
-  const rad = ((rotationDeg - FIRST_TOOTH_CENTER_DEG) * Math.PI) / 180;
-  const cos = Math.cos(rad);
-  const sin = Math.sin(rad);
-  const toPercent = (value: number) => `${(50 + value * 50 * scale).toFixed(3)}%`;
-
-  const coords = UNIT_GEAR_POINTS.map(([x, y]) => {
-    const rx = x * cos - y * sin;
-    const ry = x * sin + y * cos;
-    return `${toPercent(rx)} ${toPercent(ry)}`;
-  });
-
-  return `polygon(${coords.join(", ")})`;
 }
