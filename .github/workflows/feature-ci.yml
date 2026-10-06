@@ -66,6 +66,9 @@ jobs:
       # 本文の装置数）が e2e/ の実態と一致するかを見る（#406）。一覧は4か所に書かれ、装置を
       # 足すたびにどれかが置き去りになっていた（#405 では e2e/events/ が表にも構成にも無かった）。
       # git ls-files 以外に何も要求しないため、このジョブの「install だけで完結する」性質を崩さない。
+      - name: Check revalidation targets
+        run: pnpm run check:revalidate-targets
+
       - name: Check E2E guard list
         run: pnpm run check:e2e-guards
 

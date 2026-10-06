@@ -1,3 +1,4 @@
+import { MICROCMS_CACHE_TAGS } from "./revalidate-targets";
 import { isMicrocmsConfigured, isMicrocmsNotFound, microcmsGet } from "./microcms";
 import { normalizeEventSessions } from "./event-sessions";
 import { readSelectKey } from "./microcms-select";
@@ -186,6 +187,7 @@ export async function getEventsList(
     if (limit <= MICROCMS_MAX_LIMIT) {
       const response = await microcmsGet<RawEventListResponse>({
         endpoint: "events",
+        customRequestInit: { next: { tags: [MICROCMS_CACHE_TAGS.events], revalidate: 600 } },
         queries: {
           limit,
           orders: "-publishedAt",
@@ -203,6 +205,7 @@ export async function getEventsList(
       const perPage = Math.min(MICROCMS_MAX_LIMIT, limit - allContents.length);
       const response = await microcmsGet<RawEventListResponse>({
         endpoint: "events",
+        customRequestInit: { next: { tags: [MICROCMS_CACHE_TAGS.events], revalidate: 600 } },
         queries: {
           limit: perPage,
           offset,

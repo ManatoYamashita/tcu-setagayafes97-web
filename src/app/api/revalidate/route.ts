@@ -2,7 +2,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { isMicrocmsApi, REVALIDATE_TAGS, REVALIDATE_TARGETS } from "@/lib/revalidate-targets";
+import { isMicrocmsApi, REVALIDATE_TARGETS } from "@/lib/revalidate-targets";
 
 /**
  * microCMS Webhook 受け口（オンデマンド再検証）
@@ -141,15 +141,24 @@ export async function POST(request: NextRequest) {
 
     const targets = REVALIDATE_TARGETS[api];
 
+    const revalidated: string[] = [];
+    const revalidatedTags: string[] = [];
+
     for (const target of targets) {
-      revalidatePath(target.path, target.type);
-    }
-
-    const revalidated = targets.map((target) => target.path);
-    const revalidatedTags = REVALIDATE_TAGS[api] ?? [];
-
-    for (const tag of revalidatedTags) {
-      revalidateTag(tag, { expire: 0 });
+      switch (target.kind) {
+        case "path":
+          revalidatePath(target.path, target.type);
+          revalidated.push(target.path);
+          break;
+        case "tag":
+          revalidateTag(target.tag, { expire: 0 });
+          revalidatedTags.push(target.tag);
+          break;
+        default: {
+          const unreachable: never = target;
+          throw new Error(`Unknown revalidation target: ${JSON.stringify(unreachable)}`);
+        }
+      }
     }
 
     // Vercel の Functions ログで発火を確認する唯一の手段になるため、成功時も必ず1行残す。

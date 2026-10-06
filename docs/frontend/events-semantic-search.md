@@ -444,13 +444,13 @@ $5 は約 7,700 クエリに相当する（1クエリ $0.000649）。**残高を
 
 ### データ追従（#252）
 
-`/api/search` は microCMS を読む**初めての ISR 対象 Route Handler**になる。
-`revalidatePath()` はそこへ届かず、`src/lib/revalidate-targets.ts` の `RevalidateTarget["type"]`
-は `"page"` しか許していない（`"route"` の受け口が無い）。
+`/api/search` が読む一覧の fetch キャッシュは、`getEventsList()` の両取得経路に
+`next: { tags: [MICROCMS_CACHE_TAGS.events], revalidate: 600 }` を指定する。
+Webhook は対応表の `kind: "tag"` を引き、`revalidateTag(tag, { expire: 0 })` で即時失効する。
+ページの `revalidatePath()` だけでは Route Handler の取得データを失効できない。
 
-そこで**本経路では fetch キャッシュを一切使わず、毎回 microCMS を読む。**
-第4段はリテラルが0件のときだけ呼ばれるので、呼び出し頻度は低い。
-#252 でタグ対応が入ったら、`next: { tags: [...] }` を付けて読み直しを減らせる。
+検索応答の CDN キャッシュとクライアント内キャッシュは別層であり、このタグでは失効しない。
+取得タグと即時失効の規約・CI ガードは [content-revalidation.md](../dev/content-revalidation.md) を参照。
 
 ## 検証
 

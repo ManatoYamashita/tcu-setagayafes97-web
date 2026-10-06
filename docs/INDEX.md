@@ -92,7 +92,7 @@
   - **時刻欄は `HH:mm` だけ。** 開場時刻などを書き添えると、タイムテーブルと構造化データから黙って消える。開場時刻の置き場は `special.openTime`
 - **[draft-preview.md](./dev/draft-preview.md)** - microCMS の画面プレビューで下書きを本番と同じ詳細ページに出す仕組み
   - **`draftKey` を `searchParams` で受け取らない。`cookies()` を無条件に呼ばない。** どちらもルートが動的化して ISR が失われる
-- **[content-revalidation.md](./dev/content-revalidation.md)** - Webhook によるオンデマンド再検証の仕組みと microCMS 側の設定。共通 Footer の協賛バナーは `sponsors` タグで全ルートへ反映
+- **[content-revalidation.md](./dev/content-revalidation.md)** - Webhook によるオンデマンド再検証の仕組みと microCMS 側の設定。共通 Footer は `sponsors`、意味検索の取得データは `microcms:events` タグで即時失効（#252）
   - **`revalidatePath` はパスではなくタグの API。** 書き方を誤るとエラーにならず何もしない
   - **削除・公開終了の通知タイミングは既定 OFF。** ON にしないと「消したのに残る」
 - **[content-revalidation-ops.md](./dev/content-revalidation-ops.md)** - 再検証の検証手順と障害切り分け
@@ -143,7 +143,7 @@
 - **[special-guest-section.md](./frontend/special-guest-section.md)** - トップと `/events` 最下部の著名人企画告知セクション（写真を画面の左端へ広げる・ワイプ・白塗りロゴ・チケットの要約。#414 / #419）
   - **チケットは券種を必ず両方載せる**
   - **白塗りロゴを `SpecialEventBanner` に渡さない**（白抜きにすると文字が塊になる）
-- **[events-semantic-search.md](./frontend/events-semantic-search.md)** - `/events` の意味検索（第4段・TypeSafe Jev。#253）
+- **[events-semantic-search.md](./frontend/events-semantic-search.md)** - `/events` の意味検索（第4段・TypeSafe Jev。#253）。取得キャッシュと応答キャッシュの境界も記載（#252）
   - **足切りは `has_match`。`confidence` を使ってはいけない**
   - **来場者の検索語は米国の TypeSafe へ送られる。** 費用の歯止めはプリペイド $5（カード登録で外れる）
 - **[events-infinite-scroll.md](./frontend/events-infinite-scroll.md)** - `/events` の無限スクロールと絞り込みの追従（#239）
