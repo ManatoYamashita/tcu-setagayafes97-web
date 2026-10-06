@@ -79,11 +79,12 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       />
 
       {/*
-        3セクションは key={locale} で言語ごとに作り直す。GSAP（SplitText / ScrollTrigger）が
-        マウント時に一度だけ DOM を組み替えるため、言語切替で同じインスタンスを使い回すと
-        翻訳前の分割済み DOM が残る。
+        GSAP を使う AboutHero と ChairpersonSection は、locale を含む key で言語ごとに作り直す。
+        GSAP（SplitText / ScrollTrigger）がマウント時に一度だけ DOM を組み替えるため、
+        言語切替で同じインスタンスを使い回すと翻訳前の分割済み DOM が残る。
+        key は兄弟の間で一意でなければならないので、セクション名を接頭辞に付ける（#417）。
       */}
-      <AboutHero key={locale} content={content.hero} />
+      <AboutHero key={`hero-${locale}`} content={content.hero} />
 
       {/* 世田谷祭とは */}
       {/*
@@ -99,7 +100,11 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         絶対配置の装飾要素を持つため、白シートの内側に入れると rounded-t-3xl の
         角が欠ける。
       */}
-      <ChairpersonSection key={locale} theme={content.theme} message={content.message} />
+      <ChairpersonSection
+        key={`chairperson-${locale}`}
+        theme={content.theme}
+        message={content.message}
+      />
 
       {/* 開催概要 */}
       {/*
