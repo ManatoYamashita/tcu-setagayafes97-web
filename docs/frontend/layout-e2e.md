@@ -7,7 +7,7 @@
 | 装置             | 対象                            | 防いでいる事故                                                                                                                        |
 | ---------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | `e2e/timetable/` | `/timetable`                    | #148 — 盤面が `height: 100%` の解決失敗で 0px に潰れる / #338 — 企画詳細パネルの開閉・前後移動                                        |
-| `e2e/landmarks/` | 全ルート＋404画面               | #177 A — `<main id="content">` の付け忘れ・二重・空振り                                                                               |
+| `e2e/landmarks/` | 全ルート＋404画面               | #177 A — `<main id="content">` の付け忘れ・二重・空振り / #429 — サイト内遷移後に main が Header の裏へ潜る                           |
 | `e2e/not-found/` | 404画面（グローバル・企画詳細） | #249 — モバイルの読み順とイラスト寸法の退行 / #301 — 企画詳細の404で歯車のイラストが欠ける                                            |
 | `e2e/events/`    | `/events`（lg 未満・以上）      | #376 — 絞り込みバーの追従とボトムシート / #392 — 絞り込み後に結果の先頭がずれる（[events-filter-sheet.md](./events-filter-sheet.md)） |
 | `e2e/opener/`    | `/access` → `/about`            | #402 — サイト内からのフルロードでオープナーが再生される（[opener-entry-only.md](./opener-entry-only.md)）                             |
@@ -127,6 +127,7 @@ e2e/
 │   ├── responsive-parity.spec.ts    # 絞り込みバーの追従・ボトムシート・lg 以上のサイドバー [mobile]
 │   └── results-scroll.spec.ts       # 絞り込み後に結果の先頭が追従バーの直下へ来る        [mobile]
 ├── landmarks/
+│   ├── client-nav-scroll.spec.ts    # サイト内遷移の着地が最上部（main が Header の裏へ潜らない） [desktop]
 │   └── route-sweep.spec.ts          # 全ルート＋404画面の <main id="content"> が1つ    [desktop]
 ├── not-found/
 │   ├── event-detail.spec.ts         # 企画詳細の404に歯車のイラストが出る              [desktop]
