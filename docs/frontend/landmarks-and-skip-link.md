@@ -18,10 +18,12 @@
 | **ルートが自前で出す**               | `/`（`src/app/page.tsx`）・`/about`・`/events/[id]`・`/info/[id]`・`/special/[id]`                                                                |
 | **404・エラー画面が自前で出す**      | `src/app/not-found.tsx`・`src/app/error.tsx`・`src/app/events/[id]/not-found.tsx`・`src/app/events/[id]/error.tsx`                                |
 
-自前で出す側は、ページ最外の `<div className="min-h-screen …">` を `<main>` に変えるだけでよい。
+自前で出す側は、**ページ最外の `<div>` を残し、その内側に `<main>` を置く。**
+最外の `<div>` を `<main>` に変えてはいけない（次節「ページの先頭要素を `<main>` にしない」）。
 
 ```tsx
-<main id="content" tabIndex={-1} className="min-h-screen bg-secondary focus-visible:outline-none">
+<div className="min-h-screen bg-secondary">
+  <main id="content" tabIndex={-1} className="focus-visible:outline-none">
 ```
 
 `/about` が `PageSheetLayout` を使わないのは、`AboutHero` が `PageHero` ではなく
@@ -41,6 +43,29 @@
 `src/app/events/error.tsx` は `PageSheetLayout` を通るので対象外である。
 `global-error.tsx` を足す場合も対象外になる（ルートレイアウトごと置き換わり
 `<Header />` が描画されないため、スキップリンク自体が存在しない）。
+
+### ページの先頭要素を `<main>` にしない（#429）
+
+**`<main tabIndex={-1}>` をページの先頭 DOM 要素にしてはいけない。** フォーカスできない要素で包む。
+Fragment で包むのも不可。先頭の JSON-LD `<script>` は寸法0なので飛ばされ、次の `<main>` が先頭になる。
+
+Next.js（16.1 の `layout-router.js`、`handlePotentialScroll`）は、クライアント遷移の最後に
+変化したセグメントの先頭要素へ **`preventScroll` なしで `focus()` を呼ぶ**。
+先頭として選ばれないのは sticky / fixed の要素と寸法0の要素だけである。
+先頭が `<main tabIndex={-1}>` だとフォーカスが当たり、ブラウザが main の上端をビューポート上端へ合わせる。
+**その位置は sticky Header の裏になる。** 直接アクセスでは起きない（focus を呼ぶのはクライアント遷移だけ）。
+
+`/events` を y=2000 までスクロールしてから Link で遷移した結果（2026-10-07、本番、1440x678）:
+
+| 遷移先                                | scrollY | main の上端 | フォーカス |
+| ------------------------------------- | ------- | ----------- | ---------- |
+| `/about`・`/`・`/info/[id]`（修正前） | **77**  | 0           | MAIN       |
+| `PageSheetLayout` のページ            | 0       | 443         | BODY       |
+
+`scroll-margin-top: var(--header-height)` で逃がす案は採らなかった。y=19 で止まり、最上部にならない
+（Header の高さが最上部の 107px とピル型の 77px で変わるため）。
+`PageSheetLayout` は先頭が `<div>` なので、最初からこの問題が起きない。
+自前で出すルートも同じ構造に揃えた。再発防止は `e2e/landmarks/client-nav-scroll.spec.ts`。
 
 ## `PageSheetLayout` の `<main>` は `data-page-sheet` を兼ねる
 
@@ -150,4 +175,4 @@ document.activeElement.tagName + "#" + document.activeElement.id; // "MAIN#conte
 
 ---
 
-**最終更新日**: 2026-09-19
+**最終更新日**: 2026-10-07（#429。ページの先頭要素を main にしない）
