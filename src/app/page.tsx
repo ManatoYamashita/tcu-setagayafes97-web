@@ -21,24 +21,31 @@ const AboutSection = dynamic(() =>
 export default async function Home() {
   const [heroNews, newsList] = await Promise.all([getLatestHeroNews(), getNewsList(8)]);
 
+  /*
+   * main をページの先頭要素にしないこと。Next.js はサイト内遷移の最後にページの先頭要素へ
+   * focus() を呼ぶため、main が先頭だと main の上端が sticky Header の裏へ潜る（#429。
+   * docs/frontend/landmarks-and-skip-link.md「ページの先頭要素を main にしない」）。
+   */
   return (
-    <main id="content" tabIndex={-1} className="overflow-x-clip focus-visible:outline-none">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: serializeJsonLd(homeStructuredData),
-        }}
-      />
-      <div className="hero-about-bg">
-        <HeroSection latestNews={heroNews} />
-        {/* 著名人企画はチケット販売と直結する導線なので Hero の直後に置く。
-            背景は持たせず、Hero と ABOUT を包む .hero-about-bg のグラデーションを透かす */}
-        <SpecialGuestSection />
-        <AboutSection />
-      </div>
-      <NewsSection newsList={newsList} />
-      <FeaturedEvents />
-    </main>
+    <div>
+      <main id="content" tabIndex={-1} className="overflow-x-clip focus-visible:outline-none">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(homeStructuredData),
+          }}
+        />
+        <div className="hero-about-bg">
+          <HeroSection latestNews={heroNews} />
+          {/* 著名人企画はチケット販売と直結する導線なので Hero の直後に置く。
+              背景は持たせず、Hero と ABOUT を包む .hero-about-bg のグラデーションを透かす */}
+          <SpecialGuestSection />
+          <AboutSection />
+        </div>
+        <NewsSection newsList={newsList} />
+        <FeaturedEvents />
+      </main>
+    </div>
   );
 }
 
