@@ -62,7 +62,9 @@ export default async function EventsPage() {
         fallback はただのプレースホルダではなく「クエリ無しで来たときの完成形」である。
         bailout した境界の fallback はサーバーで描かれて静的HTMLに残るため、ここへ既定の
         ビューを置くと企画カードのリンクがHTMLに載り、/events がクロール経路として機能する。
-        クエリ無しなら本描画と同一マークアップになるので、差し替わっても見た目は動かない。
+        構造は本描画と同じだが、**並び順は一致しない。** 本描画は来場者ごとにシャッフルする
+        （#409。EventsContent / useShuffleSeed）。fallback はシードを持たないサーバーで描かれるため
+        microCMS の順（公開日の新しい順）のまま残る。差し替わるときに先頭のカードが入れ替わる。
 
         DEFAULT_EVENT_FILTERS は絞り込み無しなので filterEvents() は恒等写像になる。
         呼ばずに events をそのまま渡している。**全件を渡すが、静的HTMLへ描かれるのは

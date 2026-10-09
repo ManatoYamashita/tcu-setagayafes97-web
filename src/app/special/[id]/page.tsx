@@ -149,8 +149,14 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
     })),
   };
 
+  /*
+   * ルートを Fragment ではなく div にしていること。Fragment だと先頭の JSON-LD（寸法0で
+   * 飛ばされる）の次の main がページの先頭要素になり、Next.js がサイト内遷移の最後に呼ぶ
+   * focus() で main の上端が sticky Header の裏へ潜る（#429。
+   * docs/frontend/landmarks-and-skip-link.md「ページの先頭要素を main にしない」）。
+   */
   return (
-    <>
+    <div>
       {/*
         構造化データ。下書きプレビューでは出さない。
         公開前の内容を機械可読な形で置く必要がなく、noindex との整合も取れる
@@ -260,6 +266,6 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
       </main>
 
       {draft && <DraftPreviewBanner />}
-    </>
+    </div>
   );
 }

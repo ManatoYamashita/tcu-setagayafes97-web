@@ -139,6 +139,10 @@
 - **[events-search.md](./frontend/events-search.md)** - `/events` の検索と絞り込み（正規化・建物導出・3段カスケード）
   - **正規化は `normalizeText()` の1本に集約する。** 別々に正規化すると「検索では出るのにフィルタでは落ちる」
 - **[events-special-banner.md](./frontend/events-special-banner.md)** - `/events` 冒頭の音楽ポスター風著名人企画バナー（文字のグルーピング・画像・上角・小画面の配置）
+- **[about-past-festivals.md](./frontend/about-past-festivals.md)** - `/about` 最下部の「過去の世田谷祭」（歴代サイトのサムネイル一覧。出典・欠番・上端基準の切り抜き。#422）
+- **[special-guest-section.md](./frontend/special-guest-section.md)** - トップと `/events` 最下部の著名人企画告知セクション（写真を画面の左端へ広げる・ワイプ・白塗りロゴ・チケットの要約。#414 / #419）
+  - **チケットは券種を必ず両方載せる**
+  - **白塗りロゴを `SpecialEventBanner` に渡さない**（白抜きにすると文字が塊になる）
 - **[events-semantic-search.md](./frontend/events-semantic-search.md)** - `/events` の意味検索（第4段・TypeSafe Jev。#253）
   - **足切りは `has_match`。`confidence` を使ってはいけない**
   - **来場者の検索語は米国の TypeSafe へ送られる。** 費用の歯止めはプリペイド $5（カード登録で外れる）
@@ -148,6 +152,7 @@
   - **lg 未満で追従させるのは60pxのバーだけ。** 全項目を追従させると開いた瞬間に画面の7割を占める
 - **[static-html-and-search-params.md](./frontend/static-html-and-search-params.md)** - `useSearchParams()` と静的 HTML（#156）
   - **境界を書かないとエラーにならず、いちばん近い `loading.tsx` が代役になって本体が静的 HTML から消える**
+  - **本描画は来場者ごとにシャッフルするので、fallback と並び順は一致しない（#409）。** サーバーでは並べ替えない（ISR で同じ順番が全員に配られるため）
 - **[contact-form.md](./frontend/contact-form.md)** - お問い合わせフォームの送信可否と防御（#260 / #261）
   - **設定が欠けていたら成功を返さない。** 2026-09-21 まで本番は1通も送らず「送信完了」と表示していた
 - **[layout-e2e.md](./frontend/layout-e2e.md)** - 実ブラウザの再発防止装置（Playwright。盤面 / ランドマーク / 404 / `/events` / オープナー）。一覧のずれは `check:e2e-guards` が落とす

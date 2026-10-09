@@ -70,8 +70,10 @@ export function NewsContent({ initialNews }: NewsContentProps) {
       </div>
 
       {/* お知らせ一覧 */}
+      {/* grid-cols-1 は必須。列指定が無いと暗黙の auto トラックがカードの最小内容幅（バッジと日付の行）まで
+          広がり、320px で横にはみ出す（#425。minmax(0, 1fr) なら親の幅に収まる） */}
       {filteredNews.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filteredNews.map((news) => (
             <NewsCard key={news.id} news={news} />
           ))}

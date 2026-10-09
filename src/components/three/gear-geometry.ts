@@ -1,5 +1,7 @@
 import * as THREE from "three";
 
+import { GEAR_PROFILE, gearCornerPoints, type GearPoint } from "@/lib/gear-profile";
+
 interface GearParams {
   teeth?: number;
   outerRadius?: number;
@@ -9,9 +11,10 @@ interface GearParams {
 }
 
 export const GEAR_DEFAULTS = {
-  teeth: 8,
-  outerRadius: 2.0,
-  innerRadius: 1.55,
+  // 歯形（歯数・外径・内径）の定義は src/lib/gear-profile.ts にある
+  teeth: GEAR_PROFILE.teeth,
+  outerRadius: GEAR_PROFILE.outerRadius,
+  innerRadius: GEAR_PROFILE.innerRadius,
   holeRadius: 0.65,
   depth: 1.1,
 } as const;
@@ -28,30 +31,12 @@ export function createGearGeometry({
   depth = GEAR_DEFAULTS.depth,
 }: GearParams = {}): THREE.ExtrudeGeometry {
   const shape = new THREE.Shape();
-  const anglePerTooth = (Math.PI * 2) / teeth;
-  // 歯1つを4分割: 歯底→歯先立ち上がり→歯先→歯先立ち下がり
-  const toothTop = anglePerTooth * 0.5;
-  const toothGap = anglePerTooth * 0.045;
-
-  // 全コーナー座標を収集（1歯あたり4点）
-  const pts: [number, number][] = [];
-  for (let i = 0; i < teeth; i++) {
-    const base = i * anglePerTooth;
-    pts.push([Math.cos(base) * innerRadius, Math.sin(base) * innerRadius]);
-    pts.push([Math.cos(base + toothGap) * outerRadius, Math.sin(base + toothGap) * outerRadius]);
-    pts.push([
-      Math.cos(base + toothGap + toothTop) * outerRadius,
-      Math.sin(base + toothGap + toothTop) * outerRadius,
-    ]);
-    pts.push([
-      Math.cos(base + toothGap + toothTop + toothGap) * innerRadius,
-      Math.sin(base + toothGap + toothTop + toothGap) * innerRadius,
-    ]);
-  }
+  // 全コーナー座標（1歯あたり4点: 歯底→歯先立ち上がり→歯先→歯先立ち下がり）
+  const pts = gearCornerPoints({ teeth, outerRadius, innerRadius });
 
   const n = pts.length;
   const r = 0.04; // コーナーをほぼ直角に（角張った台形歯）
-  const lerp = (a: [number, number], b: [number, number], t: number): [number, number] => [
+  const lerp = (a: GearPoint, b: GearPoint, t: number): [number, number] => [
     a[0] + (b[0] - a[0]) * t,
     a[1] + (b[1] - a[1]) * t,
   ];

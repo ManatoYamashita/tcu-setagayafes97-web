@@ -149,8 +149,14 @@ export default async function NewsPage({ params }: NewsPageProps) {
   const newsCtaClassName =
     "inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary-600 px-6 py-3 font-semibold text-white shadow-md transition-[background-color,box-shadow,scale] duration-150 ease-out hoverable:hover:bg-primary-700 hoverable:hover:shadow-lg focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 active:scale-[0.96] motion-reduce:transition-none motion-reduce:active:scale-100";
 
+  /*
+   * ルートを Fragment ではなく div にしていること。Fragment だと先頭の JSON-LD（寸法0で
+   * 飛ばされる）の次の main がページの先頭要素になり、Next.js がサイト内遷移の最後に呼ぶ
+   * focus() で main の上端が sticky Header の裏へ潜る（#429。
+   * docs/frontend/landmarks-and-skip-link.md「ページの先頭要素を main にしない」）。
+   */
   return (
-    <>
+    <div>
       {/*
         構造化データ。下書きプレビューでは出さない。
         公開前の内容を機械可読な形で置く必要がなく、noindex との整合も取れる
@@ -320,6 +326,6 @@ export default async function NewsPage({ params }: NewsPageProps) {
       </main>
 
       {draft && <DraftPreviewBanner />}
-    </>
+    </div>
   );
 }

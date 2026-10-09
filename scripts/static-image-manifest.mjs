@@ -44,6 +44,54 @@
  * 手で二重に書かず `source` フィールドで明示する。
  */
 
+/**
+ * 過去の世田谷祭（/about の PastFestivalsSection）のサムネイル。
+ *
+ * 原画像は archive.setagayafes.org/img/<序数>.png を幅 960px の WebP へ縮めたもの。
+ * 第94回・第95回はアーカイブ側の画像が 404 だったため、各回のサイトを
+ * 1000x678 で撮影して補った（docs/frontend/about-past-festivals.md）。
+ *
+ * 原画の縦横比は回ごとに違う（836x883 〜 1448x1086）。グリッドで揃えるため 4:3 へ
+ * 切り抜く。回数やロゴはヘッダーにあるので、切り抜きの基準は上端（`position: "top"`）。
+ *
+ * 表示幅が最も広くなるのは 2列の上限 viewport 639px で、1枚 約272px。
+ * その x 2 を切り上げて 560x420 を box とする。
+ */
+const PAST_FESTIVAL_THUMBNAILS = [
+  "96th",
+  "95th",
+  "94th",
+  "93rd",
+  "92nd",
+  "91st",
+  "90th",
+  "89th",
+  "88th",
+  "86th",
+  "85th",
+  "84th",
+  "83rd",
+  "82nd",
+  "81st",
+  "80th",
+  "79th",
+  "78th",
+  "77th",
+  "76th",
+].map((ordinal) => ({
+  path: `public/images/past-festivals/${ordinal}.avif`,
+  source: `assets/source/images/past-festivals/${ordinal}.webp`,
+  box: { width: 560, height: 420 },
+  fit: "cover",
+  position: "top",
+  // スクリーンショットは文字を含むので、輪郭が滲まない 4:4:4 で焼く
+  kind: "art",
+  quality: 50,
+  // 実測の最大は 84th の 29,534 B（2026-10-07）。全回に同じ上限を掛ける
+  maxBytes: 32000,
+  note: `PastFestivalsSection（/about）の ${ordinal} のサムネイル`,
+}));
+
 /** `role: "app"`。`AppImage` からのみ描かれる画像。AVIF へ焼いて原寸のまま配る */
 const APP_IMAGES = [
   {
@@ -150,8 +198,9 @@ const APP_IMAGES = [
   {
     path: "public/images/special/mon7a.avif",
     source: "assets/source/images/special/mon7a.webp",
-    // 原画 1280x1280。`imageSizes` は lg で 460px に収束する（SpecialGuestSection の
-    // コメント参照）。460 x 2 = 920。
+    // 原画 1280x1280。歯車形の写真は md 以上で 6/12 列、max-w-6xl で 576px に頭打ち
+    // （SpecialGuestSection の `imageSizes`）。576 x 2 = 1152 に対し 920 なので、
+    // lg の DPR2 では 1.25 倍に引き伸ばされる。ファーストビュー予算との兼ね合いで据え置き。
     box: { width: 920, height: 920 },
     fit: "inside",
     kind: "photo",
@@ -168,6 +217,19 @@ const APP_IMAGES = [
     fit: "inside",
     kind: "art",
     // 旧 `quality={75}`。見出しの代替なので輪郭が痩せると読めない。
+    quality: 60,
+    maxBytes: 3200,
+    note: "SpecialEventBanner の出演者名ロゴ（brightness-0 invert で白抜きにして使う）",
+  },
+  {
+    path: "public/images/special/mon7a-logo-filled.avif",
+    // 上の mon7a-logo.webp の、黒縁に囲まれた透明部分を白で塗った版（#419）。
+    // 写真や紫の背景に重ねても文字の中身が抜けないようにするため。
+    source: "assets/source/images/special/mon7a-logo-filled.webp",
+    // 原画 1524x405。`lg:w-[260px]` x 2 = 520 だが、旧ロゴと同じ箱に揃えて輪郭を保つ。
+    box: { width: 720, height: 191 },
+    fit: "inside",
+    kind: "art",
     quality: 60,
     maxBytes: 3200,
     note: "SpecialGuestSection の出演者名ロゴ（h2 のアクセシブル名を alt が担う）",
@@ -207,6 +269,76 @@ const APP_IMAGES = [
     maxBytes: 12500,
     note: "歯車の装飾（NewsSectionInteractive）",
   },
+  {
+    path: "public/images/committee/committee-kids-event.avif",
+    source: "assets/source/images/committee/committee-kids-event.webp",
+    // CommitteePhotoCollage（/about）。列幅の比は 1 : 1.5 : 1。最も広くなるのは viewport 960〜1023px
+    // （max-w-4xl に sm の余白で中身 832px）で、左右の列が 226px、中央列が 339px（2026-10-06 実測）。
+    // その x 2 を切り上げて左右 460 / 中央 680 を box の幅とし、高さは縦横比から出す。
+    // 原画 1108x1477（3:4）。
+    box: { width: 460, height: 614 },
+    fit: "inside",
+    kind: "photo",
+    quality: 50,
+    maxBytes: 52500,
+    note: "CommitteePhotoCollage の左列の上",
+  },
+  {
+    path: "public/images/committee/committee-sparklers.avif",
+    source: "assets/source/images/committee/committee-sparklers.webp",
+    // 原画 1200x800（3:2）。
+    box: { width: 460, height: 307 },
+    fit: "inside",
+    kind: "photo",
+    quality: 50,
+    maxBytes: 13000,
+    note: "CommitteePhotoCollage の左列の下",
+  },
+  {
+    path: "public/images/committee/committee-beach.avif",
+    source: "assets/source/images/committee/committee-beach.webp",
+    // 原画 1800x1200（3:2）。
+    box: { width: 680, height: 454 },
+    fit: "inside",
+    kind: "photo",
+    quality: 50,
+    maxBytes: 45500,
+    note: "CommitteePhotoCollage の中央列の上",
+  },
+  {
+    path: "public/images/committee/committee-yakisoba.avif",
+    source: "assets/source/images/committee/committee-yakisoba.webp",
+    // 原画 858x1144（3:4。Instagram の画面の矢印とドットを切り落とした）。
+    box: { width: 680, height: 907 },
+    fit: "inside",
+    kind: "photo",
+    quality: 50,
+    maxBytes: 34000,
+    note: "CommitteePhotoCollage の中央列の下",
+  },
+  {
+    path: "public/images/committee/committee-school-event.avif",
+    source: "assets/source/images/committee/committee-school-event.webp",
+    // 原画 1477x1108（4:3）。
+    box: { width: 460, height: 345 },
+    fit: "inside",
+    kind: "photo",
+    quality: 50,
+    maxBytes: 32500,
+    note: "CommitteePhotoCollage の右列の上",
+  },
+  {
+    path: "public/images/committee/committee-meeting.avif",
+    source: "assets/source/images/committee/committee-meeting.webp",
+    // 原画 1200x900（4:3）。
+    box: { width: 460, height: 345 },
+    fit: "inside",
+    kind: "photo",
+    quality: 50,
+    maxBytes: 15000,
+    note: "CommitteePhotoCollage の右列の下",
+  },
+  ...PAST_FESTIVAL_THUMBNAILS,
 ];
 
 /**
@@ -284,7 +416,7 @@ export const FIRST_VIEW_IMAGES = [
   "public/images/brand/favicon-outline.avif",
   "public/images/photos/tcu-7.avif",
   "public/images/special/mon7a.avif",
-  "public/images/special/mon7a-logo.avif",
+  "public/images/special/mon7a-logo-filled.avif",
   "public/images/photos/setagayafe97-image.avif",
   "public/materials/geer1.avif",
   "public/materials/geers.avif",

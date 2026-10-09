@@ -239,7 +239,7 @@
 
 ### 10. About実装
 
-- [x] 委員長挨拶・理念ページルート（`/src/app/about/page.tsx`）を作成
+- [x] 委員長挨拶・理念ページルート（`/src/app/[locale]/about/page.tsx`）を作成。委員会の写真コラージュ（`CommitteePhotoCollage`）を追加（#413）
 - [x] 委員長挨拶コンテンツを実装（静的データまたはmicroCMS）
 - [x] 協賛企業一覧ページルート（`/src/app/about/sponsors/page.tsx`）を作成
 - [x] 協賛企業データをmicroCMS Informations APIから取得（category: sponsor）

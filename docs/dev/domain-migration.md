@@ -20,7 +20,7 @@
 
 > [!IMPORTANT]
 > **`setagayafes.org` 配下には9ホストが実在する**（証明書の透明性ログで確認、2026-09-03）。
-> `96th.` のほかに `about.`（実行委員会サイト）、`archive.`（第75〜95回）、`blog.`、
+> `96th.` のほかに `about.`（実行委員会サイト）、`archive.`（第75〜95回＋第96回の静的コピー。一覧は `/about` の「過去の世田谷祭」が引用。[about-past-festivals.md](../frontend/about-past-festivals.md)）、`blog.`、
 > `form.`、`link.`、そして**世田谷祭とは別の学園祭である `todorokifes.`（第13回等々力祭）**
 > がある。検索除外の対象と非対象は [`legacy-site-deindex.md`](./legacy-site-deindex.md) を参照。
 
@@ -38,7 +38,7 @@
 | WordPress の `siteurl` / `home`                        | **完了**（`https://96th.setagayafes.org`）                          |
 | `setagayafes.org` の DNS 切替                          | **完了**（Vercel）                                                  |
 | `96th.` の `X-Robots-Tag`                              | **完了**（2026-08-27、#111。静的画像・CSS・404 にも付与を実測）     |
-| `about.` `archive.` `blog.` `form.` `link.` の noindex | **未実施**（#164、[手順](./legacy-site-deindex.md)）                |
+| `about.` `archive.` `blog.` `form.` `link.` の noindex | **完了**（2026-09-04、#164、[記録](./legacy-site-deindex.md)）      |
 | `archive.` に第96回の静的コピー                        | **確認**（2026-09-03、`/96th/` が 200。WordPress 版とは別実体）     |
 | 96th 本文の `/96th/` `/95th/` 画像URL残存              | **未対応**（apex は Vercel のため 403。画像切れ。下記「残作業」）   |
 

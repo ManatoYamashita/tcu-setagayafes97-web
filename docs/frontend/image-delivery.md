@@ -493,7 +493,7 @@ pnpm images:optimize --force    # 出力が新しくても焼き直す
 pnpm check:images               # manifest の契約を検査する（CI の Static Checks と同じ）
 ```
 
-- **原画像は `assets/source/` に置く。`public/` には配信するものだけを置く。**
+- **原画像は `assets/source/` に置く。`public/` には配信するものだけを置く。** リポジトリは公開なので、写真はメタデータ（EXIF の撮影位置など）を落としてから置く（`sharp` は既定で書き出さない。#413）。
   `public/` のバイトはそのまま「配信されるバイト」なので、予算検査が曖昧にならない。
   参照ゼロだった画像 866,691 B も `assets/source/` へ退避し、デプロイ物から 0.87 MB 減らした
 - **生成物はコミットする。ビルド時に焼かない。** `public/` は Vercel のビルドキャッシュの

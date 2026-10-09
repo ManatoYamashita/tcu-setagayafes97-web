@@ -10,22 +10,27 @@ import { SpecialGuestMotion } from "./SpecialGuestMotion";
 /**
  * 著名人企画（スペシャル企画）の告知セクション
  *
- * 出演者ロゴ・バナー画像・チケット販売情報を見せ、著名人企画LPへ誘導します。
- * トップページ（Hero の直下）と企画一覧ページ（/events の最下部）の2箇所で使います。
+ * 出演者ロゴ・写真・日時と会場・チケットの要点・入場の条件を見せ、
+ * 著名人企画LPへ誘導します。トップページ（Hero の直下）と企画一覧ページ（/events の最下部）の
+ * 2箇所で使います。チケットは券種を必ず両方載せます（理由は src/data/special-banner.ts）。
  *
  * 文言は microCMS ではなく src/data/special-banner.ts が持ちますが、リンク先が実在するか
  * どうかだけは getSpecialEventById() で確認します。ID が変わって LP に到達できない場合は、
  * リンク切れを見せずにセクションごと引っ込めます。
  *
- * レイアウトは画面幅で3段階に変わります。
+ * レイアウトは画面幅で2段階に変わります。
  *
- * - 〜767px: 縦積み。画像が上、テキストが下
- * - 768〜1023px: 横並びで画像が右
- * - 1024px〜: 横並びで画像が左
+ * - 〜767px: 縦積み。写真が上、テキストが下
+ * - 768px〜: 12列グリッドで写真が左 6列、テキストが右 6列。
+ *   見出し（ロゴ＋横罫）だけを左へ引き出して写真の右端に重ねる
  *
- * DOM 順は「見出し → 明細 → CTA → 画像」で固定し、見た目の入れ替えは
- * `lg:flex-row-reverse` と画像側の `order-first` だけで行います。DOM を並べ替えると
- * h2 より先に画像が読み上げられ、セクションの主題が伝わらなくなるためです。
+ * 写真は切り抜かない四角形です。トップページ（`hero`）では画面の左端まで広げます
+ * （下の「写真を画面の左端へ広げる」）。入場モーション（SpecialGuestMotion）は窓を左端から
+ * 右へ開きます。モーション軽減時や JS が無いときは最初から全体が見えます。
+ *
+ * DOM 順は「見出し → 本文 → チケット → 注記 → CTA → 写真」で固定し、見た目の入れ替えは写真側の
+ * `order-first` だけで行います。DOM を並べ替えると h2 より先に写真が読み上げられ、
+ * セクションの主題が伝わらなくなるためです。
  */
 
 /**
@@ -56,18 +61,19 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
     return null;
   }
 
-  const { label, name, nameLogo, image, details, ctaLabel } = specialBanner;
+  const { category, name, nameLogoFilled, image, headline, tickets, notes, ctaLabel } =
+    specialBanner;
   const isSheet = variant === "sheet";
 
   /*
-   * バナー画像の実描画幅は variant で変わる。/events は PageSheetLayout の
-   * `mx-*` と `px-*` が内側に二重で効くため、横方向の余白がトップページより
-   * 片側 32px（lg では 48px）多い。同じ sizes を使うと srcset の過大な候補を
-   * 掴むので分ける。lg は inner の max-w-5xl が効いて両者とも 460px に収束する。
+   * 写真の実描画幅は variant で変わる。
+   * - hero: 画面の左端から広げるので、md 以上は画面の半分、縦積みでは画面幅から右の余白を引いた幅。
+   * - sheet: /events は PageSheetLayout の `mx-*` `px-*` と呼び出し側の container の `px-4` が重なる。
+   *   写真の列幅は md 以上で 6/12（= 0.5）、max-w-6xl で 576px に頭打ち。縦積みは max-w-sm（384px）。
    */
   const imageSizes = isSheet
-    ? "(min-width: 1024px) 460px, (min-width: 768px) 36vw, min(384px, calc(100vw - 6rem))"
-    : "(min-width: 1024px) 460px, (min-width: 768px) 42vw, min(384px, calc(100vw - 2rem))";
+    ? "(min-width: 1024px) min(576px, calc((100vw - 10rem) * 0.5)), (min-width: 768px) calc((100vw - 8rem) * 0.5), min(384px, calc(100vw - 6rem))"
+    : "(min-width: 768px) 50vw, 100vw";
 
   return (
     <section
@@ -81,48 +87,73 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
           : // z-10 は必須。直後の ABOUT が `-mt-48` でこのセクションへ 192px 潜り込み、
             // その中の装飾blob（`absolute inset-0`）が上に乗るため、Hero と同じ層へ上げる。
             // content-visibility はフォールド直下では効果が無く CLS だけ残るので付けない
-            "relative z-10 py-20 lg:py-28"
+            // overflow-x-clip は、写真を左へ広げる `50vw` がクラシックなスクロールバーの幅だけ
+            // 画面からはみ出して横スクロールを生むのを防ぐため（y 方向は切らない）
+            "relative z-10 overflow-x-clip py-20 lg:py-28"
       )}
     >
       {/* 入場モーション。DOM は出さず、下の data 属性を探して animate する */}
       <SpecialGuestMotion />
 
       <div className={isSheet ? undefined : "container mx-auto px-4"}>
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-10 md:flex-row md:items-center md:gap-12 lg:flex-row-reverse lg:gap-16">
-          {/* テキスト側。直下の子（見出し → 明細 → CTA）が入場の stagger 単位になる */}
-          <div className="w-full md:flex-1" data-special-guest-stagger>
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-y-8 md:grid-cols-12 md:gap-y-0">
+          {/* テキスト側。直下の子（見出し → 本文 → チケット → 注記 → CTA）が入場の stagger 単位になる。
+              写真より前面に置くため relative z-10。見出しだけが写真へ重なる */}
+          <div
+            className="relative z-10 md:col-start-7 md:col-end-13 md:row-start-1 md:self-center md:pl-6 lg:pl-8"
+            data-special-guest-stagger
+          >
             {/* 見出し（トップページは Kaisei Opti を読み込まないため font-sans を明示する）。
-                出演者名はロゴ画像で、alt が見出しのアクセシブル名を担う */}
-            <h2 className="font-sans">
-              <span className="block text-xs font-bold tracking-[0.2em] text-primary-700 sm:text-sm">
-                {label}
-              </span>
-              <span className="mt-4 block">
-                <AppImage
-                  src={nameLogo.src}
-                  alt={name}
-                  width={nameLogo.width}
-                  height={nameLogo.height}
-                  sizes="(min-width: 1024px) 360px, (min-width: 640px) 300px, 240px"
-                  className="h-auto w-full max-w-[240px] sm:max-w-[300px] lg:max-w-[360px]"
-                />
-              </span>
+                出演者名はロゴ画像で、alt が見出しのアクセシブル名を担う。
+                md 以上では左の余白（pl）より大きく引き出し、ロゴの頭を写真の右端へ重ねる。
+                ロゴは内側を白で塗った版なので、暗い写真の上でも文字の中身が抜けない */}
+            <h2 className="flex items-center gap-4 font-sans md:-ml-12 lg:-ml-16">
+              <AppImage
+                src={nameLogoFilled.src}
+                alt={name}
+                width={nameLogoFilled.width}
+                height={nameLogoFilled.height}
+                sizes="(min-width: 1024px) 260px, (min-width: 768px) 200px, 220px"
+                className="h-auto w-[220px] shrink-0 md:w-[200px] lg:w-[260px]"
+              />
+              <span aria-hidden="true" className="h-px min-w-8 flex-1 bg-gray-900" />
             </h2>
 
-            <dl className="mt-8 border-y border-dotted border-primary-700/30">
-              {details.map((detail, index) => (
+            {/* 本文。左に縦書きの分類ラベル、右に日時と会場。
+                会場名（14字）が1行に収まるよう列幅に合わせて文字を詰める。
+                収まらないと「アリー｜ナ」のように語の途中で折り返す（768px / 1024px で実測） */}
+            <div className="mt-6 flex gap-4 lg:mt-8 lg:gap-5">
+              <p className="font-sans text-xs font-bold tracking-[0.2em] text-primary-700 [writing-mode:vertical-rl] sm:text-sm">
+                {category}
+              </p>
+              <p className="font-sans text-lg leading-[1.6] font-bold text-gray-900 md:text-base lg:text-lg xl:text-xl">
+                {headline.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </p>
+            </div>
+
+            {/* チケットの要点。券種は必ず両方並べる（片方だけだと購入資格を誤読される） */}
+            <dl className="mt-5 border-y border-dotted border-primary-700/30 lg:mt-6">
+              {tickets.map((ticket, index) => (
                 <div
-                  key={detail.term}
-                  className={
-                    index > 0 ? "border-t border-dotted border-primary-700/30 py-4" : "py-4"
-                  }
+                  key={ticket.term}
+                  className={cn(
+                    "grid grid-cols-[3.5rem_1fr] gap-x-3 py-3 sm:grid-cols-[4.5rem_1fr]",
+                    index > 0 && "border-t border-dotted border-primary-700/30"
+                  )}
                 >
                   <dt className="font-sans text-xs font-bold tracking-[0.1em] text-primary-700 sm:text-sm">
-                    {detail.term}
+                    {ticket.term}
                   </dt>
-                  <dd className="mt-2 font-sans text-sm leading-[1.75] text-gray-700 sm:text-base">
-                    {detail.lines.map((line) => (
-                      <span key={line} className="block">
+                  <dd className="font-sans text-sm leading-[1.7] text-gray-700">
+                    {ticket.lines.map((line, lineIndex) => (
+                      <span
+                        key={line}
+                        className={cn("block", lineIndex === 0 && "font-bold text-gray-900")}
+                      >
                         {line}
                       </span>
                     ))}
@@ -131,40 +162,67 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
               ))}
             </dl>
 
-            <Link
-              href={`/special/${event.id}`}
-              className="group mt-8 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition-colors hover:bg-primary-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
-            >
-              {ctaLabel}
-              <svg
-                className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
+            {/* 入場の条件 */}
+            <ul className="mt-3 space-y-0.5 font-sans text-xs leading-[1.7] text-gray-600">
+              {notes.map((note) => (
+                <li key={note} className="text-pretty">
+                  ※{note}
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-2 flex justify-end lg:mt-4">
+              <Link
+                href={`/special/${event.id}`}
+                className="group inline-flex min-h-12 items-center gap-2 font-sans text-sm font-semibold text-gray-900 hover:text-primary-700 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </Link>
+                <span className="border-b border-current pb-0.5">{ctaLabel}</span>
+                <svg
+                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 12h14M13 6l6 6-6 6"
+                  />
+                </svg>
+              </Link>
+            </div>
           </div>
 
-          {/* 画像側。縦積みのときだけ order で先頭へ出す */}
+          {/* 写真側。縦積みのときだけ order で先頭へ出す。
+              入場モーションが data-special-guest-wipe を目印に clip-path を書き換える（SSR では持たない）。
+
+              写真を画面の左端へ広げる（hero のみ）:
+              グリッドは中央寄せなので、グリッドの左端から画面の左端までは (100vw - グリッド幅) / 2。
+              グリッドアイテムの % マージンはそのグリッド領域の幅が基準になるため、
+              - 縦積み（1列 = グリッド幅 G）: ml = 50% - 50vw、幅 = G + 余白 = 50% + 50vw
+              - md 以上（6/12 列 = G/2）: ml = 100% - 50vw。幅は auto（stretch）で画面のちょうど半分
+              右端は列の境界のまま動かさない。
+              md 以上の高さはテキスト側の行の高さに合わせ、正方形の原画を横長に切り抜く。
+              顔が上寄りにあるので object-position は上から 30%。
+
+              sheet（/events）は白いシートの内側なので広げない */}
           <div
-            className="order-first w-full max-w-sm shrink-0 overflow-hidden rounded-3xl md:order-none md:w-[42%] md:max-w-none lg:w-[45%]"
-            data-special-guest-reveal
+            className={cn(
+              "relative order-first aspect-square md:order-none md:col-start-1 md:col-end-7 md:row-start-1",
+              isSheet
+                ? "mx-auto w-full max-w-sm md:max-w-none"
+                : "ml-[calc(50%-50vw)] w-[calc(50%+50vw)] md:ml-[calc(100%-50vw)] md:aspect-auto md:min-h-[28rem] md:w-auto"
+            )}
+            data-special-guest-wipe
           >
             <AppImage
               src={image.src}
               alt={image.alt}
-              width={image.width}
-              height={image.height}
+              fill
               sizes={imageSizes}
-              className="h-auto w-full"
+              className="object-cover object-[50%_30%]"
             />
           </div>
         </div>
