@@ -78,7 +78,7 @@ describe("decideMailerAction", () => {
    */
   it("本番で設定が欠けていたら受け付けない", () => {
     expect(decideMailerAction(["SMTP_HOST"], true)).toBe("reject");
-    expect(decideMailerAction(["SMTP_HOST", "CONTACT_TO_EMAIL"], true)).toBe("reject");
+    expect(decideMailerAction(["SMTP_HOST", "SMTP_PASS"], true)).toBe("reject");
   });
 
   it("本番以外ではログへ落として受け付ける（開発の利便）", () => {

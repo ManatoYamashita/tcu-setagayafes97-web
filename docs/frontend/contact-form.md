@@ -35,13 +35,40 @@
 
 ### 必要な環境変数
 
-`SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` / `CONTACT_TO_EMAIL`。
+`SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS`。
 1つでも欠けたら送らない。**欠けている名前をログへ出す**ので、Functions ログを見れば分かる。
+判定は `resolveMailConfig()`（`src/lib/contact-mail.ts`）が持ち、ユニットテストで縛ってある。
 
-- **`CONTACT_TO_EMAIL` に既定値を置かない。** 以前は `contact@setagayafes.com` へ落ちていたが、
-  このサイトのドメインは `setagayafes.org` であり、**届かない先へ静かに送る**形だった
+- **届け先は環境変数ではなく [`src/data/contact.ts`](../../src/data/contact.ts) が持つ**
+  （現在は委員会の `sfa.koho@gmail.com`。2026-10-05 決定）。サイト担当者の
+  `mail@yamashitamana.to` が **Bcc** で控えを受け取る（To / Cc だと「全員に返信」で来場者に見える）。`CONTACT_TO_EMAIL` は**もう読まない。**
+  以前は `contact@setagayafes.com`（存在しないドメイン）が既定値で、その後は環境変数が
+  どこにも登録されず1通も届かなかった。**宛先は秘密情報ではなく、レビューを通して変える値である**
 - **差出人は `CONTACT_FROM_EMAIL || SMTP_USER`。** 別ドメインの既定値を書くと SPF / DMARC で弾かれる
-- `SMTP_PORT=465` のときだけ SSL/TLS で張る（587 は STARTTLS なので `secure: false`）
+- `SMTP_PORT=465` のときだけ SSL/TLS で張る（587 は STARTTLS なので `secure: false`）。
+  数値でない `SMTP_PORT` は未設定として扱う
+- 値の前後の空白・改行は落とす（`echo` で流し込んだときの末尾改行対策）
+
+### Gmail から送る場合
+
+届け先が Gmail なので、**同じ Gmail アカウントを SMTP で認証して自分宛てに送る**のが最短である。
+差出人と認証が同じ `gmail.com` なので SPF / DKIM / DMARC で落ちない。
+
+| 変数        | 値                                                         |
+| ----------- | ---------------------------------------------------------- |
+| `SMTP_HOST` | `smtp.gmail.com`                                           |
+| `SMTP_PORT` | `465`                                                      |
+| `SMTP_USER` | `sfa.koho@gmail.com`                                       |
+| `SMTP_PASS` | **アプリパスワード**（Google アカウントの2段階認証が前提） |
+
+通常のログインパスワードでは認証できない。来場者のアドレスは `Reply-To` に入るので、
+受信箱で「返信」すれば来場者へ返る。
+
+### 来場者の入力を HTML として解釈させない
+
+`buildContactEmail()` は氏名・件名・本文などを**エスケープしてから** HTML へ埋め込む。
+2026-10-05 まではそのまま埋め込んでおり、フォームから委員会の受信箱へ
+**公式の体裁をしたリンクや画像を描かせられた。** 件名の改行も空白へ畳む（ヘッダの行を増やさせない）。
 
 ## 画面（`/info/contact`）
 
@@ -185,12 +212,28 @@ done
 | 下限を 3秒 → 10秒 へ上げる（人を弾く側へ行きすぎ） | 1本          |
 | 拒否の案内を「時間をおいて」へ戻す                 | 1本          |
 
+`src/lib/contact-mail.ts` 側（2026-10-05 実測。すべて赤くなる）:
+
+| 注入した退行                              | 落ちるテスト |
+| ----------------------------------------- | ------------ |
+| HTML のエスケープを外す                   | 2本          |
+| `CONTACT_TO_EMAIL` で届け先を上書きできる | 1本          |
+| `CONTACT_TO_EMAIL` を必須の設定へ戻す     | 7本          |
+| 件名の改行を残す                          | 1本          |
+| 値の `trim()` を外す                      | 2本          |
+| `secure` の条件を反転する                 | 2本          |
+
 ### 偽の SMTP で送信経路を確かめる
 
 本番の資格情報を使わずに、送信そのものを確かめられる。2026-09-21 に実施し、
-`MAIL FROM` が `SMTP_USER`、`RCPT TO` が `CONTACT_TO_EMAIL`、`Reply-To` が来場者のアドレスに
+`MAIL FROM` が `SMTP_USER`、`RCPT TO` が届け先（当時は `CONTACT_TO_EMAIL`）、`Reply-To` が来場者のアドレスに
 なることを確認した。手順は `docs/dev/testing.md` の方針どおり、**使い捨てのスクリプトで行い、
 リポジトリへは残していない**（最小のSMTPサーバーを立てて `next start` の環境変数を差し替えるだけ）。
+
+2026-10-05 に届け先を `src/data/contact.ts` へ移した後も同じ手で確かめた。
+**`CONTACT_TO_EMAIL=stale@example.com` を渡しても `RCPT TO` は `sfa.koho@gmail.com` だけ**で、
+件名の `\r\nBcc:` はヘッダにならず、HTML 部（quoted-printable をデコードした後）に
+生の `<a href=...>` / `<script>` は残らなかった。
 
 ## 関連
 
