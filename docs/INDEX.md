@@ -73,7 +73,7 @@
 - **[domain-migration.md](./dev/domain-migration.md)** - `setagayafes.org` を第97回の正規ドメインにした手順と転送一覧
   - **rewrite プロキシは採らない。** trailing-slash リダイレクトと衝突して無限ループになる
 - **[96th-db-backup.md](./dev/96th-db-backup.md)** - 第96回 WordPress DB バックアップの照合情報と安全な取扱い
-- **[seo-metadata.md](./dev/seo-metadata.md)** - metadata・canonical・OGP・構造化データ・sitemap の方針
+- **[seo-metadata.md](./dev/seo-metadata.md)** - metadata・canonical・OGP・構造化データ・sitemap の方針。**外国語ページは noindex で、hreflang は出さない**（#433）
   - **JSON-LD は必ず `serializeJsonLd()` を通す。** CMS 文字列の `</script>` で script 要素が閉じる
   - **sitemap の `lastModified` に `new Date()` を使わない。** 全件同一値だと Google は lastmod を無視する
 - **[legacy-site-deindex.md](./dev/legacy-site-deindex.md)** - 過去回サイト群を検索結果から恒久除外する運用（さくら + Search Console）

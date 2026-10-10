@@ -5,9 +5,9 @@
 - 正規URLは `https://setagayafes.org` とする。
 - ページごとの `title`、`description`、canonical、Open Graph、Twitter Card は `src/lib/metadata.ts` の `createPageMetadata` で生成する。
 - canonical は実際に公開するURLへ統一し、末尾スラッシュの有無による重複を作らない。
-- 多言語ページは各ロケールURLを canonical とし、`alternates.languages` に `ja`、`en`、`zh`、`ko`、`x-default` を出力する。
+- **検索に載せるのは日本語ページだけ。** en / zh / ko のページは `noindex, follow` とし、canonical も hreflang も出さない（`src/lib/metadata.ts` の `isIndexableLocale`。#433）。ページ自体は残っており、言語切替から開ける。詳細は下の「外国語ページの検索除外」を参照。
 - ページ固有のOG画像がない場合は `/ogp-v3.webp`（1200×630）を使用する。**画像を差し替えるときはファイル名ごと変える。** X・Facebook・LINE はOGP画像をURL単位でキャッシュするため、同じURLのまま中身だけ替えると旧画像がシェアに出続ける（2026-09-28、`ogp.webp` → `ogp-v2.webp`（#278）、テーマ表記の訂正で `ogp-v2.webp` → `ogp-v3.webp`）。参照元は `siteConfig.metadata.ogImage` の1箇所で、サイトマップもここを読む。microCMS画像を使用する場合は絶対URLへ変換する。
-- Google検索結果の正方形サムネイル候補には `/images/brand/search-thumbnail-97.webp`（1200×1200）を使用する。トップページと `/about` の `primaryImageOfPage` および画像サイトマップから同じURLを示す。OGP／Discover向けの `/ogp-v3.webp` とは用途を分け、置き換えない。
+- Google検索結果の正方形サムネイル候補には `/images/brand/search-thumbnail-97.webp`（1200×1200）を使用する。トップページと `/about` の `primaryImageOfPage`、`Organization.image`、`Event.image` の先頭、画像サイトマップから同じURLを示す。ヒントが割れると Google がどれを採るか読めなくなるため、横長の画像を指していた `Organization.image` と `Event.image` も #433 で揃えた。画像は背景を白にしてある（透過にすると、ダークモードの検索結果で黒い背景に沈んで見えなくなる）。OGP／Discover向けの `/ogp-v3.webp` とは用途を分け、置き換えない。
 - トップページは `WebSite` のJSON-LDで第97回の名称・説明・正規URLを明示する。
 - トップページのJSON-LDは `WebSite`、主催 `Organization`、祭全体の `Event` を `@graph` で接続する。サイト名は年次をまたいで一貫する簡潔な「世田谷祭」、第97回の正式名称（`第97回東京都市大学世田谷祭`）はページタイトルと `Event.name` で示し、`alternateName` には検索での別名を並べる。表記ルールは [`website-content.md`](../requires/website-content.md) を参照。
 - faviconはクロール可能な500×500 PNG（`/images/brand/favicon.png`）を安定URLで配信する。
@@ -22,6 +22,31 @@
 5. 反映まで数日以上かかる場合があるため、検索結果を継続観測する。
 
 `og:image` や `primaryImageOfPage` はGoogle検索結果のサムネイルを直接固定するものではない。採用画像と反映時期はGoogle側が決定する。
+
+## 外国語ページの検索除外
+
+2026-10-10、日本語のクエリ「都市大 世田谷祭」のサイトリンクに、
+`/zh/about`（「第97届东京都市大学世田谷祭」）が混ざっているのを観測した（#433）。
+当時の hreflang は、`<link rel="alternate">`・next-intl の `Link:` ヘッダ・サイトマップの
+すべてで双方向に正しく出ていた。それでも混ざった理由は2つある。
+
+- hreflang は Google にとってヒントでしかなく、サイトリンクでは言語版が置き換わらないことがある
+- 漢字のクエリ「世田谷祭」は、中国語ページの本文にもそのまま当たる
+
+確実に除外できるのは noindex だけなので、外国語ページはすべて noindex にした。
+外国語のクエリでも日本語ページが出るようになるが、これは承知のうえで選んだ。
+
+| 層             | 実装                                                              |
+| -------------- | ----------------------------------------------------------------- |
+| メタタグ       | `createPageMetadata` が非 ja ロケールで `robots: noindex, follow` |
+| `Link:` ヘッダ | `src/i18n/routing.ts` の `alternateLinks: false`                  |
+| サイトマップ   | `src/lib/sitemap-entries.ts` が日本語URLだけを出す                |
+
+- **`robots.txt` で `/en/` などを塞がない。** クロールを止めると Googlebot が noindex を読めず、
+  検索結果から消えなくなる（過去回サイトと同じ理屈）
+- 反映を早めたいときは、Search Console の URL 検査で外国語ページを再クロールさせる。
+  急ぐ場合は、削除ツールで `https://setagayafes.org/zh/` などの接頭辞を一時的に非表示にする
+- 外国語ページを検索に戻すなら、3層すべてを戻したうえで hreflang の相互参照を復元する
 
 ## 過去回サイト群の検索除外
 
@@ -72,9 +97,8 @@
   `src/lib/sitemap-entries.ts` の `STATIC_PAGE_LAST_MODIFIED` に日付を明示し、文面を
   意味のある形で更新したら手で上げる。CMS を読む一覧ページは記事の `updatedAt` の
   最大値から導く。どちらでもないページは lastmod を省略する（誤った値より無いほうがよい）。
-- 多言語ページは `LOCALIZED_PATHNAMES` を唯一の出典として全ロケール分のURLを出し、
-  各件に **自分自身を含む** 全言語の `alternates.languages` を持たせる。Next.js の
-  直列化は自己参照を補完しない。
+- **日本語のURLだけを載せる。** 外国語ページは noindex なので、載せると Search Console が
+  「送信されたURLに noindex タグが追加されています」と警告する。hreflang（`xhtml:link`）も出さない（#433）。
 - `priority` と `changeFrequency` は Google が無視する。チューニングしない。
 - 302転送元の `/special`は載せない。Search Console が
   「リダイレクトあり」として除外するため。

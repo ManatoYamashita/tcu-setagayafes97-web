@@ -20,6 +20,14 @@ export function serializeJsonLd(value: unknown): string {
   return JSON.stringify(value).replace(/</g, "\\u003c");
 }
 
+/**
+ * 検索結果のサムネイル候補（正方形 1200×1200、背景は白）
+ *
+ * Google のサムネイルは強制できず、指定できるのはヒントだけである。ヒントが割れると
+ * どれが採られるか読めなくなるため、`primaryImageOfPage`・`Organization.image`・
+ * `Event.image` の先頭をこの画像へ揃える（#433）。`og:image` は SNS カード用の
+ * 横長 `/ogp-v3.webp` のまま残す（`docs/dev/seo-metadata.md`）。
+ */
 function createSearchThumbnailNode() {
   const imageUrl = absoluteSiteUrl(siteConfig.metadata.searchThumbnail);
 
@@ -91,7 +99,7 @@ export function createOrganizationNode() {
       width: 500,
       height: 500,
     },
-    image: absoluteSiteUrl(siteConfig.metadata.ogImage),
+    image: absoluteSiteUrl(siteConfig.metadata.searchThumbnail),
     sameAs: Object.values(siteConfig.sns),
     address: POSTAL_ADDRESS,
   };
@@ -105,7 +113,11 @@ export function createFestivalEventNode() {
     alternateName: `第${siteConfig.edition}回世田谷祭`,
     description: siteConfig.description,
     url: siteUrl,
-    image: [absoluteSiteUrl(siteConfig.metadata.ogImage)],
+    // 正方形を先頭に置く。Google の Event ガイドは複数比率の列挙を推奨している
+    image: [
+      absoluteSiteUrl(siteConfig.metadata.searchThumbnail),
+      absoluteSiteUrl(siteConfig.metadata.ogImage),
+    ],
     startDate: `${siteConfig.dates.day1}T${siteConfig.openTime}:00+09:00`,
     endDate: `${siteConfig.dates.day2}T${siteConfig.closeTime}:00+09:00`,
     eventStatus: "https://schema.org/EventScheduled",

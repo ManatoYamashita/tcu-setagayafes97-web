@@ -91,6 +91,22 @@ describe("createHomeStructuredData", () => {
     expect(page.primaryImageOfPage.width).toBe(1200);
     expect(page.primaryImageOfPage.height).toBe(1200);
   });
+
+  /**
+   * サムネイルのヒントが割れると、Google がどれを採るか読めなくなる（#433）。
+   * Organization と Event も同じ正方形画像を先頭で指す。
+   */
+  it("Organization と Event の画像も検索結果用の正方形画像を先頭にする", () => {
+    const graph = createHomeStructuredData()["@graph"];
+    const thumbnail = /\/images\/brand\/search-thumbnail-97\.webp$/;
+    const organization = graph.find((node) => node["@type"] === "Organization") as {
+      image: string;
+    };
+    const event = graph.find((node) => node["@type"] === "Event") as { image: string[] };
+
+    expect(organization.image).toMatch(thumbnail);
+    expect(event.image[0]).toMatch(thumbnail);
+  });
 });
 
 describe("createAboutStructuredData", () => {

@@ -56,8 +56,10 @@ export default function proxy(request: NextRequest) {
  *
  * 2. `:path*` は `/ja/:path*` 以外で使わない。
  *    `/(en|zh|ko)/about/:path*` のような書き方は、対応ページが存在しない
- *    `/en/about/sponsors` まで拾ってしまう。ミドルウェアを通過した404には
- *    hreflang の `Link:` ヘッダが付き、検索エンジンへ誤った代替情報を送る。
+ *    `/en/about/sponsors` まで拾ってしまう。かつてはミドルウェアを通過した404に
+ *    hreflang の `Link:` ヘッダが付き、検索エンジンへ誤った代替情報を送っていた。
+ *    このヘッダは #433 で止めた（`src/i18n/routing.ts` の `alternateLinks: false`）が、
+ *    存在しないページをミドルウェアへ通す理由も無いため、規則は残す。
  *
  * 3. 多言語対応ページを増やすときは `src/i18n/localized-pathnames.ts` の
  *    `LOCALIZED_PATHNAMES` も更新すること。Next.js の制約により matcher は

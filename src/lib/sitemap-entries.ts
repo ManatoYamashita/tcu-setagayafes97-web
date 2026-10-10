@@ -1,9 +1,6 @@
 import type { MetadataRoute } from "next";
 
 import { siteConfig } from "@/data/site";
-import { LOCALIZED_PATHNAMES } from "@/i18n/localized-pathnames";
-import { routing } from "@/i18n/routing";
-import { buildLocalePath } from "@/lib/metadata";
 
 /**
  * 静的ページのサイトマップ項目
@@ -12,14 +9,16 @@ import { buildLocalePath } from "@/lib/metadata";
  * `src/app/` 配下にはテストを置けない（ルートとして解釈される）ため、
  * 検査したい組み立て処理はここへ置く。
  *
+ * **日本語のURLだけを載せる。** en / zh / ko のページは noindex にしてあり
+ * （`src/lib/metadata.ts` の `isIndexableLocale`。#433）、noindex のURLを
+ * サイトマップへ載せると Search Console が「送信されたURLに noindex タグが追加されています」
+ * として警告する。hreflang（`xhtml:link`）も同じ理由で出さない。
  */
 export interface StaticPageEntry {
   pathname: string;
   changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
   priority: number;
   images?: readonly string[];
-  /** `LOCALIZED_PATHNAMES` に含まれ、ロケール別URLを出すページ */
-  localized?: boolean;
 }
 
 /**
@@ -57,42 +56,25 @@ export const STATIC_PAGES: readonly StaticPageEntry[] = [
   { pathname: "/events", changeFrequency: "daily", priority: 0.9 },
   { pathname: "/special", changeFrequency: "daily", priority: 0.8 },
   { pathname: "/timetable", changeFrequency: "daily", priority: 0.8 },
-  { pathname: "/access", changeFrequency: "weekly", priority: 0.7, localized: true },
+  { pathname: "/access", changeFrequency: "weekly", priority: 0.7 },
   { pathname: "/info", changeFrequency: "daily", priority: 0.8 },
-  { pathname: "/info/guide", changeFrequency: "weekly", priority: 0.6, localized: true },
-  { pathname: "/info/faq", changeFrequency: "weekly", priority: 0.6, localized: true },
+  { pathname: "/info/guide", changeFrequency: "weekly", priority: 0.6 },
+  { pathname: "/info/faq", changeFrequency: "weekly", priority: 0.6 },
   { pathname: "/info/pamphlet", changeFrequency: "weekly", priority: 0.5 },
   {
     pathname: "/about",
     changeFrequency: "monthly",
     priority: 0.5,
     images: [siteConfig.metadata.searchThumbnail],
-    localized: true,
   },
   { pathname: "/about/sponsors", changeFrequency: "weekly", priority: 0.6 },
-  { pathname: "/info/contact", changeFrequency: "monthly", priority: 0.5, localized: true },
-  { pathname: "/about/privacy", changeFrequency: "yearly", priority: 0.3, localized: true },
+  { pathname: "/info/contact", changeFrequency: "monthly", priority: 0.5 },
+  { pathname: "/about/privacy", changeFrequency: "yearly", priority: 0.3 },
 ];
 
 function absoluteUrl(pathname: string): string {
   const base = siteConfig.metadata.siteUrl.replace(/\/$/, "");
   return pathname === "/" ? base : `${base}${pathname}`;
-}
-
-/**
- * hreflang の相互参照
- *
- * Google は「各URLが自分自身を含む全言語版を列挙する」ことを要求する。
- * Next.js のサイトマップ直列化は渡した言語をそのまま `<xhtml:link>` へ並べるだけで
- * 自己参照を補完しないため、全ロケール分を明示的に入れる。
- */
-function localeAlternates(pathname: string): Record<string, string> {
-  return {
-    ...Object.fromEntries(
-      routing.locales.map((locale) => [locale, absoluteUrl(buildLocalePath(pathname, locale))])
-    ),
-    "x-default": absoluteUrl(buildLocalePath(pathname, routing.defaultLocale)),
-  };
 }
 
 export interface BuildStaticSitemapOptions {
@@ -121,32 +103,8 @@ export function buildStaticSitemapEntries({
       ...(page.images ? { images: page.images.map((image) => absoluteUrl(image)) } : {}),
     };
 
-    if (!page.localized) {
-      entries.push({ url: absoluteUrl(page.pathname), ...shared });
-      continue;
-    }
-
-    const alternates = { languages: localeAlternates(page.pathname) };
-    for (const locale of routing.locales) {
-      entries.push({
-        url: absoluteUrl(buildLocalePath(page.pathname, locale)),
-        ...shared,
-        alternates,
-      });
-    }
+    entries.push({ url: absoluteUrl(page.pathname), ...shared });
   }
 
   return entries;
 }
-
-/**
- * `localized: true` を宣言したページが `LOCALIZED_PATHNAMES` と一致しているか
- *
- * 一致していないロケール付きURLを出すと `src/proxy.ts` の matcher 外になり、
- * サイトマップが 404 を宣言することになる。テストで固定する。
- */
-export function localizedStaticPathnames(): readonly string[] {
-  return STATIC_PAGES.filter((page) => page.localized).map((page) => page.pathname);
-}
-
-export { LOCALIZED_PATHNAMES };

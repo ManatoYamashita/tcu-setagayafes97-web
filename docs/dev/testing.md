@@ -204,13 +204,20 @@ SEO シグナル（`metadata.ts` / `structured-data.ts` / `sitemap-entries.ts`�
 | 退行させた内容                                           | 落ちたテスト                             |
 | -------------------------------------------------------- | ---------------------------------------- |
 | `buildLocalePath` がデフォルトロケールにも接頭辞を付ける | デフォルトロケールには接頭辞を付けない   |
-| `x-default` を非デフォルトロケールのURLにする            | x-default はデフォルトロケールと一致する |
 | `noindex` のときも canonical を出す                      | noindex のとき canonical を出さない      |
 | `serializeJsonLd` のエスケープを外す                     | `<` を退避して script 要素を閉じさせない |
 | `/about` の `@graph` から WebSite ノードを落とす         | 宙に浮いた `@id` 参照が無い              |
-| sitemap の hreflang から自己参照を落とす                 | 自分自身を含む（相互参照）               |
 | sitemap の `lastModified` を全件ビルド時刻へ戻す         | 全件が同一値ではない                     |
 | パンくずの `position` を 0 起点にする                    | position は 1 起点の連番である           |
+
+hreflang の行（`x-default` と sitemap の自己参照）は #433 で検査ごと撤去した。外国語ページを
+noindex にしたため、守る対象が「hreflang が正しいこと」から「外国語ページが索引されないこと」へ
+反転している。こちらの注入は 2026-10-10 に行った。
+
+| 退行させた内容                               | 落ちたテスト                                        |
+| -------------------------------------------- | --------------------------------------------------- |
+| `isIndexableLocale` が全ロケールを通す       | 日本語以外は noindex で canonical を出さない        |
+| sitemap に `/zh/about` と hreflang を1件足す | 外国語ロケールのURLを載せない / hreflang を出さない |
 
 `.md` の行数の検査（`scripts/assert-doc-line-budget.mjs`、#322）にも注入した（2026-09-30）。
 導入時点で18本が300行を超えていたため、そのときの行数を上限として記録するラチェットにしてある。
