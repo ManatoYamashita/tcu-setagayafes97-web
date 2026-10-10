@@ -7,6 +7,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 
 import { aboutConfig, type AboutPageContent } from "@/data/about";
+import { PHRASE_SEPARATOR } from "@/lib/phrase-break";
+import { applyPhraseBreaks } from "@/lib/phrase-break-dom";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -174,33 +176,47 @@ export function ChairpersonSection({
       }
 
       // ── テーマ解説: 行ごとに順番に表示 ──
-      if (briefRef.current) {
+      // 分割の前に文節の区切りを入れる（PhraseBreaker）。分割後の行には React の持ち主が
+      // いないため後からは入れられず、行の切れ目が「これま / で」のように語の途中になる。
+      // 区切りを待つ間に素の段落が見えないよう、先に隠しておく。
+      const brief = briefRef.current;
+      if (brief) {
         let briefRevealed = false;
-        splits.push(
-          SplitText.create(briefRef.current.querySelectorAll("p"), {
-            type: "lines",
-            // 日本語は単語間に空白がないため、既定の区切りだと段落全体が1単語=1行になる。
-            // 1文字ずつを最小単位にして行を測らせる（type に chars を含めないので
-            // 行へグループ化したあと文字要素は解除され、行 div には素のテキストが残る）。
-            wordDelimiter: "",
-            autoSplit: true,
-            onSplit: (self) => {
-              if (briefRevealed) return;
-              return gsap.from(self.lines, {
-                autoAlpha: 0,
-                y: 16,
-                duration: 0.6,
-                ease: "power3.out",
-                stagger: 0.05,
-                force3D: true,
-                scrollTrigger: createScrollTrigger(briefRef.current),
-                onComplete: () => {
-                  briefRevealed = true;
+        gsap.set(brief, { autoAlpha: 0 });
+        void applyPhraseBreaks(brief).then(() => {
+          if (ctxRef.current !== ctx) return;
+          ctx.add(() => {
+            gsap.set(brief, { autoAlpha: 1 });
+            splits.push(
+              SplitText.create(brief.querySelectorAll("p"), {
+                type: "lines",
+                // 文節の区切りがあれば文節を、無ければ（日本語以外のロケール・読み込み失敗）
+                // 1文字ずつを最小単位にして行を測らせる。既定の空白区切りだと日本語の段落
+                // 全体が1単語=1行になる。type に words / chars を含めないので、行へ
+                // グループ化したあと単位の要素は解除され、行 div には素のテキストが残る。
+                wordDelimiter: brief.textContent?.includes(PHRASE_SEPARATOR)
+                  ? PHRASE_SEPARATOR
+                  : "",
+                autoSplit: true,
+                onSplit: (self) => {
+                  if (briefRevealed) return;
+                  return gsap.from(self.lines, {
+                    autoAlpha: 0,
+                    y: 16,
+                    duration: 0.6,
+                    ease: "power3.out",
+                    stagger: 0.05,
+                    force3D: true,
+                    scrollTrigger: createScrollTrigger(brief),
+                    onComplete: () => {
+                      briefRevealed = true;
+                    },
+                  });
                 },
-              });
-            },
-          })
-        );
+              })
+            );
+          });
+        });
       }
 
       // ── 画像: 二層ズームイン ──
