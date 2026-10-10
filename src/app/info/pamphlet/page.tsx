@@ -27,8 +27,8 @@ const pamphlets = [
     description:
       "企画一覧、タイムテーブル、キャンパスマップなど、世田谷祭を楽しむための情報が満載です。",
     fileUrl: "/pamphlets/setagayafes97_pamphlet_placeholder.pdf",
-    fileSize: "5.2MB",
-    pages: 24,
+    fileSize: "未定",
+    pages: "未定",
     isAvailable: false, // 準備中フラグ
   },
 ];
@@ -36,7 +36,7 @@ const pamphlets = [
 const notes = [
   "パンフレットはPDF形式で提供しています。",
   "印刷してご来場いただくと便利です。",
-  "紙のパンフレットは当日、各案内所にて配布しています。",
+  "紙のパンフレットは当日、入場門でのみ配布しています。",
   "内容は予告なく変更される場合があります。最新情報は当サイトでご確認ください。",
 ];
 
@@ -84,7 +84,7 @@ export default function PamphletPage() {
             <p className="mb-6 leading-8 text-gray-700">{pamphlet.description}</p>
             <FactList
               items={[
-                { label: "ページ数", value: `${pamphlet.pages}ページ` },
+                { label: "ページ数", value: pamphlet.pages },
                 { label: "ファイルサイズ", value: pamphlet.fileSize },
                 // 公開前は操作できるものが無いので、ボタンではなく状態として示す
                 ...(pamphlet.isAvailable ? [] : [{ label: "ダウンロード", value: "準備中" }]),
