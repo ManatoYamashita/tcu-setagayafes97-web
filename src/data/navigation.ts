@@ -11,19 +11,29 @@ import type { Locale } from "@/i18n/routing";
  * autonym は翻訳対象ではない（どの言語で閲覧していても「日本語」は「日本語」）
  * ため、messages ではなくここに置く。
  *
- * fallbackLabel は多言語未対応ページから切り替えた際の着地先ページ名。
- * `src/messages/<code>.json` の `guide.title` と同一文字列にすること。
+ * fallbackNote は多言語未対応ページから切り替えるときに選択肢へ添える説明で、
+ * 「このページは日本語のみ」と「着地先のページ名」を対象言語で書く。
+ * ページ名だけだと、押した来場者には別のページへ飛ばされた理由が伝わらない。
+ * ページ名は `src/messages/<code>.json` の `guide.title` と同一文字列にすること（テストが見る）。
  * 日本語は未対応ページでも常に現在ロケールになるため不要。
  */
 export const languageOptions: ReadonlyArray<{
   code: Locale;
   label: string;
-  fallbackLabel?: string;
+  fallbackNote?: string;
 }> = [
   { code: "ja", label: "日本語" },
-  { code: "en", label: "English", fallbackLabel: "Visitor Guide" },
-  { code: "zh", label: "简体中文", fallbackLabel: "参观指南" },
-  { code: "ko", label: "한국어", fallbackLabel: "방문 안내" },
+  {
+    code: "en",
+    label: "English",
+    fallbackNote: "This page is in Japanese only. Opens the Visitor Guide.",
+  },
+  { code: "zh", label: "简体中文", fallbackNote: "本页仅提供日语版。将打开参观指南。" },
+  {
+    code: "ko",
+    label: "한국어",
+    fallbackNote: "이 페이지는 일본어로만 제공됩니다. 방문 안내로 이동합니다.",
+  },
 ];
 
 interface NavLinkConfig {

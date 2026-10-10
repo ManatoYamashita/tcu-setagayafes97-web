@@ -15,12 +15,18 @@ import { useCurrentLocale } from "@/i18n/use-current-locale";
 const focusRing =
   "focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600";
 
+/**
+ * 注記の折り返し。韓国語は既定だと語の途中（音節の間）で折れるため、空白でだけ折る。
+ * 中国語・日本語に keep-all を当てると句読点でしか折れなくなるので韓国語に限る
+ */
+const noteWordBreak = (code: Locale) => (code === "ko" ? "[word-break:keep-all]" : "");
+
 interface LanguageLink {
   code: Locale;
   label: string;
   href: string;
   isCurrent: boolean;
-  /** 多言語版が無いページから切り替えるとき、着地先のページ名を対象言語で示す */
+  /** 多言語版が無いページから切り替えるとき、日本語のみであることと着地先を対象言語で示す */
   note?: string;
 }
 
@@ -47,7 +53,7 @@ function useLanguageLinks(): { current: LanguageLink; items: LanguageLink[] } {
       label: option.label,
       href: buildLocaleHref(isCurrent ? basePathname : targetPathname, option.code),
       isCurrent,
-      note: isFallbackMode && !isCurrent ? option.fallbackLabel : undefined,
+      note: isFallbackMode && !isCurrent ? option.fallbackNote : undefined,
     };
   });
 
@@ -146,7 +152,9 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
               >
                 {item.label}
                 {item.note && (
-                  <span className="mt-0.5 block text-xs font-normal text-gray-900/60">
+                  <span
+                    className={`mt-0.5 block text-xs font-normal text-gray-900/60 ${noteWordBreak(item.code)}`}
+                  >
                     {item.note}
                   </span>
                 )}
@@ -186,7 +194,10 @@ export function LanguageSwitcherInline({ className, onNavigate }: LanguageSwitch
               hrefLang={item.code}
               aria-current={item.isCurrent ? "true" : undefined}
               onClick={onNavigate}
-              className={`inline-flex min-h-11 flex-col justify-center rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${focusRing} ${
+              className={`inline-flex min-h-11 flex-col justify-center border px-4 py-2 text-sm font-semibold transition-colors ${focusRing} ${
+                // 注記の文は2行に折れるので、完全な丸ではなく角丸の札にする
+                item.note ? "rounded-2xl" : "rounded-full"
+              } ${
                 item.isCurrent
                   ? "border-transparent bg-primary-600 text-white"
                   : "border-gray-200/40 text-gray-900/80 hover:bg-white/20 hover:text-gray-900"
@@ -194,7 +205,11 @@ export function LanguageSwitcherInline({ className, onNavigate }: LanguageSwitch
             >
               {item.label}
               {item.note && (
-                <span className="text-xs font-normal text-gray-900/60">{item.note}</span>
+                <span
+                  className={`text-xs font-normal text-gray-900/60 ${noteWordBreak(item.code)}`}
+                >
+                  {item.note}
+                </span>
               )}
             </Link>
           </li>
