@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AppImage } from "@/components/ui/AppImage";
 import type { News } from "@/types/news";
 import { Badge } from "@/components/ui/Badge";
+import { UnbreakableText } from "@/components/ui/UnbreakableText";
 
 interface NewsContentProps {
   initialNews: News[];
@@ -178,7 +179,7 @@ function NewsCard({ news }: NewsCardProps) {
           {/* タイトル */}
           {/* ページの h1 の直下なので h2。見た目はクラスで決める */}
           <h2 className="mb-2 line-clamp-2 text-lg font-bold text-balance [word-break:auto-phrase] text-gray-900">
-            {news.title}
+            <UnbreakableText text={news.title} />
           </h2>
 
           {/* 説明文 */}

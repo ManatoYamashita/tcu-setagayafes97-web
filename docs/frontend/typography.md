@@ -114,6 +114,28 @@ grep -rhoE '(^|[^a-z0-9-])(sm:|md:|lg:|xl:)?text-(xs|sm|base|lg|xl|[2-9]xl)\b' s
 
 > 見出しの書体（Kaisei Opti をどこに当てるか）はサイズでは決まらない。上の「どこに当たるか」を参照。
 
+## 見出しの改行位置
+
+microCMS のタイトルを出す見出しには `text-balance` と `[word-break:auto-phrase]` を付けている。
+**この2つを付けても「第97回」は「第 / 97回」で割れる。** `auto-phrase`（Chrome のみ）は
+「第」と数字の間を文節の切れ目として残し、`text-balance` は行長を揃えるためにその位置を選ぶ。
+
+実測（2026-10-10、本番の `/info/toshi-music` を Chromium で描画）:
+
+| 幅     | `balance` + `auto-phrase`（従来）                   | 「第97回」を `nowrap` で包む                   |
+| ------ | --------------------------------------------------- | ---------------------------------------------- |
+| 390px  | `…東京都市大学　` / `第97回世田谷祭` / `『TOSHI…』` | 同左                                           |
+| 768px  | `…東京都市大学　第` / `97回世田谷祭『TOSHI…』`      | `…東京都市大学　` / `第97回世田谷祭『TOSHI…』` |
+| 1280px | `…東京都市大学　第` / `97回世田谷祭『TOSHI…』`      | `…東京都市大学　` / `第97回世田谷祭『TOSHI…』` |
+
+CSS には特定の位置だけを改行禁止にする手段が無いため、お知らせのタイトルは
+`UnbreakableText`（`src/components/ui/UnbreakableText.tsx`）で描き、
+「第」＋数字＋助数詞を `white-space: nowrap` の要素で包む。対象の規則は `src/lib/line-break.ts`。
+**入稿側で空白を入れても改行位置は変えられない**（全角スペースは元から改行可能位置で、
+`text-balance` がそれより「第」の後ろを選んでいた）。
+
+お知らせのタイトルを新しい場所に出すときは、`{news.title}` を直接置かずにこのコンポーネントを通すこと。
+
 ## 関連ドキュメント
 
 - [design.md](./design.md) - カラーシステム・CSS 変数（コントラストは [color-contrast.md](./color-contrast.md)）
@@ -122,4 +144,4 @@ grep -rhoE '(^|[^a-z0-9-])(sm:|md:|lg:|xl:)?text-(xs|sm|base|lg|xl|[2-9]xl)\b' s
 
 ---
 
-**最終更新日**: 2026-09-30（design.md から分割。フォントスケール表を Tailwind の既定値に合わせ、Kaisei Opti の適用範囲の規約を実装に揃えた）
+**最終更新日**: 2026-10-10

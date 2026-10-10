@@ -8,6 +8,7 @@ import { siteConfig } from "@/data/site";
 import { cn } from "@/lib/utils";
 import { HERO_ENTRANCE, OPENER_FAILSAFE_MS, shouldWaitForOpener } from "@/lib/motion";
 import type { News, NewsType } from "@/types/news";
+import { UnbreakableText } from "@/components/ui/UnbreakableText";
 
 /**
  * 日付文字列(YYYY-MM-DD)から年・月・日・曜日を分解
@@ -307,7 +308,7 @@ export function HeroSection({ latestNews }: HeroSectionProps) {
             <span className="text-xs text-gray-500">{formatNewsDate(latestNews.publishedAt)}</span>
           </div>
           <p className="text-sm md:text-base text-gray-700 font-medium line-clamp-2 mb-3">
-            {latestNews.title}
+            <UnbreakableText text={latestNews.title} />
           </p>
           <Link
             href={`/info/${latestNews.id}`}
