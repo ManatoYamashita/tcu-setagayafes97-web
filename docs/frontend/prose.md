@@ -56,6 +56,14 @@ microCMS のリッチテキストは `dangerouslySetInnerHTML` で挿入し、�
 `blockquote` / `table` / `figure` は入稿実績が無いため、あえて規則を書いていない。
 **入稿されてから足すこと。** 使われない規則は、次に読む人に「対応済み」と誤解させる。
 
+## お知らせ詳細の表示
+
+`/info/[id]` は淡紫の背景に白い記事シートを配置する。記事全体は `max-w-4xl`、本文は中央寄せの `max-w-[38em]` とし、説明文を淡紫のリードとして分ける。公開日は `Asia/Tokyo` で表示する。
+
+サムネイルは `object-contain` で全体を見せる。本文専用の `.news-article-prose` は見出しの区切り線、画像の余白・角丸、常時下線のリンク、長い文字列の折り返しを持つ。他ページの `prose` は変更しない。
+
+本文と CTA のスクロール入場は `NewsArticleMotion` から共通の `useScrollReveal` を利用する。タイトルと優先画像は入場演出の対象にせず、モーション軽減時や JavaScript 無効時も本文を表示する。戻るリンクは 48px 以上の高さとフォーカス表示を持つ。
+
 ## 装飾を足す場合は `@layer base` に直接書く
 
 `src/app/globals.css` の `@layer base` にセレクタを直接定義する。

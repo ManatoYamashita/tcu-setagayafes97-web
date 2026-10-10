@@ -177,6 +177,28 @@ body {
     line-height: 1.4;
   }
 
+  /* お知らせ本文だけを調整。他の CMS コンテンツの組版には影響しない。 */
+  .news-article-prose {
+    overflow-wrap: anywhere;
+  }
+
+  .news-article-prose h2 {
+    padding-block-end: 0.5em;
+    border-bottom: 1px solid var(--color-gray-200);
+  }
+
+  .news-article-prose img {
+    height: auto;
+    max-width: 100%;
+    margin-block: 1.5em;
+    border-radius: 1rem;
+  }
+
+  .news-article-prose a {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
   .prose h2 {
     font-size: 1.5rem;
   }
