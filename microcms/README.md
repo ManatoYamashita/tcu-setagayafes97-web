@@ -205,7 +205,13 @@ else links.website = sns;
 | description  | 概要     | text   |      | **1行テキスト。** textArea ではない                   |
 | image        | 画像     | media  |      | 任意。無ければ社名を文字で表示（下記）                |
 | url          | URL      | text   |      |                                                       |
-| priority     | 表示順   | number |      |                                                       |
+| priority     | 表示順   | number |      | **大きい値ほど先頭**（下記）                          |
+
+> [!NOTE]
+> **協賛企業の `priority` は降順で並びます（大きい値ほど先頭）。** 一覧・ロゴ帯とも
+> `orders: "-priority"`（`src/lib/informations.ts` の `getSponsorsList()`）。
+> 未入力の協賛は値のある協賛より後ろに並びます（2026-10-10 実測）。
+> **FAQ は `priority` を読みません**（公開日の新しい順。同ファイルの `getFAQList()`）。
 
 > [!NOTE]
 > **`description` は1行テキストです。** 協賛企業の紹介文を複数行で入稿したい場合は、
