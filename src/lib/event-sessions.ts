@@ -180,6 +180,11 @@ interface EventScheduleJsonLdInput {
   dates: Record<SessionDate, string>;
   /** 日程を持たない枠の開催日（YYYY-MM-DD） */
   defaultDateIso: string;
+  /**
+   * 両日開催（`both`）の企画なら `["day1", "day2"]`。どの枠も日程を持たないとき、
+   * 各枠を両日へ展開して日ごとの subEvent にする（#289）。省略時は `defaultDateIso` の1日分
+   */
+  undatedSessionDates?: readonly SessionDate[];
   /** 子の Event にも親と同じ場所を入れる */
   location: unknown;
   /** 開始時刻が1つも読めないときの `startDate`。省略すると出さない */
@@ -207,10 +212,27 @@ function toIsoDateTime(dateIso: string, minutes: number): string {
 }
 
 /**
+ * 日程を持たない枠を、指定した日ごとに複製する
+ *
+ * 1つでも日程を持つ枠があれば何もしない。入稿者が日ごとの枠を書いているなら、日程の無い枠は
+ * 「どの日か書き忘れた枠」であって「両日の枠」ではないため、`defaultDateIso` に任せる。
+ * 両日開催で日ごとに時刻が違う企画は、枠に日程を入れて入稿する（#305）。
+ */
+function expandUndatedSessions(
+  sessions: EventSession[],
+  undatedSessionDates: readonly SessionDate[] | undefined
+): EventSession[] {
+  if (!undatedSessionDates || undatedSessionDates.length < 2) return sessions;
+  if (sessions.some((session) => session.date)) return sessions;
+  return undatedSessionDates.flatMap((date) => sessions.map((session) => ({ ...session, date })));
+}
+
+/**
  * JSON-LD（schema.org/Event）の日時部分を作る
  *
  * 親の `startDate` は最初の枠の開始、`endDate` は最後に終わる枠の終了です。
  * 日程を持つ枠はその日の日付で、持たない枠は `defaultDateIso` で組み立てます（#305）。
+ * 両日開催で、どの枠も日程を持たないときは、各枠を両日へ展開します（#289）。
  * 2部制のように枠が2つ以上あると、親の範囲には空き時間も含まれてしまいます。
  * そのため、各枠を `subEvent` として別に出します。
  *
@@ -224,26 +246,29 @@ export function buildEventScheduleJsonLd({
   sessions,
   dates,
   defaultDateIso,
+  undatedSessionDates,
   location,
   fallbackStartDate,
 }: EventScheduleJsonLdInput): { startDate?: string; endDate?: string; subEvent?: object[] } {
-  const timed = labelSessions(sessions).flatMap((session): TimedSession[] => {
-    const startMinutes = parseTimeToMinutes(session.startTime);
-    if (startMinutes === null) return [];
-    const endMinutes = parseTimeToMinutes(session.endTime);
-    const dateIso = session.date ? dates[session.date] : defaultDateIso;
-    return [
-      {
-        suffix: [session.dayLabel, session.label].filter(Boolean).join(" "),
-        start: toIsoDateTime(dateIso, startMinutes),
-        // 終了が開始以前なら読めないものとして扱う
-        end:
-          endMinutes !== null && endMinutes > startMinutes
-            ? toIsoDateTime(dateIso, endMinutes)
-            : null,
-      },
-    ];
-  });
+  const timed = labelSessions(expandUndatedSessions(sessions, undatedSessionDates)).flatMap(
+    (session): TimedSession[] => {
+      const startMinutes = parseTimeToMinutes(session.startTime);
+      if (startMinutes === null) return [];
+      const endMinutes = parseTimeToMinutes(session.endTime);
+      const dateIso = session.date ? dates[session.date] : defaultDateIso;
+      return [
+        {
+          suffix: [session.dayLabel, session.label].filter(Boolean).join(" "),
+          start: toIsoDateTime(dateIso, startMinutes),
+          // 終了が開始以前なら読めないものとして扱う
+          end:
+            endMinutes !== null && endMinutes > startMinutes
+              ? toIsoDateTime(dateIso, endMinutes)
+              : null,
+        },
+      ];
+    }
+  );
 
   if (timed.length === 0) {
     return fallbackStartDate ? { startDate: fallbackStartDate } : {};

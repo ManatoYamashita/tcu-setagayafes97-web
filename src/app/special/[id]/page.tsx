@@ -129,9 +129,10 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
     ...buildEventScheduleJsonLd({
       title: event.title,
       sessions: event.sessions,
-      // 日程を持つ枠はその日の日付になる（#305）
+      // 日程を持つ枠はその日の日付になる（#305）。両日開催で日程の無い枠は両日へ展開する（#289）
       dates: siteConfig.dates,
       defaultDateIso: eventDateIso,
+      undatedSessionDates: event.date === "both" ? ["day1", "day2"] : undefined,
       location,
       fallbackStartDate: eventDateIso,
     }),

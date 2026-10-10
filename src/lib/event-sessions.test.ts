@@ -79,6 +79,65 @@ describe("buildEventScheduleJsonLd", () => {
     location: { name: "ホール" },
   };
 
+  it("両日開催で日程の無い枠は、両日へ展開して日ごとの subEvent を出す（#289）", () => {
+    const result = buildEventScheduleJsonLd({
+      ...base,
+      defaultDateIso: "2026-11-01",
+      undatedSessionDates: ["day1", "day2"],
+      sessions: [{ startTime: "11:00", endTime: "15:00" }],
+    });
+
+    expect(result.startDate).toBe("2026-10-31T11:00:00+09:00");
+    expect(result.endDate).toBe("2026-11-01T15:00:00+09:00");
+    expect(result.subEvent).toEqual([
+      {
+        "@type": "Event",
+        name: "カレッジフェスタ（1日目）",
+        startDate: "2026-10-31T11:00:00+09:00",
+        endDate: "2026-10-31T15:00:00+09:00",
+        location: { name: "ホール" },
+      },
+      {
+        "@type": "Event",
+        name: "カレッジフェスタ（2日目）",
+        startDate: "2026-11-01T11:00:00+09:00",
+        endDate: "2026-11-01T15:00:00+09:00",
+        location: { name: "ホール" },
+      },
+    ]);
+  });
+
+  it("両日開催の2部制は「日 × 枠」に展開する", () => {
+    const result = buildEventScheduleJsonLd({
+      ...base,
+      undatedSessionDates: ["day1", "day2"],
+      sessions: TWO_PARTS,
+    });
+
+    expect(result.subEvent?.map((event) => (event as { name: string }).name)).toEqual([
+      "カレッジフェスタ（1日目 第1部）",
+      "カレッジフェスタ（1日目 第2部）",
+      "カレッジフェスタ（2日目 第1部）",
+      "カレッジフェスタ（2日目 第2部）",
+    ]);
+  });
+
+  it("日程を持つ枠が1つでもあれば展開しない（日ごとの枠は入稿者が書いている）", () => {
+    const result = buildEventScheduleJsonLd({
+      ...base,
+      defaultDateIso: "2026-11-01",
+      undatedSessionDates: ["day1", "day2"],
+      sessions: [
+        { date: "day1", startTime: "11:00", endTime: "16:00" },
+        { startTime: "11:00", endTime: "15:00" },
+      ],
+    });
+
+    expect(result.subEvent).toHaveLength(2);
+    expect(result.startDate).toBe("2026-10-31T11:00:00+09:00");
+    expect(result.endDate).toBe("2026-11-01T15:00:00+09:00");
+  });
+
   it("1枠は親の開始・終了だけを出し、subEvent を付けない", () => {
     expect(
       buildEventScheduleJsonLd({ ...base, sessions: [{ startTime: "10:40", endTime: "11:25" }] })
