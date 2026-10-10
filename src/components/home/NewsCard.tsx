@@ -2,6 +2,7 @@ import { AppImage } from "@/components/ui/AppImage";
 import Link from "next/link";
 import type { News, NewsType } from "@/types/news";
 import { cn } from "@/lib/utils";
+import { UnbreakableText } from "@/components/ui/UnbreakableText";
 
 interface NewsCardProps {
   news: News;
@@ -151,7 +152,7 @@ export function NewsCard({ news, variant = "default", className }: NewsCardProps
         )}
       >
         <span className="decoration-primary-400 underline-offset-2 group-hover:underline">
-          {news.title}
+          <UnbreakableText text={news.title} />
         </span>
       </h3>
 

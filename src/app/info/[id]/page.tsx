@@ -16,6 +16,7 @@ import {
   organizationId,
   serializeJsonLd,
 } from "@/lib/structured-data";
+import { UnbreakableText } from "@/components/ui/UnbreakableText";
 
 interface NewsPageProps {
   params: Promise<{ id: string }>;
@@ -253,7 +254,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
 
               {/* タイトル */}
               <h1 className="mb-6 text-3xl font-bold text-balance [word-break:auto-phrase] text-gray-900 md:text-4xl">
-                {news.title}
+                <UnbreakableText text={news.title} />
               </h1>
 
               {/* サムネイル */}

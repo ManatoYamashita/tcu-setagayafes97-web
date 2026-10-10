@@ -109,8 +109,9 @@
   - **Tailwind 既定パレットを直接使わない。** `@theme` に無い色名はエラーも警告も出ずに既定値へ落ちる
 - **[interaction-states.md](./frontend/interaction-states.md)** - ホバー（`hoverable`）とキーボードフォーカスの規約
 - **[prose.md](./frontend/prose.md)** - microCMS のリッチテキスト（`prose`）の規則。`@tailwindcss/typography` は未導入
-- **[typography.md](./frontend/typography.md)** - Kaisei Opti の読み込みと使い分け、文字サイズと行送り（Tailwind の既定値）
+- **[typography.md](./frontend/typography.md)** - Kaisei Opti の読み込みと使い分け、文字サイズと行送り（Tailwind の既定値）、見出しの改行位置
   - **Kaisei Opti は要素で決まる（`h1`〜`h3` はサイズを問わず）。** sans にしたい見出しは `font-sans` を明示する（2026-09-30 に規約を実装へ揃えた）
+  - **お知らせのタイトルは `UnbreakableText` で描く。** `text-balance` + `auto-phrase` だけでは「第 / 97回」で割れる
 - **[access-page-design.md](./frontend/access-page-design.md)** - Access ページの情報設計・地図・経路・フォーカス表示・モーション方針
 - **[special-ticket-cta.md](./frontend/special-ticket-cta.md)** - 著名人企画 LP のモバイルチケット導線（固定 CTA・退避条件・320px の検証契約）
 - **[image-delivery.md](./frontend/image-delivery.md)** - 画像配信の経路（microCMS は imgix、`public/` は事前 AVIF）
