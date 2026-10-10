@@ -150,8 +150,8 @@ push 時は head をそのまま、PR 時は head を base へマージした結
 secrets もビルド成果物も要求しないため、**fork からの PR でも結果が出る**。ここへ検査を足すときは、
 「install 以外に何も要求しないか」を基準に判断すること。要求するなら別ジョブにする。
 `Layout E2E` は**実ブラウザでしか捕まえられない事故に対する再発防止装置の置き場**である。
-装置の一覧は `docs/frontend/layout-e2e.md` 冒頭の表が正本で、現在5つある（盤面 #148・企画詳細パネル #338 / `<main id="content">` の1周検査 #177 A /
-404画面 #249・#301 / `/events` の絞り込み #376・#392 / オープナー #402）。**装置を足したら表・構成・`playwright.config.ts` の冒頭・この数を直すこと（`pnpm check:e2e-guards` が落とす。#406）。**
+装置の一覧は `docs/frontend/layout-e2e.md` 冒頭の表が正本で、現在6つある（盤面 #148・企画詳細パネル #338 / `<main id="content">` の1周検査 #177 A /
+404画面 #249・#301 / `/events` の絞り込み #376・#392 / オープナー #402 / 言語保持 #441）。**装置を足したら表・構成・`playwright.config.ts` の冒頭・この数を直すこと（`pnpm check:e2e-guards` が落とす。#406）。**
 **1周検査は生HTMLでは代替できない**（`/events` は生HTML 2個・ライブDOM 1個、
 動的404は生HTML 0個・ライブDOM 1個）。
 **新しいルートを足したら `e2e/landmarks/route-sweep.spec.ts` の表へ1行足すこと。**

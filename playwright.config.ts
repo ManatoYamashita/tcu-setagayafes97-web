@@ -22,6 +22,8 @@ import { defineConfig, devices } from "@playwright/test";
  * - e2e/opener/ — #402。サイト内からのフルロードでオープナーが再生される。
  *   判定が遷移種別と referrer に依存し、どちらも実ブラウザの遷移でしか値が決まらない。
  *   このファイルだけ reducedMotion を戻してオープナーを走らせる
+ * - e2e/i18n/ — #441。日本語専用ページを経由したときの選択言語保持と解除。
+ *   sessionStorage とハイドレーション後のリンク更新は実ブラウザの遷移で確認する
  *
  * 設計判断は docs/frontend/layout-e2e.md を参照。
  */

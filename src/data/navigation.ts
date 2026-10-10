@@ -15,7 +15,7 @@ import type { Locale } from "@/i18n/routing";
  * 「このページは日本語のみ」と「着地先のページ名」を対象言語で書く。
  * ページ名だけだと、押した来場者には別のページへ飛ばされた理由が伝わらない。
  * ページ名は `src/messages/<code>.json` の `guide.title` と同一文字列にすること（テストが見る）。
- * 日本語は未対応ページでも常に現在ロケールになるため不要。
+ * 日本語を選ぶと現在の未対応ページに留まり、記憶を解除するため注記は不要。
  */
 export const languageOptions: ReadonlyArray<{
   code: Locale;

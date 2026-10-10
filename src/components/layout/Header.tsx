@@ -28,7 +28,7 @@ export function Header() {
   // ロケール解決はここで1回だけ行い、子へは props で流す。
   // 子でも呼ぶと usePathname() の購読と useMemo が二重になるうえ、
   // デスクトップナビとモバイルメニューが同じ結果を共有することが読み取れなくなる。
-  const { home, headerItems, messages, pathname } = useChromeNav();
+  const { locale, home, headerItems, messages, pathname } = useChromeNav();
 
   const [isAtTop, setIsAtTop] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -71,6 +71,7 @@ export function Header() {
         依存した結果になるため。translate で画面外へ退避させれば順序に依存しない。
       */}
       <a
+        lang={locale}
         href="#content"
         className="fixed left-4 top-4 z-50 -translate-y-24 rounded-lg bg-primary-700 px-4 py-2 text-sm font-semibold text-white shadow-lg focus-visible:translate-y-0"
       >
@@ -78,6 +79,7 @@ export function Header() {
       </a>
 
       <header
+        lang={locale}
         // transition-all はここでは意図的に残している。isAtTop の切り替えで
         // padding（px/pt）と背景色が同時に変わり、どちらのアニメーションも演出の一部。
         // #183 D で他の24箇所は変化するプロパティを明示したが、ヘッダーの追従だけは
@@ -155,6 +157,7 @@ export function Header() {
           items={headerItems}
           closeLabel={messages.header.closeMenu}
           socialLabel={messages.brand.socialLinks}
+          locale={locale}
           pathname={pathname}
         />
       )}

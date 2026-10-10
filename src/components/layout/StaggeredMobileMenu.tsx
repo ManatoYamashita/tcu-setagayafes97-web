@@ -8,6 +8,7 @@ import { LanguageSwitcherInline } from "@/components/layout/LanguageSwitcher";
 import {
   isChromePathActive,
   isChromePathCurrent,
+  type ChromeNav,
   type ChromeNavItem,
 } from "@/components/layout/useChromeNav";
 import { siteConfig } from "@/data/site";
@@ -50,6 +51,7 @@ interface StaggeredMobileMenuProps {
   /** SNSリンク群の aria-label。ロケール別 */
   socialLabel: string;
   pathname: string;
+  locale: ChromeNav["locale"];
 }
 
 export function StaggeredMobileMenu({
@@ -59,6 +61,7 @@ export function StaggeredMobileMenu({
   closeLabel,
   socialLabel,
   pathname,
+  locale,
 }: StaggeredMobileMenuProps) {
   const prevOpenRef = useRef(false);
 
@@ -332,6 +335,7 @@ export function StaggeredMobileMenu({
 
         {/* メニューパネル */}
         <aside
+          lang={locale}
           id="staggered-menu-panel"
           ref={panelRef}
           className="staggered-menu-panel pointer-events-auto absolute top-0 right-0 z-20 flex h-full flex-col overflow-y-auto bg-white p-[4em_2em_2em_2em] backdrop-blur-[12px]"

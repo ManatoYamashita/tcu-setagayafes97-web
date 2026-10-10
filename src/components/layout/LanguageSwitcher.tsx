@@ -4,6 +4,7 @@ import { Globe } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { languageOptions } from "@/data/navigation";
+import { rememberLocale } from "@/i18n/locale-preference";
 import {
   buildLocaleHref,
   isLocalizedPathname,
@@ -51,9 +52,11 @@ function useLanguageLinks(): { current: LanguageLink; items: LanguageLink[] } {
     return {
       code: option.code,
       label: option.label,
-      href: buildLocaleHref(isCurrent ? basePathname : targetPathname, option.code),
+      // 日本語専用ページでは、記憶した外国語もVisitor Guideへ。
+      // isCurrentだけで判定すると /en/events 等の存在しないURLを作ってしまう。
+      href: buildLocaleHref(option.code === "ja" ? basePathname : targetPathname, option.code),
       isCurrent,
-      note: isFallbackMode && !isCurrent ? option.fallbackNote : undefined,
+      note: isFallbackMode ? option.fallbackNote : undefined,
     };
   });
 
@@ -145,7 +148,10 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
                 lang={item.code}
                 hrefLang={item.code}
                 aria-current={item.isCurrent ? "true" : undefined}
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  rememberLocale(item.code);
+                  setIsOpen(false);
+                }}
                 className={`block px-4 py-2 text-sm transition-colors hover:bg-white/20 ${focusRing} ${
                   item.isCurrent ? "font-bold text-gray-900" : "text-gray-900/80"
                 }`}
@@ -193,7 +199,10 @@ export function LanguageSwitcherInline({ className, onNavigate }: LanguageSwitch
               lang={item.code}
               hrefLang={item.code}
               aria-current={item.isCurrent ? "true" : undefined}
-              onClick={onNavigate}
+              onClick={() => {
+                rememberLocale(item.code);
+                onNavigate?.();
+              }}
               className={`inline-flex min-h-11 flex-col justify-center border px-4 py-2 text-sm font-semibold transition-colors ${focusRing} ${
                 // 注記の文は2行に折れるので、完全な丸ではなく角丸の札にする
                 item.note ? "rounded-2xl" : "rounded-full"

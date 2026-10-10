@@ -16,7 +16,8 @@ export const routing = defineRouting({
    * Accept-Language ヘッダによる自動リダイレクトを停止する。
    * CMSコンテンツ（企画・お知らせ）は日本語のみのため、ブラウザ言語だけを根拠に
    * 情報量の少ない多言語ページへ来場者を送らない。言語の選択はヘッダーの
-   * 言語切替UI（LanguageSwitcher）に委ね、URLを言語の唯一の出典とする。
+   * 言語切替UI（LanguageSwitcher）に委ねる。本文はURL、共通UIは日本語専用ページで
+   * タブ内に記憶した言語を使う（#441。Cookieやブラウザ言語からは決めない）。
    */
   localeDetection: false,
 

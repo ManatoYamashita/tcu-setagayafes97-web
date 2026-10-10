@@ -15,12 +15,12 @@ import { useChromeNav } from "@/components/layout/useChromeNav";
  * ここで自前に useChromeNav() を呼ぶ。
  */
 export function FooterNav() {
-  const { footerSections } = useChromeNav();
+  const { locale, footerSections } = useChromeNav();
 
   return (
     <>
       {footerSections.map((section) => (
-        <div key={section.id}>
+        <div key={section.id} lang={locale}>
           <h2 className="mb-4 font-bold text-white">{section.title}</h2>
           <ul className="space-y-2">
             {section.links.map((link) => (

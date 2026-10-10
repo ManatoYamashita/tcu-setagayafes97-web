@@ -15,6 +15,7 @@
 | `src/i18n/localized-pathnames.ts` | `LOCALIZED_PATHNAMES` と `localizeNavHref()`。matcher とのドリフトを開発時に検知する |
 | `src/i18n/navigation.ts`          | `createNavigation(routing)` による `Link` / `redirect` / `usePathname` 等            |
 | `src/i18n/use-current-locale.ts`  | Provider 外でロケールを解決するフック（ヘッダー・フッター用）                        |
+| `src/i18n/locale-preference.ts`   | タブ内の選択言語を記憶し、ハイドレーション後に共有する（#441）                       |
 | `src/i18n/chrome-messages.ts`     | ヘッダー・フッター文言の辞書。`src/messages/chrome/*.json` を静的 import             |
 | `src/i18n/request.ts`             | 本文と chrome のメッセージをマージして Provider へ渡す                               |
 
@@ -134,9 +135,12 @@ const { href, hrefLang } = localizeNavHref("/access", locale);
 注記のページ名は `src/messages/<code>.json` の `guide.title` と同じ文字列にしてください（`src/data/navigation.test.ts` が見ます）。
 韓国語の注記だけ `word-break: keep-all` で空白でだけ折ります。既定のままだと「이동 / 합니다」のように語の途中で折れるためです。
 
-### 期待される挙動: `/events` へ移ると UI が日本語に戻る
+### 期待される挙動: 日本語専用ページを経由しても選択言語を保つ
 
-`/en/info/guide` からヘッダーの `Events` を押すと、遷移先の `/events` には多言語版が無いためヘッダー・フッターを含む UI 全体が日本語になります。これはバグではなく、多言語版が6パスしか存在しないことの帰結です。リンクには `hrefLang="ja"` が付いており、支援技術と検索エンジンには遷移先の言語が正しく伝わります。
+`/en/info/guide` → `/events` → ヘッダーの `Access` は `/en/access` に戻ります（zh / ko も同様）。日本語専用ページの本文と `<html lang>` は日本語のまま、ヘッダー・フッターの文言と多言語版へのリンクは記憶した言語になります。日本語専用の行き先には `hrefLang="ja"` が付きます。
+
+記憶は `sessionStorage` でタブ内だけ保持し、「日本語」を選ぶと解除します。多言語対応ページではURLが優先です。サーバーHTMLと初回描画は従来どおりURLから決め、記憶はハイドレーション後に反映します。保存できない環境では同じページ読み込み内の遷移だけ保持します。
+設計・検証は [locale-preference.md](./locale-preference.md) を参照してください（#441）。
 
 ---
 
@@ -183,7 +187,7 @@ Vercel Free Plan の帯域（100GB/月）とサーバーレス関数の制約、
 | 静的HTML           | `src/app/[locale]/layout.tsx` が `<div lang={locale}>` で children を包む          | JavaScript不要 | 支援技術への言語範囲の宣言。静的生成を維持したまま実現できる |
 | ハイドレーション後 | `src/components/layout/HtmlLangSync.tsx` が `document.documentElement.lang` を同期 | JavaScript必要 | ブラウザの翻訳UI、JSを実行するクローラ向けの補完             |
 
-`lang` はどの要素にも指定でき、支援技術は要素レベルの宣言を尊重します。ヘッダー・フッターのナビゲーションは多言語ページでも日本語のままなので、文書全体を `lang="en"` にするより**この範囲指定のほうが実態に即しています**。
+`lang` はどの要素にも指定でき、支援技術は要素レベルの宣言を尊重します。ヘッダー・フッターの翻訳部分は選択言語を自身の `lang` で宣言します。日本語専用ページで外国語のナビゲーションを保っても、本文の言語宣言は変えません。
 
 `HtmlLangSync` は `usePathname()` と `splitLocalePrefix()` からロケールを導くため、クライアントサイド遷移で多言語ページを離れると `ja` へ戻ります。
 

@@ -161,6 +161,7 @@
   - **測ろうとしている値そのものを待たない。** 待つと #148 は「検出できない」に化ける
   - **dev では Suspense の中身がまず `div[hidden][id^="S:"]` に届く。** `toBeAttached()` は通るが幾何は 0（#309）
 - **[i18n-page-structure.md](./frontend/i18n-page-structure.md)** - 多言語ページの構成パターン（next-intl・メッセージ分割・リンク・`lang`・言語切替）
+- **[locale-preference.md](./frontend/locale-preference.md)** - 日本語専用ページを経由するときの選択言語保持（#441・タブ内の記憶・URL優先・解除・ハイドレーション）
   - **多言語版の無いページの言語切替は Visitor Guide へ倒し、選択肢に「日本語のみ」の注記を対象言語で添える**（#381 までの応急処置）
 - **[page-transition.md](./frontend/page-transition.md)** - ページ遷移アニメーションと View Transitions API
   - **popstate リスナはモジュール評価時に登録する**（`useEffect` だと2回目以降動かない）。`next` を上げたら履歴遷移を再検証する

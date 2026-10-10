@@ -17,10 +17,11 @@ export function FooterLogo({
   height: number;
   className: string;
 }) {
-  const { messages } = useChromeNav();
+  const { locale, messages } = useChromeNav();
 
   return (
     <AppImage
+      lang={locale}
       src="/images/brand/logo-white.avif"
       alt={messages.brand.logoAlt}
       width={width}
@@ -38,12 +39,16 @@ export function FooterLogo({
  * 年をまたいだときにハイドレーション不一致になる（Footer がサーバーで一度だけ決めて渡す）。
  */
 export function FooterCopyright({ year }: { year: number }) {
-  const { messages } = useChromeNav();
+  const { locale, messages } = useChromeNav();
 
   return (
     <>
-      <p className="mb-2">{messages.brand.name}</p>
-      <p className="text-sm">{messages.footer.copyright.replace("{year}", String(year))}</p>
+      <p lang={locale} className="mb-2">
+        {messages.brand.name}
+      </p>
+      <p lang={locale} className="text-sm">
+        {messages.footer.copyright.replace("{year}", String(year))}
+      </p>
     </>
   );
 }
