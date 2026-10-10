@@ -108,7 +108,7 @@
 - **[color-rules.md](./frontend/color-rules.md)** - 色の使用規約と、それを守る ESLint・`check:colors`
   - **Tailwind 既定パレットを直接使わない。** `@theme` に無い色名はエラーも警告も出ずに既定値へ落ちる
 - **[interaction-states.md](./frontend/interaction-states.md)** - ホバー（`hoverable`）とキーボードフォーカスの規約
-- **[prose.md](./frontend/prose.md)** - microCMS のリッチテキスト（`prose`）の規則。`@tailwindcss/typography` は未導入
+- **[prose.md](./frontend/prose.md)** - microCMS のリッチテキスト（`prose`）の規則とお知らせ詳細の白い記事シート・モーション。`@tailwindcss/typography` は未導入
 - **[typography.md](./frontend/typography.md)** - Kaisei Opti の読み込みと使い分け、文字サイズと行送り（Tailwind の既定値）
   - **Kaisei Opti は要素で決まる（`h1`〜`h3` はサイズを問わず）。** sans にしたい見出しは `font-sans` を明示する（2026-09-30 に規約を実装へ揃えた）
 - **[access-page-design.md](./frontend/access-page-design.md)** - Access ページの情報設計・地図・経路・フォーカス表示・モーション方針

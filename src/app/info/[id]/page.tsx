@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AppImage } from "@/components/ui/AppImage";
 import { ArrowLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { getNewsById, getNewsList } from "@/lib/news";
+import { NewsArticleMotion } from "@/components/info/NewsArticleMotion";
 import { Badge } from "@/components/ui/Badge";
 import { DraftPreviewBanner } from "@/components/layout/DraftPreviewBanner";
 import { readDraftPreviewContext } from "@/lib/draft-mode";
@@ -115,6 +116,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
     year: "numeric",
     month: "long",
     day: "numeric",
+    timeZone: "Asia/Tokyo",
   });
 
   // 構造化データ（JSON-LD）
@@ -197,10 +199,10 @@ export default async function NewsPage({ params }: NewsPageProps) {
         className="min-h-screen bg-secondary focus-visible:outline-none"
       >
         {/* パンくずリスト */}
-        <nav className="border-b border-gray-200/20 bg-secondary py-4" aria-label="パンくずリスト">
+        <nav className="bg-secondary py-6 sm:py-8" aria-label="パンくずリスト">
           {/* 記事（max-w-4xl）と左端を揃える。揃えないと広い画面で左端が2本になる */}
           <div className="container mx-auto px-4">
-            <ol className="mx-auto flex max-w-4xl flex-wrap items-center gap-2 text-sm text-gray-900/80">
+            <ol className="mx-auto flex max-w-4xl min-w-0 flex-wrap items-center gap-2 text-sm text-gray-900/80">
               <li>
                 <Link href="/" className="text-primary-700 hover:underline">
                   トップ
@@ -219,7 +221,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
               <li aria-hidden="true">
                 <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
               </li>
-              <li className="font-semibold text-gray-900" aria-current="page">
+              <li className="min-w-0 break-words font-semibold text-gray-900" aria-current="page">
                 {news.title}
               </li>
             </ol>
@@ -227,38 +229,38 @@ export default async function NewsPage({ params }: NewsPageProps) {
         </nav>
 
         {/* メインコンテンツ */}
-        <div className="container mx-auto px-4 py-12">
-          <article className="mx-auto max-w-4xl">
+        <div className="mx-4 rounded-t-3xl bg-white px-5 py-8 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] sm:mx-6 sm:px-8 sm:py-12 lg:mx-8 lg:py-16">
+          <NewsArticleMotion />
+          <article className="mx-auto min-w-0 max-w-4xl">
             {/* 記事ヘッダー */}
-            <header className="mb-8">
+            <header className="mb-8 border-b border-gray-200 pb-8 sm:mb-10 sm:pb-10">
+              <p className="mb-6 text-xs font-semibold tracking-[0.2em] text-primary-700">
+                SETAGAYA FES · NEWS
+              </p>
               {/* バッジと公開日 */}
-              <div className="mb-4 flex items-center gap-3">
+              <div className="mb-5 flex flex-wrap items-center gap-3">
                 <Badge
                   variant={news.type}
                   label={
                     news.type === "urgent" ? "重要" : news.type === "news" ? "お知らせ" : "その他"
                   }
                 />
-                {/*
-                  /60 は淡紫背景(#d5a7ed)で 4.22:1 となり AA を満たさない（#95）。
-                  同じページのパンくずで使っている /80 は 7.18:1
-                */}
                 <time
                   dateTime={news.publishedAt || news.createdAt}
-                  className="text-sm text-gray-900/80"
+                  className="text-sm text-gray-600"
                 >
                   {publishedDate}
                 </time>
               </div>
 
               {/* タイトル */}
-              <h1 className="mb-6 text-3xl font-bold text-balance [word-break:auto-phrase] text-gray-900 md:text-4xl">
+              <h1 className="mb-0 text-2xl leading-relaxed font-bold break-words text-balance [word-break:auto-phrase] text-gray-900 sm:text-3xl md:text-4xl md:leading-normal">
                 {news.title}
               </h1>
 
               {/* サムネイル */}
               {news.thumbnail && (
-                <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+                <div className="relative mt-8 aspect-video w-full overflow-hidden rounded-2xl bg-gray-50">
                   {/*
                     alt に h1 と同じ文字列を入れると同じ語が2回読み上げられ、
                     画像の内容は一度も説明されないままになる。
@@ -268,7 +270,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
                     src={news.thumbnail.url}
                     alt=""
                     fill
-                    className="object-cover"
+                    className="object-contain"
                     sizes="(max-width: 768px) 100vw, 896px"
                     priority
                   />
@@ -277,20 +279,26 @@ export default async function NewsPage({ params }: NewsPageProps) {
             </header>
 
             {/* 本文 */}
-            <div className="prose max-w-[38em]">
+            <div className="news-article-prose prose mx-auto max-w-[38em] text-base text-gray-700 sm:text-lg">
               {/* 説明文 */}
               {news.description && (
-                <p className="text-xl leading-relaxed text-gray-900/90">{news.description}</p>
+                <p className="mb-8 border-l-4 border-primary-600 bg-primary-50 py-4 pr-4 pl-5 text-base leading-8 font-medium text-gray-900 sm:text-lg">
+                  {news.description}
+                </p>
               )}
 
               {/* HTMLコンテンツ */}
               {news.content && (
-                <div className="mt-6" dangerouslySetInnerHTML={{ __html: news.content }} />
+                <div
+                  className="mt-8"
+                  data-news-reveal
+                  dangerouslySetInnerHTML={{ __html: news.content }}
+                />
               )}
             </div>
 
             {newsCtaTarget && (
-              <div className="mt-8">
+              <div className="mx-auto mt-10 max-w-[38em] sm:text-lg" data-news-reveal>
                 {newsCtaTarget.external ? (
                   <a
                     href={newsCtaTarget.href}
@@ -313,12 +321,16 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </article>
 
           {/* 戻るリンク */}
-          <div className="mx-auto mt-12 max-w-4xl">
+          <div className="mx-auto mt-12 max-w-4xl border-t border-gray-200 pt-6 sm:mt-16 sm:pt-8">
             <Link
               href="/info"
-              className="inline-flex items-center gap-2 text-primary-700 hover:underline"
+              className="group inline-flex min-h-12 items-center gap-3 rounded-full border border-gray-200 px-5 py-3 text-sm font-semibold text-primary-700 transition-colors hoverable:hover:border-primary-600 hoverable:hover:bg-primary-50 focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600 motion-reduce:transition-none"
             >
-              <ArrowLeft className="h-5 w-5" strokeWidth={1.5} aria-hidden="true" />
+              <ArrowLeft
+                className="h-5 w-5 transition-transform hoverable:group-hover:-translate-x-1 motion-reduce:transform-none motion-reduce:transition-none"
+                strokeWidth={1.5}
+                aria-hidden="true"
+              />
               <span>{navigation.newsList}に戻る</span>
             </Link>
           </div>
