@@ -39,6 +39,8 @@ export interface News {
   // カスタムフィールド
   type: NewsType;
   title: string;
+  /** `title` を文節に分けたもの。描画は PhraseText で行う */
+  titlePhrases: string[];
   thumbnail?: MicroCMSImage;
   description: string;
   content: string;

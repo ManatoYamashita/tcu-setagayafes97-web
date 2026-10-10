@@ -1,3 +1,4 @@
+import { splitPhrases } from "./phrase-break";
 import { isMicrocmsConfigured, isMicrocmsNotFound, microcmsGet } from "./microcms";
 import type { News, NewsListResponse, NewsType, RawNews, RawNewsListResponse } from "@/types/news";
 
@@ -41,13 +42,15 @@ function normalizeNewsType(type: string[] | string | undefined): NewsType {
  * @returns 正規化されたNews
  */
 function normalizeNews(rawNews: RawNews): News {
+  const title = rawNews.title ?? "";
   return {
     ...rawNews,
     // microCMS側で必須設定にしていても、入力漏れがあれば undefined が返り得る
     // （`normalizeEvent()` と同じ理由・同じ扱い）。
     // 下書きのプレビューでは未入力が常態であり、既定化しないと createPageMetadata() に
     // undefined が渡って "undefined | 東京都市大学 世田谷祭" というタイトルが出る
-    title: rawNews.title ?? "",
+    title,
+    titlePhrases: splitPhrases(title),
     description: rawNews.description ?? "",
     content: rawNews.content ?? "",
     cta: rawNews.cta?.trim() || undefined,
