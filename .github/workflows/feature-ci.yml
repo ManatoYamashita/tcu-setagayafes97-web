@@ -62,6 +62,12 @@ jobs:
       - name: Check doc line budget
         run: pnpm run check:doc-lines
 
+      # microCMS を読む Route Handler にタグの失効があり、Webhook の受け口が即時失効しているかを見る（#252）。
+      # Route Handler には revalidatePath が届かず、タグが無いと取得キャッシュが黙って古いまま残る。
+      # TypeScript の AST を読むだけで、ネットワークもビルド成果物も要求しない（scripts/assert-revalidate-targets.mjs 冒頭）。
+      - name: Check revalidation targets
+        run: pnpm run check:revalidate-targets
+
       # Layout E2E の装置一覧（docs/frontend/layout-e2e.md の表と構成・playwright.config.ts の冒頭・
       # 本文の装置数）が e2e/ の実態と一致するかを見る（#406）。一覧は4か所に書かれ、装置を
       # 足すたびにどれかが置き去りになっていた（#405 では e2e/events/ が表にも構成にも無かった）。

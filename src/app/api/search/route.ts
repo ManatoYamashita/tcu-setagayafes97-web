@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
       return failure("Too many requests.", 429);
     }
 
-    // 4. 母集団。#252 が入るまで fetch キャッシュを持たせない（Route Handler は revalidatePath が届かない）
+    // 4. 母集団。microcms:events タグ付きの取得キャッシュを Webhook で即時失効する
     const events = await getEventsList(EVENTS_LIMIT);
 
     if (events.length === 0) {

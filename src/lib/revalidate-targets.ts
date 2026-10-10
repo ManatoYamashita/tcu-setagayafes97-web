@@ -57,15 +57,17 @@ export type MicrocmsApi = (typeof MICROCMS_APIS)[number];
 /** 共通 Footer の協賛バナーを全ルートから失効させるためのタグ */
 export const SPONSORS_CACHE_TAG = "sponsors";
 
-export interface RevalidateTarget {
-  /** `revalidatePath()` へ渡すパス。動的ルートは `[id]` を含むパターン形で書く */
-  readonly path: string;
-  /** 動的ルートのパターン形に必須。静的パスとメタデータルートでは付けない */
-  readonly type?: "page";
-}
+/** API 名から導出する共有タグ。取得側と失効側で同じ値を使う */
+export const MICROCMS_CACHE_TAGS = Object.fromEntries(
+  MICROCMS_APIS.map((api) => [api, `microcms:${api}`])
+) as Record<MicrocmsApi, string>;
+
+export type RevalidateTarget =
+  | { readonly kind: "path"; readonly path: string; readonly type?: "page" }
+  | { readonly kind: "tag"; readonly tag: string };
 
 /**
- * API → 再検証するパス。
+ * API → 再検証するパスとタグ。
  *
  * ページ本体だけでなく、そのページが描画する Server Component が読むデータも数えること
  * （`/` の `SponsorBanner` や `FeaturedEvents` がその例）。
@@ -76,35 +78,32 @@ export interface RevalidateTarget {
 export const REVALIDATE_TARGETS: Record<MicrocmsApi, readonly RevalidateTarget[]> = {
   // getNewsList / getLatestHeroNews / getNewsById
   news: [
-    { path: "/" }, // Hero の最新お知らせ + News セクション
-    { path: "/info" },
-    { path: "/info/[id]", type: "page" }, // 詳細 + 関連ニュース一覧
-    { path: "/sitemap.xml" },
+    { kind: "path", path: "/" }, // Hero の最新お知らせ + News セクション
+    { kind: "path", path: "/info" },
+    { kind: "path", path: "/info/[id]", type: "page" }, // 詳細 + 関連ニュース一覧
+    { kind: "path", path: "/sitemap.xml" },
   ],
 
   // getEventsList / getFeaturedEvents / getEventById / getSpecialEvents / getSpecialEventById
   events: [
-    { path: "/" }, // FeaturedEvents + SpecialGuestSection
-    { path: "/events" }, // 一覧 + SpecialGuestSection
-    { path: "/events/[id]", type: "page" }, // 詳細 + RelatedEvents
-    { path: "/timetable" },
-    { path: "/special" },
-    { path: "/special/[id]", type: "page" },
-    { path: "/sitemap.xml" },
+    { kind: "tag", tag: MICROCMS_CACHE_TAGS.events },
+    { kind: "path", path: "/" }, // FeaturedEvents + SpecialGuestSection
+    { kind: "path", path: "/events" }, // 一覧 + SpecialGuestSection
+    { kind: "path", path: "/events/[id]", type: "page" }, // 詳細 + RelatedEvents
+    { kind: "path", path: "/timetable" },
+    { kind: "path", path: "/special" },
+    { kind: "path", path: "/special/[id]", type: "page" },
+    { kind: "path", path: "/sitemap.xml" },
   ],
 
   // getSponsorsList / getFAQList
   informations: [
-    { path: "/" }, // SponsorBanner
-    { path: "/about/sponsors" },
-    { path: "/[locale]/about", type: "page" }, // SponsorBanner（4ロケール）
-    { path: "/[locale]/info/faq", type: "page" },
+    { kind: "tag", tag: SPONSORS_CACHE_TAG },
+    { kind: "path", path: "/" }, // SponsorBanner
+    { kind: "path", path: "/about/sponsors" },
+    { kind: "path", path: "/[locale]/about", type: "page" }, // SponsorBanner（4ロケール）
+    { kind: "path", path: "/[locale]/info/faq", type: "page" },
   ],
-};
-
-/** API → 共有データキャッシュタグ。ページ一覧に収まらない共通表示の失効に使う */
-export const REVALIDATE_TAGS: Partial<Record<MicrocmsApi, readonly string[]>> = {
-  informations: [SPONSORS_CACHE_TAG],
 };
 
 /**

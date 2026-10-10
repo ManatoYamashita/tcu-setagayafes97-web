@@ -38,8 +38,31 @@ Webhook 経由の再検証はこれと挙動が違う。**プロファイル無�
 キャッシュ読み取りは SWR ではなくハードミスになる。**発火後の最初の訪問者から新しい内容が出る。**
 ローカルの本番ビルドで実測済み（[content-revalidation-ops.md](./content-revalidation-ops.md) の「ローカル」）。
 
-> `revalidateTag(tag, "max")` のようにプロファイルを渡すと SWR 挙動に戻る。
-> 将来タグ方式へ移行する場合はここを取り違えないこと。
+### Next.js 16 の `revalidateTag` 早見表
+
+| 呼び方                              | 挙動                                       |
+| ----------------------------------- | ------------------------------------------ |
+| `revalidateTag(tag)`                | 第2引数が必須のため型エラー                |
+| `revalidateTag(tag, "max")`         | SWR。失効直後の1回は古い値を返す           |
+| `revalidateTag(tag, { expire: 0 })` | ハード失効。次の取得から新しい値を読む     |
+| `updateTag(tag)`                    | Server Action 専用。Route Handler では例外 |
+
+`RevalidateTarget` は `kind: "path" | "tag"` の判別共用体で、受け口の `switch` は
+`never` によって網羅性を検査する。協賛バナーの `sponsors` も同じ対応表で管理する。
+Route Handler の取得データはページの暗黙タグでは失効できないため、取得側にも明示タグが必要。
+`MICROCMS_APIS` から導出する `MICROCMS_CACHE_TAGS`（`microcms:<api>`）を両側で共有する。
+`getEventsList()` の両取得経路は `microcms:events` と `revalidate: 600` を付け、
+意味検索 API の母集団をキャッシュする。下書き取得はこの一覧キャッシュに含めない。
+
+`pnpm check:revalidate-targets` は Static Checks で、Route Handler のローカル静的 import を
+再帰的にたどって microCMS の読み手を検出し、対応表のタグと受け口の `{ expire: 0 }` を AST で検査する。
+コメントは数えない。動的 import・任意 URL の fetch・関数単位のデータフローは射程外なので、
+API ごとの取得タグと対応表の一致はレビューでも確認する（[Issue #252](https://github.com/ManatoYamashita/tcu-setagayafes97-web/issues/252)）。
+
+検証記録（2026-10-06）: `max`・第2引数なし・全タグ削除の退行を注入し、ガードがすべて exit 1 になることを確認。
+ローカルの `next build` + `next start` では署名付き Webhook が events / informations とも 200 を返し、
+応答の失効タグはそれぞれ `microcms:events` / `sponsors`。署名なしは 401。
+型検査・452件のユニットテスト・lint・format・文書検査・ビルド末尾の4検査も通過した。
 
 ## 下書きと公開状態
 
