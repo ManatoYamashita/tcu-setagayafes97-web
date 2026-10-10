@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import { siteConfig } from "@/data/site";
 import { routing } from "@/i18n/routing";
-import { buildLocalePath, createPageMetadata } from "@/lib/metadata";
+import { buildLocalePath, createPageMetadata, isIndexableLocale } from "@/lib/metadata";
 
 /**
- * canonical と hreflang の不変条件
+ * canonical と索引対象ロケールの不変条件
  *
  * ここが壊れても lint / type-check / build は通る。実際、404ページがトップの
  * canonical を継承し、実在しないIDのページが自己参照 canonical を出していた
@@ -40,38 +40,42 @@ describe("createPageMetadata の canonical", () => {
     );
   });
 
-  it("ロケールに追随する", () => {
-    for (const locale of routing.locales) {
-      const meta = createPageMetadata({ ...base, locale });
-      expect(String(meta.alternates?.canonical)).toContain(buildLocalePath("/about", locale));
-    }
+  it("日本語では自分自身を指す", () => {
+    const meta = createPageMetadata({ ...base, locale: routing.defaultLocale });
+    expect(String(meta.alternates?.canonical)).toMatch(/\/about$/);
   });
 });
 
-describe("createPageMetadata の hreflang", () => {
-  it("localized のとき全ロケール + x-default を出す", () => {
-    const languages = createPageMetadata({ ...base, localized: true }).alternates?.languages;
-    expect(Object.keys(languages ?? {})).toHaveLength(routing.locales.length + 1);
+/**
+ * 日本語以外は検索に載せない（#433）
+ *
+ * hreflang で対応づけていた間も、日本語のクエリのサイトリンクに中国語ページが混ざった。
+ * 外国語ページは noindex にし、hreflang も出さない。
+ */
+describe("createPageMetadata の索引対象ロケール", () => {
+  const foreignLocales = routing.locales.filter((locale) => locale !== routing.defaultLocale);
+
+  it("日本語以外は noindex で canonical を出さない", () => {
+    expect(foreignLocales.length).toBeGreaterThan(0);
+    for (const locale of foreignLocales) {
+      const meta = createPageMetadata({ ...base, locale });
+      expect(meta.robots).toMatchObject({ index: false, follow: true });
+      expect(meta.alternates?.canonical).toBeNull();
+    }
+  });
+
+  it("日本語は索引させる", () => {
+    expect(createPageMetadata({ ...base, locale: routing.defaultLocale }).robots).toBeUndefined();
+  });
+
+  it("どのロケールでも hreflang を出さない", () => {
     for (const locale of routing.locales) {
-      expect(languages).toHaveProperty(locale);
-    }
-    expect(languages).toHaveProperty("x-default");
-  });
-
-  it("x-default はデフォルトロケールのURLと一致する", () => {
-    const languages = createPageMetadata({ ...base, localized: true }).alternates?.languages;
-    expect(languages?.["x-default"]).toBe(languages?.[routing.defaultLocale]);
-  });
-
-  it("全ての値が絶対URLである", () => {
-    const languages = createPageMetadata({ ...base, localized: true }).alternates?.languages ?? {};
-    for (const value of Object.values(languages)) {
-      expect(String(value)).toMatch(/^https?:\/\//);
+      expect(createPageMetadata({ ...base, locale }).alternates?.languages).toBeUndefined();
     }
   });
 
-  it("localized でないときは出さない", () => {
-    expect(createPageMetadata(base).alternates?.languages).toBeUndefined();
+  it("isIndexableLocale は日本語だけを通す", () => {
+    expect(routing.locales.filter(isIndexableLocale)).toEqual([routing.defaultLocale]);
   });
 });
 
@@ -86,7 +90,7 @@ describe("createPageMetadata の noindex", () => {
    * 宣言することになる。noindex と canonical は排他でなければならない。
    */
   it("canonical を出さない", () => {
-    const meta = createPageMetadata({ ...base, noindex: true, localized: true });
+    const meta = createPageMetadata({ ...base, noindex: true });
     expect(meta.alternates?.canonical).toBeNull();
     expect(meta.alternates?.languages).toBeUndefined();
   });
@@ -131,7 +135,7 @@ describe("createPageMetadata のタイトル", () => {
   });
 
   it("日本語以外ではサイト名の接尾辞もロケール別になる", () => {
-    const meta = createPageMetadata({ ...base, title: "Contact", locale: "en", localized: true });
+    const meta = createPageMetadata({ ...base, title: "Contact", locale: "en" });
     expect(meta.title).toEqual({
       absolute: "Contact | The 97th Tokyo City University Setagaya Festival",
     });

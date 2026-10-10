@@ -24,7 +24,6 @@ interface PageMetadataOptions {
   description: string;
   pathname: string;
   locale?: Locale;
-  localized?: boolean;
   type?: "website" | "article";
   image?: MetadataImage;
   /**
@@ -43,6 +42,8 @@ interface PageMetadataOptions {
    *
    * `noindex: true` のときは canonical も出さない。存在しないURLに
    * 自己参照 canonical を与えると、Google にその URL を正規版として宣言してしまう。
+   *
+   * 日本語以外のロケールは、この指定に関わらず常に noindex になる（`isIndexableLocale`）。
    */
   noindex?: boolean;
 }
@@ -133,16 +134,35 @@ function buildImages(image: MetadataImage | undefined, title: string) {
   ];
 }
 
+/**
+ * 検索エンジンに載せるロケール
+ *
+ * 日本語だけを索引させ、en / zh / ko は noindex にする（#433）。ページ自体は残し、
+ * 言語切替からは引き続き開ける。
+ *
+ * hreflang で言語版を対応づけていた間も、日本語のクエリのサイトリンクに
+ * `/zh/about`（「第97届东京都市大学世田谷祭」）が混ざった（2026-10-10 観測）。
+ * hreflang は Google にとってヒントでしかなく、漢字のクエリ「世田谷祭」は
+ * 中国語ページの本文にもそのまま当たる。確実に除外できる手段は noindex だけである。
+ *
+ * noindex のページを指す hreflang は無意味なので、`alternates.languages`・
+ * next-intl の `Link:` ヘッダ（`src/i18n/routing.ts` の `alternateLinks`）・
+ * サイトマップの言語別URLもあわせて撤去してある。
+ */
+export function isIndexableLocale(locale: Locale): boolean {
+  return locale === routing.defaultLocale;
+}
+
 export function createPageMetadata({
   title,
   description,
   pathname,
   locale = routing.defaultLocale,
-  localized = false,
   type = "website",
   image,
-  noindex = false,
+  noindex: noindexRequested = false,
 }: PageMetadataOptions): Metadata {
+  const noindex = noindexRequested || !isIndexableLocale(locale);
   // サイト名はロケール別。ja では siteConfig.metadata の値と一致する（chrome JSON が出典）
   const { name: siteName, shortName: ogSiteName } = getChromeMessages(locale).brand;
   const fullTitle = title === siteName ? siteName : `${title} | ${siteName}`;
@@ -157,22 +177,7 @@ export function createPageMetadata({
     alternates: noindex
       ? // 継承した canonical を打ち消す。`null` は Next.js の型でも許容される。
         { canonical: null }
-      : {
-          canonical: canonicalUrl,
-          ...(localized
-            ? {
-                languages: {
-                  ...Object.fromEntries(
-                    routing.locales.map((targetLocale) => [
-                      targetLocale,
-                      absoluteUrl(buildLocalePath(pathname, targetLocale)),
-                    ])
-                  ),
-                  "x-default": absoluteUrl(buildLocalePath(pathname, routing.defaultLocale)),
-                },
-              }
-            : {}),
-        },
+      : { canonical: canonicalUrl },
     openGraph: {
       title: fullTitle,
       description,

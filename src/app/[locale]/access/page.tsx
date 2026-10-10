@@ -22,7 +22,6 @@ export async function generateMetadata({
     description: t("meta.description"),
     pathname: "/access",
     locale: locale as Locale,
-    localized: true,
   });
 }
 

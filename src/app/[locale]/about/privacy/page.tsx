@@ -32,7 +32,6 @@ export async function generateMetadata({
     description: t("meta.description"),
     pathname: "/about/privacy",
     locale: locale as "ja" | "en" | "zh" | "ko",
-    localized: true,
   });
 }
 

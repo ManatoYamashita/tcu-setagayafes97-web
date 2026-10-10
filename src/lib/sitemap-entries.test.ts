@@ -1,12 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { LOCALIZED_PATHNAMES } from "@/i18n/localized-pathnames";
 import { routing } from "@/i18n/routing";
-import {
-  buildStaticSitemapEntries,
-  localizedStaticPathnames,
-  STATIC_PAGES,
-} from "@/lib/sitemap-entries";
+import { buildStaticSitemapEntries, STATIC_PAGES } from "@/lib/sitemap-entries";
 
 /**
  * サイトマップの不変条件
@@ -14,6 +9,9 @@ import {
  * 2026-09-03 の本番サイトマップは静的13件すべての lastmod が同一のビルド時刻で、
  * 多言語URLが1件も載っていなかった（#33）。どちらも lint / build を通過する種類の
  * 欠陥なので、算術で固定する。
+ *
+ * その後 #433 で方針が反転し、外国語ページは noindex になった。いまはサイトマップに
+ * 外国語URLと hreflang が「無いこと」を固定する。
  */
 const entries = buildStaticSitemapEntries();
 
@@ -30,52 +28,23 @@ describe("URL", () => {
   });
 });
 
-describe("ロケール別URL", () => {
+describe("索引対象ロケール", () => {
   /**
-   * `localized: true` を宣言してよいのは `LOCALIZED_PATHNAMES` の6パスだけ。
-   * それ以外へ接頭辞を付けると `src/proxy.ts` の matcher 外になり、
-   * サイトマップが 404 を宣言することになる。
+   * en / zh / ko は noindex（#433）。noindex のURLを載せると Search Console が
+   * 「送信されたURLに noindex タグが追加されています」として警告する。
    */
-  it("localized の宣言が LOCALIZED_PATHNAMES に含まれる", () => {
-    for (const pathname of localizedStaticPathnames()) {
-      expect(LOCALIZED_PATHNAMES).toContain(pathname);
+  it("外国語ロケールのURLを載せない", () => {
+    const foreignPrefixes = routing.locales
+      .filter((locale) => locale !== routing.defaultLocale)
+      .map((locale) => `/${locale}/`);
+    for (const entry of entries) {
+      const pathname = new URL(entry.url).pathname;
+      expect(foreignPrefixes.some((prefix) => `${pathname}/`.startsWith(prefix))).toBe(false);
     }
   });
 
-  it("多言語ページはロケール数だけURLを出す", () => {
-    for (const pathname of localizedStaticPathnames()) {
-      const matched = entries.filter(
-        (entry) =>
-          entry.url.endsWith(pathname) ||
-          routing.locales.some((locale) => entry.url.endsWith(`/${locale}${pathname}`))
-      );
-      expect(matched.length).toBe(routing.locales.length);
-    }
-  });
-});
-
-describe("hreflang", () => {
-  const localized = entries.filter((entry) => entry.alternates?.languages);
-
-  it("多言語ページにだけ付く", () => {
-    expect(localized.length).toBe(localizedStaticPathnames().length * routing.locales.length);
-  });
-
-  it("全ロケール + x-default を列挙する", () => {
-    for (const entry of localized) {
-      expect(Object.keys(entry.alternates!.languages!)).toHaveLength(routing.locales.length + 1);
-    }
-  });
-
-  /**
-   * Google は「各URLが自分自身を含む全言語版を列挙する」ことを要求する。
-   * Next.js の直列化は自己参照を補完しないので、ここで固定する。
-   */
-  it("自分自身を含む（相互参照）", () => {
-    for (const entry of localized) {
-      const hrefs = Object.values(entry.alternates!.languages!).map(String);
-      expect(hrefs).toContain(entry.url);
-    }
+  it("hreflang を出さない", () => {
+    expect(entries.filter((entry) => entry.alternates?.languages)).toEqual([]);
   });
 });
 
@@ -136,13 +105,10 @@ describe("STATIC_PAGES", () => {
     ]);
   });
 
-  it("全ロケールのaboutページは検索結果用画像をサイトマップへ載せる", () => {
-    const aboutEntries = entries.filter((entry) => entry.url.endsWith("/about"));
-    expect(aboutEntries).toHaveLength(routing.locales.length);
-    for (const entry of aboutEntries) {
-      expect(entry.images).toEqual([
-        "https://setagayafes.org/images/brand/search-thumbnail-97.webp",
-      ]);
-    }
+  it("aboutページは検索結果用画像をサイトマップへ載せる", () => {
+    const about = entries.find((entry) => entry.url === "https://setagayafes.org/about");
+    expect(about?.images).toEqual([
+      "https://setagayafes.org/images/brand/search-thumbnail-97.webp",
+    ]);
   });
 });

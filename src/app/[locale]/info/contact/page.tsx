@@ -30,7 +30,6 @@ export async function generateMetadata({
     description: t("meta.description"),
     pathname: "/info/contact",
     locale: locale as "ja" | "en" | "zh" | "ko",
-    localized: true,
   });
 }
 

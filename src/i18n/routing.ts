@@ -26,6 +26,14 @@ export const routing = defineRouting({
    * middleware/syncCookie.ts は localeCookie のみを参照するため）。
    */
   localeCookie: false,
+
+  /**
+   * hreflang の `Link:` レスポンスヘッダを出さない。
+   * 日本語以外のロケールは noindex にしており（`src/lib/metadata.ts` の
+   * `isIndexableLocale`。#433）、noindex のページを指す hreflang は無意味である。
+   * 既定の true のままだと、proxy を通る全ページにこのヘッダが付く。
+   */
+  alternateLinks: false,
 });
 
 export type Locale = (typeof routing.locales)[number];
