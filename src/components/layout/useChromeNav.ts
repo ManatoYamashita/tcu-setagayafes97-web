@@ -1,15 +1,19 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { navigationConfig } from "@/data/navigation";
 import { getChromeMessages, type ChromeMessages } from "@/i18n/chrome-messages";
 import {
+  buildLocaleHref,
+  isLocalizedPathname,
   localizeNavHref,
   splitLocalePrefix,
   type LocalizedNavHref,
 } from "@/i18n/localized-pathnames";
+import { nextPreferredLocale, resolveNavLinkLocale } from "@/i18n/nav-link-locale";
 import type { Locale } from "@/i18n/routing";
 import { useCurrentLocale } from "@/i18n/use-current-locale";
+import { setPreferredLocale, usePreferredLocale } from "@/i18n/use-preferred-locale";
 
 export interface ChromeLink extends LocalizedNavHref {
   /**
@@ -63,16 +67,34 @@ export function isChromePathCurrent(pathname: string, href: string): boolean {
 }
 
 /**
+ * リンク先を解決する。文言の言語（`locale`）とリンク先の言語（`linkLocale`）が違うのは、
+ * 外国語を選んだ来場者が日本語専用ページにいるときだけ（#441）。そのときは
+ * 多言語版があるページへのリンクだけを記憶した言語の版へ向け、それ以外は今までどおり。
+ */
+function localizeChromeHref(
+  pathname: string,
+  locale: Locale,
+  linkLocale: Locale
+): LocalizedNavHref {
+  if (linkLocale !== locale && isLocalizedPathname(pathname)) {
+    return { href: buildLocaleHref(pathname, linkLocale), hrefLang: linkLocale };
+  }
+  return localizeNavHref(pathname, locale);
+}
+
+/**
  * ナビゲーション構成を指定ロケールで解決する純関数。
  * フックから切り離してあるのはテストしやすさのため。
+ *
+ * @param linkLocale リンク先の言語。省略時は `locale` と同じ
  */
-export function buildChromeNav(locale: Locale): ChromeNav {
+export function buildChromeNav(locale: Locale, linkLocale: Locale = locale): ChromeNav {
   const messages = getChromeMessages(locale);
 
   const toLink = (config: { labelKey: keyof ChromeMessages["navigation"]; href: string }) => ({
     id: config.labelKey,
     label: messages.navigation[config.labelKey],
-    ...localizeNavHref(config.href, locale),
+    ...localizeChromeHref(config.href, locale, linkLocale),
   });
 
   return {
@@ -103,10 +125,17 @@ export function buildChromeNav(locale: Locale): ChromeNav {
  */
 export function useChromeNav(): ChromeNav & { readonly pathname: string } {
   const { locale, pathname } = useCurrentLocale();
+  const preferredLocale = usePreferredLocale();
+  const linkLocale = resolveNavLinkLocale(locale, pathname, preferredLocale);
+
+  useEffect(() => {
+    const next = nextPreferredLocale(locale, pathname);
+    if (next !== undefined) setPreferredLocale(next);
+  }, [locale, pathname]);
 
   // 依存は pathname ではなく locale。Header はスクロールのたびに再レンダリング
   // する（isAtTop の useState）ため、これが無いと毎回オブジェクトを作り直して
   // 子の再レンダリングを誘発する。同一ロケール内の遷移でも参照を保てる。
-  const nav = useMemo(() => buildChromeNav(locale), [locale]);
+  const nav = useMemo(() => buildChromeNav(locale, linkLocale), [locale, linkLocale]);
   return useMemo(() => ({ ...nav, pathname }), [nav, pathname]);
 }

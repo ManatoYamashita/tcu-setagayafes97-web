@@ -76,8 +76,11 @@ export function buildLocaleHref(pathname: string, locale: Locale): string {
 
 export interface LocalizedNavHref {
   readonly href: string;
-  /** 多言語版が無い＝遷移先が日本語固定のページであることを宣言する */
-  readonly hrefLang?: "ja";
+  /**
+   * 遷移先の言語が今のページと違うことを宣言する。多言語版が無いページへのリンクは "ja"、
+   * 日本語専用ページから記憶した言語の版へ向けるリンク（#441）はその言語になる
+   */
+  readonly hrefLang?: Locale;
 }
 
 /**
