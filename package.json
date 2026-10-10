@@ -29,6 +29,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
+    "budoux": "0.9.3",
     "clsx": "^2.1.1",
     "gsap": "^3.14.2",
     "lucide-react": "^0.563.0",

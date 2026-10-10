@@ -136,6 +136,8 @@ CSS には特定の位置だけを改行禁止にする手段が無いため、�
 
 お知らせのタイトルを新しい場所に出すときは、`{news.title}` を直接置かずにこのコンポーネントを通すこと。
 
+サイト全体の文節での改行（BudouX）は [phrase-break.md](./phrase-break.md) にある。
+
 ## 関連ドキュメント
 
 - [design.md](./design.md) - カラーシステム・CSS 変数（コントラストは [color-contrast.md](./color-contrast.md)）
