@@ -119,10 +119,11 @@ export default async function EventPage({ params }: EventPageProps) {
       title: event.title,
       sessions: event.sessions,
       // 日付は siteConfig.dates を唯一の出典にする（src/app/special/[id]/page.tsx と同じ）。
-      // 日程を持つ枠はその日の日付になる（#305）。日程の無い枠で day1 以外（both / other）を
-      // day2 に寄せるのは従来どおり。両日開催の扱いは #289
+      // 日程を持つ枠はその日の日付になる（#305）。両日開催で日程の無い枠は両日へ展開する（#289）。
+      // それ以外で日程の無い枠は、day1 以外（other）を day2 に寄せる
       dates: siteConfig.dates,
       defaultDateIso: event.date === "day1" ? siteConfig.dates.day1 : siteConfig.dates.day2,
+      undatedSessionDates: event.date === "both" ? ["day1", "day2"] : undefined,
       location,
     }),
     image: event.thumbnail?.url,
