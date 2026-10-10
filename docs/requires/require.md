@@ -406,8 +406,7 @@ interface Information {
 ├── /data
 │   ├── site.ts           # サイト基本情報（タイトル、開催日等）
 │   ├── navigation.ts     # ナビゲーション構成
-│   ├── buildings.ts      # 建物情報（3Dマップ用）
-│   ├── facilities.ts     # 施設情報（トイレ、案内所等）
+│   ├── facilities.ts     # 施設情報（トイレ、案内所等。未使用。掲載するかを #208 で確認中）
 │   ├── access.ts         # アクセス情報
 │   ├── guide.ts          # ご来場の方へ（注意事項等）
 │   └── privacy.ts        # プライバシーポリシー
@@ -453,13 +452,12 @@ export const siteConfig = {
 
 1. **`/src/data/site.ts`** - サイト基本情報（年度、開催日、テーマカラー等）
 2. **`/src/data/navigation.ts`** - 必要に応じてメニュー項目を調整
-3. **`/src/data/buildings.ts`** - 建物情報（変更がある場合のみ）
-4. **`/src/data/facilities.ts`** - 施設情報（変更がある場合のみ）
-5. **`/src/data/access.ts`** - アクセス情報（変更がある場合のみ）
-6. **`/src/data/guide.ts`** - 注意事項等（変更がある場合のみ）
-7. **`/src/assets/images/`** - 画像ファイルの差し替え
-8. **`/src/assets/videos/`** - 動画ファイルの差し替え
-9. **microCMS** - News, Events, Informations APIのコンテンツを削除・再投稿
+3. **`/src/data/facilities.ts`** - 施設情報（画面に出していない。掲載するかを #208 で確認中）
+4. **`/src/data/access.ts`** - アクセス情報（変更がある場合のみ）
+5. **`/src/data/guide.ts`** - 注意事項等（変更がある場合のみ）
+6. **`/src/assets/images/`** - 画像ファイルの差し替え
+7. **`/src/assets/videos/`** - 動画ファイルの差し替え
+8. **microCMS** - News, Events, Informations APIのコンテンツを削除・再投稿
 
 #### 年度情報の一元管理
 

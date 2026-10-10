@@ -110,8 +110,8 @@
 
 - [x] サイト基本情報ファイルを作成（`/src/data/site.ts` - サイト名、開催日、会場、テーマカラー、SNSリンク等）
 - [x] ナビゲーション構成ファイルを作成（`/src/data/navigation.ts` - メニュー項目、パス）
-- [x] 建物情報ファイルを作成（`/src/data/buildings.ts` - 3Dマップ用、建物番号、名称、座標等）
-  - 注意: 3Dマップ見送りにより、`buildings.ts` / `facilities.ts` はどこからもインポートされていない未使用ファイル
+- [x] 建物情報ファイルを作成（3Dマップ用。見送りにより未使用のため削除済み。企画の絞り込みに使う建物一覧は `src/data/filter-options.ts`）
+  - 注意: `facilities.ts` はどこからもインポートされていない未使用ファイル（掲載するかを #208 で確認中）
 - [x] 施設情報ファイルを作成（`/src/data/facilities.ts` - トイレ、案内所、休憩所等の位置情報）
 - [x] アクセス情報ファイルを作成（`/src/data/access.ts` - 最寄り駅、ルート、駐車場情報）
 - [x] ご来場の方へファイルを作成（`/src/data/guide.ts` - 注意事項、バリアフリー情報）
@@ -186,7 +186,7 @@
 >
 > **この決定に伴う未使用資産**（別途整理の判断が必要）
 >
-> - `src/data/buildings.ts` / `src/data/facilities.ts` — 3D マップ用に作成されたが、どこからもインポートされていない
+> - `src/data/facilities.ts` — 3D マップ用に作成されたが、どこからもインポートされていない（掲載するかを #208 で確認中）
 > - `@react-three/drei` — 依存にあるが未使用
 > - `three` / `@react-three/fiber` — `src/components/three/`（カラクリのギア演出）が使用。**2026-08-10 に復活させたため、現在はクライアントチャンクに含まれる**（860K / brotli 185K）。3Dマップとは無関係なので削除しないこと
 >
@@ -366,11 +366,10 @@
 #### ステップ2: 静的コンテンツの確認・更新
 
 1. `/src/data/navigation.ts` - メニュー項目の追加・削除が必要か確認
-2. `/src/data/buildings.ts` - 建物情報の変更がないか確認
-3. `/src/data/facilities.ts` - 施設情報の変更がないか確認
-4. `/src/data/access.ts` - アクセス情報の変更がないか確認
-5. `/src/data/guide.ts` - 注意事項等の変更がないか確認
-6. `/src/data/privacy.ts` - プライバシーポリシーの変更がないか確認
+2. `/src/data/facilities.ts` - 画面に出していない。掲載するかを #208 で確認中
+3. `/src/data/access.ts` - アクセス情報の変更がないか確認
+4. `/src/data/guide.ts` - 注意事項等の変更がないか確認
+5. `/src/data/privacy.ts` - プライバシーポリシーの変更がないか確認
 
 #### ステップ3: アセット（画像・動画）の差し替え
 
