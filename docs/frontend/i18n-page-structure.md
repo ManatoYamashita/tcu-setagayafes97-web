@@ -176,6 +176,10 @@ Vercel Free Plan の帯域（100GB/月）とサーバーレス関数の制約、
 
 ---
 
+## 検索エンジンへの露出
+
+**外国語ページ（`/en/*` `/zh/*` `/ko/*`）は `noindex, follow` です**（#433）。日本語のクエリの検索結果に中国語ページが混ざったためで、hreflang・`Link:` ヘッダ・サイトマップの言語別URLもあわせて撤去しました。ページは残っており、言語切替から開けます。経緯と戻し方は [`docs/dev/seo-metadata.md`](../dev/seo-metadata.md) の「外国語ページの検索除外」を参照してください。
+
 ## 多言語ページを追加する手順
 
 1. `src/app/[locale]/<path>/page.tsx` を作る（`src/app/<path>/` には作らない）
@@ -192,7 +196,7 @@ Vercel Free Plan の帯域（100GB/月）とサーバーレス関数の制約、
 ### proxy.ts を編集するときの禁止事項
 
 - **`/` を matcher に追加しない。** `src/app/[locale]/page.tsx` が存在しないため、トップページが404になります
-- **`:path*` は `/ja/:path*` 以外で使わない。** `/(en|zh|ko)/about/:path*` のような書き方は、対応ページが存在しない `/en/about/sponsors` まで拾います。ミドルウェアを通過した404には hreflang の `Link:` ヘッダが付き、検索エンジンへ誤った代替情報を送ります
+- **`:path*` は `/ja/:path*` 以外で使わない。** `/(en|zh|ko)/about/:path*` のような書き方は、対応ページが存在しない `/en/about/sponsors` まで拾います（かつてはミドルウェアを通過した404に hreflang の `Link:` ヘッダが付いていました。#433 で `alternateLinks: false` にしてヘッダは止めましたが、存在しないページを通す理由も無いので規則は残します）
 - **matcher からパスを外さない。** 非ロケール版のページを削除済みのため、6つの正規日本語URLの到達性は matcher に全面的に依存しています
 
 matcher と `LOCALIZED_PATHNAMES` のドリフトは `proxy.ts` 末尾の検知ロジックが開発時に `console.error` で知らせます。
