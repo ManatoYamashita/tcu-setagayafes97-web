@@ -134,9 +134,15 @@ const { href, hrefLang } = localizeNavHref("/access", locale);
 注記のページ名は `src/messages/<code>.json` の `guide.title` と同じ文字列にしてください（`src/data/navigation.test.ts` が見ます）。
 韓国語の注記だけ `word-break: keep-all` で空白でだけ折ります。既定のままだと「이동 / 합니다」のように語の途中で折れるためです。
 
-### 期待される挙動: `/events` へ移ると UI が日本語に戻る
+### 期待される挙動: `/events` では UI が日本語になるが、選んだ言語は覚えている
 
-`/en/info/guide` からヘッダーの `Events` を押すと、遷移先の `/events` には多言語版が無いためヘッダー・フッターを含む UI 全体が日本語になります。これはバグではなく、多言語版が6パスしか存在しないことの帰結です。リンクには `hrefLang="ja"` が付いており、支援技術と検索エンジンには遷移先の言語が正しく伝わります。
+`/en/info/guide` から `/events` へ移ると、多言語版が無いためヘッダー・フッターを含む UI は日本語になります（多言語版が6パスしか無いことの帰結。リンクの `hrefLang="ja"` が遷移先の言語を伝えます）。
+
+ただし**選んだ外国語はタブ内（`sessionStorage`）に記憶し、日本語専用ページのヘッダー・フッターでは、多言語版があるリンクだけを記憶した言語の版へ向けます**（`/events` の `アクセス` → `/en/access`。文言は日本語のまま、`hrefLang="en"`。#441）。判定は `src/i18n/nav-link-locale.ts`、記憶は `src/i18n/use-preferred-locale.ts`。
+
+- 記憶する: 外国語の URL を開いたとき。消す: 多言語版の日本語ページを開いたとき、言語切替で「日本語」を選んだとき
+- **差し替えは hydrate の後**（`useSyncExternalStore` の server snapshot は `null`）。サーバーの HTML は日本語版へのリンクのままで、ハイドレーション不一致を起こさない
+- Cookie にしないのは、`localeCookie: false`（ブラウザ言語だけで外国語ページへ送らない）とぶつけないため。記憶はリンク先を変えるだけで、リダイレクトには使わない
 
 ---
 

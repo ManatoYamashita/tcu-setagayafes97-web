@@ -9,8 +9,9 @@ import {
   isLocalizedPathname,
   LOCALE_FALLBACK_PATHNAME,
 } from "@/i18n/localized-pathnames";
-import type { Locale } from "@/i18n/routing";
+import { routing, type Locale } from "@/i18n/routing";
 import { useCurrentLocale } from "@/i18n/use-current-locale";
+import { setPreferredLocale } from "@/i18n/use-preferred-locale";
 
 const focusRing =
   "focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600";
@@ -58,6 +59,14 @@ function useLanguageLinks(): { current: LanguageLink; items: LanguageLink[] } {
   });
 
   return { current: items.find((item) => item.isCurrent) ?? items[0], items };
+}
+
+/**
+ * 日本語を選び直したら、記憶した外国語を消す。日本語専用ページでは「日本語」が今のページへの
+ * リンクで URL が変わらないため、遷移先の URL からは選び直したことが分からない（#441）
+ */
+function forgetIfJapanese(code: Locale) {
+  if (code === routing.defaultLocale) setPreferredLocale(null);
 }
 
 interface LanguageSwitcherProps {
@@ -145,7 +154,10 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
                 lang={item.code}
                 hrefLang={item.code}
                 aria-current={item.isCurrent ? "true" : undefined}
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  forgetIfJapanese(item.code);
+                  setIsOpen(false);
+                }}
                 className={`block px-4 py-2 text-sm transition-colors hover:bg-white/20 ${focusRing} ${
                   item.isCurrent ? "font-bold text-gray-900" : "text-gray-900/80"
                 }`}
@@ -193,7 +205,10 @@ export function LanguageSwitcherInline({ className, onNavigate }: LanguageSwitch
               lang={item.code}
               hrefLang={item.code}
               aria-current={item.isCurrent ? "true" : undefined}
-              onClick={onNavigate}
+              onClick={() => {
+                forgetIfJapanese(item.code);
+                onNavigate?.();
+              }}
               className={`inline-flex min-h-11 flex-col justify-center border px-4 py-2 text-sm font-semibold transition-colors ${focusRing} ${
                 // 注記の文は2行に折れるので、完全な丸ではなく角丸の札にする
                 item.note ? "rounded-2xl" : "rounded-full"
