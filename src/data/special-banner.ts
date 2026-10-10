@@ -42,6 +42,11 @@ export interface SpecialBannerData {
   /** 見出しの下、本文の左に縦書きで置く分類ラベル */
   category: string;
   /**
+   * 企画名。見出しの1行目に文字で出し、その下に出演者名のロゴを置きます。
+   * 見出しのアクセシブル名は「企画名 + `name`」になります。
+   */
+  title: string;
+  /**
    * 出演者名。見出しはロゴ画像で表示するため、この文字列は
    * 画像の代替テキスト（= 見出しのアクセシブル名）として使われます。
    */
@@ -85,6 +90,7 @@ export interface SpecialBannerData {
 export const specialBanner: SpecialBannerData = {
   eventId: "special-event-mon7a",
   category: "著名人企画",
+  title: "TOSHI MUSIC 2026",
   name: "MON7A",
   nameLogo: {
     src: "/images/special/mon7a-logo.avif",
