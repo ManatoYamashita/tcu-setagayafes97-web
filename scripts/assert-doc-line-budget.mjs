@@ -64,15 +64,15 @@ const LINE_LIMIT = 300;
  */
 const GRANDFATHERED = new Map([
   ["DESIGN.md", 680],
-  [".claude/CLAUDE.md", 659],
-  ["docs/requires/require.md", 614],
+  [".claude/CLAUDE.md", 658],
+  ["docs/requires/require.md", 612],
   ["docs/frontend/page-transition.md", 540],
   ["docs/frontend/image-delivery.md", 529],
   ["docs/frontend/events-semantic-search.md", 496],
   ["docs/frontend/performance.md", 450],
   ["docs/frontend/timetable-gantt.md", 448],
   ["docs/dev/legacy-site-deindex.md", 435],
-  ["docs/requires/todo.md", 414],
+  ["docs/requires/todo.md", 413],
   [".agents/skills/next-cache-components/SKILL.md", 411],
   ["docs/dev/microcms.md", 325],
   [".agents/skills/deploy-to-vercel/SKILL.md", 321],
