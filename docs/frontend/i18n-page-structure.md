@@ -121,6 +121,19 @@ const { href, hrefLang } = localizeNavHref("/access", locale);
 
 `LanguageSwitcher` は `useCurrentLocale()` を共有しますが、href の組み立てに `localizeNavHref()` は**使いません**。ナビゲーションは多言語版が無いページへ実在パスで直リンクするのに対し、言語切替は着地先が無いと切替自体が成立しないため `LOCALE_FALLBACK_PATHNAME`（`/info/guide`）へ倒します。**この差は意図的なので統一しないこと。**
 
+多言語版が無いページでは、外国語の各選択肢に**「このページは日本語のみ」と着地先のページ名を、その言語の文で添えます**（`src/data/navigation.ts` の `fallbackNote`）。
+ページ名だけを添えていた間は、押した来場者には「別のページへ飛ばされた」としか見えませんでした（#440）。
+注記はリンクの中にあるため、リンクのアクセシブル名にも入ります（例: `English This page is in Japanese only. Opens the Visitor Guide.`）。
+
+| 現在のページ             | 外国語の選択肢の行き先                  | 注記 |
+| ------------------------ | --------------------------------------- | ---- |
+| 多言語版がある6パス      | 同じページの各言語版                    | 無し |
+| それ以外（`/events` 等） | `/<locale>/info/guide`（Visitor Guide） | 有り |
+
+これは残りページの多言語化（#381）までの応急処置です。ページが `[locale]` 化されれば `LOCALIZED_PATHNAMES` に入り、注記は自動で消えます。
+注記のページ名は `src/messages/<code>.json` の `guide.title` と同じ文字列にしてください（`src/data/navigation.test.ts` が見ます）。
+韓国語の注記だけ `word-break: keep-all` で空白でだけ折ります。既定のままだと「이동 / 합니다」のように語の途中で折れるためです。
+
 ### 期待される挙動: `/events` へ移ると UI が日本語に戻る
 
 `/en/info/guide` からヘッダーの `Events` を押すと、遷移先の `/events` には多言語版が無いためヘッダー・フッターを含む UI 全体が日本語になります。これはバグではなく、多言語版が6パスしか存在しないことの帰結です。リンクには `hrefLang="ja"` が付いており、支援技術と検索エンジンには遷移先の言語が正しく伝わります。

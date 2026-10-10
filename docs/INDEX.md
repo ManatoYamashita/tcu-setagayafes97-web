@@ -160,7 +160,8 @@
 - **[layout-e2e-waiting.md](./frontend/layout-e2e-waiting.md)** - E2E の待ち方（不確定要素ごとの決定的な待ち方）
   - **測ろうとしている値そのものを待たない。** 待つと #148 は「検出できない」に化ける
   - **dev では Suspense の中身がまず `div[hidden][id^="S:"]` に届く。** `toBeAttached()` は通るが幾何は 0（#309）
-- **[i18n-page-structure.md](./frontend/i18n-page-structure.md)** - 多言語ページの構成パターン（next-intl・メッセージ分割・リンク・`lang`）
+- **[i18n-page-structure.md](./frontend/i18n-page-structure.md)** - 多言語ページの構成パターン（next-intl・メッセージ分割・リンク・`lang`・言語切替）
+  - **多言語版の無いページの言語切替は Visitor Guide へ倒し、選択肢に「日本語のみ」の注記を対象言語で添える**（#381 までの応急処置）
 - **[page-transition.md](./frontend/page-transition.md)** - ページ遷移アニメーションと View Transitions API
   - **popstate リスナはモジュール評価時に登録する**（`useEffect` だと2回目以降動かない）。`next` を上げたら履歴遷移を再検証する
 - **[opener-entry-only.md](./frontend/opener-entry-only.md)** - オープナーは入口でだけ再生する（#402）
