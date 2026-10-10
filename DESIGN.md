@@ -1,7 +1,8 @@
 # DESIGN.md — 第97回東京都市大学世田谷祭 公式Webサイト
 
 > このファイルはAIエージェントおよび開発チームが正確なUIを生成・実装するためのデザイン仕様書です。
-> 実装の一次ソースは `src/app/globals.css` と `tailwind.config.ts`。本ドキュメントはその要約と運用ルールを提供します。
+> 実装の一次ソースは `src/app/globals.css`（色・フォント等のトークンは `@theme` ブロック）。本ドキュメントはその要約と運用ルールを提供します。
+> Tailwind v4 は `tailwind.config.ts` を読まない（`@config` を書かない限り）。設定ファイルを足しても配信される色は変わらない。
 
 ---
 
@@ -670,11 +671,10 @@ border-gray-200/20               → 薄いボーダー
 | ファイル                       | 内容                                              |
 | ------------------------------ | ------------------------------------------------- |
 | `src/app/globals.css`          | CSS変数・カスタムユーティリティ・キーフレーム定義 |
-| `tailwind.config.ts`           | Tailwind 拡張設定（色・フォント）                 |
 | `src/app/layout.tsx`           | Google Fonts 読み込み設定                         |
 | `src/components/ui/Button.tsx` | ボタンコンポーネント実装                          |
 | `src/components/ui/Card.tsx`   | カードコンポーネント実装                          |
 
 ---
 
-**最終更新日**: 2026-08-30
+**最終更新日**: 2026-10-10

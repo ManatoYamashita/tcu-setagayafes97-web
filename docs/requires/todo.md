@@ -51,7 +51,7 @@
 
 - [x] Next.js 16.1プロジェクトを初期化（`npx create-next-app@latest`）
 - [x] TypeScript設定を構成（`tsconfig.json`の最適化）
-- [x] TailwindCSSをインストール・設定（`tailwind.config.ts`、`globals.css`）
+- [x] TailwindCSSをインストール・設定（`globals.css` の `@theme`。v4 は `tailwind.config.ts` を使わない）
 - [x] GSAPをインストール（`pnpm add gsap`）
 - [x] package.jsonのscriptsセクションを設定（dev, build, start, lint, format等）
 - [x] ESLintを設定（`.eslintrc.json`の最適化）
