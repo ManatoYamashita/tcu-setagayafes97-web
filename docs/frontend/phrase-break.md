@@ -20,7 +20,10 @@
 - 対象外: `lang` が `ja` 以外の範囲（多言語ページ）、`textarea` / `select` / `code` / `pre` / `svg`、
   `aria-live`（書き換えると読み上げが繰り返される）、`[data-no-phrase-break]`
 - コピーした文字列からは区切りを取り除く（住所の貼り付けなどに不可視文字を持ち出さない）
-- 要素側に `[word-break:auto-phrase]` などの明示指定があれば、そちらが勝つ（base 層に置いている理由）
+- 区切りが1つも入らない（全体で1文節の）テキストの親にも `data-phrase-break` を付ける。付けないと iOS では既定の折り返しのままで、
+  お知らせの見出しが「東京都市大 / 学」で折れた（2026-10-10、iPhone 実機）
+- `word-break: keep-all` は `!important`。要素側の `[word-break:auto-phrase]` に負けると、auto-phrase を値として受け付けて
+  文節を扱わない環境で keep-all が消える。区切りが入っているので Chrome でも auto-phrase は要らない
 
 ## ハイドレーション前に書き換えない
 

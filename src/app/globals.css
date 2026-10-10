@@ -114,10 +114,12 @@ body {
   }
 
   /* PhraseBreaker が文節の境目へゼロ幅スペースを入れた要素。境目以外では折らず、
-     1文節が行幅を超えるときだけ途中で折る。base 層に置くのは、要素側の
-     `[word-break:auto-phrase]` などの明示指定を優先させるため */
+     1文節が行幅を超えるときだけ途中で折る。
+     word-break を !important にするのは、要素側の `[word-break:auto-phrase]` に勝つため。
+     auto-phrase を値として受け付けて文節を扱わない環境があると、keep-all が消えて
+     語の途中で折れる。区切りは入っているので、Chrome でも auto-phrase は要らない */
   [data-phrase-break] {
-    word-break: keep-all;
+    word-break: keep-all !important;
     overflow-wrap: anywhere;
   }
 

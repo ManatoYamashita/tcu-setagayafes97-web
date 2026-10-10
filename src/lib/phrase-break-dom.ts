@@ -1,4 +1,4 @@
-import { PHRASE_SEPARATOR, hasJapanese, insertPhraseBreaks } from "./phrase-break";
+import { hasJapanese, insertPhraseBreaks } from "./phrase-break";
 
 /** 区切りを入れたテキストの親へ付ける。`globals.css` がこれに `keep-all` を当てる */
 const MARK = "data-phrase-break";
@@ -85,9 +85,9 @@ export function breakPhrasesIn(root: Node, parse: Parse): boolean {
     const next = insertPhraseBreaks(node.data, parse);
     if (next !== node.data) node.data = next;
     processed.set(node, next);
-    if (next.includes(PHRASE_SEPARATOR) && !parent.hasAttribute(MARK)) {
-      parent.setAttribute(MARK, "");
-    }
+    // 区切りが1つも入らない（全体で1文節の）テキストにも付ける。付けないと既定の折り返しの
+    // ままになり、iOS では「東京都市大 / 学」のように語の途中で折れる（2026-10-10 実機）
+    if (!parent.hasAttribute(MARK)) parent.setAttribute(MARK, "");
   };
 
   if (root instanceof Text) {
