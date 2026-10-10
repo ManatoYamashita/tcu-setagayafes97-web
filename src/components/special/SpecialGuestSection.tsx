@@ -10,7 +10,7 @@ import { SpecialGuestMotion } from "./SpecialGuestMotion";
 /**
  * 著名人企画（スペシャル企画）の告知セクション
  *
- * 出演者ロゴ・写真・日時と会場・チケットの要点・入場の条件を見せ、
+ * 企画名・出演者ロゴ・写真・日時と会場・チケットの要点・入場の条件を見せ、
  * 著名人企画LPへ誘導します。トップページ（Hero の直下）と企画一覧ページ（/events の最下部）の
  * 2箇所で使います。チケットは券種を必ず両方載せます（理由は src/data/special-banner.ts）。
  *
@@ -61,7 +61,7 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
     return null;
   }
 
-  const { category, name, nameLogoFilled, image, headline, tickets, notes, ctaLabel } =
+  const { category, title, name, nameLogoFilled, image, headline, tickets, notes, ctaLabel } =
     specialBanner;
   const isSheet = variant === "sheet";
 
@@ -104,19 +104,26 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
             data-special-guest-stagger
           >
             {/* 見出し（トップページは Kaisei Opti を読み込まないため font-sans を明示する）。
-                出演者名はロゴ画像で、alt が見出しのアクセシブル名を担う。
-                md 以上では左の余白（pl）より大きく引き出し、ロゴの頭を写真の右端へ重ねる。
+                1行目が企画名の文字、2行目が出演者名のロゴ。見出しは1つに保ち、
+                アクセシブル名は「企画名 + ロゴの alt」になる。
+                md 以上ではロゴの行だけを左の余白（pl）より大きく引き出し、ロゴの頭を写真の右端へ重ねる。
+                企画名まで引き出すと、白で塗れない文字が暗い写真の上に乗って読めなくなる。
                 ロゴは内側を白で塗った版なので、暗い写真の上でも文字の中身が抜けない */}
-            <h2 className="flex items-center gap-4 font-sans md:-ml-12 lg:-ml-16">
-              <AppImage
-                src={nameLogoFilled.src}
-                alt={name}
-                width={nameLogoFilled.width}
-                height={nameLogoFilled.height}
-                sizes="(min-width: 1024px) 260px, (min-width: 768px) 200px, 220px"
-                className="h-auto w-[220px] shrink-0 md:w-[200px] lg:w-[260px]"
-              />
-              <span aria-hidden="true" className="h-px min-w-8 flex-1 bg-gray-900" />
+            <h2 className="font-sans">
+              <span className="block text-sm font-bold tracking-[0.12em] text-primary-700 sm:text-base">
+                {title}
+              </span>
+              <span className="mt-2 flex items-center gap-4 md:-ml-12 lg:-ml-16">
+                <AppImage
+                  src={nameLogoFilled.src}
+                  alt={name}
+                  width={nameLogoFilled.width}
+                  height={nameLogoFilled.height}
+                  sizes="(min-width: 1024px) 260px, (min-width: 768px) 200px, 220px"
+                  className="h-auto w-[220px] shrink-0 md:w-[200px] lg:w-[260px]"
+                />
+                <span aria-hidden="true" className="h-px min-w-8 flex-1 bg-gray-900" />
+              </span>
             </h2>
 
             {/* 本文。左に縦書きの分類ラベル、右に日時と会場。
