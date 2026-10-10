@@ -111,7 +111,8 @@
 - **[prose.md](./frontend/prose.md)** - microCMS のリッチテキスト（`prose`）の規則。`@tailwindcss/typography` は未導入
 - **[typography.md](./frontend/typography.md)** - Kaisei Opti の読み込みと使い分け、文字サイズと行送り（Tailwind の既定値）
   - **Kaisei Opti は要素で決まる（`h1`〜`h3` はサイズを問わず）。** sans にしたい見出しは `font-sans` を明示する（2026-09-30 に規約を実装へ揃えた）
-- **[access-page-design.md](./frontend/access-page-design.md)** - Access ページの情報設計・地図・経路・フォーカス表示・モーション方針
+- **[access-page-design.md](./frontend/access-page-design.md)** - Access ページの情報設計・地図・経路・6号館裏の駐輪案内・モーション方針
+- **[visitor-guidance-content.md](./frontend/visitor-guidance-content.md)** - 来場案内・パンフレット・会長名の確定事項と救護室の確認待ち（#436）
 - **[special-ticket-cta.md](./frontend/special-ticket-cta.md)** - 著名人企画 LP のモバイルチケット導線（固定 CTA・退避条件・320px の検証契約）
 - **[image-delivery.md](./frontend/image-delivery.md)** - 画像配信の経路（microCMS は imgix、`public/` は事前 AVIF）
   - **Vercel の変換枠は総量で枯れる。** 消費が少なくても、枯れた枠の上では 402 になる
@@ -140,7 +141,7 @@
   - **正規化は `normalizeText()` の1本に集約する。** 別々に正規化すると「検索では出るのにフィルタでは落ちる」
 - **[events-special-banner.md](./frontend/events-special-banner.md)** - `/events` 冒頭の音楽ポスター風著名人企画バナー（文字のグルーピング・画像・上角・小画面の配置）
 - **[about-past-festivals.md](./frontend/about-past-festivals.md)** - `/about` 最下部の「過去の世田谷祭」（歴代サイトのサムネイル一覧。出典・欠番・上端基準の切り抜き。#422）
-- **[special-guest-section.md](./frontend/special-guest-section.md)** - トップと `/events` 最下部の著名人企画告知セクション（写真を画面の左端へ広げる・ワイプ・白塗りロゴ・チケットの要約。#414 / #419）
+- **[special-guest-section.md](./frontend/special-guest-section.md)** - トップと `/events` 最下部の著名人企画告知セクション（TOSHI MUSIC 2026・写真・ワイプ・ロゴ・チケット。#414 / #419 / #437）
   - **チケットは券種を必ず両方載せる**
   - **白塗りロゴを `SpecialEventBanner` に渡さない**（白抜きにすると文字が塊になる）
 - **[events-semantic-search.md](./frontend/events-semantic-search.md)** - `/events` の意味検索（第4段・TypeSafe Jev。#253）。取得キャッシュと応答キャッシュの境界も記載（#252）

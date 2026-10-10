@@ -20,15 +20,26 @@ export const metadata: Metadata = createPageMetadata({
  * パンフレット情報
  * TODO: 将来的に /src/data/pamphlet.ts に移行
  */
-const pamphlets = [
+interface Pamphlet {
+  id: string;
+  title: string;
+  description: string;
+  fileUrl: string;
+  /** PDF 確定前の容量・ページ数は null（未定） */
+  fileSize: string | null;
+  pages: number | null;
+  isAvailable: boolean;
+}
+
+const pamphlets: Pamphlet[] = [
   {
     id: "main",
     title: "第97回東京都市大学世田谷祭 公式パンフレット",
     description:
       "企画一覧、タイムテーブル、キャンパスマップなど、世田谷祭を楽しむための情報が満載です。",
     fileUrl: "/pamphlets/setagayafes97_pamphlet_placeholder.pdf",
-    fileSize: "5.2MB",
-    pages: 24,
+    fileSize: null,
+    pages: null,
     isAvailable: false, // 準備中フラグ
   },
 ];
@@ -36,7 +47,7 @@ const pamphlets = [
 const notes = [
   "パンフレットはPDF形式で提供しています。",
   "印刷してご来場いただくと便利です。",
-  "紙のパンフレットは当日、各案内所にて配布しています。",
+  "紙のパンフレットは当日、入場門でのみ配布しています。",
   "内容は予告なく変更される場合があります。最新情報は当サイトでご確認ください。",
 ];
 
@@ -84,8 +95,11 @@ export default function PamphletPage() {
             <p className="mb-6 leading-8 text-gray-700">{pamphlet.description}</p>
             <FactList
               items={[
-                { label: "ページ数", value: `${pamphlet.pages}ページ` },
-                { label: "ファイルサイズ", value: pamphlet.fileSize },
+                {
+                  label: "ページ数",
+                  value: pamphlet.pages === null ? "未定" : `${pamphlet.pages}ページ`,
+                },
+                { label: "ファイルサイズ", value: pamphlet.fileSize ?? "未定" },
                 // 公開前は操作できるものが無いので、ボタンではなく状態として示す
                 ...(pamphlet.isAvailable ? [] : [{ label: "ダウンロード", value: "準備中" }]),
               ]}

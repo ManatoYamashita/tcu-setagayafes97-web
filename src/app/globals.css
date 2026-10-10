@@ -353,11 +353,11 @@ body {
    * ScrollTrigger が画面外の推定値でトリガー位置を測ってしまう。値を変えたときは
    * /events で実測し直すこと。
    */
-  /* 実測（2026-10-06、/events、#419）: 375px 53.6rem / 768px 35.1rem / 1024px 36.6rem /
-     1280px 39.1rem / 1440px 40.1rem。md〜lg はテキスト側（チケット・注記）の高さが決め、
+  /* 実測（2026-10-10、/events、#437、CMS フィクスチャ）: 390px 57.1rem / 768px 37.6rem /
+     1024px 39.1rem / 1280px 39.1rem / 1440px 40.1rem。md〜lg はテキスト側の高さが決め、
      xl 以上は写真（正方形）が列幅とともに伸びて max-w-6xl で頭打ちになる */
   .deferred-section--special {
-    contain-intrinsic-size: auto 54rem;
+    contain-intrinsic-size: auto 57rem;
   }
 
   .deferred-section--events {
@@ -370,7 +370,7 @@ body {
    */
   @media (min-width: 48rem) {
     .deferred-section--special {
-      contain-intrinsic-size: auto 36rem;
+      contain-intrinsic-size: auto 39rem;
     }
   }
 

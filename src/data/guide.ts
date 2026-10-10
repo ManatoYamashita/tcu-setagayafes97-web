@@ -59,7 +59,7 @@ export const guideContents = {
       time: "10:00〜19:30（両日とも）",
       notes: [
         "入退場自由です。",
-        "パンフレットは各案内所にて配布しています。",
+        "パンフレットは入場門でのみ配布しています。",
         "事前予約は不要です。",
       ],
     },
@@ -77,7 +77,8 @@ export const guideContents = {
       {
         id: "trash",
         category: "ゴミ",
-        content: "ゴミは各自お持ち帰りください。分別にご協力をお願いします。",
+        content:
+          "家庭ゴミの持ち込みはご遠慮ください。祭で発生したゴミは、学内各所のゴミ箱へ分別して捨ててください。",
       },
       {
         id: "pets",
@@ -101,7 +102,7 @@ export const guideContents = {
         "車椅子でのご来場も可能です。エレベーターをご利用ください。",
         "多目的トイレは各棟1階に設置されています。",
         "授乳室は6号館1階にございます。",
-        "ご不明な点がございましたら、案内所までお問い合わせください。",
+        "ご不明な点がございましたら、9号館前の本部までお問い合わせください。",
       ],
     },
     weatherInfo: {
@@ -112,22 +113,22 @@ export const guideContents = {
       ],
     },
     lostAndFound: {
-      location: "1号館1F 総合案内所",
+      location: "9号館前 本部",
       hours: "10:00〜19:30（両日とも）",
       notes: [
-        "お心当たりのある方は、総合案内所までお問い合わせください。",
+        "お心当たりのある方は、9号館前の本部までお問い合わせください。",
         "お預かり期間は当日限りです。後日のお問い合わせは公式サイトのお問い合わせフォームからお願いします。",
       ],
     },
     forFamilies: {
       notes: [
         "授乳室・おむつ交換台は6号館1階にございます。",
-        "迷子になった際は、お近くのスタッフまたは総合案内所までお声がけください。",
+        "迷子になった際は、お近くのスタッフまたは9号館前の本部までお声がけください。",
       ],
     },
     emergency: {
       medicalRoom: "1号館1F 救護室",
-      emergencyContact: "総合案内所（1号館1F）",
+      emergencyContact: "本部（9号館前）",
       notes: [
         "体調不良の際は、お近くのスタッフまたは救護室までお声がけください。",
         "災害発生時は、スタッフの指示に従って避難してください。",
@@ -141,7 +142,7 @@ export const guideContents = {
       time: "10:00–19:30 (both days)",
       notes: [
         "You may enter and leave freely.",
-        "Pamphlets are distributed at each information desk.",
+        "Pamphlets are distributed only at the entrance gate.",
         "No advance reservation is required.",
       ],
     },
@@ -159,7 +160,8 @@ export const guideContents = {
       {
         id: "trash",
         category: "Trash",
-        content: "Please take your trash home with you, and help us by sorting it properly.",
+        content:
+          "Please do not bring household trash. Sort trash generated at the festival and put it in the bins around campus.",
       },
       {
         id: "pets",
@@ -184,7 +186,7 @@ export const guideContents = {
         "Wheelchair users are welcome. Please use the elevators.",
         "Accessible restrooms are located on the first floor of each building.",
         "The nursing room is on the first floor of Building 6.",
-        "If you have any questions, please ask at an information desk.",
+        "If you have any questions, please ask at the festival headquarters in front of Building 9.",
       ],
     },
     weatherInfo: {
@@ -195,22 +197,22 @@ export const guideContents = {
       ],
     },
     lostAndFound: {
-      location: "General Information Desk, Building 1, 1F",
+      location: "Festival headquarters in front of Building 9",
       hours: "10:00–19:30 (both days)",
       notes: [
-        "If you think an item may be yours, please ask at the General Information Desk.",
+        "If you think an item may be yours, please ask at the festival headquarters in front of Building 9.",
         "Items are held for the day only. For later inquiries, please use the contact form on our official website.",
       ],
     },
     forFamilies: {
       notes: [
         "The nursing room and diaper-changing station are on the first floor of Building 6.",
-        "If a child gets lost, please speak to the nearest staff member or the General Information Desk.",
+        "If a child gets lost, please speak to the nearest staff member or the festival headquarters in front of Building 9.",
       ],
     },
     emergency: {
       medicalRoom: "First Aid Room, Building 1, 1F",
-      emergencyContact: "General Information Desk (Building 1, 1F)",
+      emergencyContact: "Festival headquarters (in front of Building 9)",
       notes: [
         "If you feel unwell, please speak to the nearest staff member or go to the First Aid Room.",
         "In the event of a disaster, please evacuate following the staff's instructions.",
@@ -222,7 +224,7 @@ export const guideContents = {
     admission: {
       fee: "免费",
       time: "10:00～19:30（两天均相同）",
-      notes: ["可自由进出。", "宣传手册在各咨询处发放。", "无需提前预约。"],
+      notes: ["可自由进出。", "宣传手册仅在入场门发放。", "无需提前预约。"],
     },
     precautions: [
       {
@@ -238,7 +240,7 @@ export const guideContents = {
       {
         id: "trash",
         category: "垃圾",
-        content: "请将垃圾自行带走，并配合进行垃圾分类。",
+        content: "请勿携带家庭垃圾。活动中产生的垃圾请分类后投入校园各处的垃圾桶。",
       },
       {
         id: "pets",
@@ -262,7 +264,7 @@ export const guideContents = {
         "欢迎轮椅使用者前来，请使用电梯。",
         "各栋1楼均设有无障碍卫生间。",
         "哺乳室位于6号馆1楼。",
-        "如有疑问，请向咨询处询问。",
+        "如有疑问，请前往9号馆前的活动本部咨询。",
       ],
     },
     weatherInfo: {
@@ -270,19 +272,22 @@ export const guideContents = {
       notes: ["遇恶劣天气时，室外企划可能取消或变更。", "最新信息将通过官方社交媒体及本网站发布。"],
     },
     lostAndFound: {
-      location: "1号馆1楼 综合咨询处",
+      location: "9号馆前 活动本部",
       hours: "10:00～19:30（两天均相同）",
       notes: [
-        "如有遗失物品的线索，请前往综合咨询处询问。",
+        "如有遗失物品的线索，请前往9号馆前的活动本部询问。",
         "物品仅保管至当天。之后如需咨询，请通过官方网站的联系表单。",
       ],
     },
     forFamilies: {
-      notes: ["哺乳室及尿布更换台位于6号馆1楼。", "如孩子走失，请联系附近的工作人员或综合咨询处。"],
+      notes: [
+        "哺乳室及尿布更换台位于6号馆1楼。",
+        "如孩子走失，请联系附近的工作人员或9号馆前的活动本部。",
+      ],
     },
     emergency: {
       medicalRoom: "1号馆1楼 医务室",
-      emergencyContact: "综合咨询处（1号馆1楼）",
+      emergencyContact: "活动本部（9号馆前）",
       notes: [
         "如身体不适，请联系附近的工作人员或前往医务室。",
         "发生灾害时，请听从工作人员指示避难。",
@@ -296,7 +301,7 @@ export const guideContents = {
       time: "10:00~19:30 (양일 동일)",
       notes: [
         "자유롭게 입장 및 퇴장하실 수 있습니다.",
-        "팸플릿은 각 안내소에서 배부합니다.",
+        "팸플릿은 입장 게이트에서만 배부합니다.",
         "사전 예약은 필요하지 않습니다.",
       ],
     },
@@ -314,7 +319,8 @@ export const guideContents = {
       {
         id: "trash",
         category: "쓰레기",
-        content: "쓰레기는 각자 가져가 주세요. 분리배출에 협조 부탁드립니다.",
+        content:
+          "가정 쓰레기는 가져오지 마세요. 축제에서 발생한 쓰레기는 분리하여 교내 곳곳의 쓰레기통에 버려 주세요.",
       },
       {
         id: "pets",
@@ -338,7 +344,7 @@ export const guideContents = {
         "휠체어로도 방문하실 수 있습니다. 엘리베이터를 이용해 주세요.",
         "장애인 화장실은 각 건물 1층에 있습니다.",
         "수유실은 6호관 1층에 있습니다.",
-        "궁금한 점이 있으시면 안내소로 문의해 주세요.",
+        "궁금한 점이 있으시면 9호관 앞 축제 본부로 문의해 주세요.",
       ],
     },
     weatherInfo: {
@@ -349,22 +355,22 @@ export const guideContents = {
       ],
     },
     lostAndFound: {
-      location: "1호관 1층 종합 안내소",
+      location: "9호관 앞 축제 본부",
       hours: "10:00~19:30 (양일 동일)",
       notes: [
-        "짐작 가는 분실물이 있으시면 종합 안내소로 문의해 주세요.",
+        "짐작 가는 분실물이 있으시면 9호관 앞 축제 본부로 문의해 주세요.",
         "보관 기간은 당일까지입니다. 이후 문의는 공식 사이트의 문의 양식을 이용해 주세요.",
       ],
     },
     forFamilies: {
       notes: [
         "수유실과 기저귀 교환대는 6호관 1층에 있습니다.",
-        "아이를 잃어버렸을 때는 가까운 스태프 또는 종합 안내소로 알려 주세요.",
+        "아이를 잃어버렸을 때는 가까운 스태프 또는 9호관 앞 축제 본부로 알려 주세요.",
       ],
     },
     emergency: {
       medicalRoom: "1호관 1층 구호실",
-      emergencyContact: "종합 안내소 (1호관 1층)",
+      emergencyContact: "축제 본부 (9호관 앞)",
       notes: [
         "몸이 좋지 않을 때는 가까운 스태프에게 말씀하시거나 구호실로 가 주세요.",
         "재해 발생 시에는 스태프의 지시에 따라 대피해 주세요.",

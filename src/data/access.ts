@@ -234,13 +234,6 @@ export const accessConfig = {
     note: "世田谷祭当日は駐車場をご利用いただけません。公共交通機関でお越しください。",
   },
 
-  bicycle: {
-    parkingAvailable: true,
-    capacity: 200,
-    location: "正門脇 駐輪場",
-    note: "当日の駐輪場所・利用方法は、詳細が決まり次第ご案内します。",
-  },
-
   googleMapsUrl:
     "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%B8%82%E5%A4%A7%E5%AD%A6+%E4%B8%96%E7%94%B0%E8%B0%B7%E3%82%AD%E3%83%A3%E3%83%B3%E3%83%91%E3%82%B9",
   googleMapsEmbedUrl:
@@ -343,8 +336,8 @@ export const accessPageContent = {
         description: "学内駐車場はご利用いただけません。公共交通機関をご利用ください。",
       },
       {
-        title: "駐輪案内は準備中です",
-        description: "当日の駐輪場所と利用方法は、決まり次第このページでお知らせします。",
+        title: "自転車でもお越しいただけます",
+        description: "自転車は6号館裏の駐輪場に停めてください。",
       },
       {
         title: "混雑を見込んでお越しください",
@@ -407,8 +400,8 @@ export const accessPageContents = {
           description: "Campus parking is not available. Please use public transportation.",
         },
         {
-          title: "Bicycle parking details pending",
-          description: "Locations and instructions will be posted here once confirmed.",
+          title: "You may arrive by bicycle",
+          description: "Please use the bicycle parking area behind Building 6.",
         },
         {
           title: "Allow extra travel time",
@@ -467,8 +460,8 @@ export const accessPageContents = {
           description: "校内停车场不对访客开放，请使用公共交通工具。",
         },
         {
-          title: "自行车停放信息准备中",
-          description: "停放地点和使用方法确定后将在本页公布。",
+          title: "欢迎骑自行车前来",
+          description: "请将自行车停放在6号馆后方的自行车停放区。",
         },
         {
           title: "请预留充足时间",
@@ -526,8 +519,8 @@ export const accessPageContents = {
           description: "교내 주차장을 이용할 수 없으므로 대중교통을 이용해 주세요.",
         },
         {
-          title: "자전거 주차 안내 준비 중",
-          description: "당일 주차 장소와 이용 방법은 확정되는 대로 이 페이지에서 안내합니다.",
+          title: "자전거로도 방문하실 수 있습니다",
+          description: "자전거는 6호관 뒤편의 자전거 주차장에 주차해 주세요.",
         },
         {
           title: "시간에 여유를 두세요",

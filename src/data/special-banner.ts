@@ -39,11 +39,13 @@ interface SpecialBannerLogo {
 export interface SpecialBannerData {
   /** microCMS 上の企画 ID。リンク先の組み立てと実在確認に使います */
   eventId: string;
+  /** 出演者ロゴの上に表示する公演名。ロゴと合わせて1つの見出しになります */
+  eventName: string;
   /** 見出しの下、本文の左に縦書きで置く分類ラベル */
   category: string;
   /**
    * 出演者名。見出しはロゴ画像で表示するため、この文字列は
-   * 画像の代替テキスト（= 見出しのアクセシブル名）として使われます。
+   * 画像の代替テキストとして、公演名とともに見出しのアクセシブル名を作ります。
    */
   name: string;
   /**
@@ -84,6 +86,7 @@ export interface SpecialBannerData {
 
 export const specialBanner: SpecialBannerData = {
   eventId: "special-event-mon7a",
+  eventName: "TOSHI MUSIC 2026",
   category: "著名人企画",
   name: "MON7A",
   nameLogo: {

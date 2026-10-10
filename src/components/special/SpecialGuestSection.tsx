@@ -61,7 +61,7 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
     return null;
   }
 
-  const { category, name, nameLogoFilled, image, headline, tickets, notes, ctaLabel } =
+  const { eventName, category, name, nameLogoFilled, image, headline, tickets, notes, ctaLabel } =
     specialBanner;
   const isSheet = variant === "sheet";
 
@@ -104,19 +104,22 @@ export async function SpecialGuestSection({ variant = "hero" }: SpecialGuestSect
             data-special-guest-stagger
           >
             {/* 見出し（トップページは Kaisei Opti を読み込まないため font-sans を明示する）。
-                出演者名はロゴ画像で、alt が見出しのアクセシブル名を担う。
+                公演名と出演者ロゴを1つの h2 にまとめ、alt と合わせて主題を伝える。
                 md 以上では左の余白（pl）より大きく引き出し、ロゴの頭を写真の右端へ重ねる。
                 ロゴは内側を白で塗った版なので、暗い写真の上でも文字の中身が抜けない */}
-            <h2 className="flex items-center gap-4 font-sans md:-ml-12 lg:-ml-16">
-              <AppImage
-                src={nameLogoFilled.src}
-                alt={name}
-                width={nameLogoFilled.width}
-                height={nameLogoFilled.height}
-                sizes="(min-width: 1024px) 260px, (min-width: 768px) 200px, 220px"
-                className="h-auto w-[220px] shrink-0 md:w-[200px] lg:w-[260px]"
-              />
-              <span aria-hidden="true" className="h-px min-w-8 flex-1 bg-gray-900" />
+            <h2 className="flex flex-col gap-3 font-sans">
+              <span className="text-lg font-bold tracking-[0.12em] text-gray-900">{eventName}</span>
+              <span className="flex items-center gap-4 md:-ml-12 lg:-ml-16">
+                <AppImage
+                  src={nameLogoFilled.src}
+                  alt={name}
+                  width={nameLogoFilled.width}
+                  height={nameLogoFilled.height}
+                  sizes="(min-width: 1024px) 260px, (min-width: 768px) 200px, 220px"
+                  className="h-auto w-[220px] shrink-0 md:w-[200px] lg:w-[260px]"
+                />
+                <span aria-hidden="true" className="h-px min-w-8 flex-1 bg-gray-900" />
+              </span>
             </h2>
 
             {/* 本文。左に縦書きの分類ラベル、右に日時と会場。
