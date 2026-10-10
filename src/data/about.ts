@@ -403,7 +403,7 @@ export const festivalIntroContents = {
  * 画像パスなど言語に依存しない値は `aboutConfig.chairpersonMessage` に残す。
  *
  * TODO(委員会確認): en / zh / ko は機械翻訳相当のドラフトで、委員会・留学生の確認前。
- * 要確認項目は Issue #361 の末尾を参照（委員長氏名の読み、「カラクリ」の扱い、
+ * 要確認項目は Issue #361 の末尾を参照（「カラクリ」の扱い、
  * 組織名の公式訳、ko 標語の語尾、繁体字の要否、改行位置）。
  */
 export interface AboutPageContent {
@@ -485,8 +485,7 @@ export const aboutPageContents = {
     message: {
       label: "MESSAGE",
       heading: "Message from the Chairperson",
-      // TODO(委員会確認): 氏名の読み・ローマ字表記が確定するまで漢字のまま出す
-      name: chairpersonMessage.name,
+      name: "Yuji Takano",
       position:
         "Chairperson, The 97th Tokyo City University Setagaya Festival Organizing Committee",
       imageAlt: "Scenes from the Setagaya Festival",
@@ -553,7 +552,6 @@ May today, when every wish sets out in motion like a "karakuri", be an unforgett
     message: {
       label: "MESSAGE",
       heading: "执行委员长致辞",
-      // TODO(委员会确认): 姓名的读音和表记确定前，保持汉字原样
       name: chairpersonMessage.name,
       position: "第97届东京都市大学世田谷祭执行委员会 执行委员长",
       imageAlt: "世田谷祭现场",
@@ -618,8 +616,7 @@ May today, when every wish sets out in motion like a "karakuri", be an unforgett
     message: {
       label: "MESSAGE",
       heading: "실행위원장 인사말",
-      // TODO(위원회 확인): 이름의 읽기와 표기가 확정될 때까지 한자 그대로 표시
-      name: chairpersonMessage.name,
+      name: "다카노 유지",
       position: "제97회 도쿄도시대학 세타가야사이 실행위원회 실행위원장",
       imageAlt: "세타가야사이 현장",
       body: `
