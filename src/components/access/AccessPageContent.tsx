@@ -1,9 +1,11 @@
 import {
   ArrowUpRight,
   Bike,
-  Car,
+  CircleParkingOff,
   Clock3,
+  DoorClosed,
   ExternalLink,
+  type LucideIcon,
   Map,
   Navigation,
   Phone,
@@ -19,12 +21,24 @@ import {
   type AccessPageContent,
   resolveBusRoutes,
   resolveTrainRoutes,
+  type VisitNoteId,
 } from "@/data/access";
 import { pageHeroes, type PageHeroData } from "@/data/page-heroes";
 import type { Locale } from "@/i18n/routing";
 
 const linkClassName =
   "inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 py-3 text-sm font-bold transition-colors focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600";
+
+/**
+ * 「ご来場前にご確認ください」のアイコン。並び順ではなく id で引くので、
+ * カードを足したり並べ替えたりしても内容とずれない（#462）。
+ */
+const visitNoteIcons: Record<VisitNoteId, LucideIcon> = {
+  "north-gate": DoorClosed,
+  car: CircleParkingOff,
+  bicycle: Bike,
+  congestion: Clock3,
+};
 
 interface AccessPageContentProps {
   content: AccessPageContent;
@@ -173,11 +187,11 @@ export function AccessPageView({ content, locale }: AccessPageContentProps) {
           </div>
 
           <ul className="grid gap-4 md:grid-cols-3" role="list" data-access-stagger>
-            {content.visitNotes.items.map((item, index) => {
-              const Icon = index === 0 ? Car : index === 1 ? Bike : Clock3;
+            {content.visitNotes.items.map((item) => {
+              const Icon = visitNoteIcons[item.id];
 
               return (
-                <li key={item.title} className="rounded-2xl border border-white/15 bg-white/5 p-5">
+                <li key={item.id} className="rounded-2xl border border-white/15 bg-white/5 p-5">
                   <Icon aria-hidden="true" className="h-6 w-6 text-primary-200" />
                   <h3 className="mt-5 font-bold">{item.title}</h3>
                   <p className="mt-2 text-sm leading-6 text-gray-200">{item.description}</p>
