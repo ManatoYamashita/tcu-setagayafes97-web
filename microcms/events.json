@@ -125,17 +125,6 @@
       "initialValue": null
     },
     {
-      "fieldId": "building",
-      "name": "建物番号",
-      "kind": "text",
-      "description": null,
-      "required": false,
-      "textSizeLimitValidation": null,
-      "patternMatchValidation": null,
-      "isUnique": false,
-      "initialValue": null
-    },
-    {
       "fieldId": "startTime",
       "name": "開始時刻",
       "kind": "text",
