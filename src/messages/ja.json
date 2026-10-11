@@ -77,9 +77,7 @@
     },
     "beforeContact": {
       "title": "お問い合わせの前に",
-      "prefix": "よくいただくご質問は",
-      "faqLink": "FAQページ",
-      "suffix": "にまとめております。まずはそちらをご確認ください。"
+      "description": "よくいただくご質問は<link>FAQページ</link>にまとめております。まずはそちらをご確認ください。"
     },
     "status": {
       "successTitle": "送信しました",
@@ -193,9 +191,7 @@
     "count": "{count} 件の質問があります",
     "empty": {
       "title": "現在、FAQは準備中です。",
-      "prefix": "ご不明な点がございましたら、",
-      "contactLink": "お問い合わせフォーム",
-      "suffix": "よりお問い合わせください。"
+      "description": "ご不明な点がございましたら、<link>お問い合わせフォーム</link>よりお問い合わせください。"
     },
     "search": {
       "label": "質問を検索",
