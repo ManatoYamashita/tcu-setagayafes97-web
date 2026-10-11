@@ -1,5 +1,5 @@
 import { normalizeText } from "@/lib/text";
-import type { EventDate, EventType } from "@/types/events";
+import type { Event, EventDate, EventType } from "@/types/events";
 
 /**
  * 日程フィルターの選択肢
@@ -69,7 +69,9 @@ export interface BuildingDef {
  * > 2. **`号館` 系をすべて `体育館`（`アリーナ`）より前に置く。** `９号館アリーナ` は
  * >    `9号館` であって体育館ではありません。逆にすると3件が体育館へ流れます
  *
- * 建物の入力欄は `place`（自由入力）一本であり、ここでの導出が絞り込みの成否を決めます。
+ * microCMS の「建物」（`buildings`）が未入力の企画は、ここでの `place` からの導出で建物を補います
+ * （`getEventBuildings()`）。**`id` は microCMS の選択肢と同じ文字列にすること。** ずれると、
+ * 入力済みの企画と未入力の企画が別々の選択肢に分かれます。
  */
 export const buildings: BuildingDef[] = [
   { id: "10号館", label: "10号館", patterns: ["10号館"] },
@@ -93,6 +95,9 @@ export const buildings: BuildingDef[] = [
  *
  * `buildings` 配列には加えません。あの配列は「実在する建物」の定義であり、「その他」は
  * 建物ではなく振り分け先の名前だからです（`src/data/stages.ts` の `OTHER_STAGE_ID` と同じ理由）。
+ *
+ * microCMS の「建物」の選択肢 `その他` と同じ文字列です。推定で決まらなかった企画と、
+ * 明示的に「その他」を選んだ企画が同じ選択肢にまとまります。
  */
 export const OTHER_BUILDING_ID = "その他";
 export const OTHER_BUILDING_LABEL = "その他";
@@ -180,13 +185,59 @@ export function getBuildingLabel(buildingId: string): string {
 }
 
 /**
- * 実在する建物ID（`buildings` の定義、または「その他」）かどうか
+ * 企画の建物を返す。**絞り込み・関連企画・検索は必ずこれを通すこと**
  *
- * URL のクエリなど外部由来の文字列を、そのまま建物として扱ってよいかの判定に使います。
- * 素通しにすると、任意の文字列が `<select>` の value になり選択肢と食い違います。
+ * microCMS の「建物」（`buildings`）が入っていればそれを、空なら `place` からの推定
+ * （`resolveBuildingId()`）を1つ返します。推定のIDと select の値は同じ文字列（`9号館` /
+ * `屋外` など）なので、入力済みの企画と未入力の企画が同じ選択肢にまとまります。
+ *
+ * @returns 1つ以上の建物名。どこにも当たらなければ `[OTHER_BUILDING_ID]`
  */
-export function isKnownBuildingId(buildingId: string): boolean {
-  return (
-    buildingId === OTHER_BUILDING_ID || buildings.some((building) => building.id === buildingId)
-  );
+export function getEventBuildings(event: Pick<Event, "buildings" | "place">): string[] {
+  // 型の上では必ずあるが、normalizeEvent() を通らない企画（欠落フィールドを持つ検索のテスト
+  // データなど。#166）でも例外にしない
+  const entered = event.buildings ?? [];
+  return entered.length > 0 ? entered : [resolveBuildingId(event.place)];
+}
+
+/**
+ * 名前の付いた場所の並び順
+ *
+ * 漢字の名前は `Intl.Collator("ja")` / `localeCompare("ja")` でも読みの順に並ばない
+ * （単語の読みを見ない）ため、順序は表で持ちます。
+ * **表に無い名前は「その他」の直前へ、出てきた順に並べます。** 選択肢から消えることはありません。
+ */
+const NAMED_BUILDING_ORDER = ["体育館", "図書館", "屋外", "ホール", "グラウンド"];
+
+const NUMBERED_HALL_PATTERN = /^(\d+)号館$/;
+const NUMBERED_ARENA_PATTERN = /^第(\d+)アリーナ$/;
+
+/** 並べ替えの鍵。`[群, 群の中の順]` */
+function buildingSortKey(buildingId: string): [number, number] {
+  const normalized = buildingId.normalize("NFKC");
+  const hall = normalized.match(NUMBERED_HALL_PATTERN);
+  if (hall) return [0, Number(hall[1])];
+  const arena = normalized.match(NUMBERED_ARENA_PATTERN);
+  if (arena) return [1, Number(arena[1])];
+  if (buildingId === OTHER_BUILDING_ID) return [4, 0];
+  const named = NAMED_BUILDING_ORDER.indexOf(buildingId);
+  return named >= 0 ? [2, named] : [3, 0];
+}
+
+/**
+ * 建物を選択肢の順に並べる
+ *
+ * `N号館`（数字順）→ `第Nアリーナ`（数字順）→ 名前の付いた場所（`NAMED_BUILDING_ORDER`）
+ * → 表に無い名前（入力の順）→ 「その他」。
+ * 数字は文字列ではなく数値で比べるので、`10号館` は `9号館` の後に来ます。
+ *
+ * @param buildingIds 並べる建物名（この配列は変更しません）
+ */
+export function sortBuildingIds(buildingIds: readonly string[]): string[] {
+  // Array.prototype.sort は安定ソートなので、同じ鍵（表に無い名前）は入力の順を保つ
+  return [...buildingIds].sort((a, b) => {
+    const [groupA, orderA] = buildingSortKey(a);
+    const [groupB, orderB] = buildingSortKey(b);
+    return groupA - groupB || orderA - orderB;
+  });
 }

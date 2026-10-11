@@ -53,16 +53,17 @@ export function fixture(
     startTime,
     endTime,
     sessions,
+    buildings = [],
     ...overrides
   }: Pick<Event, "date" | "type" | "place" | "title" | "organizer"> &
-    Partial<Pick<Event, "description" | "sessions">> & {
+    Partial<Pick<Event, "buildings" | "description" | "sessions">> & {
       startTime?: string;
       endTime?: string;
     }
 ): Event {
   const fallback: EventSession[] =
     startTime || endTime ? [{ startTime: startTime ?? "", endTime: endTime ?? "" }] : [];
-  return { ...BASE, id, ...overrides, sessions: sessions ?? fallback };
+  return { ...BASE, id, ...overrides, buildings, sessions: sessions ?? fallback };
 }
 
 export const stageEventFixtures: Event[] = [

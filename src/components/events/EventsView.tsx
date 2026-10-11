@@ -21,7 +21,8 @@ interface EventsViewProps {
    * 建物の選択肢
    *
    * 全企画から導出するため、絞り込み後の `events` からは作れません。
-   * `src/app/events/(list)/page.tsx` が `listBuildingOptions()` で1回だけ作って降ろします。
+   * `listBuildingOptions()` で作ります（fallback は `src/app/events/(list)/page.tsx`、
+   * 本描画は `EventsContent`）。
    */
   buildingOptions: BuildingFilterOption[];
   /** 最初に表示する件数（`resolveVisibleCount` の結果） */

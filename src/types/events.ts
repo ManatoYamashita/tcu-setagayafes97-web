@@ -155,6 +155,8 @@ export interface RawEvent {
   date: string[] | string;
   type: string[] | string;
   place: string;
+  // 建物（複数選択の select。値は「9号館」のような素の名前）。未入力だとキーごと返らない
+  buildings?: string[];
   title: string;
   organizer: string;
   thumbnail?: MicroCMSImage;
@@ -184,6 +186,13 @@ export interface Event {
   date: EventDate;
   type: EventType;
   place: string; // 場所（教室番号等）
+  /**
+   * 建物（前後の空白を落とし、空文字と重複を除いたもの）。未入力なら空配列
+   *
+   * **絞り込み・関連企画・検索はこれを直接読まないこと。** 未入力の企画は `place` から推定した
+   * 建物で補う必要があるため、`getEventBuildings()`（`src/data/filter-options.ts`）を通す。
+   */
+  buildings: string[];
   title: string;
   organizer: string; // 主催団体名
   thumbnail?: MicroCMSImage;

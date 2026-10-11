@@ -98,6 +98,22 @@ function normalizeSNSLinks(sns: string | undefined): SNSLinks | undefined {
 }
 
 /**
+ * microCMS の「建物」（複数選択の select）を正規化
+ *
+ * 値は `値 : ラベル` 形式ではないので `readSelectKey()` を通さない（`9号館` がそのまま値）。
+ * @param buildings microCMS の `buildings`。未入力ならキーごと返らない
+ * @returns 前後の空白を落とし、空文字と重複を除いた建物名（入稿順）
+ */
+export function normalizeEventBuildings(buildings: unknown): string[] {
+  if (!Array.isArray(buildings)) return [];
+  const names = buildings
+    .filter((name): name is string => typeof name === "string")
+    .map((name) => name.trim())
+    .filter(Boolean);
+  return [...new Set(names)];
+}
+
+/**
  * RawEventをEventに正規化
  * @param rawEvent microCMSから取得した生データ
  * @returns 正規化されたEvent
@@ -116,6 +132,7 @@ export function normalizeEvent(rawEvent: RawEvent): Event {
     organizer: rawEvent.organizer ?? "",
     description: rawEvent.description ?? "",
     place: rawEvent.place ?? "",
+    buildings: normalizeEventBuildings(rawEvent.buildings),
     // content は実データ18件中16件で欠落している（2026-09-06 実測）。
     // キーワード検索が本文も対象にするため、ここでも既定化しておく
     content: rawEvent.content ?? "",

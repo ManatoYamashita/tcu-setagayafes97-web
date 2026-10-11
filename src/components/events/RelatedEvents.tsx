@@ -1,6 +1,6 @@
 import type { Event } from "@/types/events";
 import { getEventsList } from "@/lib/events";
-import { OTHER_BUILDING_ID, resolveBuildingId } from "@/data/filter-options";
+import { getEventBuildings, OTHER_BUILDING_ID } from "@/data/filter-options";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { EventGrid } from "./EventGrid";
@@ -20,9 +20,13 @@ export async function RelatedEvents({ currentEvent }: RelatedEventsProps) {
   // 現在の企画を除外
   const otherEvents = allEvents.filter((e) => e.id !== currentEvent.id);
 
-  // 建物は place から導出したIDで比べる。素の place 同士を比べると部屋単位の一致になり、
-  // 並べ替えの第2基準として機能しない
-  const currentBuilding = resolveBuildingId(currentEvent.place);
+  // 素の place 同士を比べると部屋単位の一致になり、並べ替えの第2基準として機能しない。
+  // 「その他」は建物ではなく振り分け先の名前なので、「その他」同士は同じ建物と見なさない
+  const currentBuildings = new Set(
+    getEventBuildings(currentEvent).filter((building) => building !== OTHER_BUILDING_ID)
+  );
+  const sharesBuilding = (event: Event) =>
+    getEventBuildings(event).some((building) => currentBuildings.has(building));
 
   // 関連企画を抽出（優先順位: 同じ種別 > 同じ建物）
   const relatedEvents = otherEvents
@@ -34,12 +38,9 @@ export async function RelatedEvents({ currentEvent }: RelatedEventsProps) {
       if (aTypeMatch && !bTypeMatch) return -1;
       if (!aTypeMatch && bTypeMatch) return 1;
 
-      // 同じ建物の企画を次に優先。どちらも解決できなかった場合（「その他」同士）は
-      // 「同じ建物」とは見なさない
-      const aBuildingMatch =
-        currentBuilding !== OTHER_BUILDING_ID && resolveBuildingId(a.place) === currentBuilding;
-      const bBuildingMatch =
-        currentBuilding !== OTHER_BUILDING_ID && resolveBuildingId(b.place) === currentBuilding;
+      // 共通する建物が1つ以上ある企画を次に優先
+      const aBuildingMatch = sharesBuilding(a);
+      const bBuildingMatch = sharesBuilding(b);
 
       if (aBuildingMatch && !bBuildingMatch) return -1;
       if (!aBuildingMatch && bBuildingMatch) return 1;
