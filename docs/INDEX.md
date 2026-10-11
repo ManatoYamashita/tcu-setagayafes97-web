@@ -139,8 +139,10 @@
 - **[timetable-event-panel.md](./frontend/timetable-event-panel.md)** - タイムテーブルの企画詳細パネル（右パネル／ボトムシート、`?event=` による状態、前後移動）の設計
   - **縦方向の寸法は必ず px で持つ。** `height: %` は `min-height` しか持たない親の下で 0px に潰れる（#148）
   - **絞り込みとグループ化は必ず同じ `resolveStageId()` を通す**
-- **[events-search.md](./frontend/events-search.md)** - `/events` の検索と絞り込み（正規化・建物導出・3段カスケード）
+- **[events-search.md](./frontend/events-search.md)** - `/events` の検索と絞り込み（正規化・3段カスケード・URL クエリの検証）
   - **正規化は `normalizeText()` の1本に集約する。** 別々に正規化すると「検索では出るのにフィルタでは落ちる」
+- **[events-building-filter.md](./frontend/events-building-filter.md)** - `/events` の建物の絞り込み（microCMS の「建物」と `place` からの推定・選択肢の並び順・URL の検証。#467）
+  - **企画の建物は必ず `getEventBuildings()` を通す。** `event.buildings` を直接読むと未入力の企画が選択肢から消える
 - **[events-special-banner.md](./frontend/events-special-banner.md)** - `/events` 冒頭の音楽ポスター風著名人企画バナー（文字のグルーピング・画像・上角・小画面の配置）
 - **[about-past-festivals.md](./frontend/about-past-festivals.md)** - `/about` 最下部の「過去の世田谷祭」（歴代サイトのサムネイル一覧。出典・欠番・上端基準の切り抜き。#422）
 - **[special-guest-section.md](./frontend/special-guest-section.md)** - トップと `/events` 最下部の著名人企画告知セクション（写真を画面の左端へ広げる・ワイプ・白塗りロゴ・チケットの要約。#414 / #419）

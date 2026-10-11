@@ -76,7 +76,6 @@ const GRANDFATHERED = new Map([
   [".agents/skills/next-cache-components/SKILL.md", 411],
   ["docs/dev/microcms.md", 316],
   [".agents/skills/deploy-to-vercel/SKILL.md", 321],
-  ["docs/frontend/events-search.md", 309],
 ]);
 
 /** 行数を数える。数え方の定義は冒頭の「行の数え方」 */
