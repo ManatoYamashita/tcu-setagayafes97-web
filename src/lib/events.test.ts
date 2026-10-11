@@ -52,6 +52,25 @@ describe("normalizeEvent", () => {
   });
 });
 
+describe("normalizeEvent の建物（#467）", () => {
+  it("未入力（キーごと返らない）なら空配列", () => {
+    expect(normalizeEvent(rawEventFixture()).buildings).toEqual([]);
+  });
+
+  it("前後の空白を落とし、空文字と重複を除く（入稿順は保つ）", () => {
+    const raw = rawEventFixture({ buildings: [" 9号館 ", "第3アリーナ", "", "  ", "9号館"] });
+
+    expect(normalizeEvent(raw).buildings).toEqual(["9号館", "第3アリーナ"]);
+  });
+
+  it("値 : ラベル 形式として割らない", () => {
+    // 建物の select は素の名前が値。readSelectKey() を通すと「:」を含む名前が切れる
+    const raw = rawEventFixture({ buildings: ["9号館"] });
+
+    expect(normalizeEvent(raw).buildings).toEqual(["9号館"]);
+  });
+});
+
 describe("normalizeEvent の開催枠（#281）", () => {
   const session = (startTime?: string, endTime?: string) =>
     ({ fieldId: "session", startTime, endTime }) as const;

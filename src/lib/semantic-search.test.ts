@@ -35,6 +35,7 @@ function event(id: string, overrides: Partial<Event> = {}): Event {
     organizer: "ダミー団体",
     description: "ダミーの説明文です。",
     content: "",
+    buildings: [],
     sessions: [],
     ...overrides,
   };
