@@ -46,7 +46,6 @@ export interface GuideContent {
     notes: readonly string[];
   };
   emergency: {
-    medicalRoom: string;
     emergencyContact: string;
     notes: readonly string[];
   };
@@ -127,10 +126,9 @@ export const guideContents = {
       ],
     },
     emergency: {
-      medicalRoom: "1号館1F 救護室",
       emergencyContact: "9号館前本部",
       notes: [
-        "体調不良の際は、お近くのスタッフまたは救護室までお声がけください。",
+        "体調不良の際は、お近くのスタッフまたは9号館前本部までお声がけください。",
         "災害発生時は、スタッフの指示に従って避難してください。",
       ],
     },
@@ -211,10 +209,9 @@ export const guideContents = {
       ],
     },
     emergency: {
-      medicalRoom: "First Aid Room, Building 1, 1F",
       emergencyContact: "Headquarters in front of Building 9",
       notes: [
-        "If you feel unwell, please speak to the nearest staff member or go to the First Aid Room.",
+        "If you feel unwell, please speak to the nearest staff member or the Headquarters in front of Building 9.",
         "In the event of a disaster, please evacuate following the staff's instructions.",
       ],
     },
@@ -286,10 +283,9 @@ export const guideContents = {
       ],
     },
     emergency: {
-      medicalRoom: "1号馆1楼 医务室",
       emergencyContact: "9号馆前本部",
       notes: [
-        "如身体不适，请联系附近的工作人员或前往医务室。",
+        "如身体不适，请联系附近的工作人员或9号馆前本部。",
         "发生灾害时，请听从工作人员指示避难。",
       ],
     },
@@ -369,10 +365,9 @@ export const guideContents = {
       ],
     },
     emergency: {
-      medicalRoom: "1호관 1층 구호실",
       emergencyContact: "9호관 앞 본부",
       notes: [
-        "몸이 좋지 않을 때는 가까운 스태프에게 말씀하시거나 구호실로 가 주세요.",
+        "몸이 좋지 않을 때는 가까운 스태프 또는 9호관 앞 본부로 알려 주세요.",
         "재해 발생 시에는 스태프의 지시에 따라 대피해 주세요.",
       ],
     },
