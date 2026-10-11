@@ -200,7 +200,6 @@ export default async function GuidePage({ params }: { params: Promise<{ locale: 
           <FactList
             tone="alert"
             items={[
-              { label: t("labels.medicalRoom"), value: guide.emergency.medicalRoom },
               {
                 label: t("labels.emergencyContact"),
                 value: guide.emergency.emergencyContact,
