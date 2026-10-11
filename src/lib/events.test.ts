@@ -4,7 +4,7 @@ import { filterEvents } from "@/lib/filters";
 import type { RawEvent } from "@/types/events";
 
 /**
- * `RawEvent` は `title` / `organizer` / `description` / `place` / `building` を
+ * `RawEvent` は `title` / `organizer` / `description` / `place` を
  * 必須の `string` と宣言しているが、これは型上の約束に過ぎない。microCMS の
  * フィールドが未入力のまま公開されると、実際には `undefined` が返り得る。
  *
