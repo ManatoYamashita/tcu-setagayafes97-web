@@ -156,7 +156,7 @@ microCMS は未入力フィールドを**キーごと返さない**ため、型�
 
 ### 建物は「建物」（`buildings`）を主とし、未入力なら `place` から推定する
 
-「建物」は複数選択の select（#467。**管理画面への追加は未実施**）。未入力の企画は `place` から
+「建物」は複数選択の select（#467。2026-10-11 作成。選択肢の改名・削除の挙動も同日実測）。未入力の企画は `place` から
 建物を推定する（`getEventBuildings()` → `resolveBuildingId()`）。設計は
 [`docs/frontend/events-building-filter.md`](../frontend/events-building-filter.md) を参照。
 

@@ -178,6 +178,34 @@
       "required": false,
       "repeaterCountLimitValidation": null,
       "customFieldIds": ["session"]
+    },
+    {
+      "fieldId": "buildings",
+      "name": "建物",
+      "kind": "select",
+      "description": null,
+      "required": false,
+      "selectItems": [
+        { "id": "_GFLeQXCO_", "value": "1号館" },
+        { "id": "l2EIRbk4Yf", "value": "2号館" },
+        { "id": "qiGf9zLn2I", "value": "3号館" },
+        { "id": "DtTdAWvifi", "value": "4号館" },
+        { "id": "AbnHartFtp", "value": "5号館" },
+        { "id": "VEMeEi4IwI", "value": "6号館" },
+        { "id": "BQQ9QSHtlO", "value": "7号館" },
+        { "id": "_sXEow00v8", "value": "8号館" },
+        { "id": "IahJUWh2Qq", "value": "9号館" },
+        { "id": "_oaP-U3eAj", "value": "10号館" },
+        { "id": "bcmHEwP9S8", "value": "第1アリーナ" },
+        { "id": "hrso5WlRP1", "value": "第3アリーナ" },
+        { "id": "ufsz5qojSy", "value": "図書館" },
+        { "id": "RxmVbcxL1r", "value": "屋外" },
+        { "id": "KP1Mu2BZoe", "value": "ホール" },
+        { "id": "Nd-mAzzi4G", "value": "グラウンド" },
+        { "id": "UbTN1ZVFZB", "value": "その他" }
+      ],
+      "multipleSelect": true,
+      "initialValue": ["DEFAULT"]
     }
   ],
   "customFields": [

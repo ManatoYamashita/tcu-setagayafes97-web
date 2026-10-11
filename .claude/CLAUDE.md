@@ -257,7 +257,7 @@ CI 緑・マージ済みのまま本番だけが40分以上古いまま取り残
 **主要フィールド:**
 
 - **News API**: `type` (urgent/news/other), `title`, `thumbnail`, `description`, `content`
-- **Events API**: `date` (day1/day2/both/other), `type` (room/stage/special/other), `place`, `buildings`（未作成。#467）, `title`, `organizer`, `thumbnail`, `description`, `content`, `startTime`, `endTime`, `sessions`, `sns`, `special`
+- **Events API**: `date` (day1/day2/both/other), `type` (room/stage/special/other), `place`, `buildings`（建物。複数選択。#467）, `title`, `organizer`, `thumbnail`, `description`, `content`, `startTime`, `endTime`, `sessions`, `sns`, `special`
   - `sessions` は開催枠の繰り返し（カスタムフィールド `session` = 日程・開始・終了）。2部制の企画用（#281）。**枠に日程（`day1` / `day2`）があれば、その枠はその日だけに出る**（両日開催で日ごとに時刻が違う企画用。#305）。**時刻欄には `HH:mm` だけを入れる**（開場時刻は `special.openTime` へ。説明文に書いてもタイムテーブルには出ない）。**値があれば `startTime` / `endTime` より優先**し、無ければ従来の欄から1枠を作る。**必須にしないこと**。正規化後の `Event` に `startTime` / `endTime` は無く、表示は `src/lib/event-sessions.ts` を通す。契約は [`docs/dev/event-sessions.md`](../docs/dev/event-sessions.md)
   - `sns` は**テキストフィールド1つ**（カスタムフィールドではない）。1企画につきSNSリンクは1件のみ
   - `special` は著名人企画LP用のカスタムフィールド（想定は `type = special` のみ。ただし `openTime` はステージ企画にも入稿されており、値があれば種別を問わずタイムテーブルに出る）。中身は `logo` / `photos` / `openTime` / `goods` / `tickets` / `notices` ほか。詳細は `microcms/README.md`
