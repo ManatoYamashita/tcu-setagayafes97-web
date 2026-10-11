@@ -184,7 +184,7 @@
       "name": "建物",
       "kind": "select",
       "description": null,
-      "required": false,
+      "required": true,
       "selectItems": [
         { "id": "_GFLeQXCO_", "value": "1号館" },
         { "id": "l2EIRbk4Yf", "value": "2号館" },

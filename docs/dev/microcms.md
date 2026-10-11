@@ -154,10 +154,10 @@ microCMS は未入力フィールドを**キーごと返さない**ため、型�
 これは欠損データを自動補完する仕組みではない。入稿内容の修正は引き続き microCMS で行い、
 公開画面では不完全なデータをエラーや空欄にせず案内するための防御である。
 
-### 建物は「建物」（`buildings`）を主とし、未入力なら `place` から推定する
+### 建物は「建物」（`buildings`。必須）だけから決める
 
-「建物」は複数選択の select（#467。2026-10-11 作成。選択肢の改名・削除の挙動も同日実測）。未入力の企画は `place` から
-建物を推定する（`getEventBuildings()` → `resolveBuildingId()`）。設計は
+「建物」は複数選択の select（#467。2026-10-11 作成、10-12 に必須 ON。改名・削除の挙動も実測済み）。`place` からの
+推定は撤去した（値が無ければ `その他`。`getEventBuildings()`）。設計は
 [`docs/frontend/events-building-filter.md`](../frontend/events-building-filter.md) を参照。
 
 `place` は自由入力なので `9号館アリーナ` と `９号館アリーナ` が同居する。

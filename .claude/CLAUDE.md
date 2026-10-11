@@ -501,7 +501,7 @@ microCMS の編集画面にある「画面プレビュー」から、**公開せ
 
 ### 企画検索・一覧 (/events)
 
-- **フィルター**: 日程（Day1/Day2/両日）、建物（`buildings`。未入力は `place` から推定。[`docs/frontend/events-building-filter.md`](../docs/frontend/events-building-filter.md)）、カテゴリ（教室/ステージ/スペシャル）、キーワード
+- **フィルター**: 日程（Day1/Day2/両日）、建物（microCMS の `buildings`。必須。[`docs/frontend/events-building-filter.md`](../docs/frontend/events-building-filter.md)）、カテゴリ（教室/ステージ/スペシャル）、キーワード
 - **表示形式**: カード形式、サムネイル・タイトル・カテゴリバッジ・場所・日程
 - **一覧は無限スクロール**（#239。ページ分割は撤去済み）。12件ずつ継ぎ足し、
   「もっと見る」ボタンを併設する。絞り込みは `position: sticky` で画面内に留める。

@@ -160,7 +160,7 @@ WCAG 1.4.11（非テキストコントラスト）の 3:1 を満たす必要が�
 
 > [!NOTE]
 > **企画一覧の建物フィルタは、この節と同じ設計を写したものです**
-> （`resolveBuildingId()` / `OTHER_BUILDING_ID` / `listBuildingOptions()`）。
+> （`getEventBuildings()` / `OTHER_BUILDING_ID` / `listBuildingOptions()`）。
 > 片方を直すときはもう片方も見てください →
 > [events-search.md](./events-search.md)
 
