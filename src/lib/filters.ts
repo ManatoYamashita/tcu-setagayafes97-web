@@ -1,10 +1,8 @@
 import {
-  buildings,
   dateFilterOptions,
   getBuildingLabel,
-  isKnownBuildingId,
-  OTHER_BUILDING_ID,
-  resolveBuildingId,
+  getEventBuildings,
+  sortBuildingIds,
   typeFilterOptions,
   type BuildingFilterOption,
 } from "@/data/filter-options";
@@ -79,26 +77,29 @@ function parseOption(raw: string | null, known: Set<string>): string {
 /**
  * 建物のクエリ値を検証する
  *
- * 建物IDは `9号館` のような日本語なので `toLowerCase()` はせず、
- * `isKnownBuildingId()`（`src/data/filter-options.ts`）で照合します。
+ * 建物の選択肢は microCMS のデータから作るので、照合も固定の定義ではなく
+ * **データに存在する建物**で行います（`collectBuildingIds()`）。企画が1件も無い建物は
+ * 「すべて」へ戻します。選択肢に無い値を残すと `<select>` の表示が「すべて」へ化けたまま
+ * 0件が並びます。建物名は `9号館` のような日本語なので `toLowerCase()` はしません。
  */
-function parseBuilding(raw: string | null): string {
+function parseBuilding(raw: string | null, events: Event[]): string {
   if (!raw) return "all";
   const value = raw.trim();
   if (value === "all" || value === "") return "all";
-  return isKnownBuildingId(value) ? value : "all";
+  return collectBuildingIds(events).includes(value) ? value : "all";
 }
 
 /**
  * URL のクエリからフィルターパラメータを組み立てる
  * @param params 読み取り元のクエリ
+ * @param events 全企画（絞り込み前のもの）。建物の値の検証に使う
  * @returns 未指定の項目を既定値（"all" / 空文字）で埋めたフィルターパラメータ
  */
-export function parseEventFilters(params: SearchParamsLike): FilterParams {
+export function parseEventFilters(params: SearchParamsLike, events: Event[]): FilterParams {
   return {
     date: parseOption(params.get("date"), knownDates) as EventDate | "all",
     type: parseOption(params.get("type"), knownTypes) as EventType | "all",
-    building: parseBuilding(params.get("building")),
+    building: parseBuilding(params.get("building"), events),
     // 空白だけのキーワードで検索を走らせない。`?keyword=%20` は truthy なので
     // trim しないと「全件から空白を含むものを探す」という無意味な検索になる
     keyword: (params.get("keyword") || "").trim(),
@@ -198,9 +199,10 @@ export function filterEvents(events: Event[], filters: FilterParams): Event[] {
     filtered = filtered.filter((e) => e.type === filters.type);
   }
 
-  // 建物フィルター（`place` から導出した建物IDで判定する）
+  // 建物フィルター。複数の建物を持つ企画は、そのどれを選んでも当たる
   if (filters.building && filters.building !== "all") {
-    filtered = filtered.filter((e) => resolveBuildingId(e.place) === filters.building);
+    const building = filters.building;
+    filtered = filtered.filter((e) => getEventBuildings(e).includes(building));
   }
 
   // キーワード検索（結果は関連度順に並ぶ）
@@ -212,35 +214,32 @@ export function filterEvents(events: Event[], filters: FilterParams): Event[] {
 }
 
 /**
+ * 全企画の建物の和集合（初めて出てきた順）
+ *
+ * 選択肢（`listBuildingOptions()`）と URL の検証（`parseEventFilters()`）は、どちらもこの
+ * 集合から作ります。同じ集合を使うので、**URL で受け付けた建物は必ず選択肢にあります。**
+ */
+export function collectBuildingIds(events: Event[]): string[] {
+  return [...new Set(events.flatMap(getEventBuildings))];
+}
+
+/**
  * 実データに存在する建物だけを選択肢として返す
  *
  * `src/lib/timetable.ts` の `listStageTabs()` と同じ設計です。固定の14件を出していた頃は、
- * どれを選んでも0件になる選択肢が並んでいました。
- *
- * **選択中の値は該当0件でもリストへ残します。** 外すと `<select>` の `value` が
- * 選択肢に無い状態になり、React が警告を出したうえで表示が「すべて」へ化けます。
+ * どれを選んでも0件になる選択肢が並んでいました。microCMS で建物の選択肢を足せば、
+ * コードを直さずにここへ出ます。
  *
  * @param events 全企画（絞り込み前のもの）
- * @param selected 現在選択中の建物ID
- * @returns 「すべて」を先頭に、`buildings` の宣言順（最後に「その他」）で並べた選択肢
+ * @returns 「すべて」を先頭に、`sortBuildingIds()` の順で並べた選択肢
  */
-export function listBuildingOptions(
-  events: Event[],
-  selected: string = "all"
-): BuildingFilterOption[] {
-  const present = new Set(events.map((event) => resolveBuildingId(event.place)));
-
-  if (selected !== "all" && isKnownBuildingId(selected)) {
-    present.add(selected);
-  }
-
-  const order = [...buildings.map((building) => building.id), OTHER_BUILDING_ID];
-
+export function listBuildingOptions(events: Event[]): BuildingFilterOption[] {
   return [
     { value: "all", label: "すべて" },
-    ...order
-      .filter((id) => present.has(id))
-      .map((id) => ({ value: id, label: getBuildingLabel(id) })),
+    ...sortBuildingIds(collectBuildingIds(events)).map((id) => ({
+      value: id,
+      label: getBuildingLabel(id),
+    })),
   ];
 }
 

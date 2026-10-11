@@ -1,4 +1,4 @@
-import { OTHER_BUILDING_ID, resolveBuildingId } from "@/data/filter-options";
+import { getEventBuildings, OTHER_BUILDING_ID } from "@/data/filter-options";
 import { searchParticles, searchStopwords } from "@/data/search-stopwords";
 import { normalizeText, stripHtml } from "./text";
 import type { Event } from "@/types/events";
@@ -170,18 +170,15 @@ export function tokenizeQuery(query: string): string[] {
  * `undefined` に対する `.toLowerCase()` が起きません（#166）。
  */
 function toSearchFields(event: Event): SearchField[] {
-  const buildingId = resolveBuildingId(event.place);
+  // 「その他」は建物名ではなく振り分け先の名前なので検索対象にしない。
+  // 対象にすると「その他」で検索したときに解決できなかった企画が全部出る
+  const buildingNames = getEventBuildings(event).filter((name) => name !== OTHER_BUILDING_ID);
 
   return [
     { text: normalizeText(event.title), weight: FIELD_WEIGHTS.title },
     { text: normalizeText(event.organizer), weight: FIELD_WEIGHTS.organizer },
     { text: normalizeText(event.place), weight: FIELD_WEIGHTS.place },
-    {
-      // 「その他」は建物名ではなく振り分け先の名前なので検索対象にしない。
-      // 対象にすると「その他」で検索したときに解決できなかった企画が全部出る
-      text: buildingId === OTHER_BUILDING_ID ? "" : normalizeText(buildingId),
-      weight: FIELD_WEIGHTS.building,
-    },
+    { text: normalizeText(buildingNames.join(" ")), weight: FIELD_WEIGHTS.building },
     { text: normalizeText(event.description), weight: FIELD_WEIGHTS.description },
     { text: normalizeText(stripHtml(event.content)), weight: FIELD_WEIGHTS.content },
   ];

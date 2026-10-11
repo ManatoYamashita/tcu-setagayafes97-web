@@ -38,17 +38,12 @@ export function EventsContent({ initialEvents }: EventsContentProps) {
   const searchParams = useSearchParams();
 
   // URL Search Params からフィルター情報を取得
-  const filters = parseEventFilters(searchParams);
+  const filters = parseEventFilters(searchParams, initialEvents);
   const currentPage = parseEventPage(searchParams);
 
   // 建物の選択肢。全企画から導出するので、絞り込み後の配列からは作れない。
-  //
-  // **選択中の建物を渡せるのはここだけ。** page.tsx は useSearchParams() を読まないため
-  // 選択値を知らず、そちらで作った配列を降ろすと listBuildingOptions() の selected が
-  // production から一度も渡らない。該当0件の建物（?building=7号館 など）を指定されたとき、
-  // <select> の value が選択肢に無い状態＝ selectedIndex = -1 になり、絞り込みが
-  // 効いていないように見える。
-  const buildingOptions = listBuildingOptions(initialEvents, filters.building);
+  // parseEventFilters() と同じ initialEvents から作るので、URL で受け付けた建物は必ず選択肢にある
+  const buildingOptions = listBuildingOptions(initialEvents);
 
   /*
    * 表示順のランダム化（#409）

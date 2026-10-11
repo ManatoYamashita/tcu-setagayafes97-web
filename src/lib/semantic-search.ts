@@ -1,7 +1,7 @@
 import {
   dateFilterOptions,
+  getEventBuildings,
   OTHER_BUILDING_ID,
-  resolveBuildingId,
   typeFilterOptions,
 } from "@/data/filter-options";
 import { searchEvents } from "./search";
@@ -213,7 +213,7 @@ function omitEmpty(value: string): string | undefined {
  * 既存のタイムテーブル側のコードが持っています。
  */
 function toEntry(event: Event, ref: string): SemanticEventEntry {
-  const buildingId = resolveBuildingId(event.place);
+  const buildingNames = getEventBuildings(event).filter((name) => name !== OTHER_BUILDING_ID);
 
   return {
     ref,
@@ -221,7 +221,7 @@ function toEntry(event: Event, ref: string): SemanticEventEntry {
     organizer: omitEmpty((event.organizer ?? "").trim()),
     place: omitEmpty((event.place ?? "").trim()),
     // 「その他」は建物名ではなく振り分け先の名前なので渡さない（src/lib/search.ts と同じ判断）
-    building: buildingId === OTHER_BUILDING_ID ? undefined : buildingId,
+    building: omitEmpty(buildingNames.join("、")),
     category: typeLabels.get(event.type),
     day: dateLabels.get(event.date),
     description: omitEmpty((event.description ?? "").trim()),

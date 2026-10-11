@@ -44,8 +44,7 @@ export default async function EventsPage() {
   // 全企画を取得（最大200件）
   const events = await getEventsList(200);
 
-  // 建物の選択肢（fallback 用）。fallback は定義上クエリ無し（DEFAULT_EVENT_FILTERS）なので
-  // 選択中の建物を持たない。本描画側は選択値を知っている EventsContent が自分で作る
+  // 建物の選択肢（fallback 用）。本描画側は EventsContent が同じ関数で自分で作る
   const fallbackBuildingOptions = listBuildingOptions(events);
 
   return (

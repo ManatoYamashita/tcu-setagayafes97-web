@@ -80,7 +80,24 @@ describe("filterEvents", () => {
     expect(ids(filterEvents(events, { type: "room" }))).toEqual(["ev-day1", "ev-both"]);
   });
 
-  it("building は place から導出した建物で判定する", () => {
+  it("建物を複数持つ企画は、どの建物を選んでも当たる", () => {
+    const entered = [
+      fixture("ev-arena", {
+        date: "day1",
+        type: "stage",
+        place: "9号館 第3アリーナ",
+        buildings: ["9号館", "第3アリーナ"],
+        title: "ダンスステージ",
+        organizer: "ダンス部",
+      }),
+    ];
+
+    expect(ids(filterEvents(entered, { building: "9号館" }))).toEqual(["ev-arena"]);
+    expect(ids(filterEvents(entered, { building: "第3アリーナ" }))).toEqual(["ev-arena"]);
+    expect(filterEvents(entered, { building: "体育館" })).toEqual([]);
+  });
+
+  it("buildings が空なら place から推定した建物で判定する", () => {
     expect(ids(filterEvents(events, { building: "7号館" }))).toEqual(["ev-day2"]);
     // 教室コード（22B → 2号館）からも導出する
     expect(ids(filterEvents(events, { building: "2号館" }))).toEqual(["ev-both"]);
@@ -210,13 +227,13 @@ describe("resolveVisibleCount", () => {
  */
 describe("parseEventFilters", () => {
   it("未指定の項目を既定値で埋める", () => {
-    expect(parseEventFilters(new URLSearchParams())).toEqual(DEFAULT_EVENT_FILTERS);
+    expect(parseEventFilters(new URLSearchParams(), events)).toEqual(DEFAULT_EVENT_FILTERS);
   });
 
   it("指定された項目をそのまま読む", () => {
     const params = new URLSearchParams("date=day1&type=stage&building=7号館&keyword=軽音");
 
-    expect(parseEventFilters(params)).toEqual({
+    expect(parseEventFilters(params, events)).toEqual({
       date: "day1",
       type: "stage",
       building: "7号館",
@@ -227,13 +244,37 @@ describe("parseEventFilters", () => {
   it("大小文字だけが違う値を受け入れる", () => {
     // ?type=Stage を無言の0件にしない
     const params = new URLSearchParams("date=DAY1&type=Stage");
-    expect(parseEventFilters(params)).toMatchObject({ date: "day1", type: "stage" });
+    expect(parseEventFilters(params, events)).toMatchObject({ date: "day1", type: "stage" });
+  });
+
+  it("企画が1件も無い建物は「すべて」へ倒す", () => {
+    // 建物の選択肢はデータから作る。グラウンドは推定の定義にはあるが、この企画群には無い
+    const params = new URLSearchParams("building=グラウンド");
+
+    expect(parseEventFilters(params, events).building).toBe("all");
+  });
+
+  it("microCMS で入力された建物を受け入れる", () => {
+    const entered = [
+      fixture("ev-arena", {
+        date: "day1",
+        type: "stage",
+        place: "9号館 第3アリーナ",
+        buildings: ["9号館", "第3アリーナ"],
+        title: "ダンスステージ",
+        organizer: "ダンス部",
+      }),
+    ];
+
+    expect(parseEventFilters(new URLSearchParams("building=第3アリーナ"), entered).building).toBe(
+      "第3アリーナ"
+    );
   });
 
   it("存在しない値は既定値へ倒す（無言の0件を作らない）", () => {
     const params = new URLSearchParams("date=day9&type=bogus&building=99号館");
 
-    expect(parseEventFilters(params)).toEqual({
+    expect(parseEventFilters(params, events)).toEqual({
       date: "all",
       type: "all",
       building: "all",
@@ -242,8 +283,10 @@ describe("parseEventFilters", () => {
   });
 
   it("キーワードの前後の空白を落とす", () => {
-    expect(parseEventFilters(new URLSearchParams("keyword=%20%20"))).toMatchObject({ keyword: "" });
-    expect(parseEventFilters(new URLSearchParams("keyword=%20軽音%20"))).toMatchObject({
+    expect(parseEventFilters(new URLSearchParams("keyword=%20%20"), events)).toMatchObject({
+      keyword: "",
+    });
+    expect(parseEventFilters(new URLSearchParams("keyword=%20軽音%20"), events)).toMatchObject({
       keyword: "軽音",
     });
   });
@@ -280,17 +323,91 @@ describe("listBuildingOptions", () => {
     expect(listBuildingOptions(derived).map((option) => option.value)).toEqual(["all", "ホール"]);
   });
 
-  it("選択中の建物は該当0件でもリストに残す", () => {
-    // 外すと <select> の value が選択肢に無い状態になり、表示が「すべて」へ化ける
-    const values = listBuildingOptions(events, "グラウンド").map((option) => option.value);
+  it("複数の建物を持つ企画は、その全部を選択肢に出す", () => {
+    const entered = [
+      fixture("ev-arena", {
+        date: "day1",
+        type: "stage",
+        place: "9号館 第3アリーナ",
+        buildings: ["9号館", "第3アリーナ"],
+        title: "ダンスステージ",
+        organizer: "ダンス部",
+      }),
+    ];
 
-    expect(values).toContain("グラウンド");
+    expect(listBuildingOptions(entered).map((option) => option.value)).toEqual([
+      "all",
+      "9号館",
+      "第3アリーナ",
+    ]);
   });
 
-  it("未知の値は残さない", () => {
-    const values = listBuildingOptions(events, "99号館").map((option) => option.value);
+  it("入力済みの建物と place から推定した建物が同じ選択肢にまとまる", () => {
+    const mixed = [
+      fixture("ev-entered", {
+        date: "day1",
+        type: "room",
+        place: "91A",
+        buildings: ["9号館"],
+        title: "入力済み",
+        organizer: "x",
+      }),
+      fixture("ev-inferred", {
+        date: "day1",
+        type: "room",
+        place: "９号館アリーナ",
+        title: "未入力",
+        organizer: "x",
+      }),
+    ];
 
-    expect(values).not.toContain("99号館");
+    expect(listBuildingOptions(mixed).map((option) => option.value)).toEqual(["all", "9号館"]);
+    expect(ids(filterEvents(mixed, { building: "9号館" }))).toEqual(["ev-entered", "ev-inferred"]);
+  });
+
+  it("号館・アリーナは数字順、名前の付いた場所は表の順、表に無い名前は「その他」の直前", () => {
+    const names = ["その他", "新しい広場", "第3アリーナ", "10号館", "屋外", "第1アリーナ"];
+    const scattered = [
+      ...names.map((name, index) =>
+        fixture(`ev-${index}`, {
+          date: "day1",
+          type: "room",
+          place: "",
+          buildings: [name],
+          title: name,
+          organizer: "x",
+        })
+      ),
+      // 推定（buildings 未入力）からも同じ並びへ入る
+      fixture("ev-inferred-9", {
+        date: "day1",
+        type: "room",
+        place: "9号館",
+        title: "推定",
+        organizer: "x",
+      }),
+      fixture("ev-arena-2", {
+        date: "day1",
+        type: "room",
+        place: "",
+        buildings: ["第2アリーナ", "体育館"],
+        title: "第2",
+        organizer: "x",
+      }),
+    ];
+
+    expect(listBuildingOptions(scattered).map((option) => option.value)).toEqual([
+      "all",
+      "9号館",
+      "10号館",
+      "第1アリーナ",
+      "第2アリーナ",
+      "第3アリーナ",
+      "体育館",
+      "屋外",
+      "新しい広場",
+      "その他",
+    ]);
   });
 });
 
@@ -352,7 +469,9 @@ describe("buildEventsQuery", () => {
       keyword: "展示",
     };
 
-    expect(parseEventFilters(new URLSearchParams(buildEventsQuery(filters, 3)))).toEqual(filters);
+    expect(parseEventFilters(new URLSearchParams(buildEventsQuery(filters, 3)), events)).toEqual(
+      filters
+    );
     expect(parseEventPage(new URLSearchParams(buildEventsQuery(filters, 3)))).toBe(3);
   });
 });

@@ -1,6 +1,7 @@
 # `/events` の検索と絞り込み
 
-`/events` のキーワード検索・建物フィルタの設計と、そう決めた理由をまとめる。
+`/events` のキーワード検索と絞り込みの設計と、そう決めた理由をまとめる。
+**建物の絞り込みは [events-building-filter.md](./events-building-filter.md) が扱う。**
 **一覧の表示方式（無限スクロール・絞り込みの追従）は
 [events-infinite-scroll.md](./events-infinite-scroll.md) が扱う。
 リテラル照合が0件になったときの第4段（意味検索）は
@@ -13,7 +14,7 @@
 | `src/lib/text.ts`              | 正規化（`normalizeText` / `stripHtml`）。**検索と建物導出の共通の入口** |
 | `src/data/search-stopwords.ts` | 文章クエリの区切り語・不要語                                            |
 | `src/lib/search.ts`            | 3段カスケードの検索（`tokenizeQuery` / `searchEvents`）                 |
-| `src/data/filter-options.ts`   | 建物の定義と `resolveBuildingId()`                                      |
+| `src/data/filter-options.ts`   | 建物の定義と `getEventBuildings()` / `resolveBuildingId()`              |
 | `src/lib/filters.ts`           | URL クエリの検証、絞り込み、選択肢の組み立て                            |
 
 ## 出発点: コードが実データと食い違っていた
@@ -39,8 +40,9 @@ TCUホール ×10 / 9号館アリーナ ×2 / ９号館アリーナ（全角）�
 PR #199 が `normalizeEvent()` の既定化で塞いだ）。
 
 > [!IMPORTANT]
-> **建物の判定は `place` からの導出だけで行う。** 当時あった「建物番号」（`building`）欄は
-> 全件未入力のまま削除した（#466）。
+> 当時あった「建物番号」（`building`）欄は全件未入力のまま削除した（#466）。
+> 建物は microCMS の「建物」（`buildings`）を主とし、未入力の企画は `place` から推定する
+> （[events-building-filter.md](./events-building-filter.md)）。
 
 ## 正規化はひとつの関数に集約する
 
@@ -143,76 +145,23 @@ PR #199 が `normalizeEvent()` の既定化で塞いだ）。
 
 ### フィールドの重み
 
-| フィールド                       | 重み |
-| -------------------------------- | ---- |
-| `title`                          | 5    |
-| `organizer` / `place` / 導出建物 | 3    |
-| `description`                    | 2    |
-| `content`（タグ除去後）          | 1    |
+| フィールド                   | 重み |
+| ---------------------------- | ---- |
+| `title`                      | 5    |
+| `organizer` / `place` / 建物 | 3    |
+| `description`                | 2    |
+| `content`（タグ除去後）      | 1    |
 
 `content` は `stripHtml()` を通す。**タグを残すと `a` や `p` の1文字検索が全件に当たる。**
 
-導出建物を対象に含めているので、`place` が `９号館アリーナ` の企画を `9号館` で引ける。
-ただし `その他` は建物名ではなく振り分け先の名前なので、検索対象から外している
-（含めると「その他」で検索したときに解決できなかった企画が全部出る）。
+建物（`getEventBuildings()`。複数ならすべて）を対象に含めているので、`place` が
+`９号館アリーナ` の企画を `9号館` で引ける。ただし `その他` は建物名ではなく振り分け先の
+名前なので、検索対象から外している（含めると「その他」で検索したときに解決できなかった企画が全部出る）。
 
-## 建物の導出
+## 建物
 
-`resolveBuildingId(place)` の解決順。**この順序が仕様。**
-
-1. `place` を `buildings` の**宣言順**で部分一致
-2. 号館番号だけの表記（`7`）と教室コード規則 `/^([1-9])\d{1,2}[a-z]?$/` — 先頭1桁が号館番号（`11D`→1号館 / `61C`→6号館）
-3. どれにも当たらなければ `OTHER_BUILDING_ID`（企画がどこにも属さず消える経路は無い）
-
-> [!IMPORTANT]
-> **`buildings` 配列の並び順は仕様である。** 守るべき順序は2つ。
->
-> 1. `10号館` を `1号館` より前に置く
-> 2. **`号館` 系をすべて `体育館`（`アリーナ`）より前に置く**
->
-> 2 を崩すと `９号館アリーナ` が体育館へ倒れ、実データで3件が誤配される。
-> `src/data/filter-options.test.ts` の「号館はアリーナより先に判定される」が
-> この順序を固定している。
-
-`src/data/stages.ts` の `extractStageId` / `resolveStageId` と同じ形にしてある。
-`その他` を `buildings` 配列へ入れていないのも同じ理由で、あの配列は「実在する建物」の
-定義であり、「その他」は建物ではなく振り分け先の名前だから。
-
-### 選択肢は実データから作る
-
-`listBuildingOptions(events, selected)`（`src/lib/filters.ts`）が、**企画が1件以上ある建物だけ**を
-返す。`src/lib/timetable.ts` の `listStageTabs()` と同じ設計。
-
-**選択中の値は該当0件でもリストへ残す。** 外すと `<select>` の `value` が選択肢に無い状態
-になり、**表示が「すべて」へ化けたまま0件が並ぶ。** `parseBuilding()` は
-`isKnownBuildingId()` を通った値をそのまま採るので、定義済み14建物のうち実データに企画が
-無いもの（2026-09-06 時点で 2〜5 / 7 / 8 / 10号館 / グラウンドの8件）と「その他」は、
-`/events?building=7号館` のような深いリンクで普通に踏める。
-
-実測（2026-09-06 / 本番ビルド / 実 Chrome / `?building=7号館`）:
-
-| 状態   | `<select>` の options | `value` | 表示       | 件数 |
-| ------ | --------------------- | ------- | ---------- | ---- |
-| 修正前 | `7号館` **無し**      | `all`   | 「すべて」 | 0    |
-| 修正後 | `7号館` あり          | `7号館` | 「7号館」  | 0    |
-
-修正前の見え方は「絞り込んでいないのに1件も無い」であり、**このPRが潰そうとした
-「無言の0件」そのもの**になる。
-
-> [!IMPORTANT]
-> **`selected` を渡せるのはクエリを読める場所だけである。** `src/app/events/(list)/page.tsx` は
-> `useSearchParams()` を読まない設計（#156）なので選択値を知らない。したがって作る場所は
-> 2つに分かれる。
->
-> | 作る場所                         | 呼び方                                         | 用途                                   |
-> | -------------------------------- | ---------------------------------------------- | -------------------------------------- |
-> | `src/app/events/(list)/page.tsx` | `listBuildingOptions(events)`                  | `<Suspense>` の fallback（クエリ無し） |
-> | `EventsContent`                  | `listBuildingOptions(initialEvents, selected)` | 本描画                                 |
->
-> **2箇所で作っても中身はずれない。** fallback は定義上 `building: "all"`（`DEFAULT_EVENT_FILTERS`）
-> なので選択値を持たず、差は「選択中の1件」だけ——それがまさに欲しい差である。
-> 逆に `page.tsx` の配列を本描画へ降ろすと、`selected` 引数が production から一度も渡らず、
-> **`listBuildingOptions` の単体テストだけが緑になる**（#207 のレビューで発覚）。
+建物の出どころ（microCMS の「建物」と `place` からの推定）、選択肢の作り方と並び順、
+絞り込み・URL の検証・関連企画での使い方は [events-building-filter.md](./events-building-filter.md) が扱う。
 
 ## URL クエリの検証
 
@@ -221,7 +170,8 @@ PR #199 が `normalizeEvent()` の既定化で塞いだ）。
 来場者からは「絞り込みが壊れている」と見える。
 
 現在は `date` / `type` をホワイトリスト照合（`toLowerCase()` 後）、`building` を
-`isKnownBuildingId()` で照合し、外れたものは `"all"` へ倒す。`keyword` は `trim()` する
+データに存在する建物で照合し（[events-building-filter.md](./events-building-filter.md#url-クエリの検証)）、
+外れたものは `"all"` へ倒す。`keyword` は `trim()` する
 （`?keyword=%20` は truthy なので、trim しないと空白の検索が走る）。
 
 ## 日程の `both` は Day1 / Day2 の両方に出す
