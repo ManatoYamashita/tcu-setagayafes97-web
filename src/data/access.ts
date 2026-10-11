@@ -241,6 +241,9 @@ export const accessConfig = {
   officialAccessUrl: "https://www.tcu.ac.jp/access/",
 } as const;
 
+/** 「ご来場前にご確認ください」のカードの識別子（ロケールによらない） */
+export type VisitNoteId = "north-gate" | "car" | "bicycle" | "congestion";
+
 /**
  * 日本語Accessページの表示文言
  */
@@ -280,7 +283,9 @@ export interface AccessPageContent {
   visitNotes: {
     label: string;
     title: string;
+    /** id は表示に使わない安定識別子。アイコンの対応と React の key に使う */
     items: readonly {
+      id: VisitNoteId;
       title: string;
       description: string;
     }[];
@@ -328,18 +333,22 @@ export const accessPageContent = {
     title: "ご来場前にご確認ください",
     items: [
       {
+        id: "north-gate",
         title: "北門は封鎖されています",
         description: "当日は北門が封鎖されています。正門からお越しください。",
       },
       {
+        id: "car",
         title: "お車での来場はできません",
         description: "学内駐車場はご利用いただけません。公共交通機関をご利用ください。",
       },
       {
+        id: "bicycle",
         title: "自転車でのご来場は可能です",
         description: "自転車は6号館裏の駐輪場に停めてください。",
       },
       {
+        id: "congestion",
         title: "混雑を見込んでお越しください",
         description: "駅やバス停、周辺道路の混雑が予想されます。時間に余裕を持ってお越しください。",
       },
@@ -391,19 +400,23 @@ export const accessPageContents = {
       title: "Please check before arrival",
       items: [
         {
+          id: "north-gate",
           title: "The north gate is closed",
           description:
             "The north gate will be closed on the day. Please enter through the main gate.",
         },
         {
+          id: "car",
           title: "No visitor parking",
           description: "Campus parking is not available. Please use public transportation.",
         },
         {
+          id: "bicycle",
           title: "You may come by bicycle",
           description: "Please park your bicycle at the bicycle parking area behind Building 6.",
         },
         {
+          id: "congestion",
           title: "Allow extra travel time",
           description: "Stations, bus stops, and nearby streets are expected to be crowded.",
         },
@@ -452,18 +465,22 @@ export const accessPageContents = {
       title: "到场前请确认",
       items: [
         {
+          id: "north-gate",
           title: "北门关闭",
           description: "活动当天北门关闭，请从正门入场。",
         },
         {
+          id: "car",
           title: "无法驾车来场",
           description: "校内停车场不对访客开放，请使用公共交通工具。",
         },
         {
+          id: "bicycle",
           title: "可骑自行车前来",
           description: "请将自行车停放在6号馆后方的自行车停放处。",
         },
         {
+          id: "congestion",
           title: "请预留充足时间",
           description: "车站、巴士站及周边道路预计会较为拥挤。",
         },
@@ -511,18 +528,22 @@ export const accessPageContents = {
       title: "방문 전에 확인해 주세요",
       items: [
         {
+          id: "north-gate",
           title: "북문은 폐쇄됩니다",
           description: "당일에는 북문이 폐쇄되므로 정문으로 입장해 주세요.",
         },
         {
+          id: "car",
           title: "자동차로 방문할 수 없습니다",
           description: "교내 주차장을 이용할 수 없으므로 대중교통을 이용해 주세요.",
         },
         {
+          id: "bicycle",
           title: "자전거로 방문하실 수 있습니다",
           description: "자전거는 6호관 뒤편 자전거 주차장에 세워 주세요.",
         },
         {
+          id: "congestion",
           title: "시간에 여유를 두세요",
           description: "역, 버스 정류장, 주변 도로의 혼잡이 예상됩니다.",
         },
