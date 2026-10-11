@@ -1,6 +1,5 @@
 import {
   dateFilterOptions,
-  getBuildingLabel,
   getEventBuildings,
   sortBuildingIds,
   typeFilterOptions,
@@ -238,7 +237,7 @@ export function listBuildingOptions(events: Event[]): BuildingFilterOption[] {
     { value: "all", label: "すべて" },
     ...sortBuildingIds(collectBuildingIds(events)).map((id) => ({
       value: id,
-      label: getBuildingLabel(id),
+      label: id,
     })),
   ];
 }
