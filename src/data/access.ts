@@ -349,7 +349,7 @@ export const accessPageContent = {
     label: "Campus map",
     title: "キャンパスマップは準備中です",
     description:
-      "企画会場や案内所を掲載した当日用マップは、詳細が決まり次第このページで公開します。",
+      "企画会場や9号館前本部を掲載した当日用マップは、詳細が決まり次第このページで公開します。",
   },
 } as const satisfies AccessPageContent;
 
@@ -413,7 +413,7 @@ export const accessPageContents = {
       label: "Campus map",
       title: "The festival campus map is coming soon",
       description:
-        "A day-of map showing event venues and information desks will be published here once finalized.",
+        "A day-of map showing event venues and the Headquarters in front of Building 9 will be published here once finalized.",
     },
   },
   zh: {
@@ -472,7 +472,7 @@ export const accessPageContents = {
     campusMap: {
       label: "Campus map",
       title: "校园活动地图正在准备中",
-      description: "标注活动会场和服务台的当日地图将在确定后于本页发布。",
+      description: "标注活动会场和9号馆前本部的当日地图将在确定后于本页发布。",
     },
   },
   ko: {
@@ -531,7 +531,8 @@ export const accessPageContents = {
     campusMap: {
       label: "Campus map",
       title: "캠퍼스 안내 지도는 준비 중입니다",
-      description: "행사장과 안내소가 표시된 당일 지도는 확정되는 대로 이 페이지에 공개합니다.",
+      description:
+        "행사장과 9호관 앞 본부가 표시된 당일 지도는 확정되는 대로 이 페이지에 공개합니다.",
     },
   },
 } as const satisfies Record<"ja" | "en" | "zh" | "ko", AccessPageContent>;
