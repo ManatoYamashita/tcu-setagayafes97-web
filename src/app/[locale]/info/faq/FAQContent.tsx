@@ -129,11 +129,13 @@ export function FAQContent({ initialFAQ }: FAQContentProps) {
       <div className="mx-auto max-w-3xl">
         <p className="text-lg font-bold text-gray-900">{t("empty.title")}</p>
         <p className="mt-2 leading-8 text-gray-700">
-          {t("empty.prefix")}{" "}
-          <Link href="/info/contact" className={linkClassName}>
-            {t("empty.contactLink")}
-          </Link>{" "}
-          {t("empty.suffix")}
+          {t.rich("empty.description", {
+            link: (chunks) => (
+              <Link href="/info/contact" className={linkClassName}>
+                {chunks}
+              </Link>
+            ),
+          })}
         </p>
       </div>
     );

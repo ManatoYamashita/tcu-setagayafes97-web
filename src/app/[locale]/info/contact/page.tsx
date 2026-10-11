@@ -92,14 +92,16 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
           ここは本題ではないので、囲みを持たせず1行の地の文として置く。
         */}
         <p className="text-sm leading-relaxed text-gray-600">
-          {t("beforeContact.prefix")}{" "}
-          <Link
-            href="/info/faq"
-            className="font-semibold text-primary-600 underline underline-offset-4 hoverable:hover:no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
-          >
-            {t("beforeContact.faqLink")}
-          </Link>{" "}
-          {t("beforeContact.suffix")}
+          {t.rich("beforeContact.description", {
+            link: (chunks) => (
+              <Link
+                href="/info/faq"
+                className="font-semibold text-primary-600 underline underline-offset-4 hoverable:hover:no-underline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+              >
+                {chunks}
+              </Link>
+            ),
+          })}
         </p>
 
         <ContactForm typeOptions={typeOptions} />

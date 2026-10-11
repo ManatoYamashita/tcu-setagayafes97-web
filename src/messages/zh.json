@@ -77,9 +77,7 @@
     },
     "beforeContact": {
       "title": "咨询前请注意",
-      "prefix": "请先查阅",
-      "faqLink": "常见问题页面",
-      "suffix": "了解常见问题。"
+      "description": "请先查阅<link>常见问题页面</link>了解常见问题。"
     },
     "status": {
       "successTitle": "已提交",
@@ -193,9 +191,7 @@
     "count": "{count} 个问题",
     "empty": {
       "title": "常见问题正在准备中。",
-      "prefix": "如有疑问，请通过",
-      "contactLink": "咨询表格",
-      "suffix": "联系我们。"
+      "description": "如有疑问，请通过<link>咨询表格</link>联系我们。"
     },
     "search": {
       "label": "搜索问题",
