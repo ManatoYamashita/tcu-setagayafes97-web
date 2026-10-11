@@ -80,10 +80,10 @@ refactor/<refactor-target>   # リファクタリング
 ワークフローは2本。定義の一次情報は `.github/workflows/` で、カバー範囲の表は
 [.claude/CLAUDE.md](../../.claude/CLAUDE.md) の「CI のカバー範囲」にある。
 
-| ワークフロー                  | いつ走るか                                       | 何をするか                                                       |
-| ----------------------------- | ------------------------------------------------ | ---------------------------------------------------------------- |
-| `feature-ci.yml`              | 上記5種のブランチへの push、base が `main` の PR | `Static Checks` / `Layout E2E` / `Build Check` の3ジョブ         |
-| `production-deploy-guard.yml` | `main` への push                                 | そのコミットの Vercel Production デプロイが5分以内に現れるか見る |
+| ワークフロー                  | いつ走るか                                       | 何をするか                                                          |
+| ----------------------------- | ------------------------------------------------ | ------------------------------------------------------------------- |
+| `feature-ci.yml`              | 上記5種のブランチへの push、base が `main` の PR | `Static Checks` / `Layout E2E` / `Build Check` の3ジョブ            |
+| `production-deploy-guard.yml` | `main` への push                                 | そのコミットの Vercel Production デプロイが作られ、成功したかを見る |
 
 **命名規則から外れたブランチ名では、push 時のチェックが一切走らない。**
 

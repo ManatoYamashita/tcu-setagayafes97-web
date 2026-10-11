@@ -160,7 +160,7 @@ git merge --abort
 
 1. **リモートのブランチが消えたか** — `git ls-remote --heads origin <branch>` が空であること
 2. **閉じるはずの Issue が閉じたか** — `gh issue view <N> --json state --jq .state`（上の 4 の取りこぼし）
-3. **本番デプロイが作られたか** — `main` の `Production Deploy Guard` が success であること（[vercel-production-deploy.md](./vercel-production-deploy.md)）
+3. **本番デプロイが成功したか** — `main` の `Production Deploy Guard` が success であること（[vercel-production-deploy.md](./vercel-production-deploy.md)）
 
 1 は 2026-10-04 に起きた。detached HEAD のツリーで `gh pr merge --delete-branch` を実行すると、
 マージは成功するが、ローカルの後始末で `could not determine current branch` を出して止まり、
