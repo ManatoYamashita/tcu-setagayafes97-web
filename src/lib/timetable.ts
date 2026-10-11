@@ -104,7 +104,7 @@ export function buildStageEventDetails(events: Event[]): Record<string, Timetabl
     details[event.id] = {
       description: event.description,
       sns: event.sns,
-      venue: [event.building?.trim(), event.place?.trim()].filter(Boolean).join(" "),
+      venue: event.place?.trim() ?? "",
       thumbnail: event.thumbnail?.url
         ? {
             url: event.thumbnail.url,

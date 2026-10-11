@@ -8,8 +8,6 @@ interface SpecialScheduleProps {
   openTime?: string;
   /** 開演時刻（Event.sessions）。2部制なら行を分けて出す */
   sessions: EventSession[];
-  /** 建物名 */
-  building?: string;
   /** 場所 */
   place: string;
 }
@@ -45,14 +43,8 @@ function formatEventDate(date: EventDate): string {
  *
  * 未入力の項目は行ごと出力しません（開場時刻が未定の年もあるため）。
  */
-export function SpecialSchedule({
-  date,
-  openTime,
-  sessions,
-  building,
-  place,
-}: SpecialScheduleProps) {
-  const venue = [building, place].filter(Boolean).join(" ");
+export function SpecialSchedule({ date, openTime, sessions, place }: SpecialScheduleProps) {
+  const venue = place;
   const performance = formatSessions(sessions);
 
   return (

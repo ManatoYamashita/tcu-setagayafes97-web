@@ -20,10 +20,9 @@ export async function RelatedEvents({ currentEvent }: RelatedEventsProps) {
   // 現在の企画を除外
   const otherEvents = allEvents.filter((e) => e.id !== currentEvent.id);
 
-  // 建物は microCMS では全件未入力なので、place から導出したIDで比べる。
-  // 素の building 同士を比べると "" === "" で全件が「同じ建物」になり、
+  // 建物は place から導出したIDで比べる。素の place 同士を比べると部屋単位の一致になり、
   // 並べ替えの第2基準として機能しない
-  const currentBuilding = resolveBuildingId(currentEvent.place, currentEvent.building);
+  const currentBuilding = resolveBuildingId(currentEvent.place);
 
   // 関連企画を抽出（優先順位: 同じ種別 > 同じ建物）
   const relatedEvents = otherEvents
@@ -38,11 +37,9 @@ export async function RelatedEvents({ currentEvent }: RelatedEventsProps) {
       // 同じ建物の企画を次に優先。どちらも解決できなかった場合（「その他」同士）は
       // 「同じ建物」とは見なさない
       const aBuildingMatch =
-        currentBuilding !== OTHER_BUILDING_ID &&
-        resolveBuildingId(a.place, a.building) === currentBuilding;
+        currentBuilding !== OTHER_BUILDING_ID && resolveBuildingId(a.place) === currentBuilding;
       const bBuildingMatch =
-        currentBuilding !== OTHER_BUILDING_ID &&
-        resolveBuildingId(b.place, b.building) === currentBuilding;
+        currentBuilding !== OTHER_BUILDING_ID && resolveBuildingId(b.place) === currentBuilding;
 
       if (aBuildingMatch && !bBuildingMatch) return -1;
       if (!aBuildingMatch && bBuildingMatch) return 1;

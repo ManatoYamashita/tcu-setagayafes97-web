@@ -35,7 +35,6 @@ const BASE = {
   createdAt: "2026-08-01T00:00:00.000Z",
   updatedAt: "2026-08-01T00:00:00.000Z",
   publishedAt: "2026-08-01T00:00:00.000Z",
-  building: "7号館",
   description: "検証用のダミー企画です。",
   content: "<p>検証用のダミー企画です。</p>",
 } as const;
@@ -56,7 +55,7 @@ export function fixture(
     sessions,
     ...overrides
   }: Pick<Event, "date" | "type" | "place" | "title" | "organizer"> &
-    Partial<Pick<Event, "building" | "description" | "sessions">> & {
+    Partial<Pick<Event, "description" | "sessions">> & {
       startTime?: string;
       endTime?: string;
     }
@@ -112,7 +111,6 @@ export const stageEventFixtures: Event[] = [
     place: "体育館 メインアリーナ",
     title: "オープニングセレモニー",
     organizer: "実行委員会",
-    building: "体育館",
     startTime: "09:30",
     endTime: "10:15",
   }),
@@ -133,7 +131,6 @@ export const stageEventFixtures: Event[] = [
     place: "ホール",
     title: "落語研究会 寄席",
     organizer: "落語研究会",
-    building: "講堂",
     startTime: "12:00",
     endTime: "12:30",
   }),
@@ -145,7 +142,6 @@ export const stageEventFixtures: Event[] = [
     place: "ホール",
     title: "2部制ステージ（検証用）",
     organizer: "実行委員会",
-    building: "講堂",
     sessions: [
       { startTime: "10:40", endTime: "11:25" },
       { startTime: "14:45", endTime: "15:45" },
@@ -158,7 +154,6 @@ export const stageEventFixtures: Event[] = [
     place: "中庭特設ステージ",
     title: "後夜祭ライブ",
     organizer: "実行委員会",
-    building: "中庭",
     startTime: "17:30",
     endTime: "19:00",
   }),

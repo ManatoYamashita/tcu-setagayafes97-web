@@ -106,7 +106,7 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
   // 構造化データ（JSON-LD）
   const location = {
     "@type": "Place",
-    name: [event.building, event.place].filter(Boolean).join(" "),
+    name: event.place,
     address: {
       "@type": "PostalAddress",
       streetAddress: siteConfig.address,
@@ -246,7 +246,6 @@ export default async function SpecialDetailPage({ params }: SpecialPageProps) {
                 date={event.date}
                 openTime={special?.openTime}
                 sessions={event.sessions}
-                building={event.building}
                 place={event.place}
               />
 

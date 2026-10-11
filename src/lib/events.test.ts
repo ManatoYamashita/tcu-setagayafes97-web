@@ -19,7 +19,6 @@ function rawEventFixture(overrides: Partial<RawEvent> = {}): RawEvent {
     date: "day1 : 10月31日（土）",
     type: "room : 教室企画",
     place: "1101教室",
-    building: "1号館",
     title: "テスト企画",
     organizer: "テスト団体",
     description: "テスト説明文",
@@ -29,13 +28,12 @@ function rawEventFixture(overrides: Partial<RawEvent> = {}): RawEvent {
 }
 
 describe("normalizeEvent", () => {
-  it("title/organizer/description/place/building が undefined でも空文字に既定化する", () => {
+  it("title/organizer/description/place が undefined でも空文字に既定化する", () => {
     const raw = rawEventFixture({
       title: undefined,
       organizer: undefined,
       description: undefined,
       place: undefined,
-      building: undefined,
     } as Partial<RawEvent>);
 
     const event = normalizeEvent(raw);
@@ -44,7 +42,6 @@ describe("normalizeEvent", () => {
     expect(event.organizer).toBe("");
     expect(event.description).toBe("");
     expect(event.place).toBe("");
-    expect(event.building).toBe("");
   });
 
   it("正規化後の企画をキーワード検索してもクラッシュしない（回帰）", () => {

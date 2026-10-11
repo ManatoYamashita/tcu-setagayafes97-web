@@ -358,28 +358,26 @@ describe("buildStageEventDetails", () => {
     }
   });
 
-  it("建物名と場所の空項目を落として繋ぐ", () => {
+  it("会場は場所の前後の空白を落として出す", () => {
     const events = [
       fixture("v1", {
         date: "day1",
         type: "stage",
-        place: "7A ステージ",
-        building: "",
+        place: " 7A ステージ ",
         title: "a",
         organizer: "x",
       }),
       fixture("v2", {
         date: "day1",
         type: "stage",
-        place: "ステージ",
-        building: " 7号館 ",
+        place: "",
         title: "b",
         organizer: "x",
       }),
     ];
     const built = buildStageEventDetails(events);
     expect(built.v1.venue).toBe("7A ステージ");
-    expect(built.v2.venue).toBe("7号館 ステージ");
+    expect(built.v2.venue).toBe("");
   });
 });
 

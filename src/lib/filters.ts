@@ -198,12 +198,9 @@ export function filterEvents(events: Event[], filters: FilterParams): Event[] {
     filtered = filtered.filter((e) => e.type === filters.type);
   }
 
-  // 建物フィルター
-  //
-  // microCMS の `building` は実データで全件未入力のため、`e.building` との比較は
-  // 常に0件になる（#166）。入稿済みの `place` から導出した建物IDで判定する。
+  // 建物フィルター（`place` から導出した建物IDで判定する）
   if (filters.building && filters.building !== "all") {
-    filtered = filtered.filter((e) => resolveBuildingId(e.place, e.building) === filters.building);
+    filtered = filtered.filter((e) => resolveBuildingId(e.place) === filters.building);
   }
 
   // キーワード検索（結果は関連度順に並ぶ）
@@ -231,7 +228,7 @@ export function listBuildingOptions(
   events: Event[],
   selected: string = "all"
 ): BuildingFilterOption[] {
-  const present = new Set(events.map((event) => resolveBuildingId(event.place, event.building)));
+  const present = new Set(events.map((event) => resolveBuildingId(event.place)));
 
   if (selected !== "all" && isKnownBuildingId(selected)) {
     present.add(selected);

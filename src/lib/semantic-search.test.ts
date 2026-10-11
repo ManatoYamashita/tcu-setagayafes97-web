@@ -31,7 +31,6 @@ function event(id: string, overrides: Partial<Event> = {}): Event {
     date: "day1",
     type: "stage",
     place: "TCUホール",
-    building: "",
     title: "ダミー企画",
     organizer: "ダミー団体",
     description: "ダミーの説明文です。",
