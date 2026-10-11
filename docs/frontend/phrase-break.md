@@ -74,6 +74,7 @@ SplitText のように DOM を作り替えた後の要素には React の持ち�
 | ライブラリ | `budoux` 0.9.3（Google、Apache-2.0。https://github.com/google/budoux ）。`package.json` で版を固定している（`^` なし）                                                                                                               |
 | 導入目的   | iOS（WebKit）・Firefox でも、日本語を文節の境目でだけ改行させる。`word-break: auto-phrase` は Chrome にしか無い                                                                                                                      |
 | 承認       | #453 で承認されたのは、サーバー側でお知らせのタイトルだけを分割し、ブラウザへモデルを配信しない方式だった（下の経緯の3）。PR #454 の途中でブラウザ側の方式へ変わり、その形のまま 2026-10-11 02:18 JST にリポジトリ管理者がマージした |
+| 追認       | 2026-10-11、リポジトリ管理者が変更後の方式（ブラウザ側でサイト全体を処理する）を追認した（[PR #454 のコメント](https://github.com/ManatoYamashita/tcu-setagayafes97-web/pull/454#issuecomment-6106665209)）                          |
 
 ### 経緯
 
