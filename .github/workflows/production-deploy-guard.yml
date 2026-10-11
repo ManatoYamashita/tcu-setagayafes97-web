@@ -1,4 +1,4 @@
-# main へのマージに対して Vercel の Production デプロイが作られたことを確認する。
+# main へのマージが Vercel の Production デプロイとして成功したことを確認する。
 #
 # 2026-08-30、マージ（ee1c9fb / PR #147）に対する Production デプロイが作られず、
 # 本番だけが古いまま取り残された。GitHub 上は CI 緑・マージ済みで、Vercel 側にも
@@ -8,6 +8,15 @@
 # この事象の危険は頻度ではなく沈黙にある。過去7件のマージのうち落ちたのは1件だけで、
 # 設定不良ではなく webhook 配信の単発失敗と見られる（Issue #152）。直す対象が
 # 存在しない以上、検知できるようにするのが唯一の対策になる。
+#
+# 2026-10-10 には、デプロイは作られたがビルド前に Error になった（4935710 / Issue #455）。
+# 「作られたか」しか見ていなかったため Guard は緑のまま、本番は約11時間古かった。
+# 作られなかったのも失敗したのも「マージしたのに本番が古い」点で同じ事故なので、
+# deployment の最新ステータスが success になるまでを確認する。
+#
+# Vercel は GitHub の deployment をビルド完了時に終端ステータス付きで作る（途中経過の
+# pending はコミットの status にしか出ない）。したがって「作られるまで」の待ちが
+# ビルド時間をすでに含む。状態待ちのループは pending を返された場合の保険である。
 name: Production Deploy Guard
 
 on:
@@ -22,9 +31,10 @@ permissions:
 
 jobs:
   verify:
-    name: Production デプロイの作成を確認
+    name: Production デプロイの成功を確認
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # 作成待ち最大5分 + 状態待ち最大5分 + 余裕
+    timeout-minutes: 12
 
     steps:
       - name: このコミットの Production デプロイを待つ
@@ -35,24 +45,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          # 正常時はマージから45〜85秒で作られる（docs/dev/ci-env.md の実測表）。
-          # 15秒間隔で20回＝最大5分待つ。実測の最長85秒に対して十分な余裕がある。
-          for attempt in $(seq 1 20); do
-            id=$(gh api "repos/$REPO/deployments?environment=Production&per_page=30" \
-              --jq "[.[] | select(.sha == \"$SHA\")] | .[0].id // empty")
-
-            if [ -n "$id" ]; then
-              echo "Production デプロイを確認しました（deployment id=$id / 経過 $((attempt * 15 - 15))秒）"
-              exit 0
-            fi
-
-            echo "まだ作られていません。15秒後に再確認します（$attempt/20）"
-            sleep 15
-          done
-
-          echo "::error title=Production デプロイが作られていません::$SHA に対する Production デプロイが5分経っても作られませんでした。Vercel の git 連携が push を取りこぼした可能性があります（Issue #152）。本番は古いままです。"
-
-          cat <<'RECOVERY'
+          print_recovery() {
+            cat <<'RECOVERY'
 
           ────────────────────────────────────────────────────────────
           復旧手順（手元のマシンで実行する）
@@ -65,10 +59,70 @@ jobs:
             git worktree remove --force "$TMP"
 
           `vercel redeploy` は使わないこと。既存デプロイのソースを焼き直すだけで、
-          デプロイが存在しないこのケースでは新しいコミットを本番へ持って行けない。
+          新しいコミットを本番へ持って行けない。
 
-          詳細: docs/dev/ci-env.md の「Vercel の本番反映」
+          コミットの Vercel ステータスが「Deployment rate limited」なら、
+          取りこぼしではなくデプロイ数の上限で、手順が違う。
+
+          詳細: docs/dev/vercel-production-deploy.md
           ────────────────────────────────────────────────────────────
           RECOVERY
+          }
 
+          # 正常時はマージから45〜85秒で作られる（docs/dev/vercel-production-deploy.md の実測表）。
+          # 15秒間隔で20回＝最大5分待つ。実測の最長85秒に対して十分な余裕がある。
+          id=""
+          for attempt in $(seq 1 20); do
+            id=$(gh api "repos/$REPO/deployments?environment=Production&per_page=30" \
+              --jq "[.[] | select(.sha == \"$SHA\")] | .[0].id // empty")
+            if [ -n "$id" ]; then
+              echo "Production デプロイが作られました（deployment id=$id / 経過 $((attempt * 15 - 15))秒）"
+              break
+            fi
+            echo "まだ作られていません。15秒後に再確認します（$attempt/20）"
+            sleep 15
+          done
+
+          if [ -z "$id" ]; then
+            echo "::error title=Production デプロイが作られていません::$SHA に対する Production デプロイが5分経っても作られませんでした。Vercel の git 連携が push を取りこぼした可能性があります（Issue #152）。本番は古いままです。"
+            print_recovery
+            exit 1
+          fi
+
+          for attempt in $(seq 1 20); do
+            # statuses は新しい順。最新の1件がこのデプロイの現在の状態である。
+            IFS=$'\t' read -r state desc < <(gh api "repos/$REPO/deployments/$id/statuses?per_page=1" \
+              --jq '(.[0] // {state: "pending"}) | "\(.state)\t\(.description // "")"')
+            echo "状態: $state（$desc）"
+
+            case "$state" in
+              success)
+                echo "Production デプロイが成功しました。"
+                exit 0
+                ;;
+              failure | error)
+                echo "::error title=Production デプロイが失敗しました::$SHA の Production デプロイは作られましたが $state で終わりました。本番は古いままです（Issue #455）。理由は vercel inspect <deployment> --logs で確かめてください: $desc"
+                print_recovery
+                exit 1
+                ;;
+              inactive)
+                # 連続マージでは、先のデプロイが Vercel に Canceled にされ inactive になる。
+                # 後続のコミットは main の先端としてこのコミットを含んで出るので、
+                # その成否は後続の Guard が見る。先端のままなら本番は古い。
+                head=$(gh api "repos/$REPO/commits/main" --jq '.sha')
+                if [ "$head" != "$SHA" ]; then
+                  echo "後続のコミット（$head）に含まれて出るため、このコミットの確認はそちらの Guard に委ねます。"
+                  exit 0
+                fi
+                echo "::error title=Production デプロイが取り消されました::$SHA は main の先端ですが、Production デプロイが $state（$desc）で終わりました。本番は古いままです（Issue #455）。"
+                print_recovery
+                exit 1
+                ;;
+            esac
+
+            echo "まだ終わっていません。15秒後に再確認します（$attempt/20）"
+            sleep 15
+          done
+
+          echo "::error title=Production デプロイが終わりません::$SHA の Production デプロイ（deployment id=$id）が5分経っても終端状態になりませんでした（最後の状態: $state）。Vercel のダッシュボードで状態を確かめてください。"
           exit 1

@@ -185,7 +185,7 @@ CI はクリーンチェックアウトなので陳腐化しないが、**ロー
 スクリプト側へ入れてある。**
 
 もう1本、`.github/workflows/production-deploy-guard.yml` が `main` への push で走る。
-そのコミットの Vercel Production デプロイが作られたかを最大5分間確認し、現れなければ失敗する。
+そのコミットの Vercel Production デプロイが作られ、`success` で終わったかを確認する。**作られない・Error で終わる・main の先端のまま Canceled になる、のどれでも失敗する**（連続マージ途中の Canceled は緑。#455）。
 
 **Vercel の git 連携はマージを取りこぼすことがある。** 2026-08-30 に実際に発生し、
 CI 緑・マージ済みのまま本番だけが40分以上古いまま取り残された。Vercel 側にも

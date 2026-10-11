@@ -35,9 +35,20 @@
 > **webhook 配信の単発失敗**と見られる。原因はリポジトリ側から手の届かない領域にある（#152）。
 
 **この取りこぼしは `.github/workflows/production-deploy-guard.yml` が自動で検知する。**
-`main` への push ごとに、そのコミットの Production デプロイが作られたかを最大5分間確認し、
-現れなければ CI を失敗させる。**沈黙したまま進む状態は解消されている**ので、
+`main` への push ごとに、そのコミットの Production デプロイが作られるのを最大5分待ち、
+その最新ステータスが `success` になるのを確かめる。作られない・`failure` / `error` で終わる・
+先端のまま取り消される（下記）のいずれでも CI を失敗させる。**沈黙したまま進む状態は解消されている**ので、
 以下の手動確認は Guard が落ちたとき、あるいは Guard 導入前のコミットを追うときに使う。
+
+> [!WARNING]
+> **「作られた」は「成功した」ではない。** `4935710`（PR #454、2026-10-10）の Production デプロイは
+> 作られたが、ビルド前に `Git information retrieval failed for this deployment.` で Error になった。
+> 当時の Guard は作成しか見ておらず緑のまま、本番は約11時間古かった（#455）。
+>
+> Vercel は GitHub の deployment を**ビルド完了時に終端ステータス付きで**作る（`pending` はコミットの
+> status にだけ出る）。連続マージで先のデプロイが Canceled になると、その deployment は `inactive`
+> （`Canceled from the Vercel Dashboard`）になる。後続のコミットに含まれて出るので正常であり、
+> Guard は `main` の先端が先へ進んでいれば緑にする（2026-10-10 の #447・#450 で実測）。
 
 Production が作られるのは**マージコミットに対してだけ**です。そのマージに含まれる個々のコミット（`3530cd4` など）には Production デプロイは作られません。Vercel はブランチ先端をデプロイするためで、正常な挙動です。
 
@@ -57,13 +68,14 @@ Production が作られるのは**マージコミットに対してだけ**で�
 ## 手順
 
 1. **まず反映済みかを確かめる**（下記「完了判定」）。一致していれば何もしなくてよい
-2. マージから数分待っても一致しない場合、**対処は2通りに分かれる**
+2. マージから数分待っても一致しない場合、**状況によって対処が分かれる**
 
-| 状況                                                                               | 対処                                                                      |
-| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| そのコミットの Production デプロイは**存在する**が内容が古い（環境変数を変えた等） | `vercel redeploy --target production`（`promote` は使わない。理由は後述） |
-| そのコミットの Production デプロイが**存在しない**（Vercel の取りこぼし）          | 下記「取りこぼしからの復旧」                                              |
-| そのコミットの Vercel ステータスが **`Deployment rate limited`**                   | 下記「デプロイ数の上限で止まったとき」。取りこぼしとは復旧手順が違う      |
+| 状況                                                                                | 対処                                                                          |
+| ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| そのコミットの Production デプロイは**存在する**が内容が古い（環境変数を変えた等）  | `vercel redeploy --target production`（`promote` は使わない。理由は後述）     |
+| そのコミットの Production デプロイが**存在しない**（Vercel の取りこぼし）           | 下記「取りこぼしからの復旧」                                                  |
+| そのコミットの Production デプロイが **Error / Failed**（Guard が「失敗しました」） | `vercel inspect <deployment> --logs` で理由を見てから「取りこぼしからの復旧」 |
+| そのコミットの Vercel ステータスが **`Deployment rate limited`**                    | 下記「デプロイ数の上限で止まったとき」。取りこぼしとは復旧手順が違う          |
 
 > [!CAUTION]
 > **`vercel redeploy` は取りこぼしの復旧には使えない。** 既存デプロイの**ソースを焼き直す**だけなので、
@@ -149,10 +161,15 @@ Ignored Build Step の注記）。`docs/` のブランチにコードの変更�
 CI の緑は Preview ビルドの成功を意味するだけです。**本番反映は sha の一致で判定してください。**
 
 ```bash
-# この2つが一致していれば本番反映済み
+# この2つが一致し、かつ3つ目が success なら本番反映済み
 gh api "repos/ManatoYamashita/tcu-setagayafes97-web/deployments?environment=Production&per_page=1" --jq '.[0].sha'
 git ls-remote origin refs/heads/main | cut -f1
+DEP=$(gh api "repos/ManatoYamashita/tcu-setagayafes97-web/deployments?environment=Production&per_page=1" --jq '.[0].id')
+gh api "repos/ManatoYamashita/tcu-setagayafes97-web/deployments/$DEP/statuses" --jq '.[0].state'
 ```
+
+**CLI（`vercel deploy --prod`）で出したデプロイは GitHub の deployment を作らない。** 復旧後もこの一覧の先頭は
+失敗したデプロイのままなので、復旧の確認は `vercel inspect` と公開ドメインの実応答で行う（#455 の復旧で実測）。
 
 `vercel ls <project> --prod` でも Production デプロイの履歴を確認できます。`vercel inspect <url>` の `target` が `production` かどうかが正準です。
 
@@ -274,8 +291,8 @@ curl -s https://<production deployment url>/robots.txt | grep Sitemap
 
 - [ci-env.md](./ci-env.md) - GitHub Actions / Vercel の環境変数とシークレット登録順
 - [staging-and-merge.md](./staging-and-merge.md) - マージ前チェックリスト
-- `.github/workflows/production-deploy-guard.yml` - Production デプロイが作られたかを確かめる Guard
+- `.github/workflows/production-deploy-guard.yml` - Production デプロイが成功したかを確かめる Guard
 
 ---
 
-**最終更新日**: 2026-10-01（ci-env.md から分割し、デプロイ数の上限で止まったときの手順を追加。空く時刻は読めないことを実例で追記）
+**最終更新日**: 2026-10-11
