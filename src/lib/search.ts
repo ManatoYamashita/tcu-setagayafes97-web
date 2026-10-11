@@ -170,7 +170,7 @@ export function tokenizeQuery(query: string): string[] {
  * `undefined` に対する `.toLowerCase()` が起きません（#166）。
  */
 function toSearchFields(event: Event): SearchField[] {
-  const buildingId = resolveBuildingId(event.place, event.building);
+  const buildingId = resolveBuildingId(event.place);
 
   return [
     { text: normalizeText(event.title), weight: FIELD_WEIGHTS.title },

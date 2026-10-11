@@ -11,8 +11,7 @@ import {
 /**
  * 建物の導出
  *
- * microCMS の `building` は実データ18件すべてで未入力のため、絞り込みの成否は
- * `place` からの導出だけで決まる。ここで固定するのは**解決の規則**であり、
+ * 建物の絞り込みの成否は `place` からの導出だけで決まる。ここで固定するのは**解決の規則**であり、
  * 実データそのものではない（第98回で企画が入れ替わっても規則は変わらない）。
  */
 describe("resolveBuildingId", () => {
@@ -45,14 +44,8 @@ describe("resolveBuildingId", () => {
     expect(resolveBuildingId("10号館 1001教室")).toBe("10号館");
   });
 
-  it("building が入稿されていれば place より優先する", () => {
-    // 将来 CMS 側を埋めたときに、そちらが勝つ
-    expect(resolveBuildingId("TCUホール", "7号館")).toBe("7号館");
-  });
-
-  it("building に号館番号だけが入っていても読む", () => {
-    // docs/requires/require.md が示す入力例（"7"）に備える
-    expect(resolveBuildingId("", "7")).toBe("7号館");
+  it("号館番号だけの表記を読む", () => {
+    expect(resolveBuildingId("7")).toBe("7号館");
   });
 
   it("解決できなければ「その他」へ落とし、企画を消さない", () => {

@@ -66,9 +66,7 @@ export function EventDetail({ event }: EventDetailProps) {
   const title = displayEventText(event.title, EVENT_DISPLAY_FALLBACKS.title);
   const organizer = displayEventText(event.organizer, EVENT_DISPLAY_FALLBACKS.organizer);
   const description = displayEventText(event.description, EVENT_DISPLAY_FALLBACKS.description);
-  const venue =
-    [event.building?.trim(), event.place?.trim()].filter(Boolean).join(" ") ||
-    EVENT_DISPLAY_FALLBACKS.venue;
+  const venue = event.place?.trim() || EVENT_DISPLAY_FALLBACKS.venue;
   const hasThumbnail = Boolean(event.thumbnail?.url);
   const thumbnailWidth = event.thumbnail?.width ?? 0;
   const thumbnailHeight = event.thumbnail?.height ?? 0;

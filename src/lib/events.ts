@@ -18,7 +18,6 @@ import type {
 export interface EventsFilterOptions {
   date?: EventDate;
   type?: EventType;
-  building?: string;
 }
 
 /**
@@ -117,7 +116,6 @@ export function normalizeEvent(rawEvent: RawEvent): Event {
     organizer: rawEvent.organizer ?? "",
     description: rawEvent.description ?? "",
     place: rawEvent.place ?? "",
-    building: rawEvent.building ?? "",
     // content は実データ18件中16件で欠落している（2026-09-06 実測）。
     // キーワード検索が本文も対象にするため、ここでも既定化しておく
     content: rawEvent.content ?? "",
@@ -149,7 +147,6 @@ const MICROCMS_MAX_LIMIT = 100;
  *
  * ラベルまで含めれば一致するが、**入稿側でラベルを直した瞬間に壊れる**。
  * したがって select の絞り込みは API に任せず、正規化後の値で filter する。
- * text フィールド（`building` など）は `[equals]` が正しく動くため API 側で絞ってよい。
  */
 
 /**
@@ -166,16 +163,7 @@ export async function getEventsList(
 ): Promise<Event[]> {
   if (!isMicrocmsConfigured) return [];
   try {
-    // microCMS filters パラメータの構築
-    // select（date / type）は API では絞れないため、取得後に applyFilters() で適用する
-    const filterQueries: string[] = [];
-    if (filters?.building) {
-      filterQueries.push(`building[equals]${filters.building}`);
-    }
-
-    const filterParam = filterQueries.length > 0 ? { filters: filterQueries.join("[and]") } : {};
-
-    /** select の絞り込みを正規化後の値で適用する */
+    /** select（date / type）は API では絞れないため、取得後に正規化後の値で適用する */
     const applyFilters = (events: Event[]): Event[] =>
       events.filter(
         (event) =>
@@ -191,7 +179,6 @@ export async function getEventsList(
         queries: {
           limit,
           orders: "-publishedAt",
-          ...filterParam,
         },
       });
       return applyFilters(response.contents.map(normalizeEvent));
@@ -210,7 +197,6 @@ export async function getEventsList(
           limit: perPage,
           offset,
           orders: "-publishedAt",
-          ...filterParam,
         },
       });
 

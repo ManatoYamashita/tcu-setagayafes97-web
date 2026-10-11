@@ -49,7 +49,7 @@ export interface BuildingFilterOption {
 /**
  * 建物の定義
  *
- * `patterns` は `place`（および `building`）に含まれていたら、その建物と見なす語です。
+ * `patterns` は `place` に含まれていたら、その建物と見なす語です。
  * 表記は読みやすい形で書き、照合時に `normalizeText()` を通します。
  */
 export interface BuildingDef {
@@ -69,9 +69,7 @@ export interface BuildingDef {
  * > 2. **`号館` 系をすべて `体育館`（`アリーナ`）より前に置く。** `９号館アリーナ` は
  * >    `9号館` であって体育館ではありません。逆にすると3件が体育館へ流れます
  *
- * microCMS の `building` は「建物番号」という名前のテキストフィールドで、実データでは
- * 18件すべてが未入力です（2026-09-06 実測）。したがって実質的な入力は `place` 一本であり、
- * ここでの導出が絞り込みの成否を決めます。
+ * 建物の入力欄は `place`（自由入力）一本であり、ここでの導出が絞り込みの成否を決めます。
  */
 export const buildings: BuildingDef[] = [
   { id: "10号館", label: "10号館", patterns: ["10号館"] },
@@ -119,7 +117,7 @@ const normalizedBuildings = buildings.map((building) => ({
  */
 const ROOM_CODE_PATTERN = /^([1-9])\d{1,2}[a-z]?$/;
 
-/** `building` に号館番号だけ（`7` など）が入稿された場合の規則 */
+/** `place` に号館番号だけ（`7` など）が入稿された場合の規則 */
 const BUILDING_NUMBER_PATTERN = /^([1-9]|10)$/;
 
 /** 正規化済みテキストから建物IDを探す。見つからなければ null */
@@ -156,23 +154,14 @@ function matchBuildingNumber(normalized: string): string | null {
  *
  * 解決順（**この順序が仕様**）:
  *
- * 1. `building` が入稿されていればそれを優先する（将来 CMS 側を埋めたときに勝たせる）
- * 2. `place` を `buildings` の宣言順で部分一致
- * 3. 教室コード規則（`11D` → `1号館`）
- * 4. どれにも当たらなければ「その他」
+ * 1. `place` を `buildings` の宣言順で部分一致
+ * 2. 号館番号だけの表記（`7`）と教室コード規則（`11D` → `1号館`）
+ * 3. どれにも当たらなければ「その他」
  *
  * @param place 場所（microCMS の `place`。必須フィールドだが防御的に optional で受ける）
- * @param building 建物番号（microCMS の `building`。実データでは常に空）
  * @returns 建物ID。解決できなければ `OTHER_BUILDING_ID`
  */
-export function resolveBuildingId(place?: string, building?: string): string {
-  const normalizedBuilding = normalizeText(building);
-  if (normalizedBuilding) {
-    const fromBuilding =
-      matchBuildingPattern(normalizedBuilding) ?? matchBuildingNumber(normalizedBuilding);
-    if (fromBuilding) return fromBuilding;
-  }
-
+export function resolveBuildingId(place?: string): string {
   const normalizedPlace = normalizeText(place);
   const fromPlace = matchBuildingPattern(normalizedPlace) ?? matchBuildingNumber(normalizedPlace);
   if (fromPlace) return fromPlace;

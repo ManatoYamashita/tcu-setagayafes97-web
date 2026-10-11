@@ -119,10 +119,8 @@ export function FeaturedCarousel({ events }: { events: Event[] }) {
             {events.map((event) => {
               const imageUrl = event.thumbnail?.url || "/images/photos/setagayafe97-image.avif";
               // 分類タグ。企画種別を含め、カードの識別情報はすべてこの行へ集約する。
-              // microCMS は未入力のフィールドをキーごと返さないため、building は
-              // 実データで欠落しうる（#166）。空文字のまま描くと中身の無いタグが
-              // ただの丸として並ぶので、ここで落としてから描画する
-              const tags = [typeLabels[event.type], event.building].filter(Boolean);
+              // 空文字のまま描くと中身の無いタグがただの丸として並ぶので、落としてから描画する
+              const tags = [typeLabels[event.type]].filter(Boolean);
               return (
                 <Link
                   key={event.id}

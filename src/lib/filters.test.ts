@@ -25,8 +25,7 @@ const events: Event[] = [
   fixture("ev-day1", {
     date: "day1",
     type: "room",
-    place: "1101教室",
-    building: "1号館",
+    place: "1号館 1101教室",
     title: "化学実験ショー",
     organizer: "化学部",
     description: "身近な材料でできる実験を披露します。",
@@ -34,8 +33,7 @@ const events: Event[] = [
   fixture("ev-day2", {
     date: "day2",
     type: "stage",
-    place: "7A ステージ",
-    building: "7号館",
+    place: "7号館 7A ステージ",
     title: "Jazz Live",
     organizer: "ジャズ研究会",
     description: "スタンダードナンバーを演奏します。",
@@ -43,8 +41,7 @@ const events: Event[] = [
   fixture("ev-both", {
     date: "both",
     type: "room",
-    place: "2201教室",
-    building: "2号館",
+    place: "22B",
     title: "鉄道模型展示",
     organizer: "鉄道研究会",
     description: "ジオラマの走行展示を行います。",
@@ -53,7 +50,6 @@ const events: Event[] = [
     date: "other",
     type: "special",
     place: "体育館 メインアリーナ",
-    building: "体育館",
     title: "前夜祭",
     organizer: "実行委員会",
     description: "前日の限定企画です。",
@@ -85,15 +81,14 @@ describe("filterEvents", () => {
   });
 
   it("building は place から導出した建物で判定する", () => {
-    // building フィールドが入っていればそれを使う
     expect(ids(filterEvents(events, { building: "7号館" }))).toEqual(["ev-day2"]);
-    // building が空でも place から導出できる（microCMS の実データはこちら）
+    // 教室コード（22B → 2号館）からも導出する
+    expect(ids(filterEvents(events, { building: "2号館" }))).toEqual(["ev-both"]);
     const derived = [
       fixture("ev-derived", {
         date: "day1",
         type: "stage",
         place: "９号館アリーナ",
-        building: "",
         title: "ダンスステージ",
         organizer: "ダンス部",
       }),
@@ -108,6 +103,7 @@ describe("filterEvents", () => {
     expect(ids(filterEvents(events, { keyword: "ジャズ研究会" }))).toEqual(["ev-day2"]); // organizer
     expect(ids(filterEvents(events, { keyword: "ジオラマ" }))).toEqual(["ev-both"]); // description
     expect(ids(filterEvents(events, { keyword: "メインアリーナ" }))).toEqual(["ev-other"]); // place
+    // place は「22B」なので、当たるのは導出した建物
     expect(ids(filterEvents(events, { keyword: "2号館" }))).toEqual(["ev-both"]); // building
   });
 
@@ -132,7 +128,6 @@ describe("filterEvents", () => {
         date: "day1",
         type: "stage",
         place: "９号館アリーナ",
-        building: "",
         title: "ダンスステージ",
         organizer: "ダンス部",
       }),
@@ -277,7 +272,6 @@ describe("listBuildingOptions", () => {
         date: "day1",
         type: "stage",
         place: "TCUホール",
-        building: "",
         title: "開会式",
         organizer: "実行委員会",
       }),

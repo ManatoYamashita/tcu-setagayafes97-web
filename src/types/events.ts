@@ -87,7 +87,7 @@ export interface NoticeSection {
  * 企画にのみ入力されます。
  *
  * アーティスト写真（メイン）・紹介文・開演時刻・会場は Event の既存フィールド
- * （`thumbnail` / `content` / `sessions` / `place` / `building`）を使うため、
+ * （`thumbnail` / `content` / `sessions` / `place`）を使うため、
  * ここには含まれません。
  *
  * すべて任意です。未入力の項目はページ側でセクションごと非表示にします。
@@ -155,7 +155,6 @@ export interface RawEvent {
   date: string[] | string;
   type: string[] | string;
   place: string;
-  building: string;
   title: string;
   organizer: string;
   thumbnail?: MicroCMSImage;
@@ -185,7 +184,6 @@ export interface Event {
   date: EventDate;
   type: EventType;
   place: string; // 場所（教室番号等）
-  building: string; // 建物名
   title: string;
   organizer: string; // 主催団体名
   thumbnail?: MicroCMSImage;

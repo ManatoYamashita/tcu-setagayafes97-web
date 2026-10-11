@@ -213,7 +213,7 @@ function omitEmpty(value: string): string | undefined {
  * 既存のタイムテーブル側のコードが持っています。
  */
 function toEntry(event: Event, ref: string): SemanticEventEntry {
-  const buildingId = resolveBuildingId(event.place, event.building);
+  const buildingId = resolveBuildingId(event.place);
 
   return {
     ref,

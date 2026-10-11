@@ -65,7 +65,7 @@ const LINE_LIMIT = 300;
 const GRANDFATHERED = new Map([
   ["DESIGN.md", 680],
   [".claude/CLAUDE.md", 658],
-  ["docs/requires/require.md", 612],
+  ["docs/requires/require.md", 609],
   ["docs/frontend/page-transition.md", 540],
   ["docs/frontend/image-delivery.md", 529],
   ["docs/frontend/events-semantic-search.md", 496],
@@ -74,9 +74,9 @@ const GRANDFATHERED = new Map([
   ["docs/dev/legacy-site-deindex.md", 435],
   ["docs/requires/todo.md", 413],
   [".agents/skills/next-cache-components/SKILL.md", 411],
-  ["docs/dev/microcms.md", 325],
+  ["docs/dev/microcms.md", 316],
   [".agents/skills/deploy-to-vercel/SKILL.md", 321],
-  ["docs/frontend/events-search.md", 312],
+  ["docs/frontend/events-search.md", 309],
 ]);
 
 /** 行数を数える。数え方の定義は冒頭の「行の数え方」 */
