@@ -26,6 +26,7 @@ const events: Event[] = [
     date: "day1",
     type: "room",
     place: "1号館 1101教室",
+    buildings: ["1号館"],
     title: "化学実験ショー",
     organizer: "化学部",
     description: "身近な材料でできる実験を披露します。",
@@ -34,6 +35,7 @@ const events: Event[] = [
     date: "day2",
     type: "stage",
     place: "7号館 7A ステージ",
+    buildings: ["7号館"],
     title: "Jazz Live",
     organizer: "ジャズ研究会",
     description: "スタンダードナンバーを演奏します。",
@@ -42,6 +44,7 @@ const events: Event[] = [
     date: "both",
     type: "room",
     place: "22B",
+    buildings: ["2号館"],
     title: "鉄道模型展示",
     organizer: "鉄道研究会",
     description: "ジオラマの走行展示を行います。",
@@ -50,6 +53,7 @@ const events: Event[] = [
     date: "other",
     type: "special",
     place: "体育館 メインアリーナ",
+    buildings: ["9号館", "第1アリーナ"],
     title: "前夜祭",
     organizer: "実行委員会",
     description: "前日の限定企画です。",
@@ -97,22 +101,18 @@ describe("filterEvents", () => {
     expect(filterEvents(entered, { building: "体育館" })).toEqual([]);
   });
 
-  it("buildings が空なら place から推定した建物で判定する", () => {
-    expect(ids(filterEvents(events, { building: "7号館" }))).toEqual(["ev-day2"]);
-    // 教室コード（22B → 2号館）からも導出する
-    expect(ids(filterEvents(events, { building: "2号館" }))).toEqual(["ev-both"]);
-    const derived = [
-      fixture("ev-derived", {
+  it("buildings が空の企画は「その他」で当たり、place からは推定しない", () => {
+    const empty = [
+      fixture("ev-empty", {
         date: "day1",
         type: "stage",
-        place: "９号館アリーナ",
-        title: "ダンスステージ",
-        organizer: "ダンス部",
+        place: "７号館１階TCUホール",
+        title: "未入力",
+        organizer: "x",
       }),
     ];
-    expect(ids(filterEvents(derived, { building: "9号館" }))).toEqual(["ev-derived"]);
-    // 「アリーナ」より「号館」が勝つので体育館には入らない
-    expect(filterEvents(derived, { building: "体育館" })).toEqual([]);
+    expect(ids(filterEvents(empty, { building: "その他" }))).toEqual(["ev-empty"]);
+    expect(filterEvents(empty, { building: "7号館" })).toEqual([]);
   });
 
   it("キーワードがタイトル・団体名・場所・建物・概要を横断する", () => {
@@ -120,7 +120,7 @@ describe("filterEvents", () => {
     expect(ids(filterEvents(events, { keyword: "ジャズ研究会" }))).toEqual(["ev-day2"]); // organizer
     expect(ids(filterEvents(events, { keyword: "ジオラマ" }))).toEqual(["ev-both"]); // description
     expect(ids(filterEvents(events, { keyword: "メインアリーナ" }))).toEqual(["ev-other"]); // place
-    // place は「22B」なので、当たるのは導出した建物
+    // place は「22B」なので、当たるのは microCMS の「建物」
     expect(ids(filterEvents(events, { keyword: "2号館" }))).toEqual(["ev-both"]); // building
   });
 
@@ -248,7 +248,7 @@ describe("parseEventFilters", () => {
   });
 
   it("企画が1件も無い建物は「すべて」へ倒す", () => {
-    // 建物の選択肢はデータから作る。グラウンドは推定の定義にはあるが、この企画群には無い
+    // 建物の選択肢はデータから作る。グラウンドは microCMS の選択肢にはあるが、この企画群には無い
     const params = new URLSearchParams("building=グラウンド");
 
     expect(parseEventFilters(params, events).building).toBe("all");
@@ -302,16 +302,16 @@ describe("listBuildingOptions", () => {
   it("企画が1件も無い建物を出さない", () => {
     const values = listBuildingOptions(events).map((option) => option.value);
 
-    expect(values).toEqual(["all", "1号館", "2号館", "7号館", "体育館"]);
+    expect(values).toEqual(["all", "1号館", "2号館", "7号館", "9号館", "第1アリーナ"]);
   });
 
   it("先頭は必ず「すべて」", () => {
     expect(listBuildingOptions([])).toEqual([{ value: "all", label: "すべて" }]);
   });
 
-  it("place から導出した建物も選択肢に出る", () => {
-    const derived = [
-      fixture("ev-derived", {
+  it("buildings が空の企画は「その他」の選択肢に出る", () => {
+    const empty = [
+      fixture("ev-empty", {
         date: "day1",
         type: "stage",
         place: "TCUホール",
@@ -320,7 +320,7 @@ describe("listBuildingOptions", () => {
       }),
     ];
 
-    expect(listBuildingOptions(derived).map((option) => option.value)).toEqual(["all", "ホール"]);
+    expect(listBuildingOptions(empty).map((option) => option.value)).toEqual(["all", "その他"]);
   });
 
   it("複数の建物を持つ企画は、その全部を選択肢に出す", () => {
@@ -342,29 +342,6 @@ describe("listBuildingOptions", () => {
     ]);
   });
 
-  it("入力済みの建物と place から推定した建物が同じ選択肢にまとまる", () => {
-    const mixed = [
-      fixture("ev-entered", {
-        date: "day1",
-        type: "room",
-        place: "91A",
-        buildings: ["9号館"],
-        title: "入力済み",
-        organizer: "x",
-      }),
-      fixture("ev-inferred", {
-        date: "day1",
-        type: "room",
-        place: "９号館アリーナ",
-        title: "未入力",
-        organizer: "x",
-      }),
-    ];
-
-    expect(listBuildingOptions(mixed).map((option) => option.value)).toEqual(["all", "9号館"]);
-    expect(ids(filterEvents(mixed, { building: "9号館" }))).toEqual(["ev-entered", "ev-inferred"]);
-  });
-
   it("号館・アリーナは数字順、名前の付いた場所は表の順、表に無い名前は「その他」の直前", () => {
     const names = ["その他", "新しい広場", "第3アリーナ", "10号館", "屋外", "第1アリーナ"];
     const scattered = [
@@ -378,19 +355,19 @@ describe("listBuildingOptions", () => {
           organizer: "x",
         })
       ),
-      // 推定（buildings 未入力）からも同じ並びへ入る
-      fixture("ev-inferred-9", {
+      fixture("ev-9", {
         date: "day1",
         type: "room",
-        place: "9号館",
-        title: "推定",
+        place: "",
+        buildings: ["9号館"],
+        title: "9号館",
         organizer: "x",
       }),
       fixture("ev-arena-2", {
         date: "day1",
         type: "room",
         place: "",
-        buildings: ["第2アリーナ", "体育館"],
+        buildings: ["第2アリーナ", "図書館"],
         title: "第2",
         organizer: "x",
       }),
@@ -403,7 +380,7 @@ describe("listBuildingOptions", () => {
       "第1アリーナ",
       "第2アリーナ",
       "第3アリーナ",
-      "体育館",
+      "図書館",
       "屋外",
       "新しい広場",
       "その他",
@@ -465,7 +442,7 @@ describe("buildEventsQuery", () => {
     const filters: FilterParams = {
       date: "both",
       type: "room",
-      building: "体育館",
+      building: "第1アリーナ",
       keyword: "展示",
     };
 

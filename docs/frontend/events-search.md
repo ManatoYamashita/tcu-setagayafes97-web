@@ -14,7 +14,7 @@
 | `src/lib/text.ts`              | 正規化（`normalizeText` / `stripHtml`）。**検索と建物導出の共通の入口** |
 | `src/data/search-stopwords.ts` | 文章クエリの区切り語・不要語                                            |
 | `src/lib/search.ts`            | 3段カスケードの検索（`tokenizeQuery` / `searchEvents`）                 |
-| `src/data/filter-options.ts`   | 建物の定義と `getEventBuildings()` / `resolveBuildingId()`              |
+| `src/data/filter-options.ts`   | `getEventBuildings()` / `sortBuildingIds()`                             |
 | `src/lib/filters.ts`           | URL クエリの検証、絞り込み、選択肢の組み立て                            |
 
 ## 出発点: コードが実データと食い違っていた
@@ -41,7 +41,7 @@ PR #199 が `normalizeEvent()` の既定化で塞いだ）。
 
 > [!IMPORTANT]
 > 当時あった「建物番号」（`building`）欄は全件未入力のまま削除した（#466）。
-> 建物は microCMS の「建物」（`buildings`）を主とし、未入力の企画は `place` から推定する
+> 建物は microCMS の「建物」（`buildings`。必須）だけから決める（`place` からの推定は #467 で撤去）
 > （[events-building-filter.md](./events-building-filter.md)）。
 
 ## 正規化はひとつの関数に集約する
@@ -160,7 +160,7 @@ PR #199 が `normalizeEvent()` の既定化で塞いだ）。
 
 ## 建物
 
-建物の出どころ（microCMS の「建物」と `place` からの推定）、選択肢の作り方と並び順、
+建物の出どころ（microCMS の「建物」）、選択肢の作り方と並び順、
 絞り込み・URL の検証・関連企画での使い方は [events-building-filter.md](./events-building-filter.md) が扱う。
 
 ## URL クエリの検証

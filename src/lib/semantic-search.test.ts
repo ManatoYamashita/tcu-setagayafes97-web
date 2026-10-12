@@ -35,7 +35,7 @@ function event(id: string, overrides: Partial<Event> = {}): Event {
     organizer: "ダミー団体",
     description: "ダミーの説明文です。",
     content: "",
-    buildings: [],
+    buildings: ["7号館", "ホール"],
     sessions: [],
     ...overrides,
   };
@@ -198,7 +198,9 @@ describe("buildSemanticRequest", () => {
 
   it("建物が解決できない企画に「その他」を渡さない", () => {
     // 「その他」は建物名ではなく振り分け先の名前。渡すと建物名として読まれる
-    const plan = buildSemanticRequest("食べ物", [event("unknown", { place: "どこか" })]);
+    const plan = buildSemanticRequest("食べ物", [
+      event("unknown", { place: "どこか", buildings: [] }),
+    ]);
 
     expect(plan.state.events[0].building).toBeUndefined();
   });

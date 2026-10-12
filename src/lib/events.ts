@@ -101,7 +101,7 @@ function normalizeSNSLinks(sns: string | undefined): SNSLinks | undefined {
  * microCMS の「建物」（複数選択の select）を正規化
  *
  * 値は `値 : ラベル` 形式ではないので `readSelectKey()` を通さない（`9号館` がそのまま値）。
- * @param buildings microCMS の `buildings`。未入力ならキーごと返らない
+ * @param buildings microCMS の `buildings`。未入力なら `[]`（キーが無い場合も同じ扱い）
  * @returns 前後の空白を落とし、空文字と重複を除いた建物名（入稿順）
  */
 export function normalizeEventBuildings(buildings: unknown): string[] {
