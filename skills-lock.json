@@ -6,6 +6,24 @@
       "sourceType": "github",
       "computedHash": "d2b5bcc7c09fdb649129ffc7dd7b647ec1b155736974b974292675afd588cb39"
     },
+    "microcms-docs": {
+      "source": "microcmsio/skills",
+      "sourceType": "github",
+      "skillPath": "skills/microcms-docs/SKILL.md",
+      "computedHash": "1b59e62bb2206d6bf5e91f14f1f084fa227a04b89dfcc773aa885a4145c8b7b9"
+    },
+    "microcms-guide": {
+      "source": "microcmsio/skills",
+      "sourceType": "github",
+      "skillPath": "skills/microcms-guide/SKILL.md",
+      "computedHash": "e05a78b5f3c8a0eb65ca1cfe0d663afd6a6423381abe55ad3ed790a452798380"
+    },
+    "microcms-nextjs": {
+      "source": "microcmsio/skills",
+      "sourceType": "github",
+      "skillPath": "skills/microcms-nextjs/SKILL.md",
+      "computedHash": "a841f304d5d7a2df2426a6d40515b70efd53eb7167b658130358fffdbd25d515"
+    },
     "next-cache-components": {
       "source": "vercel-labs/next-skills",
       "sourceType": "github",

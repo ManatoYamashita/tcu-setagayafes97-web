@@ -82,6 +82,8 @@
 - **[microcms.md](./dev/microcms.md)** - microCMS API の制約と実装パターン（limit・select・カスタムフィールド・画像）
   - **select の選択肢を増やしたら正規化関数も直す。** 直さないと新しい値が黙って `other` に落ちる
   - **スキーマ操作は記事本文の編集と異なる。** 作成・変更は実マウスイベントで操作を確認する
+- **[microcms-skills.md](./dev/microcms-skills.md)** - Codex 向け microCMS Skills のプロジェクト導入・更新・使い分け
+  - **更新時は参照資料の分割を再適用する。** 上流の取得ハッシュとローカル調整を分けて管理する
 - **[microcms-rich-tables.md](./dev/microcms-rich-tables.md)** - リッチテキストの表の入稿・表示と Aside での記事編集（#300）
   - **表は HTML のまま描画し、外枠とセル罫線を指定する。** 画像への置き換えは不要
 - **[microcms-fetch-failures.md](./dev/microcms-fetch-failures.md)** - 取得に失敗したときの扱いと本番での確認（#287）
