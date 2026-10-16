@@ -8,7 +8,7 @@ import { HOUR_HEIGHT_PX, calculateBoardHeight } from "@/lib/timetable-layout";
  * 盤面高さは (19 - 9) × HOUR_HEIGHT_PX = 960px になります。
  */
 const EXPECTED_BOARD_HEIGHT = calculateBoardHeight({ startHour: 9, endHour: 19 });
-const EXPECTED_COLUMNS = 6; // 7A / 7B / アリーナ / ホール / 中庭 / その他
+const EXPECTED_COLUMNS = 6; // ホール / 体育館 / 7A / 7B / 中庭 / その他（stages の宣言順）
 /** ブロック数。10企画のうち2部制の1企画が2ブロックになる（#281） */
 const EXPECTED_EVENTS = 11;
 

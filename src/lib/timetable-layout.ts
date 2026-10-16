@@ -49,6 +49,15 @@ const CARD_BORDER_PX = 2;
  */
 export const MIN_EVENT_HEIGHT_PX = 24 + CARD_GAP_PX;
 
+/**
+ * 見出しと盤面の開始時刻（10:00 など）の罫線の間に空ける余白（px）
+ *
+ * これが無いと最初の目盛りが見出しの下辺に接し、そのラベルだけを罫線の下へずらして
+ * 表示するしかありませんでした。余白は盤面の外側（`TimetableGantt` のラッパ）に置き、
+ * 盤面そのものの高さと座標の基準は変えません。ラベルの半分（12px × 行高）より大きいこと。
+ */
+export const BOARD_TOP_INSET_PX = 16;
+
 /** 時間軸カラムの幅（px） */
 export const TIME_COL_WIDTH_PX = 72;
 
