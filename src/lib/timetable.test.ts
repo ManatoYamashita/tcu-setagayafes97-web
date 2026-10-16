@@ -210,9 +210,11 @@ describe("filterEventsByStage", () => {
     const events = [...day1Events, ...filterStageEvents([arenaEvent])];
     expect(ids(filterEventsByStage(events, "体育館"))).toEqual(["fx-gym-1", "fx-gym-2", "arena"]);
     expect(groupEventsByStage(events).find((group) => group.id === "体育館")?.name).toBe(
-      "アリーナ"
+      "体育館（第1アリーナ）"
     );
-    expect(listStageTabs(events, "all").find((tab) => tab.id === "体育館")?.name).toBe("アリーナ");
+    expect(listStageTabs(events, "all").find((tab) => tab.id === "体育館")?.name).toBe(
+      "体育館（第1アリーナ）"
+    );
   });
 
   it("「その他」で受け皿の企画を取れる", () => {
@@ -294,7 +296,7 @@ describe("groupEventsByStage", () => {
 
 describe("listStageTabs", () => {
   it("当日企画のあるステージを並べる", () => {
-    expect(listStageTabs(day2Events, "all").map((tab) => tab.id)).toEqual(["7A", "ホール"]);
+    expect(listStageTabs(day2Events, "all").map((tab) => tab.id)).toEqual(["ホール", "7A"]);
   });
 
   it("選択中のステージを当日0件でも残す", () => {
@@ -313,13 +315,13 @@ describe("listStageTabs", () => {
   it("実在しないステージIDを無視する", () => {
     // 素通しにすると URL の任意の文字列がタブのラベルとして表示される
     expect(listStageTabs(day2Events, "存在しないID").map((tab) => tab.id)).toEqual([
-      "7A",
       "ホール",
+      "7A",
     ]);
   });
 
   it("既に含まれるステージを重複させない", () => {
-    expect(listStageTabs(day2Events, "7A").map((tab) => tab.id)).toEqual(["7A", "ホール"]);
+    expect(listStageTabs(day2Events, "7A").map((tab) => tab.id)).toEqual(["ホール", "7A"]);
   });
 });
 

@@ -21,7 +21,8 @@ function tickTopPx(index: number, hourHeightPx: number): number {
  * そのため面は不透明（`bg-white`）でなければなりません。**下を企画カードが通過します。**
  * 旧実装の時刻チップも `bg-white` でしたが、あれは「自分の下を通る罫線を切り抜く」ための
  * ものでした。罫線はステージ列の中へ移したので、いまの理由は sticky です。
- * 最初の目盛りは見出し下辺に接するため、そのラベルだけ境界の下から表示します。
+ * 全てのラベルを罫線の中央へ揃えます。最初のラベルの上半分は、`TimetableGantt` が
+ * 見出しとの間に空けた `BOARD_TOP_INSET_PX` の余白へはみ出します。
  *
  * `aria-hidden` にしているのは、各カードが自分の時刻を文字で持っているためです。
  * 目盛りまで読み上げるとノイズにしかなりません。
@@ -41,9 +42,7 @@ export function TimeAxisColumn({ range, hourHeightPx }: TimeAxisProps) {
       {timeAxis.map((time, index) => (
         <span
           key={time}
-          className={`absolute right-3 text-xs font-medium text-gray-700 tabular-nums${
-            index > 0 ? " -translate-y-1/2" : ""
-          }`}
+          className="absolute right-3 -translate-y-1/2 text-xs font-medium text-gray-700 tabular-nums"
           style={{ top: tickTopPx(index, hourHeightPx) }}
         >
           {time}

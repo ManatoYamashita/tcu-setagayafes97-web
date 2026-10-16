@@ -29,10 +29,20 @@ describe("extractStageId", () => {
     expect(extractStageId("９号館アリーナ")).toBe("体育館");
   });
 
-  it("id の完全一致を name の部分一致より優先する", () => {
-    // "中庭特設ステージ" は id "中庭" と name "中庭特設ステージ" の両方に一致するが、
-    // 探索順により id 側で解決される
-    expect(extractStageId("中庭特設ステージ")).toBe("中庭");
+  it("実データの place をパンフレットの会場へ解決する（#474）", () => {
+    // microCMS の入稿表記そのまま。全角数字・号館つき・末尾の全角空白を含む
+    expect(extractStageId("７号館１階TCUホール")).toBe("ホール");
+    expect(extractStageId("7号館1階TCUホール")).toBe("ホール");
+    expect(extractStageId("9号館 体育館(第1アリーナ)　")).toBe("体育館");
+    expect(extractStageId("SAKURA GARDEN")).toBe("SAKURA");
+    expect(extractStageId("61C")).toBe("61C");
+  });
+
+  it("表示名を振り分けに使わない", () => {
+    // 表示名で判定すると、見出しの文言を変えただけで企画が「その他」へ落ちる。
+    // 「（第1アリーナ）」が「アリーナ」として拾われるのは、表示名ではなく aliases による
+    expect(extractStageId("TCU")).toBeNull();
+    expect(extractStageId("ガーデン")).toBeNull();
   });
 
   it("どのステージにも一致しなければ null を返す", () => {
@@ -77,8 +87,9 @@ describe("isKnownStageId", () => {
 });
 
 describe("getStageName", () => {
-  it("体育館のステージをアリーナと表示する", () => {
-    expect(getStageName("体育館")).toBe("アリーナ");
+  it("パンフレットの表記で表示する（#474）", () => {
+    expect(getStageName("ホール")).toBe("TCUホール（7号館）");
+    expect(getStageName("体育館")).toBe("体育館（第1アリーナ）");
   });
 
   it("「その他」の名前を返す", () => {
@@ -96,6 +107,16 @@ describe("stages の定義", () => {
     // stages は「実在する会場」の定義。混ぜると会場一覧として読む箇所へ
     // 実在しない会場が漏れる
     expect(stages.every((stage) => stage.id !== OTHER_STAGE_ID)).toBe(true);
+  });
+
+  it("先頭の並びがパンフレットの列順と同じ（#474）", () => {
+    // 宣言順がそのまま盤面の列順になる
+    expect(stages.slice(0, 4).map((stage) => stage.name)).toEqual([
+      "TCUホール（7号館）",
+      "体育館（第1アリーナ）",
+      "SAKURAガーデン",
+      "61C",
+    ]);
   });
 
   it("id が一意である", () => {

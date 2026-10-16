@@ -1,5 +1,6 @@
 import { countDistinctEvents, type StageGroup } from "@/lib/timetable";
 import {
+  BOARD_TOP_INSET_PX,
   CARD_GAP_PX,
   HOUR_HEIGHT_PX,
   MIN_STAGE_COL_WIDTH_PX,
@@ -19,8 +20,13 @@ interface TimetableGanttProps {
   onSelect?: (entryKey: string) => void;
 }
 
-/** 見出し行の高さ（px）。全列で同じ値にすることで盤面の開始位置が揃う */
-const HEADER_HEIGHT_CLASS = "h-8";
+/**
+ * 見出し行の高さ。全列で同じ値にすることで盤面の開始位置が揃う
+ *
+ * 会場名は「TCUホール（7号館）」のように括弧書きを含み、lg 直上の幅では1行に収まらない。
+ * 切り詰めずに2行まで折り返せる高さを取っている（#474）。
+ */
+const HEADER_HEIGHT_CLASS = "h-12";
 
 /**
  * デスクトップのガントチャート盤面（縦軸: 時間 / 横軸: ステージ）
@@ -65,7 +71,9 @@ export function TimetableGantt({ groups, range, onSelect }: TimetableGanttProps)
           >
             時刻
           </div>
-          <TimeAxisColumn range={range} hourHeightPx={HOUR_HEIGHT_PX} />
+          <div style={{ paddingTop: BOARD_TOP_INSET_PX }}>
+            <TimeAxisColumn range={range} hourHeightPx={HOUR_HEIGHT_PX} />
+          </div>
         </div>
 
         {/* ステージ列 */}
@@ -75,42 +83,41 @@ export function TimetableGantt({ groups, range, onSelect }: TimetableGanttProps)
               data-timetable-stage-heading
               className={`flex ${HEADER_HEIGHT_CLASS} items-center justify-between gap-2 border-b border-gray-200 bg-gray-50 px-2 text-sm font-bold text-gray-900`}
             >
-              <span className="truncate">{group.name}</span>
+              <span className="line-clamp-2 leading-tight">{group.name}</span>
               <span className="shrink-0 rounded-full bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700">
                 {countDistinctEvents(group.events)}件
               </span>
             </h3>
 
-            <div
-              data-timetable-column
-              className="relative border-l border-gray-200"
-              style={{ height: boardHeight }}
-            >
-              <TimeGridLines range={range} hourHeightPx={HOUR_HEIGHT_PX} />
+            {/* 余白は盤面の外に置く。盤面（data-timetable-column）の高さと座標の基準は変えない */}
+            <div className="border-l border-gray-200" style={{ paddingTop: BOARD_TOP_INSET_PX }}>
+              <div data-timetable-column className="relative" style={{ height: boardHeight }}>
+                <TimeGridLines range={range} hourHeightPx={HOUR_HEIGHT_PX} />
 
-              {layoutStageEvents(group.events, range, HOUR_HEIGHT_PX).map((positioned) => (
-                <div
-                  key={positioned.event.entryKey}
-                  data-timetable-event
-                  // px-1 が隣り合う列の間隔。下の余白は密度判定が引く値と同一でなければ
-                  // ならないため、Tailwind の pb-1 ではなく CARD_GAP_PX を直接載せている
-                  className="absolute px-1"
-                  style={{
-                    top: positioned.topPx,
-                    height: positioned.heightPx,
-                    paddingBottom: CARD_GAP_PX,
-                    left: `${(positioned.laneIndex / positioned.laneCount) * 100}%`,
-                    width: `${100 / positioned.laneCount}%`,
-                  }}
-                >
-                  <TimetableEventCard
-                    event={positioned.event}
-                    density={getCardDensity(positioned.heightPx)}
-                    stageName={group.name}
-                    onSelect={onSelect}
-                  />
-                </div>
-              ))}
+                {layoutStageEvents(group.events, range, HOUR_HEIGHT_PX).map((positioned) => (
+                  <div
+                    key={positioned.event.entryKey}
+                    data-timetable-event
+                    // px-1 が隣り合う列の間隔。下の余白は密度判定が引く値と同一でなければ
+                    // ならないため、Tailwind の pb-1 ではなく CARD_GAP_PX を直接載せている
+                    className="absolute px-1"
+                    style={{
+                      top: positioned.topPx,
+                      height: positioned.heightPx,
+                      paddingBottom: CARD_GAP_PX,
+                      left: `${(positioned.laneIndex / positioned.laneCount) * 100}%`,
+                      width: `${100 / positioned.laneCount}%`,
+                    }}
+                  >
+                    <TimetableEventCard
+                      event={positioned.event}
+                      density={getCardDensity(positioned.heightPx)}
+                      stageName={group.name}
+                      onSelect={onSelect}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
         ))}

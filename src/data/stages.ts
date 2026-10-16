@@ -4,14 +4,48 @@
  */
 export interface Stage {
   id: string;
+  /** 列見出し・タブ・企画詳細パネルに出す名前。パンフレットの表記に揃える */
   name: string;
   description?: string;
+  /**
+   * `place` がこの文字列を含めばこのステージとみなす（`id` に加えて）
+   *
+   * 表示名は判定に使いません。表示名を変えただけで振り分けが変わると、
+   * 文言の調整が「企画が『その他』へ落ちる」事故になるためです。
+   */
+  aliases?: string[];
 }
 
 /**
  * ステージ一覧
+ *
+ * **宣言順がそのまま盤面の列順になります。** 先頭の4つはパンフレットのタイムテーブル
+ * （P.17-18）と同じ並びです（#474）。
  */
 export const stages: Stage[] = [
+  {
+    id: "ホール",
+    name: "TCUホール（7号館）",
+    description: "7号館1階の講堂ホール",
+  },
+  {
+    id: "体育館",
+    name: "体育館（第1アリーナ）",
+    description: "9号館の第1アリーナ",
+    // 実データは「9号館 体育館(第1アリーナ)」のほか「9号館アリーナ」「９号館アリーナ」でも
+    // 入稿されている。号館を含む表記も除外しない（除外すると全件が「その他」へ落ちる。#302）
+    aliases: ["アリーナ"],
+  },
+  {
+    id: "SAKURA",
+    name: "SAKURAガーデン",
+    description: "屋外のステージ",
+  },
+  {
+    id: "61C",
+    name: "61C",
+    description: "6号館の教室",
+  },
   {
     id: "7A",
     name: "7号館A（7A）",
@@ -21,16 +55,6 @@ export const stages: Stage[] = [
     id: "7B",
     name: "7号館B（7B）",
     description: "7号館B棟のステージスペース",
-  },
-  {
-    id: "体育館",
-    name: "アリーナ",
-    description: "メインアリーナでの大型ステージ",
-  },
-  {
-    id: "ホール",
-    name: "ホール",
-    description: "講堂ホール（演劇・公演向け）",
   },
   {
     id: "中庭",
@@ -75,12 +99,10 @@ export function extractStageId(place: string): string | null {
   const exactMatch = stages.find((s) => place.includes(s.id));
   if (exactMatch) return exactMatch.id;
 
-  // 「体育館」と「アリーナ」は同じステージ。体育館表記は上の ID 判定で拾い、
-  // アリーナ表記はここで拾う。実データのステージ企画は「9号館アリーナ」「９号館アリーナ」で
-  // 入稿されているため、号館を含む表記も除外しない（除外すると全件が「その他」へ落ちる。#302）。
+  // 別表記（「体育館」に対する「アリーナ」など）。ID 判定で拾えなかったものだけをここで拾う。
   // 建物フィルタ（src/data/filter-options.ts）で「9号館アリーナ」を 9号館 とするのは別の判定。
-  const partialMatch = stages.find((s) => place.includes(s.name));
-  if (partialMatch) return partialMatch.id;
+  const aliasMatch = stages.find((s) => s.aliases?.some((alias) => place.includes(alias)));
+  if (aliasMatch) return aliasMatch.id;
 
   return null;
 }

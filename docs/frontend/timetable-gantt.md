@@ -58,11 +58,11 @@ CSS の百分率高さは、**親の高さが確定しているときにしか�
        style={{ gridTemplateColumns: `72px repeat(n, minmax(180px, 1fr))` }}>
 
     <div className="sticky left-0 z-20 bg-white">       ← 時刻ラベル列
-      <div className="h-8" />                           ← 見出し行ぶんの余白
+      <div className="h-12" />                           ← 見出し行ぶんの余白
       <TimeAxisColumn />                                ← 自分で px 高さを持つ
 
     <section>× n                                        ← ステージ列
-      <h3 className="h-8">ステージ名</h3>
+      <h3 className="h-12">ステージ名</h3>
       <div className="relative" style={{ height: 盤面高さ }}>
         <TimeGridLines />                               ← 30分罫線（列の内側）
         <div className="absolute" style={{ top, height, left, width }}>
@@ -71,7 +71,7 @@ CSS の百分率高さは、**親の高さが確定しているときにしか�
 
 見出しを別行の grid セルに置かず、**各ステージ列の中に `<h3>` を含めている**のは、
 見出しとその列の内容を同じ `<section>` に収めるためです。行の高さは全列で同じ
-（`h-8`）なので、盤面の開始位置は揃います。
+（`h-12`）なので、盤面の開始位置は揃います。
 
 ### 罫線は列ごとに置く
 
