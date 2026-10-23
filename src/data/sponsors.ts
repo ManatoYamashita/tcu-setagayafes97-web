@@ -12,7 +12,16 @@ export const sponsorsPageContent = {
   ],
   /** 掲載件数の単位。大学・実行委員会など企業ではない団体も含むため「社」は使わない */
   countSuffix: "の企業・団体",
-  /** 掲載が0件のとき */
+  /**
+   * 節の見出し。microCMS `informations` の category（sponsor / ad / thanks）ごとに1節。
+   * 0件の節は出さない（#476）
+   */
+  sectionHeadings: {
+    sponsor: "協賛・協力一覧",
+    ad: "広告掲載一覧",
+    thanks: "Special Thanks",
+  },
+  /** 3つの節がすべて0件のとき */
   emptyMessage: "現在、協賛・協力の情報は準備中です。",
   /** 協賛先の Web サイトへのリンク文言 */
   websiteLabel: "Webサイトを見る",

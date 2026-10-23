@@ -96,11 +96,11 @@ export const REVALIDATE_TARGETS: Record<MicrocmsApi, readonly RevalidateTarget[]
     { kind: "path", path: "/sitemap.xml" },
   ],
 
-  // getSponsorsList / getFAQList
+  // getSponsorsList / getAdsList / getSpecialThanksList / getFAQList
   informations: [
     { kind: "tag", tag: SPONSORS_CACHE_TAG },
     { kind: "path", path: "/" }, // SponsorBanner
-    { kind: "path", path: "/about/sponsors" },
+    { kind: "path", path: "/about/sponsors" }, // 協賛・広告掲載・Special Thanks
     { kind: "path", path: "/[locale]/about", type: "page" }, // SponsorBanner（4ロケール）
     { kind: "path", path: "/[locale]/info/faq", type: "page" },
   ],
