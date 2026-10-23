@@ -1,16 +1,17 @@
 import Link from "next/link";
 import { sponsorBannerCta } from "@/data/sponsors";
 import { SponsorBannerCtaLabel, SponsorBannerHeading } from "@/components/layout/SponsorBannerText";
-import { getSponsorsList } from "@/lib/informations";
+import { getSponsorBannerList } from "@/lib/informations";
 import { SponsorLogoLoopLoader } from "@/components/home/SponsorLogoLoopLoader";
 
 /**
- * 協賛企業バナー（サーバーコンポーネント）
+ * 協賛バナー（サーバーコンポーネント）
  * データ取得のみ担当し、表示はクライアントコンポーネントに委譲
+ * ロゴ帯には協賛企業・広告掲載・Special Thanks をまとめて流す（#478）
  * ロゴ帯の下に一覧ページへの CTA を置く
  */
 export async function SponsorBanner() {
-  const sponsors = await getSponsorsList();
+  const sponsors = await getSponsorBannerList();
 
   if (sponsors.length === 0) {
     return null;

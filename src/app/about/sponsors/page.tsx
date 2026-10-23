@@ -31,7 +31,7 @@ export const revalidate = 600;
  *
  * トップと /about の協賛バー（SponsorBanner）の CTA から遷移してくる。
  * 見出しはバーと同じ「協賛・協力」にそろえる。
- * 協賛の下に広告掲載・Special Thanks を並べる（#476）。0件の節は出さない。
+ * 協賛企業の下に広告掲載・スペシャルサンクスの節を並べる（#476 / #478）。0件の節は出さない。
  * 3つの取得は同じリクエストを共有する（`src/lib/informations.ts`）。
  */
 export default async function SponsorsPage() {
