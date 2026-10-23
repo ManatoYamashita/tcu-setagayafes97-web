@@ -44,6 +44,7 @@
     "viewAll": "협찬·협력 목록 보기",
     "logosLabel": "협찬·협력 기업·단체",
     "detailLabel": "{name} 상세 정보",
+    "viewDetail": "{name} 상세 정보 보기",
     "website": "웹사이트 보기",
     "close": "닫기"
   }

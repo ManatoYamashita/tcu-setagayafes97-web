@@ -44,6 +44,7 @@
     "viewAll": "協賛・協力の一覧を見る",
     "logosLabel": "協賛・協力の企業・団体",
     "detailLabel": "{name}の詳細",
+    "viewDetail": "{name}の詳細を見る",
     "website": "Webサイトを見る",
     "close": "閉じる"
   }

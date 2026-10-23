@@ -44,6 +44,7 @@
     "viewAll": "View all sponsors and supporters",
     "logosLabel": "Sponsors and supporters",
     "detailLabel": "Details of {name}",
+    "viewDetail": "View details of {name}",
     "website": "Visit website",
     "close": "Close"
   }

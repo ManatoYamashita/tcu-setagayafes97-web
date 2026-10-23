@@ -6,6 +6,7 @@ import { useChromeNav } from "@/components/layout/useChromeNav";
 import { LogoLoop, type LogoItem } from "@/components/ui/LogoLoop";
 import { SponsorModal } from "./SponsorModal";
 import { SponsorWordmark } from "./SponsorWordmark";
+import { hasSponsorDetails } from "@/lib/sponsor-list";
 import { SPONSOR_LOGO_HEIGHT, toSponsorLogos } from "@/lib/sponsor-logos";
 import type { Information } from "@/types/informations";
 
@@ -15,8 +16,8 @@ interface SponsorLogoLoopProps {
 }
 
 /**
- * 協賛企業ロゴの無限スクロールアニメーション（クライアントコンポーネント）
- * ロゴクリックでスポンサー詳細モーダルを表示
+ * 協賛・広告掲載・Special Thanks のロゴの無限スクロールアニメーション（クライアントコンポーネント）
+ * 詳細を持つ項目だけ、クリックで詳細モーダルを表示
  */
 export function SponsorLogoLoop({ sponsors, onReady }: SponsorLogoLoopProps) {
   const { messages } = useChromeNav();
@@ -83,6 +84,13 @@ export function SponsorLogoLoop({ sponsors, onReady }: SponsorLogoLoopProps) {
           <SponsorWordmark title={title} />
         );
 
+      // 名前と表示順しか持たない項目は押せない。開いても名前だけのモーダルになるため
+      // （協賛・協力ページのタイルと同じ判定。#478 で広告掲載・Special Thanks も流すようになり、
+      // 押せても何も出ない項目がタブ順に70件以上並んでいた）
+      if (!hasSponsorDetails(logo.sponsor)) {
+        return copyIndex > 0 ? <span aria-hidden="true">{logoContent}</span> : logoContent;
+      }
+
       // 無限スクロール用の複製列は aria-hidden。操作要素を内包すると
       // Lighthouse違反になるため、先頭列だけをボタンにする。
       if (copyIndex > 0) {
@@ -102,13 +110,13 @@ export function SponsorLogoLoop({ sponsors, onReady }: SponsorLogoLoopProps) {
           type="button"
           onClick={() => handleSponsorClick(itemIndex)}
           className="cursor-pointer border-0 bg-transparent p-0"
-          aria-label={`${title || "協賛企業"}の詳細を見る`}
+          aria-label={messages.sponsors.viewDetail.replace("{name}", title)}
         >
           {logoContent}
         </button>
       );
     },
-    [sponsorLogos, handleSponsorClick]
+    [sponsorLogos, handleSponsorClick, messages.sponsors.viewDetail]
   );
 
   if (logos.length === 0) {

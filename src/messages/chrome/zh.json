@@ -44,6 +44,7 @@
     "viewAll": "查看赞助与协作名单",
     "logosLabel": "赞助与协作企业及团体",
     "detailLabel": "{name}的详情",
+    "viewDetail": "查看{name}的详情",
     "website": "访问网站",
     "close": "关闭"
   }
