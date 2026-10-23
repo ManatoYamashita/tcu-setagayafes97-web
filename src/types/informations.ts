@@ -2,8 +2,14 @@ import type { MicroCMSImage, MicroCMSListResponse } from "microcms-js-sdk";
 
 /**
  * 情報カテゴリ
+ *
+ * microCMS の `category`（select）の `値 : ラベル` の値部分と一致させる。
+ * ad = 広告掲載、thanks = Special Thanks（#476）。
+ * ここに無い値は `other` に丸められ、どのページにも出ない。
  */
-export type InformationCategory = "sponsor" | "faq" | "other";
+export const informationCategories = ["sponsor", "faq", "ad", "thanks", "other"] as const;
+
+export type InformationCategory = (typeof informationCategories)[number];
 
 /**
  * microCMSから返される生のInformation型
