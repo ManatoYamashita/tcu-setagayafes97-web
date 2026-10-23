@@ -14,7 +14,8 @@ interface SpecialThanksListProps {
  */
 export function SpecialThanksList({ people }: SpecialThanksListProps) {
   return (
-    <ul className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-center">
+    // 名前の中に全角スペースを含む団体があるため、横に流さず列で区切る
+    <ul className="grid gap-x-8 gap-y-4 text-center sm:grid-cols-2 lg:grid-cols-3">
       {people.map((person) => (
         <li
           key={person.id}
