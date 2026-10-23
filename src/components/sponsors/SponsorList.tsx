@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { ExternalLink, Plus, X } from "lucide-react";
 import { AppImage } from "@/components/ui/AppImage";
 import { SlidePanel } from "@/components/ui/SlidePanel";
@@ -13,8 +13,6 @@ interface SponsorListProps {
   sponsors: Information[];
 }
 
-const PANEL_TITLE_ID = "sponsor-panel-title";
-
 /**
  * 協賛・協力の一覧（ロゴまたは団体名だけのタイル）
  *
@@ -22,9 +20,11 @@ const PANEL_TITLE_ID = "sponsor-panel-title";
  * 押すと `SlidePanel`（タイムテーブルの企画詳細と同じ機構）が出て、説明・Web サイトを見せる。
  * 団体名と表示順しか持たない協賛は押せない（`hasSponsorDetails`）。
  * 開いている協賛はURLに載せない。共有する価値が無いため。
+ * 協賛と広告掲載の2か所で使うため、パネル見出しの id は `useId()` で一意にする（#476）。
  */
 export function SponsorList({ sponsors }: SponsorListProps) {
   const [selected, setSelected] = useState<Information | null>(null);
+  const panelTitleId = useId();
 
   return (
     <>
@@ -38,9 +38,15 @@ export function SponsorList({ sponsors }: SponsorListProps) {
       <SlidePanel
         open={selected !== null}
         onClose={() => setSelected(null)}
-        labelledBy={PANEL_TITLE_ID}
+        labelledBy={panelTitleId}
       >
-        {selected && <SponsorPanelBody sponsor={selected} onClose={() => setSelected(null)} />}
+        {selected && (
+          <SponsorPanelBody
+            sponsor={selected}
+            titleId={panelTitleId}
+            onClose={() => setSelected(null)}
+          />
+        )}
       </SlidePanel>
     </>
   );
@@ -92,7 +98,15 @@ function SponsorTile({
   );
 }
 
-function SponsorPanelBody({ sponsor, onClose }: { sponsor: Information; onClose: () => void }) {
+function SponsorPanelBody({
+  sponsor,
+  titleId,
+  onClose,
+}: {
+  sponsor: Information;
+  titleId: string;
+  onClose: () => void;
+}) {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex shrink-0 justify-end border-b border-gray-200 px-4 py-2 sm:px-6">
@@ -119,10 +133,7 @@ function SponsorPanelBody({ sponsor, onClose }: { sponsor: Information; onClose:
           </div>
         )}
 
-        <h2
-          id={PANEL_TITLE_ID}
-          className="text-2xl font-bold leading-tight text-balance text-gray-900"
-        >
+        <h2 id={titleId} className="text-2xl font-bold leading-tight text-balance text-gray-900">
           {sponsor.title}
         </h2>
 

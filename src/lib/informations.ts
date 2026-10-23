@@ -1,20 +1,21 @@
 import { isMicrocmsConfigured, isMicrocmsNotFound, microcmsGet } from "./microcms";
 import { SPONSORS_CACHE_TAG } from "./revalidate-targets";
-import type {
-  Information,
-  InformationListResponse,
-  InformationCategory,
-  RawInformation,
-  RawInformationListResponse,
+import {
+  informationCategories,
+  type Information,
+  type InformationListResponse,
+  type InformationCategory,
+  type RawInformation,
+  type RawInformationListResponse,
 } from "@/types/informations";
 
 /**
  * microCMSから返されるcategoryフィールドを正規化
  * 配列形式 ["sponsor : 協賛企業"] や文字列形式 "sponsor" に対応
  * @param category microCMSのcategoryフィールド
- * @returns 正規化されたInformationCategory
+ * @returns 正規化されたInformationCategory。未知の値は "other"
  */
-function normalizeInformationCategory(
+export function normalizeInformationCategory(
   category: string[] | string | undefined
 ): InformationCategory {
   if (!category) {
@@ -29,11 +30,11 @@ function normalizeInformationCategory(
 
   const cleanCategory = rawCategory.split(":")[0].trim().toLowerCase();
 
-  if (cleanCategory === "sponsor" || cleanCategory === "faq" || cleanCategory === "other") {
-    return cleanCategory;
-  }
+  return isInformationCategory(cleanCategory) ? cleanCategory : "other";
+}
 
-  return "other";
+function isInformationCategory(value: string): value is InformationCategory {
+  return (informationCategories as readonly string[]).includes(value);
 }
 
 /**
@@ -62,11 +63,17 @@ function normalizeInformation(rawInfo: RawInformation): Information {
  */
 
 /**
- * 協賛企業一覧を取得
- * @returns 協賛企業の配列（優先度順）
+ * 協賛・広告掲載・Special Thanks を表示順（`priority` の降順）で取得し、カテゴリで絞る
+ *
+ * 3つとも同じリクエストを使う。協賛・協力ページで3つを並べて呼んでも Next.js の fetch 重複排除で
+ * HTTP 要求は1本にまとまり、`SPONSORS_CACHE_TAG` の失効も3つに同時に効く。
+ * `limit: 100` は全カテゴリの合計にかかる（2026-10-23 時点で協賛 58 件）。超えるならページングが要る。
  * @throws microCMS から取得できなかった場合（空配列にはしない。#287）
  */
-export async function getSponsorsList(): Promise<Information[]> {
+async function getPriorityOrderedList(
+  category: Extract<InformationCategory, "sponsor" | "ad" | "thanks">,
+  caller: string
+): Promise<Information[]> {
   if (!isMicrocmsConfigured) return [];
   try {
     const response = await microcmsGet<RawInformationListResponse>({
@@ -83,14 +90,39 @@ export async function getSponsorsList(): Promise<Information[]> {
       },
     });
     // select は API の filters で絞れない（上記コメント参照）。正規化後の値で絞る
-    return response.contents
-      .map(normalizeInformation)
-      .filter((info) => info.category === "sponsor");
+    return response.contents.map(normalizeInformation).filter((info) => info.category === category);
   } catch (error) {
     // 「0件」と「取れなかった」を区別するため、空配列にせず投げる（#287）
-    console.error("[getSponsorsList] Error:", error);
+    console.error(`[${caller}] Error:`, error);
     throw error;
   }
+}
+
+/**
+ * 協賛企業一覧を取得
+ * @returns 協賛企業の配列（優先度順）
+ * @throws microCMS から取得できなかった場合（空配列にはしない。#287）
+ */
+export async function getSponsorsList(): Promise<Information[]> {
+  return getPriorityOrderedList("sponsor", "getSponsorsList");
+}
+
+/**
+ * 広告掲載一覧を取得（#476）
+ * @returns 広告掲載の配列（優先度順）
+ * @throws microCMS から取得できなかった場合
+ */
+export async function getAdsList(): Promise<Information[]> {
+  return getPriorityOrderedList("ad", "getAdsList");
+}
+
+/**
+ * Special Thanks 一覧を取得（#476）
+ * @returns Special Thanks の配列（優先度順）
+ * @throws microCMS から取得できなかった場合
+ */
+export async function getSpecialThanksList(): Promise<Information[]> {
+  return getPriorityOrderedList("thanks", "getSpecialThanksList");
 }
 
 /**

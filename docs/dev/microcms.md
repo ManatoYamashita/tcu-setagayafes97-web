@@ -102,11 +102,11 @@ News API の任意フィールド `cta` は、記事詳細に表示する「詳�
 `src/lib/*.ts` の正規化関数はホワイトリスト方式で、想定外の値をすべてフォールバック値へ落とす。
 
 ```typescript
-// src/lib/informations.ts
-if (cleanCategory === "sponsor" || cleanCategory === "faq" || cleanCategory === "other") {
-  return cleanCategory;
-}
-return "other"; // ← 新しい選択肢はここに吸い込まれる
+// src/lib/informations.ts（候補は src/types/informations.ts の informationCategories）
+// 2026-10-23 に ad（広告掲載）/ thanks（Special Thanks）を足した（#476）
+return isInformationCategory(cleanCategory) ? cleanCategory : "other";
+// ↑ 候補に無い選択肢は "other" に吸い込まれる。other はどのページにも出ないため、
+//   informationCategories に足し忘れると入稿しても表示されない
 ```
 
 **エラーにならない。** 入稿側では新しい選択肢が選べているため、原因にたどり着くまで時間がかかる。

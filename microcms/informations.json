@@ -9,7 +9,9 @@
       "selectItems": [
         { "id": "JTUkzbRFIv", "value": "sponsor : 協賛企業" },
         { "id": "vVfH91UxAq", "value": "faq : FAQ" },
-        { "id": "mCFnoWmiXG", "value": "other : その他" }
+        { "id": "mCFnoWmiXG", "value": "other : その他" },
+        { "id": "zeTZRPaMqw", "value": "ad : 広告掲載" },
+        { "id": "rp_OcXJW3j", "value": "thanks : Special Thanks" }
       ],
       "multipleSelect": false,
       "initialValue": ["DEFAULT"]

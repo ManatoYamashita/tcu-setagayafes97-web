@@ -92,7 +92,7 @@ async function resolveTargetPath(
       return resolveDraftPreviewPath(api, id);
     }
     case "informations":
-      // 単一コンテンツの詳細ページを持たない（協賛一覧とFAQの構成要素にしかならない）。
+      // 単一コンテンツの詳細ページを持たない（協賛・協力ページとFAQの構成要素にしかならない）。
       // この API には画面プレビューを設定しない運用だが、設定されても安全に断る
       return null;
   }
