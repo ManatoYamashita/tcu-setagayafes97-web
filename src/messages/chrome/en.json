@@ -42,8 +42,9 @@
   "sponsors": {
     "heading": "Sponsors & Supporters",
     "viewAll": "View all sponsors and supporters",
-    "logosLabel": "Sponsor logos",
+    "logosLabel": "Sponsors and supporters",
     "detailLabel": "Details of {name}",
+    "viewDetail": "View details of {name}",
     "website": "Visit website",
     "close": "Close"
   }

@@ -126,6 +126,18 @@ export async function getSpecialThanksList(): Promise<Information[]> {
 }
 
 /**
+ * フッター上の協賛バーに流す一覧を取得（#478）
+ *
+ * 協賛企業 → 広告掲載 → Special Thanks の順につなぐ。各カテゴリの中は優先度順で、
+ * 協賛・協力ページの節の並びと同じになる。取得は上の3つと同じリクエストを共有する。
+ * @throws microCMS から取得できなかった場合
+ */
+export async function getSponsorBannerList(): Promise<Information[]> {
+  const lists = await Promise.all([getSponsorsList(), getAdsList(), getSpecialThanksList()]);
+  return lists.flat();
+}
+
+/**
  * よくある質問（FAQ）一覧を取得
  * @returns FAQの配列
  * @throws microCMS から取得できなかった場合

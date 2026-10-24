@@ -1,7 +1,8 @@
 /**
  * 協賛・協力ページとトップの協賛バーで使う文言
  *
- * 協賛企業そのもの（社名・ロゴ・URL）は microCMS `informations` の `sponsor` が持つ。
+ * 協賛企業・広告掲載・スペシャルサンクスそのもの（社名・ロゴ・URL）は microCMS `informations` の
+ * `sponsor` / `ad` / `thanks` が持つ。
  * ここに置くのはページの枠組みの文言だけ。
  */
 export const sponsorsPageContent = {
@@ -14,12 +15,12 @@ export const sponsorsPageContent = {
   countSuffix: "の企業・団体",
   /**
    * 節の見出し。microCMS `informations` の category（sponsor / ad / thanks）ごとに1節。
-   * 0件の節は出さない（#476）
+   * 0件の節は出さない（#476）。見出しの呼び方は委員会の指定（#478）
    */
   sectionHeadings: {
-    sponsor: "協賛・協力一覧",
-    ad: "広告掲載一覧",
-    thanks: "Special Thanks",
+    sponsor: "協賛企業",
+    ad: "広告掲載",
+    thanks: "スペシャルサンクス",
   },
   /** 3つの節がすべて0件のとき */
   emptyMessage: "現在、協賛・協力の情報は準備中です。",
