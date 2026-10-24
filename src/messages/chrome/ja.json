@@ -47,5 +47,11 @@
     "viewDetail": "{name}の詳細を見る",
     "website": "Webサイトを見る",
     "close": "閉じる"
+  },
+  "ads": {
+    "heading": "広告掲載",
+    "label": "広告",
+    "close": "広告を閉じる",
+    "newTab": "（新しいタブで開きます）"
   }
 }

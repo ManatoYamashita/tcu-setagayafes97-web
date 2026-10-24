@@ -47,5 +47,11 @@
     "viewDetail": "View details of {name}",
     "website": "Visit website",
     "close": "Close"
+  },
+  "ads": {
+    "heading": "Advertisements",
+    "label": "Ad",
+    "close": "Close ad",
+    "newTab": "(opens in a new tab)"
   }
 }

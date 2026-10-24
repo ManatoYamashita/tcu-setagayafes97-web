@@ -47,5 +47,11 @@
     "viewDetail": "查看{name}的详情",
     "website": "访问网站",
     "close": "关闭"
+  },
+  "ads": {
+    "heading": "广告",
+    "label": "广告",
+    "close": "关闭广告",
+    "newTab": "（在新标签页中打开）"
   }
 }

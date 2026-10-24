@@ -47,5 +47,11 @@
     "viewDetail": "{name} 상세 정보 보기",
     "website": "웹사이트 보기",
     "close": "닫기"
+  },
+  "ads": {
+    "heading": "광고",
+    "label": "광고",
+    "close": "광고 닫기",
+    "newTab": "(새 탭에서 열림)"
   }
 }

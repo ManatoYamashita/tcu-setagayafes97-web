@@ -262,7 +262,7 @@ CI 緑・マージ済みのまま本番だけが40分以上古いまま取り残
   - `sns` は**テキストフィールド1つ**（カスタムフィールドではない）。1企画につきSNSリンクは1件のみ
   - `special` は著名人企画LP用のカスタムフィールド（想定は `type = special` のみ。ただし `openTime` はステージ企画にも入稿されており、値があれば種別を問わずタイムテーブルに出る）。中身は `logo` / `photos` / `openTime` / `goods` / `tickets` / `notices` ほか。詳細は `microcms/README.md`
   - `select` の値は `day1 : 10月31日（土）` のように **`値 : ラベル`** 形式。コード側は `split(":")` で先頭を取り出す
-- **Informations API**: `category` (sponsor/faq/ad/thanks/other。ad = 広告掲載・thanks = Special Thanks は `/about/sponsors` の節で、協賛と一緒にフッター上のロゴ帯にも流れる。#476 / #478), `title`, `description`, `image`, `url`, `priority`
+- **Informations API**: `category` (sponsor/faq/ad/thanks/other。ad = 広告掲載・thanks = Special Thanks は `/about/sponsors` の節。thanks は協賛とロゴ帯に流れ、ad はフッター上の広告欄とモバイルの固定バナーに出る。#476 / #478 / #481), `title`, `description`, `image`, `url`, `priority`
 
 ### 取得に失敗したとき（#287）
 
