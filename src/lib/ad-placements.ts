@@ -8,6 +8,12 @@ import { splitLocalePrefix } from "@/i18n/localized-pathnames";
  * docs/frontend/ad-placements.md を参照。
  */
 
+/** 固定バナーを退かせる領域（フッター上の広告欄から下）の目印。Footer.tsx が付ける */
+export const AD_DOCK_STOP_ATTRIBUTE = "data-ad-dock-stop";
+
+/** 広告欄の見出し。固定バナーの閉じるボタンを押した後のフォーカスの行き先 */
+export const AD_BANNERS_HEADING_ID = "ad-banners-heading";
+
 /**
  * モバイルの固定バナーを出すページかどうか
  *

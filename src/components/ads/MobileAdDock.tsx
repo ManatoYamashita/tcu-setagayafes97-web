@@ -4,12 +4,14 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 import { useChromeNav } from "@/components/layout/useChromeNav";
-import { pickAd, shouldShowMobileAdDock } from "@/lib/ad-placements";
+import {
+  AD_BANNERS_HEADING_ID,
+  AD_DOCK_STOP_ATTRIBUTE,
+  pickAd,
+  shouldShowMobileAdDock,
+} from "@/lib/ad-placements";
 import type { Information } from "@/types/informations";
 import { AdBannerLink } from "./AdBannerLink";
-
-/** 固定バナーを隠す領域（フッター上の広告欄から下）の目印。Footer.tsx が付ける */
-export const AD_DOCK_STOP_ATTRIBUTE = "data-ad-dock-stop";
 
 /**
  * 閉じた状態の記憶。寿命はタブ1つ分（`sessionStorage`）。
@@ -55,11 +57,15 @@ function getNull(): null {
  * モバイル（md 未満）の画面下部に固定する広告バナー（#481）
  *
  * - `/` と `/special/[id]` では出さない（`shouldShowMobileAdDock`）
- * - フッター上の広告欄から下が画面に入ったら隠す（MobileTicketCTA と同じ方式）。
- *   中にフォーカスがある間は隠さない
+ * - フッター上の広告欄から下が画面に入ったら、画面の下へ退かせる（MobileTicketCTA と同じ判定）
  * - 閉じたら、そのタブの間は出さない。sessionStorage が使えなければ、その表示の間だけ閉じる
  * - 出ている間は `<html>` に scroll-padding-bottom を付け、Tab で移ったフォーカスが
  *   バナーの下に隠れないようにする（WCAG 2.4.11）
+ *
+ * **退かせるときもアンマウントしない。** DOM の位置はフッターの広告欄の直前なので、Tab で
+ * ここへ来るころにはフッター側が見えている。アンマウントしていると閉じるボタンへキーボードで
+ * 一度も届かない（マウスでは押せるのに）。画面外へ退かせたまま Tab の順に残し、
+ * 中にフォーカスが来たら引き上げる（スキップリンクと同じ考え方）。
  */
 export function MobileAdDock({ ads }: { ads: Information[] }) {
   const { messages } = useChromeNav();
@@ -72,12 +78,9 @@ export function MobileAdDock({ ads }: { ads: Information[] }) {
   const [hasFocusWithin, setHasFocusWithin] = useState(false);
 
   const ad = random === null ? null : pickAd(ads, random);
-  const isVisible =
-    ad !== null &&
-    shouldShowMobileAdDock(pathname) &&
-    !storedDismissed &&
-    !dismissedHere &&
-    (!isStopAreaVisible || hasFocusWithin);
+  const isMounted =
+    ad !== null && shouldShowMobileAdDock(pathname) && !storedDismissed && !dismissedHere;
+  const isVisible = isMounted && (!isStopAreaVisible || hasFocusWithin);
 
   useEffect(() => {
     if (!("IntersectionObserver" in window)) return;
@@ -104,10 +107,12 @@ export function MobileAdDock({ ads }: { ads: Information[] }) {
     };
   }, [isVisible]);
 
-  if (!isVisible || ad === null) return null;
+  if (!isMounted || ad === null) return null;
 
   const dismiss = () => {
     setDismissedHere(true);
+    // 押したボタンが消えるとフォーカスが文書の先頭へ戻るため、続きの広告欄の見出しへ移す
+    document.getElementById(AD_BANNERS_HEADING_ID)?.focus({ preventScroll: true });
     try {
       window.sessionStorage.setItem(DISMISSED_KEY, "1");
     } catch {
@@ -120,7 +125,9 @@ export function MobileAdDock({ ads }: { ads: Information[] }) {
     <aside
       ref={dockRef}
       aria-label={messages.ads.label}
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-8px_24px_rgba(29,4,40,0.16)] md:hidden"
+      className={`fixed inset-x-0 bottom-0 z-30 border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-8px_24px_rgba(29,4,40,0.16)] motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out md:hidden ${
+        isVisible ? "" : "pointer-events-none translate-y-[calc(100%+24px)]"
+      }`}
       onFocus={() => setHasFocusWithin(true)}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setHasFocusWithin(false);

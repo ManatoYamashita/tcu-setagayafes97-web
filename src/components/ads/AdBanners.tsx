@@ -17,8 +17,9 @@ export async function AdBanners() {
 
   return (
     <>
-      <AdBannersView ads={ads} />
+      {/* 固定バナーを先に置く。Tab の順で、本文の次・広告欄の前に来る */}
       <MobileAdDock ads={ads} />
+      <AdBannersView ads={ads} />
     </>
   );
 }
