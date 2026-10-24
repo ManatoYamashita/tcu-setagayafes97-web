@@ -1,35 +1,29 @@
+import type { CSSProperties, ReactNode } from "react";
 import { AppImage } from "@/components/ui/AppImage";
+import { adImageSize } from "@/lib/ad-placements";
 import type { Information } from "@/types/informations";
 
-interface AdBannerLinkProps {
+interface AdLinkProps {
   ad: Information;
-  /** `AppImage` の sizes。置き場所ごとに表示幅が違う */
-  sizes: string;
   /** 外部リンクに添える「新しいタブで開きます」（ロケール別） */
   newTabLabel: string;
   className?: string;
+  style?: CSSProperties;
+  children: ReactNode;
 }
 
 /**
- * 広告バナー1枚（#481）
+ * 広告1件の外枠。`url` があれば外部リンク、無ければただの枠にする
  *
- * 横長の枠（9:2）に `image` を収める。画像が無ければ団体名を文字で出す。
- * `url` があれば外部リンクにし、無ければただの枠にする。リンクの名前は団体名。
- * 広告欄（`AdBannersView`）とモバイルの固定バナー（`MobileAdDock`）で共有する。
+ * 広告欄のバナー（`AdBannerLink`）とモバイルの固定バナー（`MobileAdDock`）で共有する。
  */
-export function AdBannerLink({ ad, sizes, newTabLabel, className = "" }: AdBannerLinkProps) {
-  const face = ad.image?.url ? (
-    <AppImage src={ad.image.url} alt={ad.title} fill className="object-contain" sizes={sizes} />
-  ) : (
-    <span className="px-3 text-center text-sm font-bold text-balance [overflow-wrap:anywhere] text-gray-900 md:text-base">
-      {ad.title}
-    </span>
-  );
-
-  const frameClassName = `relative flex aspect-[9/2] w-full items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white ${className}`;
-
+export function AdLink({ ad, newTabLabel, className = "", style, children }: AdLinkProps) {
   if (!ad.url) {
-    return <div className={frameClassName}>{face}</div>;
+    return (
+      <div className={className} style={style}>
+        {children}
+      </div>
+    );
   }
 
   return (
@@ -37,10 +31,58 @@ export function AdBannerLink({ ad, sizes, newTabLabel, className = "" }: AdBanne
       href={ad.url}
       target="_blank"
       rel="noopener noreferrer sponsored"
-      className={`${frameClassName} transition-[border-color,box-shadow] hoverable:hover:border-primary-300 hoverable:hover:shadow-md focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600`}
+      className={`${className} focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-primary-600`}
+      style={style}
     >
-      {face}
+      {children}
       <span className="sr-only">{newTabLabel}</span>
     </a>
+  );
+}
+
+interface AdBannerLinkProps {
+  ad: Information;
+  newTabLabel: string;
+}
+
+/**
+ * 広告バナー1枚（#481 / #485）
+ *
+ * 入稿された画像の大きさ（縦横比）のまま出す。拡大はせず、狭い画面では親の幅まで縮める。
+ * 広告そのもののデザインを崩さないよう、画像には枠線を付けない。
+ * 画像が無ければ、団体名を横長（9:2）の枠に文字で出す。リンクの名前は団体名。
+ */
+export function AdBannerLink({ ad, newTabLabel }: AdBannerLinkProps) {
+  if (!ad.image?.url) {
+    return (
+      <AdLink
+        ad={ad}
+        newTabLabel={newTabLabel}
+        className="flex aspect-[9/2] w-[360px] max-w-full items-center justify-center rounded-lg border border-gray-200 bg-white px-3 transition-[border-color,box-shadow] hoverable:hover:border-primary-300 hoverable:hover:shadow-md"
+      >
+        <span className="text-center text-sm font-bold text-balance [overflow-wrap:anywhere] text-gray-900 md:text-base">
+          {ad.title}
+        </span>
+      </AdLink>
+    );
+  }
+
+  const { width, height } = adImageSize(ad.image);
+
+  return (
+    <AdLink
+      ad={ad}
+      newTabLabel={newTabLabel}
+      className="relative block max-w-full overflow-hidden rounded-lg transition-shadow hoverable:hover:shadow-md"
+      style={{ width, aspectRatio: `${width} / ${height}` }}
+    >
+      <AppImage
+        src={ad.image.url}
+        alt={ad.title}
+        fill
+        className="object-contain"
+        sizes={`${width}px`}
+      />
+    </AdLink>
   );
 }

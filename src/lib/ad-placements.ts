@@ -41,3 +41,26 @@ export function pickAd<T>(ads: readonly T[], random: number): T | null {
   const index = Math.min(ads.length - 1, Math.max(0, Math.floor(random * ads.length)));
   return ads[index];
 }
+
+/** 寸法がまったく分からない広告画像の一辺（CSS px） */
+const AD_FALLBACK_SIDE = 300;
+
+/**
+ * 広告画像の表示寸法（CSS px）。入稿された画像の大きさのまま出す（#485）
+ *
+ * 広告の画像は 300×250 のような広告の定番寸法で入稿されることが多く、決まった枠の
+ * 縦横比に当てはめると大きく縮む。拡大はせず、狭い画面では親の幅まで縮める（呼び出し側の max-w-full）。
+ * 寸法が欠けている画像は正方形とみなす（0 や undefined で割らない。`toSponsorLogos()` と同じ扱い）。
+ */
+export function adImageSize(image: { width?: number; height?: number }): {
+  width: number;
+  height: number;
+} {
+  const width = image.width && image.width > 0 ? image.width : 0;
+  const height = image.height && image.height > 0 ? image.height : 0;
+  if (width === 0 || height === 0) {
+    const side = width || height || AD_FALLBACK_SIDE;
+    return { width: side, height: side };
+  }
+  return { width, height };
+}
