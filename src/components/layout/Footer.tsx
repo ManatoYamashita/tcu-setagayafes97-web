@@ -2,6 +2,7 @@ import { FooterNav } from "@/components/layout/FooterNav";
 import { FooterCopyright, FooterLogo } from "@/components/layout/FooterBrand";
 import { SocialIcons } from "@/components/ui/SocialIcons";
 import { SponsorBanner } from "@/components/layout/SponsorBanner";
+import { AdBanners } from "@/components/ads/AdBanners";
 
 /**
  * 共通フッター
@@ -14,7 +15,9 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <div className="bg-white">
+    // data-ad-dock-stop: ここから下が見えたらモバイルの固定広告を隠す（MobileAdDock）
+    <div className="bg-white" data-ad-dock-stop>
+      <AdBanners />
       <SponsorBanner />
       <footer className="relative bg-primary-600 rounded-t-3xl">
         <div className="container mx-auto px-4 py-8">

@@ -16,7 +16,7 @@ interface SponsorLogoLoopProps {
 }
 
 /**
- * 協賛・広告掲載・Special Thanks のロゴの無限スクロールアニメーション（クライアントコンポーネント）
+ * 協賛・Special Thanks のロゴの無限スクロールアニメーション（クライアントコンポーネント）
  * 詳細を持つ項目だけ、クリックで詳細モーダルを表示
  */
 export function SponsorLogoLoop({ sponsors, onReady }: SponsorLogoLoopProps) {
@@ -85,8 +85,8 @@ export function SponsorLogoLoop({ sponsors, onReady }: SponsorLogoLoopProps) {
         );
 
       // 名前と表示順しか持たない項目は押せない。開いても名前だけのモーダルになるため
-      // （協賛・協力ページのタイルと同じ判定。#478 で広告掲載・Special Thanks も流すようになり、
-      // 押せても何も出ない項目がタブ順に70件以上並んでいた）
+      // （協賛・協力ページのタイルと同じ判定。#478 で広告掲載・Special Thanks も流したとき、
+      // 押せても何も出ない項目がタブ順に70件以上並んだ。広告掲載は #481 でバーから外した）
       if (!hasSponsorDetails(logo.sponsor)) {
         return copyIndex > 0 ? <span aria-hidden="true">{logoContent}</span> : logoContent;
       }

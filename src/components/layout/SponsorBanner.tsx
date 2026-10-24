@@ -7,7 +7,7 @@ import { SponsorLogoLoopLoader } from "@/components/home/SponsorLogoLoopLoader";
 /**
  * 協賛バナー（サーバーコンポーネント）
  * データ取得のみ担当し、表示はクライアントコンポーネントに委譲
- * ロゴ帯には協賛企業・広告掲載・Special Thanks をまとめて流す（#478）
+ * ロゴ帯には協賛企業と Special Thanks をまとめて流す（#478。広告掲載は #481 で AdBanners へ移した）
  * ロゴ帯の下に一覧ページへの CTA を置く
  */
 export async function SponsorBanner() {
