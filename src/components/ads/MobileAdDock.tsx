@@ -4,14 +4,16 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 import { useChromeNav } from "@/components/layout/useChromeNav";
+import { AppImage } from "@/components/ui/AppImage";
 import {
   AD_BANNERS_HEADING_ID,
   AD_DOCK_STOP_ATTRIBUTE,
+  adImageSize,
   pickAd,
   shouldShowMobileAdDock,
 } from "@/lib/ad-placements";
 import type { Information } from "@/types/informations";
-import { AdBannerLink } from "./AdBannerLink";
+import { AdLink } from "./AdBannerLink";
 
 /**
  * 閉じた状態の記憶。寿命はタブ1つ分（`sessionStorage`）。
@@ -109,6 +111,8 @@ export function MobileAdDock({ ads }: { ads: Information[] }) {
 
   if (!isMounted || ad === null) return null;
 
+  const imageSize = adImageSize(ad.image ?? {});
+
   const dismiss = () => {
     setDismissedHere(true);
     // 押したボタンが消えるとフォーカスが文書の先頭へ戻るため、続きの広告欄の見出しへ移す
@@ -134,19 +138,33 @@ export function MobileAdDock({ ads }: { ads: Information[] }) {
       }}
     >
       <div className="mx-auto flex max-w-md items-center gap-2 py-2 ps-3 pe-1">
-        <div className="relative min-w-0 flex-1">
-          <AdBannerLink
-            ad={ad}
-            sizes="(min-width: 28rem) 400px, 100vw"
-            newTabLabel={messages.ads.newTab}
-          />
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute start-1 top-1 rounded bg-gray-700 px-1.5 py-0.5 text-xs leading-none font-bold text-white"
-          >
-            {messages.ads.label}
+        {/* 画像は入稿された縦横比のまま高さ 96px に縮め、横に社名を並べる（#485）。
+            300×250 のような広告をそのまま出すと画面の約3分の1を覆うため */}
+        <AdLink
+          ad={ad}
+          newTabLabel={messages.ads.newTab}
+          className="flex min-w-0 flex-1 items-center gap-3 rounded-lg"
+        >
+          {ad.image?.url && (
+            <span
+              className="relative h-24 max-w-[40vw] shrink-0 overflow-hidden rounded"
+              style={{ aspectRatio: `${imageSize.width} / ${imageSize.height}` }}
+            >
+              <AppImage src={ad.image.url} alt="" fill className="object-contain" sizes="40vw" />
+            </span>
+          )}
+          <span className="flex min-w-0 flex-col items-start gap-1">
+            <span
+              aria-hidden="true"
+              className="rounded bg-gray-700 px-1.5 py-0.5 text-xs leading-none font-bold text-white"
+            >
+              {messages.ads.label}
+            </span>
+            <span className="text-sm leading-snug font-bold [overflow-wrap:anywhere] text-gray-900">
+              {ad.title}
+            </span>
           </span>
-        </div>
+        </AdLink>
         <button
           type="button"
           onClick={dismiss}

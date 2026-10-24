@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { PageSheetLayout } from "@/components/layout/PageSheetLayout";
-import { SpecialThanksList } from "@/components/sponsors/SpecialThanksList";
+import { AdBannerList } from "@/components/ads/AdBannerList";
 import { SponsorList } from "@/components/sponsors/SponsorList";
 import { pageHeroes } from "@/data/page-heroes";
 import { sponsorsPageContent } from "@/data/sponsors";
@@ -9,7 +9,8 @@ import { createPageMetadata } from "@/lib/metadata";
 import { getChromeMessages } from "@/i18n/chrome-messages";
 
 /** ページの呼称はカタログ1箇所で決める。フッターのリンク文言と同じ値を使う */
-const { sponsors: sponsorsLabel } = getChromeMessages("ja").navigation;
+const { navigation, ads: adMessages } = getChromeMessages("ja");
+const sponsorsLabel = navigation.sponsors;
 
 /**
  * メタデータ
@@ -31,7 +32,9 @@ export const revalidate = 600;
  *
  * トップと /about の協賛バー（SponsorBanner）の CTA から遷移してくる。
  * 見出しはバーと同じ「協賛・協力」にそろえる。
- * 協賛企業の下に広告掲載・スペシャルサンクスの節を並べる（#476 / #478）。0件の節は出さない。
+ * 節の並びは 広告掲載 → 協賛企業 → スペシャルサンクス（#485）。0件の節は出さない。
+ * 広告掲載は入稿画像の大きさのバナー（フッター上の広告欄と同じ `AdBannerList`）、
+ * スペシャルサンクスは協賛企業と同じタイル（`SponsorList`）で出す。
  * 3つの取得は同じリクエストを共有する（`src/lib/informations.ts`）。
  */
 export default async function SponsorsPage() {
@@ -55,6 +58,12 @@ export default async function SponsorsPage() {
           ))}
         </div>
 
+        {ads.length > 0 && (
+          <ListSection id="ad-list-heading" heading={sectionHeadings.ad}>
+            <AdBannerList ads={ads} newTabLabel={adMessages.newTab} />
+          </ListSection>
+        )}
+
         {sponsors.length > 0 && (
           <ListSection
             id="sponsor-list-heading"
@@ -66,20 +75,14 @@ export default async function SponsorsPage() {
           </ListSection>
         )}
 
-        {ads.length > 0 && (
+        {specialThanks.length > 0 && (
           <ListSection
-            id="ad-list-heading"
-            heading={sectionHeadings.ad}
-            count={ads.length}
+            id="special-thanks-heading"
+            heading={sectionHeadings.thanks}
+            count={specialThanks.length}
             countSuffix={countSuffix}
           >
-            <SponsorList sponsors={ads} />
-          </ListSection>
-        )}
-
-        {specialThanks.length > 0 && (
-          <ListSection id="special-thanks-heading" heading={sectionHeadings.thanks}>
-            <SpecialThanksList people={specialThanks} />
+            <SponsorList sponsors={specialThanks} />
           </ListSection>
         )}
 
@@ -94,7 +97,7 @@ export default async function SponsorsPage() {
 }
 
 /**
- * 一覧の節（見出し＋件数）。件数は企業・団体を数える節にだけ出す
+ * 一覧の節（見出し＋件数）。件数はタイルで並べる節（協賛企業・スペシャルサンクス）にだけ出す
  */
 function ListSection({
   id,
